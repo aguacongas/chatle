@@ -1,0 +1,20 @@
+﻿{
+    "DatabaseEngine": "Redis",
+    "CreateDatabase": "false",
+    "Data": {
+        "DefaultConnection": {
+            "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnetvnext-Chat.CMACGM-97825e42-e3bf-46b3-b5fe-c1bdf56ab00a;Trusted_Connection=True;MultipleActiveResultSets=true"
+        },
+        "Redis": {
+            "Hostname": "localhost"
+        }
+    },
+    "Identity": {
+        "Password": {
+            "RequireDigit" : "false",
+            "RequireLowercase" : "false",
+            "RequireUppercase" : "false",
+            "RequireNonLetterOrDigit" : "false"
+        }
+    }
+}
