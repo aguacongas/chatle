@@ -1,13 +1,11 @@
 ﻿using System;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Routing;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Chat.CMACGM.Models;
-using Microsoft.AspNet.SignalR;
 using Microsoft.Data.Entity.Redis.Extensions;
 
 namespace Chat.CMACGM
@@ -77,7 +75,7 @@ namespace Chat.CMACGM
                         if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
                             port = 6379;
                         int.TryParse(Configuration.Get("Data: Redis:Database"), out database);
-
+                        
                         options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
                         break;
                 }
@@ -100,7 +98,9 @@ namespace Chat.CMACGM
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseStaticFiles()
+            app.UseBrowserLink()
+               .UseErrorPage()
+               .UseStaticFiles()
                .UseIdentity()
                .UseMvc(routes =>
                {

@@ -1,26 +1,29 @@
 ﻿{
-    "webroot" : "wwwroot",
+    "webroot": "wwwroot",
     "exclude": "wwwroot/**/*.*",
+    "version": "1.0.0-*",
     "dependencies": {
-        "EntityFramework.InMemory": "7.0.0-*",
-        "EntityFramework.Redis": "7.0.0-*",
-        "EntityFramework.SQLite": "7.0.0-*",
-        "EntityFramework.SqlServer": "7.0.0-*",
-        "Microsoft.AspNet.Diagnostics": "1.0.0-*", 
-        "Microsoft.AspNet.Mvc": "6.0.0-*",
-        "Microsoft.AspNet.Identity": "3.0.0-*",
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-*",
-        "Microsoft.AspNet.Security.Cookies": "1.0.0-*",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-*",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-*",
-        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
-        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-*",
-        "Microsoft.AspNet.SignalR.Server": "3.0.0-*"
+        "Kestrel": "1.0.0-beta1",
+        "EntityFramework.InMemory": "7.0.0-beta1",
+        "EntityFramework.Redis": "7.0.0-beta1",
+        "EntityFramework.SQLite": "7.0.0-beta1",
+        "EntityFramework.SqlServer": "7.0.0-beta1",
+        "Microsoft.AspNet.Diagnostics": "1.0.0-beta1",
+        "Microsoft.AspNet.Mvc": "6.0.0-beta1",
+        "Microsoft.AspNet.Identity": "3.0.0-beta1",
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta1",
+        "Microsoft.AspNet.Security.Cookies": "1.0.0-beta1",
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta1",
+        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta1",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta1",
+        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta1",
+        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1",
+        "Microsoft.AspNet.SignalR.Server": "3.0.0-beta1"
     },
     "commands": {
         /* Change the port number when you are self hosting this application */
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000"
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
+        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5000"
     },
     "frameworks": {
         "aspnet50" : { },
