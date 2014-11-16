@@ -59,12 +59,6 @@ namespace Chat.CMACGM.Hubs
             return dbContext.SetConnectionStatus(name, Context.ConnectionId, isConnected);
         }
 
-        public IEnumerable<string> Get()
-        {
-            var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
-            return dbContext.Users.Where(x => x.IsConnected && x.UserName != Context.User.Identity.Name).Select(x => x.UserName);
-        }
-
         public bool PostMessage(Message message)
         {
             Trace.TraceInformation("[ChatHub] SendMsg {0} {1}", message.To, message.Text);
@@ -74,13 +68,6 @@ namespace Chat.CMACGM.Hubs
             var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
             dbContext.Messages.Add(message);
             return dbContext.SaveChanges() > 0;
-        }
-
-        public IEnumerable<Message> GetMessages(string name)
-        {
-            var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
-            var userName = Context.User.Identity.Name;
-            return dbContext.Messages.Where(x => (x.From == name && x.To == userName) || (x.To == name && x.From == userName)).OrderByDescending(x => x.Date);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Chat.CMACGM
                 default:
                     throw new InvalidOperationException("Database engine unsupported");
             }
-            
+
             builder.AddDbContext<ApplicationDbContext>(options =>
             {
                 switch (dbEngine)
@@ -75,7 +75,7 @@ namespace Chat.CMACGM
                         if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
                             port = 6379;
                         int.TryParse(Configuration.Get("Data: Redis:Database"), out database);
-                        
+
                         options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
                         break;
                 }
@@ -99,21 +99,21 @@ namespace Chat.CMACGM
         public void Configure(IApplicationBuilder app)
         {
             app.UseBrowserLink()
-               .UseErrorPage()
-               .UseStaticFiles()
-               .UseIdentity()
-               .UseMvc(routes =>
-               {
-                   routes.MapRoute(
+                .UseErrorPage()
+                .UseStaticFiles()
+                .UseIdentity()
+                .UseMvc(routes =>
+                {
+                    routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" });
 
-                   routes.MapRoute(
-                       name: "api",
-                       template: "{controller}/{id?}");
-               })
-               .UseSignalR();
+                    routes.MapRoute(
+                        name: "api",
+                        template: "{controller}/{id?}");
+                })
+                .UseSignalR();
         }
     }
 }

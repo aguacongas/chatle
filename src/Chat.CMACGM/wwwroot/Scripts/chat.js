@@ -19,7 +19,7 @@
         },
         showMessage: function (user) {
             viewModel.currentUser(user);
-            chatHub.server.getMessages(user)
+            $.getJSON('/chat/get/' + user)
                 .done(function (data) {
                     viewModel.messages(data);
                 });
@@ -84,7 +84,7 @@
     $.connection.hub.start()
         .done(function () {
             console.log("Chat Hub started");
-            chatHub.server.get()
+            $.getJSON('/user/get')
                 .done(function (data) {
                     viewModel.users(data);
                 });
