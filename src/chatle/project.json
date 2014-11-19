@@ -33,8 +33,8 @@
         "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5000"
     },
     "frameworks": {
-        "aspnet50": { },
-        "aspnetcore50": { }
+        "aspnet50": { }/*,
+        "aspnetcore50": { }*/
     },
     "exclude": [
         "wwwroot",

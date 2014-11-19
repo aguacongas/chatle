@@ -15,6 +15,9 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+node_modules/
+bower_components/
+wwwroot/lib/
 
 # Roslyn cache directories
 *.ide/
