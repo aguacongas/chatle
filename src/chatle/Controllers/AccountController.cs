@@ -5,9 +5,9 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
-using Chat.CMACGM.Models;
+using ChatLe.Models;
 
-namespace Chat.CMACGM.Controllers
+namespace ChatLe.Controllers
 {
     [Authorize]
     public class AccountController : Controller

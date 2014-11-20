@@ -5,10 +5,10 @@ using Microsoft.AspNet.Routing;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
-using Chat.CMACGM.Models;
+using ChatLe.Models;
 using Microsoft.Data.Entity.Redis.Extensions;
 
-namespace Chat.CMACGM
+namespace ChatLe
 {
     public class Startup
     {

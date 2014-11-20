@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Chat.CMACGM.Models
+namespace ChatLe.Models
 {
     public class ExternalLoginConfirmationViewModel
     {

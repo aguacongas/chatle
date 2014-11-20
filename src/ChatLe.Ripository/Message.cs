@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chat.CMACGM.Models
+namespace ChatLe.Models
 {
     public class Message
     {

@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Microsoft.Data.Entity.Metadata;
 
-namespace Chat.CMACGM.Models
+namespace ChatLe.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
@@ -20,6 +21,10 @@ namespace Chat.CMACGM.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Message> Messages { get; set; }
+
+        public ApplicationDbContext()
+        {
+        }
 
         public bool SetConnectionStatus(string userId, string connectionId, bool isConnected)
         {
@@ -49,6 +54,16 @@ namespace Chat.CMACGM.Models
             user.IsConnected = status;
             user.SignalRConnectionId = connectionId;
             this.SaveChanges();
+        }
+
+        protected override void OnConfiguring(DbContextOptions options)
+        {
+            base.OnConfiguring(options);
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
         }
     }
 

@@ -4,10 +4,10 @@ using Microsoft.AspNet.SignalR.Hubs;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Chat.CMACGM.Models;
+using ChatLe.Models;
 using System.Diagnostics;
 
-namespace Chat.CMACGM.Hubs
+namespace ChatLe.Hubs
 {
     [HubName("chat")]
     public class ChatHub : Hub
