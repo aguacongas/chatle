@@ -5,7 +5,9 @@
         "bootstrap": "~3.0.0",
         "jquery": "~1.10.2",
         "jquery-validation": "~1.11.1",
-        "jquery-validation-unobtrusive": "~3.2.2"
+        "jquery-validation-unobtrusive": "~3.2.2",
+        "knockout": "~3.2.0",
+        "signalr": "~2.1.2"
     },
     "exportsOverride": {
         "bootstrap": {

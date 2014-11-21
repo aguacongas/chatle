@@ -10,6 +10,7 @@ using Microsoft.AspNet.SignalR;
 
 namespace ChatLe.Controllers
 {
+    [Route("api/chat")]
     public class ChatController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -21,13 +22,13 @@ namespace ChatLe.Controllers
             _hub = manager.GetHubContext<ChatHub>();
         }
         // GET: /<controller>/
-        [HttpGet("messages")]
+        [HttpGet()]
         public IEnumerable<Message> Get(string id)
         {
             return _dbContext.Messages.Where(x => (x.From == id && x.To ==Context.User.Identity.Name) || (x.To == id && x.From == Context.User.Identity.Name)).OrderByDescending(x => x.Date);
         }
 
-        [HttpPost("message")]
+        [HttpPost()]
         public void SendMessage(Message message)
         {
             _hub.Clients.Group(message.To).messageReceived(message.Text);

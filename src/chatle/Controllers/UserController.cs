@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace ChatLe.Controllers
 {
+    [Route("api/users")]
     public class UserController : Controller
     {
         ApplicationDbContext _dbContext;
@@ -15,6 +16,7 @@ namespace ChatLe.Controllers
             _dbContext = dbContext;
         }
         // GET: /<controller>/
+        [HttpGet()]
         public IEnumerable<string> Get()
         {
             return _dbContext.Users.Where(x => x.IsConnected && x.UserName != Context.User.Identity.Name).Select(x => x.UserName);
