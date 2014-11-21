@@ -11,7 +11,6 @@ namespace chatle.test
 {
     public class IdentityModelTest
     {
-
         IServiceProvider _provider;
 
         public IdentityModelTest()
@@ -28,9 +27,18 @@ namespace chatle.test
         }
 
         [Fact]
-        public void SetConnectionStatusTest()
+        public void SetConnectionStatusOnUnExistingUserTest()
         {
             var context = _provider.GetService<ApplicationDbContext>();
+            context.SetConnectionStatus("test", "test", true);
+        }
+
+        [Fact]
+        public void SetConnectionStatusOnExistingUserTest()
+        {
+            var context = _provider.GetService<ApplicationDbContext>();
+            context.Users.Add(new ApplicationUser() { UserName = "test" });
+            context.SaveChanges();
             context.SetConnectionStatus("test", "test", true);
         }
     }

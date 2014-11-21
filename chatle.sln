@@ -16,7 +16,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle", "src\chatle\chatle
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle.test", "test\chatle.test\chatle.test.kproj", "{3CD74F78-03DA-4509-A240-520B83BE873D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository", "src\ChatLe.Ripository\ChatLe.Repository.kproj", "{A9750428-BF89-4C11-A7FC-B6001C00CFC8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository", "src\ChatLe.Repository\ChatLe.Repository.kproj", "{A9750428-BF89-4C11-A7FC-B6001C00CFC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

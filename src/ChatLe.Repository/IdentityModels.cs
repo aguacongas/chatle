@@ -58,11 +58,13 @@ namespace ChatLe.Models
 
         protected override void OnConfiguring(DbContextOptions options)
         {
+            Trace.TraceInformation("[ApplicationDbContext] OnConfiguring");
             base.OnConfiguring(options);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            Trace.TraceInformation("[ApplicationDbContext] OnModelCreating");
             base.OnModelCreating(builder);
         }
     }

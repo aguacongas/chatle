@@ -2,7 +2,7 @@
     "version": "1.0.0-*",
     "dependencies": {
         "chatle": "",
-        "ChatLe.Ripository": "",
+        "ChatLe.Repository": "",
         "EntityFramework.InMemory": "7.0.0-beta1",
         "Microsoft.AspNet.Hosting": "1.0.0-beta1",
         "Xunit.KRunner": "1.0.0-beta1"
