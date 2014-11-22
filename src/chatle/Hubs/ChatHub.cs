@@ -61,10 +61,10 @@ namespace ChatLe.Hubs
 
         public bool PostMessage(Message message)
         {
-            Trace.TraceInformation("[ChatHub] SendMsg {0} {1}", message.To, message.Text);
+            Trace.TraceInformation("[ChatHub] SendMsg {0} {1}", message.ConversationId, message.Text);
             message.From = Context.User.Identity.Name;
             message.Date = DateTime.UtcNow;
-            Clients.Group(message.To).messageReceived(message);
+            Clients.Group(message.ConversationId).messageReceived(message);
             var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
             dbContext.Messages.Add(message);
             return dbContext.SaveChanges() > 0;

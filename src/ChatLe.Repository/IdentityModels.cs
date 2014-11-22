@@ -11,19 +11,16 @@ using Microsoft.Data.Entity.Metadata;
 
 namespace ChatLe.Models
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
-    public class ApplicationUser : IdentityUser
-    {
-        public bool IsConnected { get; set; }
-        public string SignalRConnectionId { get; set; }
-    }
-
+    
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Message> Messages { get; set; }
 
+        public DbSet<Conversation> Conversations { get; set; }
+
         public ApplicationDbContext()
         {
+            Trace.TraceInformation("[ApplicationDbContext] constructor");
         }
 
         public bool SetConnectionStatus(string userId, string connectionId, bool isConnected)

@@ -10,13 +10,13 @@
         unreadMessages: ko.observableArray(),
         currentUser: ko.observable(),
         sendMessage: function (message) {
-            var model = { to: viewModel.currentUser(), text: message };
+            var model = { To: viewModel.currentUser(), Text: message };
             $.ajax('api/chat', {
                 data: model,
-                method: "POST"
+                type: "POST"
             }).done(function (data) {
-                mode.from = "Me";
-                messages.unshift(model);
+                model.From = "Me";
+                viewModel.messages.unshift(model);
             });
         },
         showMessage: function (user) {
@@ -26,14 +26,14 @@
                     viewModel.messages(data);
                 });
             viewModel.unreadMessages.remove(function (item) {
-                return item.from == user;
+                return item.From == user;
             });
         },
         messageReceived: function (data) {
             if (!data) {
                 return;
             }
-            if (viewModel.currentUser() == data.from) {
+            if (viewModel.currentUser() == data.From) {
                 viewModel.messages.unshift(data);
             } else {
                 viewModel.unreadMessages.unshift(data);

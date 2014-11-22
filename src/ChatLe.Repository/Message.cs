@@ -4,9 +4,9 @@ namespace ChatLe.Models
 {
     public class Message
     {
-        public string To { get; set; }
-        public string From { get; set; }
-        public string Text { get; set; }
-        public DateTime Date { get; set; }
+        public virtual string ConversationId { get; set; }
+        public virtual string From { get; set; }
+        public virtual string Text { get; set; }
+        public virtual DateTime Date { get; set; }
     }
 }

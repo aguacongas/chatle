@@ -13,11 +13,11 @@
         <div data-bind="visible: currentUser">
             <h6 data-bind="text: currentUser"></h6>
             <input id="message" />
-            <button data-bind="click: sendMessage.bind($('#message').value)">send</button>
+            <button data-bind="click: function(data, event) { sendMessage($('#message').val()); }">send</button>
             <ul data-bind="foreach: messages">
                 <li>
-                    <span data-bind="text: from"></span><br />
-                    <span data-bind="text: message"></span>
+                    <span data-bind="text: From"></span><br />
+                    <span data-bind="text: Text"></span>
                 </li>
             </ul>
         </div>
@@ -26,9 +26,9 @@
     <div class="col-xs-3">
         <h6>UNREAD</h6>
         <ul data-bind="foreach: unreadMessages">
-            <li data-bind="click: $parent.showMessage.bind(from)">
-                <span data-bind="text: from"></span><br />
-                <span data-bind="text: message"></span>
+            <li data-bind="click: $parent.showMessage.bind(From)">
+                <span data-bind="text: From"></span><br />
+                <span data-bind="text: Text"></span>
             </li>
         </ul>
     </div>
