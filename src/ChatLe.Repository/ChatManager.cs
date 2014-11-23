@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,27 @@ namespace ChatLe.Models
         }
 
         public IChatStore<TUser> Store { get; private set; }
+
+        public Task AddMessage(string from, string to, string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Conversation> GetConversationAsync(string from, string to)
+        {
+            if (from == null)
+            {
+                throw new ArgumentNullException("from");
+            }
+            if(to == null)
+            {
+                throw new ArgumentNullException("to");
+            }
+
+            var attendee1 = await Store.FindUserByNameAsync(from);
+            var attendee2 = await Store.FindUserByNameAsync(to);
+            return await Store.GetConversationAsync(attendee1, attendee2);
+        }
 
         public async Task<bool> SetConnectionStatusAsync(string userName, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken))
         {

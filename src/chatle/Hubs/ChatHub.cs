@@ -15,50 +15,55 @@ namespace ChatLe.Hubs
         IServiceProvider _provider;
         public ChatHub(IServiceProvider provider) :base()
         {
+            if (provider == null)
+            {
+                throw new ArgumentNullException("provider");
+            }
+            Trace.TraceInformation("[ChatHub] constructor");
             _provider = provider;
         }
 
-        public override Task OnConnected()
+        public override async Task OnConnected()
         {
-            string name;
-            if (SetConnectionStatus(true, out name))
+            string name = Context.User.Identity.Name;
+            Trace.TraceInformation("[ChatHub] OnConneect " + name);
+            if (await SetConnectionStatus(true, name))
             {
-                Groups.Add(this.Context.ConnectionId, name);
+                await Groups.Add(this.Context.ConnectionId, name);
                 Clients.Others.userConnected(name);
             }
-            return base.OnConnected();
+            await base.OnConnected();
         }
 
-        public override Task OnReconnected()
+        public override async Task OnReconnected()
         {
-            string name;
-            if (SetConnectionStatus(true, out name))
+            string name = Context.User.Identity.Name;
+            Trace.TraceInformation("[ChatHub] OnReconnected " + name);
+            if (await SetConnectionStatus(true, name))
             {
-                Groups.Add(this.Context.ConnectionId, name);
+                await Groups.Add(this.Context.ConnectionId, name);
                 Clients.Others.userConnected(name);
             }
-            return base.OnReconnected();
+            await base.OnReconnected();
         }
 
-        public override Task OnDisconnected(bool stopCalled)
+        public override async Task OnDisconnected(bool stopCalled)
         {
-            string name;
-            if (SetConnectionStatus(false, out name))
+            string name = Context.User.Identity.Name;
+            Trace.TraceInformation("[ChatHub] OnDisconnected " + name);
+            if (await SetConnectionStatus(false, name))
             {
-                Groups.Remove(this.Context.ConnectionId, name);
+                await Groups.Remove(this.Context.ConnectionId, name);
                 Clients.Others.userDisconnected(name);
             }
-            return base.OnDisconnected(stopCalled);
+            await base.OnDisconnected(stopCalled);
         }
 
-        private bool SetConnectionStatus(bool isConnected, out string name)
-        {
-            name = Context.User.Identity.Name;
-            var manager = _provider.GetService(typeof(ChatManager<ApplicationUser>)) as ChatManager<ApplicationUser>;
+        private async Task<bool> SetConnectionStatus(bool isConnected, string name)
+        {            
+            var manager = _provider.GetService(typeof(IChatManager<ApplicationUser>)) as IChatManager<ApplicationUser>;
             Trace.TraceInformation("[ChatHub] SetConnectionStatus {0} {1} {2}", name, Context.ConnectionId, isConnected);
-            var task= manager.SetConnectionStatusAsync(name, Context.ConnectionId, isConnected);
-            task.Wait();
-            return task.Result;
+            return await manager.SetConnectionStatusAsync(name, Context.ConnectionId, isConnected);
         }
     }
 }

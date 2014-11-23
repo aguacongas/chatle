@@ -11,7 +11,7 @@ namespace ChatLe.Models
             where TContext : DbContext
         {
             services.AddScoped<IChatStore<TUser>, ChatStore<string, TUser, TContext>>();
-            services.AddScoped<ChatManager<TUser>>();
+            services.AddScoped<IChatManager<TUser>, ChatManager<TUser>>();
             return services;
         }
     }
