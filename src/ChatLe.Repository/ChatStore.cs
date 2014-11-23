@@ -14,13 +14,13 @@ namespace ChatLe.Models
         public ChatStore(DbContext context) : base(context) { }
     }
     public class ChatStore<TUser> : ChatStore<string, TUser, DbContext>
-        where TUser : IdentityUser, IApplicationUser
-    {
+        where TUser : class, IApplicationUser
+        {
         public ChatStore(DbContext context) : base(context) { }
     }
-    public class ChatStore<TKey, TUser, TContext>
+    public class ChatStore<TKey, TUser, TContext> :IChatStore<TUser>
         where TKey : IEquatable<TKey>
-        where TUser : IdentityUser<TKey>, IApplicationUser
+        where TUser : class, IApplicationUser
         where TContext : DbContext
     {
         public ChatStore(TContext context)
@@ -37,51 +37,17 @@ namespace ChatLe.Models
 
         public DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
 
-        public async Task<bool> SetConnectionStatusByIdAsync(TKey id, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TUser> FindUserByNameAsync(string userName)
         {
-            var user = Users.FirstOrDefault(u => u.Id.Equals(id));
-            if (user != null)
-            {
-                return await SetConnectionStatusAsync(user, connectionId, isConnected, cancellationToken);
-            }
-
-            return false;
+            return await Users.FirstOrDefaultAsync(u => u.UserName == userName);
         }
 
-        public async Task<bool> SetConnectionStatusByNameAsync(string userName, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task SetConnectionStatusAsync(TUser user, string connectionId, bool status, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var user = Users.FirstOrDefault(u => u.UserName == userName);
-            if (user != null)
-            {
-                return await SetConnectionStatusAsync(user, connectionId, isConnected, cancellationToken);
-            }
-
-            return false;
-        }
-        public async Task<bool> SetConnectionStatusAsync(TUser user, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
             {
                 throw new ArgumentNullException("user");
             }
-            if (isConnected)
-            {
-                var ret = !user.IsConnected;
-                await SetConnectionStatus(true, connectionId, user);
-                return ret;
-            }
-            else if (user.SignalRConnectionId == connectionId)
-            {
-                await SetConnectionStatus(false, null, user);
-                return true;
-            }
-
-            return false;
-        }
-
-        private async Task SetConnectionStatus(bool status, string connectionId, TUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
             Trace.TraceInformation("[ChatStore] SetConnectionStatus {0} {1} {2}", user.UserName, connectionId, status);
             user.IsConnected = status;
             user.SignalRConnectionId = connectionId;

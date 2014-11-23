@@ -52,22 +52,5 @@ namespace ChatLe.Models
             user.SignalRConnectionId = connectionId;
             this.SaveChanges();
         }
-
-        protected override void OnConfiguring(DbContextOptions options)
-        {
-            Trace.TraceInformation("[ApplicationDbContext] OnConfiguring");
-            base.OnConfiguring(options);
-        }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            Trace.TraceInformation("[ApplicationDbContext] OnModelCreating");
-            base.OnModelCreating(builder);
-        }
-    }
-
-    public class IdentityDbContextOptions : DbContextOptions
-    {
-        public bool CreateDatabase { get; set; }
     }
 }

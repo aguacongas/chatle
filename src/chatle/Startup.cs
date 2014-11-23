@@ -81,11 +81,6 @@ namespace ChatLe
                 }
             });
 
-            services.Configure<IdentityDbContextOptions>(options =>
-            {
-                options.CreateDatabase = Configuration.Get("CreateDatabase").ToLower() == "true";
-            });
-
             services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
@@ -94,6 +89,8 @@ namespace ChatLe
             services.AddMvc();
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+
+            services.AddChatLe<ApplicationUser, ApplicationDbContext>();
         }
 
         public void Configure(IApplicationBuilder app)

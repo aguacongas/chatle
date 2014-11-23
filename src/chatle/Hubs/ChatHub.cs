@@ -54,20 +54,11 @@ namespace ChatLe.Hubs
         private bool SetConnectionStatus(bool isConnected, out string name)
         {
             name = Context.User.Identity.Name;
-            var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
+            var manager = _provider.GetService(typeof(ChatManager<ApplicationUser>)) as ChatManager<ApplicationUser>;
             Trace.TraceInformation("[ChatHub] SetConnectionStatus {0} {1} {2}", name, Context.ConnectionId, isConnected);
-            return dbContext.SetConnectionStatus(name, Context.ConnectionId, isConnected);
-        }
-
-        public bool PostMessage(Message message)
-        {
-            Trace.TraceInformation("[ChatHub] SendMsg {0} {1}", message.ConversationId, message.Text);
-            message.From = Context.User.Identity.Name;
-            message.Date = DateTime.UtcNow;
-            Clients.Group(message.ConversationId).messageReceived(message);
-            var dbContext = _provider.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
-            dbContext.Messages.Add(message);
-            return dbContext.SaveChanges() > 0;
+            var task= manager.SetConnectionStatusAsync(name, Context.ConnectionId, isConnected);
+            task.Wait();
+            return task.Result;
         }
     }
 }

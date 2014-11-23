@@ -8,5 +8,13 @@
         "Redis": {
             "Hostname": "localhost"
         }
+    },
+    "Identity": {
+        "Password": {
+            "RequireDigit": "false",
+            "RequireLowercase": "false",
+            "RequireUppercase": "false",
+            "RequireNonLetterOrDigit": "false"
+        }
     }
 }
