@@ -7,13 +7,14 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
-    public interface IChatStore<TUser>
-        where TUser : IApplicationUser
+    public interface IChatStore<TKey, TUser>
+        where TUser : IApplicationUser<TKey>
     {
         Task SetConnectionStatusAsync(TUser user, string connectionId, bool status, CancellationToken cancellationToken = default(CancellationToken));
         Task<TUser> FindUserByNameAsync(string userName);
-        Task AddMessageAsync(Conversation conversation, Message message);
-        Task CreateConversationAsync(TUser attendee1, TUser attendee2);
-        Task<Conversation> GetConversationAsync(TUser attendee1, TUser attendee2);
+        Task AddMessageAsync(Conversation<TKey> conversation, Message<TKey> message);
+        Task AddAttendeeAsync(Conversation<TKey> conversation, TUser user);
+        Task<Conversation<TKey>> CreateConversationAsync(TUser attendee1, TUser attendee2);
+        Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2);
     }
 }

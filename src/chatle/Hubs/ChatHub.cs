@@ -61,7 +61,7 @@ namespace ChatLe.Hubs
 
         private async Task<bool> SetConnectionStatus(bool isConnected, string name)
         {            
-            var manager = _provider.GetService(typeof(IChatManager<ApplicationUser>)) as IChatManager<ApplicationUser>;
+            var manager = _provider.GetService(typeof(IChatManager<string, ApplicationUser>)) as IChatManager<string, ApplicationUser>;
             Trace.TraceInformation("[ChatHub] SetConnectionStatus {0} {1} {2}", name, Context.ConnectionId, isConnected);
             return await manager.SetConnectionStatusAsync(name, Context.ConnectionId, isConnected);
         }

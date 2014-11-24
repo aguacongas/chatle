@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
-    public class ChatManager<TUser> : IChatManager<TUser> where TUser : IApplicationUser
+    public class ChatManager<TKey, TUser> : IChatManager<TKey, TUser> where TUser : IApplicationUser<TKey>
     {
-        public ChatManager(IChatStore<TUser> store)
+        public ChatManager(IChatStore<TKey, TUser> store)
         {
             if (store == null)
             {
@@ -16,14 +16,14 @@ namespace ChatLe.Models
             Store = store;
         }
 
-        public IChatStore<TUser> Store { get; private set; }
+        public IChatStore<TKey, TUser> Store { get; private set; }
 
-        public Task AddMessage(string from, string to, string message)
+        public Task AddMessage(TKey from, TKey to, string message)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Conversation> GetConversationAsync(string from, string to)
+        public async Task<Conversation<TKey>> GetConversationAsync(string from, string to)
         {
             if (from == null)
             {

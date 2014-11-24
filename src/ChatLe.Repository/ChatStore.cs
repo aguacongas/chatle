@@ -15,13 +15,13 @@ namespace ChatLe.Models
         public ChatStore(DbContext context) : base(context) { }
     }
     public class ChatStore<TUser> : ChatStore<string, TUser, DbContext>
-        where TUser : class, IApplicationUser
+        where TUser : class, IApplicationUser<string>
         {
         public ChatStore(DbContext context) : base(context) { }
     }
-    public class ChatStore<TKey, TUser, TContext> :IChatStore<TUser>
+    public class ChatStore<TKey, TUser, TContext> :IChatStore<TKey,TUser>
         where TKey : IEquatable<TKey>
-        where TUser : class, IApplicationUser
+        where TUser : class, IApplicationUser<TKey>
         where TContext : DbContext
     {
         public ChatStore(TContext context)
@@ -37,23 +37,30 @@ namespace ChatLe.Models
         public TContext Context { get; private set; }
 
         public DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
-        public DbSet<Conversation> Conversations { get { return Context.Set<Conversation>(); } }
-        public DbSet<Message> Messages { get { return Context.Set<Message>(); } }
+        public DbSet<Conversation<TKey>> Conversations { get { return Context.Set<Conversation<TKey>>(); } }
+        public DbSet<Message<TKey>> Messages { get { return Context.Set<Message<TKey>>(); } }
 
-        public async Task AddMessageAsync(Conversation conversation, Message message)
-        {
+        public async Task AddMessageAsync(Conversation<TKey> conversation, Message<TKey> message)
+        {            
             message.ConversationId = conversation.Id;
             await Messages.AddAsync(message);
             await Context.SaveChangesAsync();
+            conversation.Messages.Add(message);
         }
 
-        public async Task CreateConversationAsync(TUser attendee1, TUser attendee2)
+        public async Task AddAttendeeAsync(Conversation<TKey> conversation, Message<TKey> message)
         {
-            var conversation = new Conversation();
-            conversation.Users.Add(attendee1);
-            conversation.Users.Add(attendee2);
+            throw new NotImplementedException();
+        }
+
+        public async Task<Conversation<TKey>> CreateConversationAsync(TUser attendee1, TUser attendee2)
+        {
+            var conversation = new Conversation<TKey>();
             await Conversations.AddAsync(conversation);
             await Context.SaveChangesAsync();
+            conversation.Users.Add(attendee1);
+            conversation.Users.Add(attendee2);
+            return conversation;
         }
 
         public async Task<TUser> FindUserByNameAsync(string userName)
@@ -74,9 +81,9 @@ namespace ChatLe.Models
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Conversation> GetConversationAsync(TUser attendee1, TUser attendee2)
+        public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
-            return await Conversations.FirstOrDefaultAsync(x => x.Users.Count == 2 && x.Users.Any(a => a.Id == attendee1.Id) && x.Users.Any(b => b.UserName == attendee2.UserName));
+            return await Conversations.FirstOrDefaultAsync(x => x.Users.Count == 2 && x.Users.Any(a => a.Id.Equals(attendee1.Id)) && x.Users.Any(b => b.Id.Equals(attendee2.UserName)));
         }
     }
 }

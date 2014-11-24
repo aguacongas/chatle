@@ -27,13 +27,13 @@ namespace ChatLe.Controllers
         [HttpGet("{id}")]
         public IEnumerable<Message> Get(string id)
         {
-            return _dbContext.Messages.Where(x => (x.From == id && x.ConversationId ==Context.User.Identity.Name) || (x.ConversationId == id && x.From == Context.User.Identity.Name)).OrderByDescending(x => x.Date);
+            return _dbContext.Messages.Where(x => (x.UserId == id && x.ConversationId ==Context.User.Identity.Name) || (x.ConversationId == id && x.UserId == Context.User.Identity.Name)).OrderByDescending(x => x.Date);
         }
 
         [HttpPost()]
         public async Task SendMessage(string to, string text)
         {
-            var message = new Message() { From = Context.User.Identity.Name, ConversationId = to, Text = text, Date = DateTime.Now };
+            var message = new Message() { UserId = Context.User.Identity.Name, ConversationId = to, Text = text, Date = DateTime.Now };
             _hub.Clients.Group(to).messageReceived(message);
             await _dbContext.Messages.AddAsync(message);
             await _dbContext.SaveChangesAsync();

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
-    public class ApplicationUser : IdentityUser, IApplicationUser
+    public class ApplicationUser : IdentityUser, IApplicationUser<string>
     {
         public ApplicationUser()
         {
@@ -16,6 +16,5 @@ namespace ChatLe.Models
         }
         public virtual bool IsConnected { get; set; }
         public virtual string SignalRConnectionId { get; set; }
-        public virtual ICollection<Conversation> Conversations { get; } = new List<Conversation>();
     }
 }

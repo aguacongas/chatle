@@ -2,9 +2,9 @@
 
 namespace ChatLe.Models
 {
-    public interface IApplicationUser
+    public interface IApplicationUser<TKey>
     {
-        string Id { get; set; }
+        TKey Id { get; set; }
         string UserName { get; set; }
         bool IsConnected { get; set; }
         string SignalRConnectionId { get; set; }

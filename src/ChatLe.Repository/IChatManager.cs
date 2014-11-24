@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
-    public interface IChatManager<TUser> where TUser : IApplicationUser
+    public interface IChatManager<TKey, TUser> where TUser : IApplicationUser<TKey>
     {
-        IChatStore<TUser> Store { get; }
+        IChatStore<TKey, TUser> Store { get; }
 
         Task<bool> SetConnectionStatusAsync(string userName, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<Conversation> GetConversationAsync(string from, string to);
+        Task<Conversation<TKey>> GetConversationAsync(string from, string to);
 
-        Task AddMessage(string from, string to, string message);
+        Task AddMessage(TKey from, TKey to, string message);
     }
 }
