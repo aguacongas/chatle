@@ -12,9 +12,9 @@ namespace ChatLe.Models
     {
         Task SetConnectionStatusAsync(TUser user, string connectionId, bool status, CancellationToken cancellationToken = default(CancellationToken));
         Task<TUser> FindUserByNameAsync(string userName);
-        Task AddMessageAsync(Conversation<TKey> conversation, Message<TKey> message);
-        Task AddAttendeeAsync(Conversation<TKey> conversation, TUser user);
-        Task<Conversation<TKey>> CreateConversationAsync(TUser attendee1, TUser attendee2);
+        Task CreateMessageAsync(Message<TKey> message);
+        Task CreateAttendeeAsync(Attendee<TKey> attendee);
+        Task CreateConversationAsync(Conversation<TKey> conversation);
         Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2);
     }
 }

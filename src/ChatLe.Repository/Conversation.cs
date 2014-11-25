@@ -13,7 +13,7 @@ namespace ChatLe.Models
     public class Conversation<TKey>
     {
         public virtual TKey Id { get; set; }
-        public virtual ICollection<IApplicationUser<TKey>> Users { get; } = new List<IApplicationUser<TKey>>();
+        public virtual ICollection<Attendee<TKey>> Attendees { get; } = new List<Attendee<TKey>>();
         public virtual ICollection<Message<TKey>> Messages { get; } = new List<Message<TKey>>();
     }
 }

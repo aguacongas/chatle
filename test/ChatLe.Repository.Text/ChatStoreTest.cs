@@ -7,6 +7,7 @@ using Microsoft.Framework.OptionsModel;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Data.Entity.Metadata;
 
 namespace ChatLe.Repository.Text
 {
@@ -114,9 +115,38 @@ namespace ChatLe.Repository.Text
         {
             public ChatDbContext(IServiceProvider provider) :base(provider) { }
 
+            public DbSet<UserTest> Users { get; set; }
             public DbSet<Message> Messages { get; set; }
-
+            public DbSet<Attendee> Attendee { get; set; }
             public DbSet<Conversation> Conversations { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                base.OnModelCreating(builder);
+                builder.Entity<UserTest>(b =>
+                {
+                    b.Key(u => u.Id);
+                });
+
+                builder.Entity<Conversation>(b =>
+                {
+                    b.Key(c => c.Id);
+                });
+
+                builder.Entity<Message>(b =>
+                {
+                    b.Key(m => m.Id);
+                    b.ForeignKey<UserTest>(m => m.UserId);
+                    b.ForeignKey<Conversation>(m => m.ConversationId);
+                });
+
+                builder.Entity<Attendee>(b =>
+                {
+                    b.Key(a => new { a.ConversationId, a.UserId });
+                    b.ForeignKey<Conversation>(a => a.ConversationId);
+                });
+
+            }
         }
 
         [Fact]
@@ -159,7 +189,7 @@ namespace ChatLe.Repository.Text
             }
         }
         [Fact]
-        public async Task AddMessageAsyncTest()
+        public async Task CreateMessageAsyncTest()
         {
             ServiceCollection services = GetServicesCollection();
 
@@ -168,14 +198,12 @@ namespace ChatLe.Repository.Text
                 var store = new ChatStore<string, UserTest, ChatDbContext>(context);
                 var message = new Message()
                 {
+                    ConversationId = "test",
                     Date = DateTime.UtcNow,
                     Text = "test",
                     UserId = "test",
                 };
-                var conversation = new Conversation();
-                await store.AddMessageAsync(conversation, message);
-                Assert.Equal(message.ConversationId, conversation.Id);
-                Assert.Contains(message, conversation.Messages);
+                await store.CreateMessageAsync(message);
             }
         }
     }

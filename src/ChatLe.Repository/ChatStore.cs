@@ -39,28 +39,24 @@ namespace ChatLe.Models
         public DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
         public DbSet<Conversation<TKey>> Conversations { get { return Context.Set<Conversation<TKey>>(); } }
         public DbSet<Message<TKey>> Messages { get { return Context.Set<Message<TKey>>(); } }
+        public DbSet<Attendee<TKey>> Attendees { get { return Context.Set<Attendee<TKey>>(); } }
 
-        public async Task AddMessageAsync(Conversation<TKey> conversation, Message<TKey> message)
+        public async Task CreateMessageAsync(Message<TKey> message)
         {            
-            message.ConversationId = conversation.Id;
-            await Messages.AddAsync(message);
+            await Context.AddAsync(message);
             await Context.SaveChangesAsync();
-            conversation.Messages.Add(message);
         }
 
-        public async Task AddAttendeeAsync(Conversation<TKey> conversation, Message<TKey> message)
+        public async Task CreateAttendeeAsync(Attendee<TKey> attendee)
         {
-            throw new NotImplementedException();
+            await Context.AddAsync(attendee);
+            await Context.SaveChangesAsync();
         }
 
-        public async Task<Conversation<TKey>> CreateConversationAsync(TUser attendee1, TUser attendee2)
+        public async Task CreateConversationAsync(Conversation<TKey> conversation)
         {
-            var conversation = new Conversation<TKey>();
-            await Conversations.AddAsync(conversation);
+            await Context.AddAsync(conversation);
             await Context.SaveChangesAsync();
-            conversation.Users.Add(attendee1);
-            conversation.Users.Add(attendee2);
-            return conversation;
         }
 
         public async Task<TUser> FindUserByNameAsync(string userName)
@@ -83,7 +79,7 @@ namespace ChatLe.Models
 
         public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
-            return await Conversations.FirstOrDefaultAsync(x => x.Users.Count == 2 && x.Users.Any(a => a.Id.Equals(attendee1.Id)) && x.Users.Any(b => b.Id.Equals(attendee2.UserName)));
+            return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
     }
 }
