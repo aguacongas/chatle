@@ -12,14 +12,14 @@ namespace ChatLe.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ChatLeUser> userManager, SignInManager<ChatLeUser> signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
-        public SignInManager<ApplicationUser> SignInManager { get; private set; }
+        public UserManager<ChatLeUser> UserManager { get; private set; }
+        public SignInManager<ChatLeUser> SignInManager { get; private set; }
 
         // GET: /Account/Login
         [HttpGet]
@@ -73,7 +73,7 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName };
+                var user = new ChatLeUser { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -148,7 +148,7 @@ namespace ChatLe.Controllers
             }
         }
 
-        private async Task<ApplicationUser> GetCurrentUserAsync()
+        private async Task<ChatLeUser> GetCurrentUserAsync()
         {
             return await UserManager.FindByIdAsync(Context.User.Identity.GetUserId());
         }

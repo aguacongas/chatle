@@ -56,7 +56,7 @@ namespace ChatLe
                     throw new InvalidOperationException("Database engine unsupported");
             }
 
-            builder.AddDbContext<ApplicationDbContext>(options =>
+            builder.AddDbContext<ChatLeIdentityDbContext>(options =>
             {
                 switch (dbEngine)
                 {
@@ -81,7 +81,7 @@ namespace ChatLe
                 }
             });
 
-            services.AddDefaultIdentity<ApplicationDbContext, ApplicationUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
+            services.AddDefaultIdentity<ChatLeIdentityDbContext, ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
             });
@@ -90,7 +90,7 @@ namespace ChatLe
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
 
-            services.AddChatLe<ApplicationUser, ApplicationDbContext>();
+            services.AddChatLe<ChatLeUser, ChatLeIdentityDbContext>();
         }
 
         public void Configure(IApplicationBuilder app)

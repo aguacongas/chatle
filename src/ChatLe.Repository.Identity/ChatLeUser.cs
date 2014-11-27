@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
-    public class ApplicationUser : IdentityUser, IApplicationUser<string>
+    public class ChatLeUser : IdentityUser, IApplicationUser<string>
     {
-        public ApplicationUser()
+        public ChatLeUser()
         {
             Id = Guid.NewGuid().ToString("N");
         }
-        public ApplicationUser(string userName) :this()
+        public ChatLeUser(string userName) :this()
         {
             UserName = userName;
         }

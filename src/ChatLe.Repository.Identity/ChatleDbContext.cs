@@ -12,7 +12,7 @@ using Microsoft.Data.Entity.Metadata;
 namespace ChatLe.Models
 {
     
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
     {
         public DbSet<Message> Messages { get; set; }
 
@@ -20,7 +20,7 @@ namespace ChatLe.Models
 
         public DbSet<Attendee> Attendees { get; set; }
 
-        public ApplicationDbContext()
+        public ChatLeIdentityDbContext()
         {
             Trace.TraceInformation("[ApplicationDbContext] constructor");
         }
@@ -34,13 +34,13 @@ namespace ChatLe.Models
                 b.ForRelational().Table("Conversations");
             });
 
-            builder.Entity<Message>(b =>
+            builder.Entity<Message>((Action<ModelBuilder.EntityBuilder<Message>>)((ModelBuilder.EntityBuilder<Message> b) =>
             {
                 b.Key(m => m.Id);
-                b.ForeignKey<ApplicationUser>(m => m.UserId);
+                b.ForeignKey<Models.ChatLeUser>(m => m.UserId);
                 b.ForeignKey<Conversation>(m => m.ConversationId);
                 b.ForRelational().Table("Messages");
-            });
+            }));
 
             builder.Entity<Attendee>(b =>
             {

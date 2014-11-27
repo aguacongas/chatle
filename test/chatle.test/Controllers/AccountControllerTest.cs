@@ -54,10 +54,10 @@ namespace chatle.test.Controllers
         [Fact]
         public async Task RegisterTest()
         {            
-            var userManager = MockUserManager<ApplicationUser>();
-            userManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Success).Verifiable();
-            var signinManager = MockSigninManager<ApplicationUser>(userManager.Object);
-            signinManager.Setup(m => m.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
+            var userManager = MockUserManager<ChatLeUser>();
+            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Success).Verifiable();
+            var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
+            signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var metaDataProvider = new Mock<IModelMetadataProvider>().Object;
             using (var controller = new AccountController(userManager.Object, signinManager.Object) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
             {
@@ -74,10 +74,10 @@ namespace chatle.test.Controllers
 
         public async Task RegisterFailedTest()
         {
-            var userManager = MockUserManager<ApplicationUser>();
-            userManager.Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Failed()).Verifiable();
-            var signinManager = MockSigninManager<ApplicationUser>(userManager.Object);
-            signinManager.Setup(m => m.SignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
+            var userManager = MockUserManager<ChatLeUser>();
+            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Failed()).Verifiable();
+            var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
+            signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var metaDataProvider = new Mock<IModelMetadataProvider>().Object;
             using (var controller = new AccountController(userManager.Object, signinManager.Object) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
             {

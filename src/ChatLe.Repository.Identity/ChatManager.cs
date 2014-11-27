@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
-    public class ChatManager : ChatManager<string, ApplicationUser>
+    public class ChatManager : ChatManager<string, ChatLeUser>
     {
     }
     public class ChatManager<TKey, TUser> : IChatManager<TKey, TUser> where TUser : IApplicationUser<TKey>
@@ -66,9 +66,7 @@ namespace ChatLe.Models
             if (toConversationId == null)
             {
                 throw new ArgumentNullException("toConversationId");
-        }
-            return null;
-        }
+            }
 
             var user = await Store.FindUserByNameAsync(fromName);
             if (user != null)
@@ -79,7 +77,7 @@ namespace ChatLe.Models
                 await Store.AddMessageAsync(message);
                 conv.Messages.Add(message);
             }
-            }
+        }
 
         public async Task<Conversation<TKey>> GetConversationAsync(string from, string to)
         {

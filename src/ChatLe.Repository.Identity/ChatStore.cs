@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
-    public class ChatStore : ChatStore<ApplicationUser>
+    public class ChatStore : ChatStore<ChatLeUser>
     {
         public ChatStore(DbContext context) : base(context) { }
     }

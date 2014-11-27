@@ -10,8 +10,8 @@ namespace ChatLe.Controllers
     [Route("api/users")]
     public class UserController : Controller
     {
-        ApplicationDbContext _dbContext;
-        public UserController(ApplicationDbContext dbContext)
+        ChatLeIdentityDbContext _dbContext;
+        public UserController(ChatLeIdentityDbContext dbContext)
         {
             _dbContext = dbContext;
         }

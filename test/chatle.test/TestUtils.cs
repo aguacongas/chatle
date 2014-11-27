@@ -16,7 +16,7 @@ namespace chatle.test
             services.Add(HostingServices.GetDefaultServices());
             services.AddEntityFramework()
                 .AddInMemoryStore()
-                .AddDbContext<ApplicationDbContext>();
+                .AddDbContext<ChatLeIdentityDbContext>();
             services.Add(OptionsServices.GetDefaultServices())
                 .AddInstance<ILoggerFactory>(new LoggerFactory());
 

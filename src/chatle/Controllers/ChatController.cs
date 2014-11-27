@@ -15,10 +15,10 @@ namespace ChatLe.Controllers
     [Route("api/chat")]
     public class ChatController : Controller
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ChatLeIdentityDbContext _dbContext;
         private readonly IHubContext _hub;
 
-        public ChatController(ApplicationDbContext dbContext, IConnectionManager manager)
+        public ChatController(ChatLeIdentityDbContext dbContext, IConnectionManager manager)
         {
             _dbContext = dbContext;
             _hub = manager.GetHubContext<ChatHub>();
