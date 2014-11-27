@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
+﻿using Microsoft.Data.Entity;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
@@ -14,6 +11,7 @@ namespace ChatLe.Models
     {
         public ChatStore(DbContext context) : base(context) { }
     }
+
     public class ChatStore<TUser> : ChatStore<string, TUser, DbContext>
         where TUser : class, IApplicationUser<string>
         {
@@ -76,6 +74,14 @@ namespace ChatLe.Models
 
         public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
+            if (attendee1 == null)
+            {
+                throw new ArgumentNullException("attendee1");
+            }
+            if (attendee2 == null)
+            {
+                throw new ArgumentNullException("attendee2");
+            }
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
 
