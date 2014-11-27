@@ -26,7 +26,7 @@ namespace ChatLe.Models
             if (userName == null)
             {
                 throw new ArgumentNullException("userName");
-            }
+        }
             if (connectionId == null)
             {
                 throw new ArgumentNullException("connectionId");
@@ -34,13 +34,13 @@ namespace ChatLe.Models
 
             var user = await Store.FindUserByNameAsync(userName);
             if (!user.SignalRConnectionIds.Contains(connectionId))
-            {
+        {
                 user.SignalRConnectionIds.Add(connectionId);
             }
             await Store.UpdateUserAsync(user, cancellationToken);
         }
         public async Task RemoveConnectionIdAsync(string userName, string connectionId, CancellationToken cancellationToken = default(CancellationToken))
-        {
+            {
             if (userName == null)
             {
                 throw new ArgumentNullException("userName");
@@ -66,7 +66,9 @@ namespace ChatLe.Models
             if (toConversationId == null)
             {
                 throw new ArgumentNullException("toConversationId");
-            }
+        }
+            return null;
+        }
 
             var user = await Store.FindUserByNameAsync(fromName);
             if (user != null)
@@ -77,7 +79,7 @@ namespace ChatLe.Models
                 await Store.AddMessageAsync(message);
                 conv.Messages.Add(message);
             }
-        }
+            }
 
         public async Task<Conversation<TKey>> GetConversationAsync(string from, string to)
         {

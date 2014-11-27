@@ -3,7 +3,6 @@ using Microsoft.Data.Entity;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.DependencyInjection.Fallback;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
 using System;
 using System.Threading.Tasks;
 using Xunit;
