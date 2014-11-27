@@ -41,18 +41,30 @@ namespace ChatLe.Models
 
         public async Task CreateMessageAsync(Message<TKey> message)
         {            
+            if(message == null)
+            {
+                throw new ArgumentNullException("message");
+            }
             await Context.AddAsync(message);
             await Context.SaveChangesAsync();
         }
 
         public async Task CreateAttendeeAsync(Attendee<TKey> attendee)
         {
+            if(attendee == null)
+            {
+                throw new ArgumentNullException("attendee");
+            }
             await Context.AddAsync(attendee);
             await Context.SaveChangesAsync();
         }
 
         public async Task CreateConversationAsync(Conversation<TKey> conversation)
         {
+            if (conversation == null)
+            {
+                throw new ArgumentNullException("conversation");
+            }
             await Context.AddAsync(conversation);
             await Context.SaveChangesAsync();
         }
@@ -85,14 +97,10 @@ namespace ChatLe.Models
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
 
-        public Task<Conversation<TKey>> GetConversationAsync(TKey toConversationId)
+        public async Task<Conversation<TKey>> GetConversationAsync(TKey convId)
         {
-            throw new NotImplementedException();
+            return await Conversations.FirstOrDefaultAsync(c => c.Id.Equals(convId));
         }
 
-        public Task AddMessageAsync(Message<TKey> message)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
