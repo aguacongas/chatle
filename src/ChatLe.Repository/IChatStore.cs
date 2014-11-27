@@ -17,6 +17,5 @@ namespace ChatLe.Models
         Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2);
         Task UpdateUserAsync(TUser user, CancellationToken cancellationToken);
         Task<Conversation<TKey>> GetConversationAsync(TKey toConversationId);
-        Task AddMessageAsync(Message<TKey> message);
     }
 }
