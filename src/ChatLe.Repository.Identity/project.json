@@ -1,7 +1,8 @@
 ﻿{
     "version": "1.0.0-*",
     "dependencies": {
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta1"
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta1",
+        "ChatLe.Repository": ""
     },
 
     "frameworks" : {

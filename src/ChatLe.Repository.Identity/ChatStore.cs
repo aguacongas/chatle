@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
+﻿using Microsoft.Data.Entity;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
@@ -14,6 +11,7 @@ namespace ChatLe.Models
     {
         public ChatStore(DbContext context) : base(context) { }
     }
+
     public class ChatStore<TUser> : ChatStore<string, TUser, DbContext>
         where TUser : class, IApplicationUser<string>
         {

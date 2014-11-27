@@ -1,13 +1,12 @@
 ﻿using ChatLe.Models;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.DependencyInjection.Fallback;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Data.Entity.Metadata;
 
 namespace ChatLe.Repository.Text
 {
@@ -21,7 +20,7 @@ namespace ChatLe.Repository.Text
             ServiceCollection services = GetServicesCollection();
 
             using (var context = new DbContext(services.BuildServiceProvider()))
-            {
+            {                
                 var store = new ChatStore(context);
             }
         }
