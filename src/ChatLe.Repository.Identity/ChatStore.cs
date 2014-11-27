@@ -64,15 +64,12 @@ namespace ChatLe.Models
             return await Users.FirstOrDefaultAsync(u => u.UserName == userName);
         }
 
-        public async Task SetConnectionStatusAsync(TUser user, string connectionId, bool status, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (user == null)
             {
                 throw new ArgumentNullException("user");
             }
-            Trace.TraceInformation("[ChatStore] SetConnectionStatus {0} {1} {2}", user.UserName, connectionId, status);
-            user.IsConnected = status;
-            user.SignalRConnectionId = connectionId;
             await Context.UpdateAsync(user, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -80,6 +77,16 @@ namespace ChatLe.Models
         public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
+        }
+
+        public Task<Conversation<TKey>> GetConversationAsync(TKey toConversationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddMessageAsync(Message<TKey> message)
+        {
+            throw new NotImplementedException();
         }
     }
 }

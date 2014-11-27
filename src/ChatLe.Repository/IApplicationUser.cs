@@ -6,7 +6,7 @@ namespace ChatLe.Models
     {
         TKey Id { get; set; }
         string UserName { get; set; }
-        bool IsConnected { get; set; }
-        string SignalRConnectionId { get; set; }
+        bool IsConnected { get; }
+        ICollection<string> SignalRConnectionIds { get; }
     }
 }

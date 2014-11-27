@@ -1,15 +1,16 @@
 ﻿{
     "version": "1.0.0-*",
     "dependencies": {
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta1"
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta1",
+        "ChatLe.Repository": ""
     },
 
-    "frameworks" : {
-        "aspnet50" : { 
+    "frameworks": {
+        "aspnet50": {
             "dependencies": {
             }
         },
-        "aspnetcore50" : { 
+        "aspnetcore50": {
             "dependencies": {
                 "System.Runtime": "4.0.20-beta-22231"
             }

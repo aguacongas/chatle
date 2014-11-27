@@ -4,34 +4,37 @@ using Microsoft.AspNet.SignalR.Hubs;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using ChatLe.Models;
 using System.Diagnostics;
+using ChatLe.Models;
 
 namespace ChatLe.Hubs
 {
     [HubName("chat")]
     public class ChatHub : Hub
     {
-        IServiceProvider _provider;
-        public ChatHub(IServiceProvider provider) :base()
+        public ChatManager Manager
         {
-            if (provider == null)
+            get;
+            private set;
+        }
+
+        public ChatHub(ChatManager manager) :base()
+        {
+            if (manager == null)
             {
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException("manager");
             }
             Trace.TraceInformation("[ChatHub] constructor");
-            _provider = provider;
+            Manager = manager;
         }
 
         public override async Task OnConnected()
         {
             string name = Context.User.Identity.Name;
             Trace.TraceInformation("[ChatHub] OnConneect " + name);
-            if (await SetConnectionStatus(true, name))
-            {
-                await Groups.Add(this.Context.ConnectionId, name);
-                Clients.Others.userConnected(name);
-            }
+            await Manager.AddConnectionIdAsync(name, Context.ConnectionId);            
+            await Groups.Add(this.Context.ConnectionId, name);
+            Clients.Others.userConnected(name);
             await base.OnConnected();
         }
 
@@ -39,11 +42,9 @@ namespace ChatLe.Hubs
         {
             string name = Context.User.Identity.Name;
             Trace.TraceInformation("[ChatHub] OnReconnected " + name);
-            if (await SetConnectionStatus(true, name))
-            {
-                await Groups.Add(this.Context.ConnectionId, name);
-                Clients.Others.userConnected(name);
-            }
+            await Manager.AddConnectionIdAsync(name, Context.ConnectionId);
+            await Groups.Add(this.Context.ConnectionId, name);
+            Clients.Others.userConnected(name);
             await base.OnReconnected();
         }
 
@@ -51,19 +52,10 @@ namespace ChatLe.Hubs
         {
             string name = Context.User.Identity.Name;
             Trace.TraceInformation("[ChatHub] OnDisconnected " + name);
-            if (await SetConnectionStatus(false, name))
-            {
-                await Groups.Remove(this.Context.ConnectionId, name);
-                Clients.Others.userDisconnected(name);
-            }
+            await Manager.RemoveConnectionIdAsync(name, Context.ConnectionId);
+            await Groups.Remove(Context.ConnectionId, name);
+            Clients.Others.userDisconnected(name);
             await base.OnDisconnected(stopCalled);
-        }
-
-        private async Task<bool> SetConnectionStatus(bool isConnected, string name)
-        {            
-            var manager = _provider.GetService(typeof(IChatManager<string, ApplicationUser>)) as IChatManager<string, ApplicationUser>;
-            Trace.TraceInformation("[ChatHub] SetConnectionStatus {0} {1} {2}", name, Context.ConnectionId, isConnected);
-            return await manager.SetConnectionStatusAsync(name, Context.ConnectionId, isConnected);
         }
     }
 }

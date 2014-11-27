@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.Data.Entity.Metadata;
+using System.Collections.Generic;
 
 namespace ChatLe.Repository.Text
 {
@@ -63,18 +64,7 @@ namespace ChatLe.Repository.Text
                 }
             }
 
-            public string SignalRConnectionId
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            public ICollection<string> SignalRConnectionIds { get; } = new List<string>();
 
             public string UserName
             {

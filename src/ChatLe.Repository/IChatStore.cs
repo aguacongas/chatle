@@ -10,11 +10,13 @@ namespace ChatLe.Models
     public interface IChatStore<TKey, TUser>
         where TUser : IApplicationUser<TKey>
     {
-        Task SetConnectionStatusAsync(TUser user, string connectionId, bool status, CancellationToken cancellationToken = default(CancellationToken));
         Task<TUser> FindUserByNameAsync(string userName);
         Task CreateMessageAsync(Message<TKey> message);
         Task CreateAttendeeAsync(Attendee<TKey> attendee);
         Task CreateConversationAsync(Conversation<TKey> conversation);
         Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2);
+        Task UpdateUserAsync(TUser user, CancellationToken cancellationToken);
+        Task<Conversation<TKey>> GetConversationAsync(TKey toConversationId);
+        Task AddMessageAsync(Message<TKey> message);
     }
 }
