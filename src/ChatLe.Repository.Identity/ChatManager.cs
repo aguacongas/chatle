@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatLe.Models
-{    
+{
     public class ChatManager : ChatManager<string, ChatLeUser>
     {
         public ChatManager(IChatStore<string, ChatLeUser> store) : base(store) { }
@@ -28,21 +28,24 @@ namespace ChatLe.Models
             if (userName == null)
             {
                 throw new ArgumentNullException("userName");
-        }
+            }
             if (connectionId == null)
             {
                 throw new ArgumentNullException("connectionId");
             }
 
             var user = await Store.FindUserByNameAsync(userName);
-            if (!user.SignalRConnectionIds.Contains(connectionId))
-        {
-                user.SignalRConnectionIds.Add(connectionId);
+            if (user != null)
+            {
+                if (!user.SignalRConnectionIds.Contains(connectionId))
+                {
+                    user.SignalRConnectionIds.Add(connectionId);
+                }
+                await Store.UpdateUserAsync(user, cancellationToken);
             }
-            await Store.UpdateUserAsync(user, cancellationToken);
         }
         public async Task RemoveConnectionIdAsync(string userName, string connectionId, CancellationToken cancellationToken = default(CancellationToken))
-            {
+        {
             if (userName == null)
             {
                 throw new ArgumentNullException("userName");

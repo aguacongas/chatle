@@ -19,7 +19,7 @@ namespace ChatLe.Repository.Text
             return services;
         }
     }
-    class UserTest : IApplicationUser<string>
+    public class UserTest : IApplicationUser<string>
     {
         public string Id { get; set; } = "test";
 
@@ -29,7 +29,7 @@ namespace ChatLe.Repository.Text
 
         public string UserName { get; set; } = "test";
     }
-    class ChatDbContext : DbContext
+    public class ChatDbContext : DbContext
     {
         public ChatDbContext(IServiceProvider provider) : base(provider) { }
 
