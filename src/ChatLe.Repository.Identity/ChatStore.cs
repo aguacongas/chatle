@@ -77,6 +77,14 @@ namespace ChatLe.Models
 
         public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
+            if (attendee1 == null)
+            {
+                throw new ArgumentNullException("attendee1");
+            }
+            if (attendee2 == null)
+            {
+                throw new ArgumentNullException("attendee2");
+            }
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
     }

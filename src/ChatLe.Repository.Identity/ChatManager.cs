@@ -36,7 +36,11 @@ namespace ChatLe.Models
 
             var attendee1 = await Store.FindUserByNameAsync(from);
             var attendee2 = await Store.FindUserByNameAsync(to);
-            return await Store.GetConversationAsync(attendee1, attendee2);
+            if (attendee1 != null && attendee2 != null)
+            {
+                return await Store.GetConversationAsync(attendee1, attendee2);
+            }
+            return null;
         }
 
         public async Task<bool> SetConnectionStatusAsync(string userName, string connectionId, bool isConnected, CancellationToken cancellationToken = default(CancellationToken))
