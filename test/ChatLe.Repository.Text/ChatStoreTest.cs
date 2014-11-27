@@ -12,9 +12,7 @@ using System.Collections.Generic;
 namespace ChatLe.Repository.Text
 {
     public class ChatStoreTest
-    {
-        public object HostingServices { get; private set; }
-
+    {       
         [Fact]
         public void Construtor1Test()
         {
@@ -26,58 +24,11 @@ namespace ChatLe.Repository.Text
             }
         }
 
-        private static ServiceCollection GetServicesCollection()
+        private ServiceCollection GetServicesCollection()
         {
-            var services = new ServiceCollection();
-            services.AddEntityFramework()
-                .AddInMemoryStore();
-            services.AddInstance<ILoggerFactory>(new LoggerFactory());
-            return services;
+            return TestHelpers.GetServicesCollection();
         }
-
-        class UserTest : IApplicationUser<string>
-        {
-            public string Id
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public bool IsConnected
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public ICollection<string> SignalRConnectionIds { get; } = new List<string>();
-
-            public string UserName
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-        }
+        
         [Fact]
         public void Construtor2Test()
         {
@@ -98,44 +49,6 @@ namespace ChatLe.Repository.Text
         class FakeContextTest : DbContext
         {
             public FakeContextTest(IServiceProvider provider) :base(provider) { }
-        }
-
-        class ChatDbContext : DbContext
-        {
-            public ChatDbContext(IServiceProvider provider) :base(provider) { }
-
-            public DbSet<UserTest> Users { get; set; }
-            public DbSet<Message> Messages { get; set; }
-            public DbSet<Attendee> Attendee { get; set; }
-            public DbSet<Conversation> Conversations { get; set; }
-
-            protected override void OnModelCreating(ModelBuilder builder)
-            {
-                base.OnModelCreating(builder);
-                builder.Entity<UserTest>(b =>
-                {
-                    b.Key(u => u.Id);
-                });
-
-                builder.Entity<Conversation>(b =>
-                {
-                    b.Key(c => c.Id);
-                });
-
-                builder.Entity<Message>(b =>
-                {
-                    b.Key(m => m.Id);
-                    b.ForeignKey<UserTest>(m => m.UserId);
-                    b.ForeignKey<Conversation>(m => m.ConversationId);
-                });
-
-                builder.Entity<Attendee>(b =>
-                {
-                    b.Key(a => new { a.ConversationId, a.UserId });
-                    b.ForeignKey<Conversation>(a => a.ConversationId);
-                });
-
-            }
         }
 
         [Fact]
@@ -193,6 +106,21 @@ namespace ChatLe.Repository.Text
                     UserId = "test",
                 };
                 await store.CreateMessageAsync(message);
+            }
+        }
+        [Fact]
+        public async Task UpdateUserAsyncTest()
+        {
+            ServiceCollection services = GetServicesCollection();
+
+            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            {
+                var store = new ChatStore<string, UserTest, ChatDbContext>(context);
+                var user = new UserTest()
+                {
+                    Id = "test", UserName = "test", IsConnected = false
+                };
+                await store.UpdateUserAsync(user);
             }
         }
     }
