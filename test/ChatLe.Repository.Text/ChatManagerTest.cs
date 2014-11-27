@@ -1,5 +1,7 @@
-﻿using Microsoft.Data.Entity;
+﻿using ChatLe.Models;
+using Microsoft.Data.Entity;
 using Microsoft.Framework.DependencyInjection.Fallback;
+using Moq;
 using System;
 using Xunit;
 
@@ -11,10 +13,8 @@ namespace ChatLe.Repository.Text
         public void Constructor()
         {
             var services = TestHelpers.GetServicesCollection();
-            using (var context = new DbContext(services.BuildServiceProvider()))
-            {
-                var store = new ChatManager<UserTest>(context);
-            }
+            var manager1 = new ChatManager<string, UserTest>(new Mock<IChatStore<string, UserTest>>().Object);
+            var manager2 = new ChatManager(new Mock<ChatStore>().Object);
         }
     }
 }
