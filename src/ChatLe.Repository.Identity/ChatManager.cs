@@ -4,10 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatLe.Models
-{
+{    
     public class ChatManager : ChatManager<string, ChatLeUser>
     {
+        public ChatManager(IChatStore<string, ChatLeUser> store) : base(store) { }
     }
+
     public class ChatManager<TKey, TUser> : IChatManager<TKey, TUser> where TUser : IApplicationUser<TKey>
     {
         public ChatManager(IChatStore<TKey, TUser> store)
@@ -72,10 +74,13 @@ namespace ChatLe.Models
             if (user != null)
             {
                 var conv = await Store.GetConversationAsync(toConversationId);
-                message.ConversationId = toConversationId;
-                message.UserId = user.Id;
-                await Store.AddMessageAsync(message);
-                conv.Messages.Add(message);
+                if (conv != null)
+                {
+                    message.ConversationId = toConversationId;
+                    message.UserId = user.Id;
+                    await Store.CreateMessageAsync(message);
+                    conv.Messages.Add(message);
+                }
             }
         }
 
