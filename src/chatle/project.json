@@ -2,6 +2,8 @@
     /* Click to learn more about project.json  http://go.microsoft.com/fwlink/?LinkID=517074 */
     "webroot": "wwwroot",
     "version": "1.0.0-*",
+    "authors": [ "Olivier Lefebvre" ],
+    "description": "chatle is simple chat website using AST.NET 5 technologies",
     "dependencies": {
         "Kestrel": "1.0.0-beta1",
         "ChatLe.Repository.Identity": "",

@@ -1,7 +1,7 @@
 {
     "version": "1.0.0-*",
     "dependencies": {
-        "ChatLe.Repository.Identity": "1.0.0-*",
+        "ChatLe.Repository.Identity": "",
         "EntityFramework.InMemory": "7.0.0-beta1",
         "Xunit.KRunner": "1.0.0-beta1"
     },
