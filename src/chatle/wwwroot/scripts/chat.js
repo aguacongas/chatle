@@ -4,39 +4,98 @@
 
     var chatHub = $.connection.chat;
 
-    var viewModel = {
-        users: ko.observableArray(),
-        messages: ko.observableArray(),
-        unreadMessages: ko.observableArray(),
-        currentUser: ko.observable(),
-        sendMessage: function (message) {
-            var model = { To: viewModel.currentUser(), Text: message };
-            $.ajax('api/chat', {
-                data: model,
-                type: "POST"
-            }).done(function (data) {
-                model.From = "Me";
-                viewModel.messages.unshift(model);
-            });
-        },
-        showMessage: function (user) {
-            viewModel.currentUser(user);
-            $.getJSON('api/chat/' + user)
-                .done(function (data) {
-                    viewModel.messages(data);
+    var VM = function () {
+        return {
+            users: ko.observableArray(),
+            conversations: ko.observableArray(),
+            unreadMessages: ko.observableArray(),
+            currentConv: ko.observable(),
+            showMessage: function (user) {
+                var conv;
+                $.each(this.conversations, function (index, c) {
+                    var attendees = c.attendees();
+                    if (attendees.length === 1) {
+                        for (var a in attendees) {
+                            if (a.Id === user.Id) {
+                                conv = c;
+                                return false;
+                            }
+                        }
+                    }
                 });
-            viewModel.unreadMessages.remove(function (item) {
-                return item.From == user;
-            });
-        },
-        messageReceived: function (data) {
-            if (!data) {
-                return;
+                if (conv) {
+                    this.currentConv(conv);
+                    $.getJSON('api/chat/' + conv.Id)
+                        .done(function (data) {
+                            conv.messages(data);
+                        });
+                } else {
+                    conv = createConversationVM(
+                        {
+                            Id: null,
+                            Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: null }],
+                            Messages: null
+                        })
+                }
+                this.unreadMessages.remove(function (item) {
+                    return item.userId == user.Id;
+                });
+            },
+            messageReceived: function (data) {
+                if (!data) {
+                    return;
+                }
+                var conv;
+                $.each(this.conversations, function (index, c) {
+                    if (c === data.ConversationId) {
+                        conv = c;
+                        return false;
+                    }
+                });
+                if (!conv) {
+                    return;
+                }
+                conv.messages.unshift(data);
+                if (this.currentUser().Id !== data.UserId) {
+                    this.unreadMessages.unshift(data);
+                }
+            },
+            joinConversation: function (data) {
+                if (!data) {
+                    return;
+                }
+                var exist = false;
+                this.conversations.remove(function (conv) {
+                    return conv.Id === data.Id;
+                });
+                this.conversations.unshift(new ConversationVM(data));
             }
-            if (viewModel.currentUser() == data.From) {
-                viewModel.messages.unshift(data);
-            } else {
-                viewModel.unreadMessages.unshift(data);
+        }
+    };
+
+    var viewModel = new VM();
+    var ConversationVM = function (conv) {
+        return {
+            id: conv.Id,
+            attendees: ko.observableArray(conv.Attendees),
+            messages: ko.observableArray(conv.Messages),
+            sendMessage: function (message) {
+                if (!this.id) {
+                    $.ajax('api/chat/conv', {
+                        data: { to: attendees()[0].UserId, text: message },
+                        type: "POST"
+                    }).done(function (data) {
+                        this.id = data;
+                        viewModel.messages.unshift(model);
+                    });
+                } else {
+                    $.ajax('api/chat', {
+                        data: { to: this.id, text: message },
+                        type: "POST"
+                    }).done(function () {
+                        viewModel.messages.unshift({ from: "Me", text: message });
+                    });
+                }
             }
         }
     };
@@ -56,6 +115,10 @@
 
     chatHub.client.messageReceived = function (data) {
         viewModel.messageReceived(data);
+    }
+
+    chatHub.client.joinConversation = function (data) {
+        viewModel.joinConversation(data);
     }
 
     $.connection.hub.stateChanged(function (change) {

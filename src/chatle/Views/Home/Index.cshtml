@@ -10,18 +10,18 @@
         </ul>
     </div>
     <div class="col-xs-6">
-        <div data-bind="visible: currentUser">
-            <h6 data-bind="text: currentUser"></h6>
+        <div data-bind="visible: currentConv">
+            <h6 data-bind="text: currentConv"></h6>
             <input id="message" />
             <button data-bind="click: function(data, event) { sendMessage($('#message').val()); }">send</button>
-            <ul data-bind="foreach: messages">
+            <ul data-bind="foreach: currentConv.messages">
                 <li>
                     <span data-bind="text: From"></span><br />
                     <span data-bind="text: Text"></span>
                 </li>
             </ul>
         </div>
-        <h1 data-bind="visible:  typeof currentUser() === 'undefined'">WELCOME TO THIS REALY SIMPLE CHAT</h1>
+        <h1 data-bind="visible:  typeof currentConv() === 'undefined'">WELCOME TO THIS REALY SIMPLE CHAT</h1>
     </div>
     <div class="col-xs-3">
         <h6>UNREAD</h6>

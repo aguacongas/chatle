@@ -21,7 +21,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore(context);
+                var store = new ChatStore<UserTest>(context);
             }
         }
 

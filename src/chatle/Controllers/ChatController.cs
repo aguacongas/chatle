@@ -39,11 +39,11 @@ namespace ChatLe.Controllers
         }
 
         [HttpPost("conv")]
-        public async Task<string> CreateConversation(string withUserName, string initialMessage)
+        public async Task<string> CreateConversation(string to, string text)
         {
             var userName = Context.User.Identity.Name;
-            var conversation = await _chatManager.GetOrCreateConversationAsync(userName, withUserName);            
-            _hub.Clients.Group(withUserName).messageReceived(conversation.Id, userName, initialMessage);
+            var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
+            _hub.Clients.Group(to).joinConversation(conversation);
             return conversation.Id;
         }
 
