@@ -90,7 +90,7 @@ namespace ChatLe
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
 
-            services.AddChatLe<ChatLeUser, ChatLeIdentityDbContext>();
+            services.AddChatLe();
         }
 
         public void Configure(IApplicationBuilder app)

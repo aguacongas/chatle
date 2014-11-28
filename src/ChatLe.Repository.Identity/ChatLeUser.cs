@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
-    public class ChatLeUser : IdentityUser, IApplicationUser<string>
+    public class ChatLeUser : IdentityUser, IChatUser<string>
     {
         public ChatLeUser()
         {

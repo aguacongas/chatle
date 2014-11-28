@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,16 +11,16 @@ namespace ChatLe.Controllers
     [Route("api/users")]
     public class UserController : Controller
     {
-        ChatLeIdentityDbContext _dbContext;
-        public UserController(ChatLeIdentityDbContext dbContext)
+        IChatManager<string, ChatLeUser, Conversation, Attendee, Message> _manager;
+        public UserController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message> manager)
         {
-            _dbContext = dbContext;
+            _manager = manager;
         }
         // GET: /<controller>/
         [HttpGet()]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<ChatLeUser>> Get()
         {
-            return _dbContext.Users.Where(x => x.IsConnected && x.UserName != Context.User.Identity.Name).Select(x => x.UserName);
+            return await _manager.GetUsersConnectedAsync();
         }
     }
 }

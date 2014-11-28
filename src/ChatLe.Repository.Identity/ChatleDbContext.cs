@@ -1,17 +1,12 @@
-﻿using System;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using Microsoft.Framework.OptionsModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using Microsoft.Data.Entity.Metadata;
+using System;
+using System.Diagnostics;
 
 namespace ChatLe.Models
 {
-    
+
     public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
     {
         public DbSet<Message> Messages { get; set; }
@@ -47,16 +42,7 @@ namespace ChatLe.Models
                 b.Key(a => new { a.ConversationId, a.UserId });
                 b.ForeignKey<Conversation>(a => a.ConversationId);
                 b.ForRelational().Table("Attendees");
-            });
-
-            var model = builder.Model;
-            var conversationType = model.GetEntityType(typeof(Conversation));
-            var messageType = model.GetEntityType(typeof(Message));
-            var attendeeType = model.GetEntityType(typeof(Attendee));
-            var fkcm = messageType.GetOrAddForeignKey(messageType.GetProperty("UserId"), conversationType.GetPrimaryKey());
-            conversationType.AddNavigation("Messsages", fkcm, false);
-            var fkca = attendeeType.GetOrAddForeignKey(attendeeType.GetProperty("ConversationId"), conversationType.GetPrimaryKey());
-            conversationType.AddNavigation("Attendees", fkca, false);
+            });            
         }
     }
 }

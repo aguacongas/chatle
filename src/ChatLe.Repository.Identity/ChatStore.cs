@@ -4,23 +4,27 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
     public class ChatStore : ChatStore<ChatLeUser>
     {
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
     }
 
-    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext>
-        where TUser : class, IApplicationUser<string>
+    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message>
+        where TUser : class, IChatUser<string>
         {
         public ChatStore(DbContext context) : base(context) { }
     }
-    public class ChatStore<TKey, TUser, TContext> :IChatStore<TKey,TUser>
+    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage>
         where TKey : IEquatable<TKey>
-        where TUser : class, IApplicationUser<TKey>
+        where TUser : class, IChatUser<TKey>
         where TContext : DbContext
+        where TConversation : Conversation<TKey>
+        where TAttendee : Attendee<TKey>
+        where TMessage : Message<TKey>
     {
         public ChatStore(TContext context)
         {
@@ -35,11 +39,11 @@ namespace ChatLe.Models
         public TContext Context { get; private set; }
 
         public DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
-        public DbSet<Conversation<TKey>> Conversations { get { return Context.Set<Conversation<TKey>>(); } }
-        public DbSet<Message<TKey>> Messages { get { return Context.Set<Message<TKey>>(); } }
-        public DbSet<Attendee<TKey>> Attendees { get { return Context.Set<Attendee<TKey>>(); } }
+        public DbSet<TConversation> Conversations { get { return Context.Set<TConversation>(); } }
+        public DbSet<TMessage> Messages { get { return Context.Set<TMessage>(); } }
+        public DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
 
-        public async Task CreateMessageAsync(Message<TKey> message)
+        public async Task CreateMessageAsync(TMessage message)
         {            
             if(message == null)
             {
@@ -49,7 +53,7 @@ namespace ChatLe.Models
             await Context.SaveChangesAsync();
         }
 
-        public async Task CreateAttendeeAsync(Attendee<TKey> attendee)
+        public async Task CreateAttendeeAsync(TAttendee attendee)
         {
             if(attendee == null)
             {
@@ -59,7 +63,7 @@ namespace ChatLe.Models
             await Context.SaveChangesAsync();
         }
 
-        public async Task CreateConversationAsync(Conversation<TKey> conversation)
+        public async Task CreateConversationAsync(TConversation conversation)
         {
             if (conversation == null)
             {
@@ -84,7 +88,7 @@ namespace ChatLe.Models
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Conversation<TKey>> GetConversationAsync(TUser attendee1, TUser attendee2)
+        public async Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2)
         {
             if (attendee1 == null)
             {
@@ -97,10 +101,19 @@ namespace ChatLe.Models
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
 
-        public async Task<Conversation<TKey>> GetConversationAsync(TKey convId)
+        public async Task<TConversation> GetConversationAsync(TKey convId)
         {
             return await Conversations.FirstOrDefaultAsync(c => c.Id.Equals(convId));
         }
 
+        public async Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId)
+        {
+            return await Messages.Where(m => m.ConversationId.Equals(convId)).ToListAsync();
+        }
+
+        public async Task<IEnumerable<TUser>> GetUsersConnectedAsync()
+        {
+            return await Users.Where(u => u.IsConnected == true).ToListAsync();
+        }
     }
 }

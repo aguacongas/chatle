@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Microsoft.Data.Entity.Metadata;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatLe.Repository.Text
 {
@@ -43,7 +44,7 @@ namespace ChatLe.Repository.Text
         [Fact]        
         public void ConstrutorFailTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest>(null));            
+            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message>(null));            
         }
 
         class FakeContextTest : DbContext
@@ -58,7 +59,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message>(context);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsType<DbSet<Conversation<string>>>(conversations);
@@ -71,7 +72,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message>(context);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsType<DbSet<Message<string>>>(messages);
@@ -84,7 +85,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message>(context);
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsType<DbSet<UserTest>>(users);
@@ -97,7 +98,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message>(context);
                 var message = new Message()
                 {
                     ConversationId = "test",
@@ -115,12 +116,42 @@ namespace ChatLe.Repository.Text
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message>(context);
                 var user = new UserTest()
                 {
                     Id = "test", UserName = "test", IsConnected = false
                 };
                 await store.UpdateUserAsync(user);
+            }
+        }
+
+        [Fact]
+        public async Task GetUsersConnectedAsyncTest()
+        {
+            ServiceCollection services = GetServicesCollection();
+
+            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            {
+                var connected = new UserTest()
+                {
+                    Id = "connected",
+                    UserName = "connected",
+                    IsConnected = true
+                };
+                var notConnected = new UserTest()
+                {
+                    Id = "notConnected",
+                    UserName = "notConnected",
+                    IsConnected = false
+                };
+                context.Users.Add(connected);
+                context.Users.Add(notConnected);
+                context.SaveChanges();
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message>(context);
+
+                var users = await store.GetUsersConnectedAsync();
+                Assert.True(users.Count() == 1);
+                Assert.True(users.FirstOrDefault() == connected);
             }
         }
     }

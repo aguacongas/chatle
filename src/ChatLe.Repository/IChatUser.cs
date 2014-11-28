@@ -2,7 +2,7 @@
 
 namespace ChatLe.Models
 {
-    public interface IApplicationUser<TKey>
+    public interface IChatUser<TKey>
     {
         TKey Id { get; set; }
         string UserName { get; set; }

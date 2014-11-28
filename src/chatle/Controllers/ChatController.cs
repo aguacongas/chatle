@@ -15,28 +15,37 @@ namespace ChatLe.Controllers
     [Route("api/chat")]
     public class ChatController : Controller
     {
-        private readonly ChatLeIdentityDbContext _dbContext;
+        private readonly IChatManager<string, ChatLeUser, Conversation, Attendee, Message> _chatManager;
         private readonly IHubContext _hub;
 
-        public ChatController(ChatLeIdentityDbContext dbContext, IConnectionManager manager)
+        public ChatController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message> chatManager, IConnectionManager manager)
         {
-            _dbContext = dbContext;
+            _chatManager = chatManager;
             _hub = manager.GetHubContext<ChatHub>();
         }
         // GET: /<controller>/
         [HttpGet("{id}")]
-        public IEnumerable<Message> Get(string id)
+        public async Task<IEnumerable<Message>> Get(string id)
         {
-            return _dbContext.Messages.Where(x => (x.UserId == id && x.ConversationId ==Context.User.Identity.Name) || (x.ConversationId == id && x.UserId == Context.User.Identity.Name)).OrderByDescending(x => x.Date);
+            return await _chatManager.GetMessagesAsync(id);
         }
 
         [HttpPost()]
         public async Task SendMessage(string to, string text)
         {
-            var message = new Message() { UserId = Context.User.Identity.Name, ConversationId = to, Text = text, Date = DateTime.Now };
+            var message = new Message() { ConversationId = to, Text = text, Date = DateTime.Now };
+            await _chatManager.AddMessageAsync(Context.User.Identity.Name, to, message);
             _hub.Clients.Group(to).messageReceived(message);
-            await _dbContext.Messages.AddAsync(message);
-            await _dbContext.SaveChangesAsync();
         }
+
+        [HttpPost("conv")]
+        public async Task<string> CreateConversation(string withUserName, string initialMessage)
+        {
+            var userName = Context.User.Identity.Name;
+            var conversation = await _chatManager.GetOrCreateConversationAsync(userName, withUserName);            
+            _hub.Clients.Group(withUserName).messageReceived(conversation.Id, userName, initialMessage);
+            return conversation.Id;
+        }
+
     }
 }

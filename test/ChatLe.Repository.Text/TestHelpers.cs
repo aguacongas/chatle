@@ -19,7 +19,7 @@ namespace ChatLe.Repository.Text
             return services;
         }
     }
-    public class UserTest : IApplicationUser<string>
+    public class UserTest : IChatUser<string>
     {
         public string Id { get; set; } = "test";
 
