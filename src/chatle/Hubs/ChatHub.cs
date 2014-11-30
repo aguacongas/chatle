@@ -12,13 +12,13 @@ namespace ChatLe.Hubs
     [HubName("chat")]
     public class ChatHub : Hub
     {
-        public ChatManager Manager
+        public IChatManager<string, ChatLeUser, Conversation, Attendee, Message> Manager
         {
             get;
             private set;
         }
 
-        public ChatHub(ChatManager manager) :base()
+        public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message> manager) :base()
         {
             if (manager == null)
             {

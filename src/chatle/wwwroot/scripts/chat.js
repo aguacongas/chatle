@@ -5,14 +5,14 @@
     var chatHub = $.connection.chat;
 
     var VM = function () {
-        return {
+        var vm = {
             users: ko.observableArray(),
             conversations: ko.observableArray(),
             unreadMessages: ko.observableArray(),
             currentConv: ko.observable(),
             showMessage: function (user) {
                 var conv;
-                $.each(this.conversations, function (index, c) {
+                $.each(vm.conversations(), function (index, c) {
                     var attendees = c.attendees();
                     if (attendees.length === 1) {
                         for (var a in attendees) {
@@ -24,20 +24,21 @@
                     }
                 });
                 if (conv) {
-                    this.currentConv(conv);
+                    vm.currentConv(conv);
                     $.getJSON('api/chat/' + conv.Id)
                         .done(function (data) {
                             conv.messages(data);
                         });
                 } else {
-                    conv = createConversationVM(
+                    conv = new ConversationVM(
                         {
                             Id: null,
                             Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: null }],
                             Messages: null
                         })
                 }
-                this.unreadMessages.remove(function (item) {
+                vm.currentConv(conv);
+                vm.unreadMessages.remove(function (item) {
                     return item.userId == user.Id;
                 });
             },
@@ -46,7 +47,7 @@
                     return;
                 }
                 var conv;
-                $.each(this.conversations, function (index, c) {
+                $.each(vm.conversations, function (index, c) {
                     if (c === data.ConversationId) {
                         conv = c;
                         return false;
@@ -56,8 +57,8 @@
                     return;
                 }
                 conv.messages.unshift(data);
-                if (this.currentUser().Id !== data.UserId) {
-                    this.unreadMessages.unshift(data);
+                if (vm.currentUser().Id !== data.UserId) {
+                    vm.unreadMessages.unshift(data);
                 }
             },
             joinConversation: function (data) {
@@ -65,39 +66,42 @@
                     return;
                 }
                 var exist = false;
-                this.conversations.remove(function (conv) {
+                vm.conversations.remove(function (conv) {
                     return conv.Id === data.Id;
                 });
-                this.conversations.unshift(new ConversationVM(data));
+                vm.conversations.unshift(new ConversationVM(data));
             }
-        }
+        };
+
+        return vm;
     };
 
     var viewModel = new VM();
     var ConversationVM = function (conv) {
-        return {
+        var vm = {
             id: conv.Id,
             attendees: ko.observableArray(conv.Attendees),
             messages: ko.observableArray(conv.Messages),
             sendMessage: function (message) {
-                if (!this.id) {
+                if (!vm.id) {
                     $.ajax('api/chat/conv', {
                         data: { to: attendees()[0].UserId, text: message },
                         type: "POST"
                     }).done(function (data) {
-                        this.id = data;
+                        vm.id = data;
                         viewModel.messages.unshift(model);
                     });
                 } else {
                     $.ajax('api/chat', {
-                        data: { to: this.id, text: message },
+                        data: { to: vm.id, text: message },
                         type: "POST"
                     }).done(function () {
                         viewModel.messages.unshift({ from: "Me", text: message });
                     });
                 }
             }
-        }
+        };
+        return vm;
     };
 
     chatHub.client.userConnected = function (userName) {

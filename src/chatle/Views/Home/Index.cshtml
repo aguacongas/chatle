@@ -13,7 +13,7 @@
         <div data-bind="visible: currentConv">
             <h6 data-bind="text: currentConv"></h6>
             <input id="message" />
-            <button data-bind="click: function(data, event) { sendMessage($('#message').val()); }">send</button>
+            <button data-bind="click: function(data, event) { currentConv.sendMessage($('#message').val()); }">send</button>
             <ul data-bind="foreach: currentConv.messages">
                 <li>
                     <span data-bind="text: From"></span><br />
