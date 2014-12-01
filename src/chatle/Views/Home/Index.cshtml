@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Security.Principal
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -6,20 +7,22 @@
     <div class="col-xs-3">
         <h6>CONNECTED</h6>
         <ul data-bind="foreach: users">
-            <li data-bind="text: $data, click: $parent.showMessage"></li>
+            <li><a href="#" data-bind="text: Id, click: $parent.showMessage($data)"></a></li>
         </ul>
     </div>
     <div class="col-xs-6">
         <div data-bind="visible: currentConv">
-            <h6 data-bind="text: currentConv"></h6>
+            <!-- ko with currentConv -->
+            <h6 data-bind="text: title"></h6>
             <input id="message" />
-            <button data-bind="click: function(data, event) { currentConv.sendMessage($('#message').val()); }">send</button>
-            <ul data-bind="foreach: currentConv.messages">
+            <button data-bind="click: function(data, event) { sendMessage($('#message').val()); $('#message').val(''); }">send</button>
+            <ul data-bind="foreach: messages">
                 <li>
                     <span data-bind="text: From"></span><br />
                     <span data-bind="text: Text"></span>
                 </li>
             </ul>
+            <!-- /ko -->
         </div>
         <h1 data-bind="visible:  typeof currentConv() === 'undefined'">WELCOME TO THIS REALY SIMPLE CHAT</h1>
     </div>
@@ -40,4 +43,7 @@
     <script src="~/lib/signalr/jquery.signalR.js"></script>
     <script src="/signalr/js"></script>
     <script src="~/scripts/chat.js"></script>
+    <script>
+        var UserName = '@User.Identity.GetUserName()';
+    </script>
 }

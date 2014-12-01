@@ -15,14 +15,6 @@ namespace ChatLe.Models
             UserName = userName;
         }
 
-        public bool IsConnected
-        {
-            get
-            {
-                return SignalRConnectionIds.Count > 0;
-            }
-        }
-
-        public virtual ICollection<string> SignalRConnectionIds { get; } = new List<string>();
+        public virtual ICollection<NotificationConnection<string>> NotificationConnections { get; } = new List<NotificationConnection<string>>();
     }
 }

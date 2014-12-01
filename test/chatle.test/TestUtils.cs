@@ -1,5 +1,6 @@
 ﻿using ChatLe.Models;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Identity;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.DependencyInjection.Fallback;
 using Microsoft.Framework.Logging;
@@ -19,7 +20,8 @@ namespace chatle.test
                 .AddDbContext<ChatLeIdentityDbContext>();
             services.Add(OptionsServices.GetDefaultServices())
                 .AddInstance<ILoggerFactory>(new LoggerFactory());
-
+            services.AddDefaultIdentity<ChatLeIdentityDbContext, ChatLeUser, IdentityRole>();
+            services.AddChatLe();
             return services.BuildServiceProvider();
         }
     }

@@ -36,8 +36,9 @@
                             Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: null }],
                             Messages: null
                         })
+                    vm.conversations.unshift(conv);
                 }
-                vm.currentConv(conv);
+                vm.currentConv(conv);                
                 vm.unreadMessages.remove(function (item) {
                     return item.userId == user.Id;
                 });

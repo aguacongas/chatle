@@ -36,8 +36,9 @@
                             Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: null }],
                             Messages: null
                         })
+                    vm.conversations.unshift(conv);
                 }
-                vm.currentConv(conv);
+                vm.currentConv(conv);                
                 vm.unreadMessages.remove(function (item) {
                     return item.userId == user.Id;
                 });
@@ -80,7 +81,8 @@
     var ConversationVM = function (conv) {
         var vm = {
             id: conv.Id,
-            attendees: ko.observableArray(conv.Attendees),
+            title: ko.observable(),
+            attendees: conv.Attendees,
             messages: ko.observableArray(conv.Messages),
             sendMessage: function (message) {
                 if (!vm.id) {
@@ -101,6 +103,13 @@
                 }
             }
         };
+
+        for (var attendee in conv.Attendees) {
+            if (attendee.Id !== UserName) {
+                vm.title += attendee.Id + ' ';
+            }
+        }
+    
         return vm;
     };
 

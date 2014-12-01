@@ -11,16 +11,17 @@ namespace ChatLe.Controllers
     [Route("api/users")]
     public class UserController : Controller
     {
-        IChatManager<string, ChatLeUser, Conversation, Attendee, Message> _manager;
-        public UserController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message> manager)
+        IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> _manager;
+        public UserController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager)
         {
             _manager = manager;
         }
         // GET: /<controller>/
         [HttpGet()]
-        public async Task<IEnumerable<ChatLeUser>> Get()
+        public async Task<IEnumerable<dynamic>> Get()
         {
-            return await _manager.GetUsersConnectedAsync();
+            var users = await _manager.GetUsersConnectedAsync();
+            return users.Select(u => new { Id = u.UserName });
         }
     }
 }

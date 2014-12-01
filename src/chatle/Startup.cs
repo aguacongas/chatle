@@ -106,7 +106,8 @@ namespace ChatLe
                     template: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" });
                 })
-                .UseSignalR();
+                .UseSignalR()
+                .UseChatLe();
         }
     }
 }

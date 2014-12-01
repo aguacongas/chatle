@@ -15,6 +15,8 @@ namespace ChatLe.Models
 
         public DbSet<Attendee> Attendees { get; set; }
 
+        public DbSet<NotificationConnection> NotificationConnections { get; set; }
+
         public ChatLeIdentityDbContext()
         {
             Trace.TraceInformation("[ApplicationDbContext] constructor");
@@ -23,6 +25,13 @@ namespace ChatLe.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<NotificationConnection>(b =>
+            {
+                b.Key(n => new { n.ConnectionId, n.NotificationType });
+                b.ForeignKey<ChatLeUser>(n => n.UserId);
+                b.ForRelational().Table("NotificationConnections");
+            });
+
             builder.Entity<Conversation>(b =>
             {
                 b.Key(c => c.Id);
@@ -44,5 +53,6 @@ namespace ChatLe.Models
                 b.ForRelational().Table("Attendees");
             });            
         }
+
     }
 }

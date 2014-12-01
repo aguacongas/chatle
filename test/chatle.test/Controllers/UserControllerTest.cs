@@ -11,9 +11,9 @@ namespace chatle.test.Controllers
         public void GetUsersTest()
         {
             var provider = TestUtils.GetServiceProvider();
-            var dbContext = provider.GetService(typeof(ChatLeIdentityDbContext)) as ChatLeIdentityDbContext;
-
-            using (var controller = new UserController(dbContext))
+            var manager = provider.GetService(typeof(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>)) as IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>;
+            
+            using (var controller = new UserController(manager))
             {
                 var users = controller.Get();
             }                

@@ -10,5 +10,6 @@ namespace ChatLe.Models
         public TKey ConversationId { get; set; }
 
         public TKey UserId { get; set; }
+
     }
 }

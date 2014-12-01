@@ -13,18 +13,19 @@ namespace ChatLe.Models
         public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
     }
 
-    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message>
+    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection>
         where TUser : class, IChatUser<string>
         {
         public ChatStore(DbContext context) : base(context) { }
     }
-    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage>
+    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TKey : IEquatable<TKey>
         where TUser : class, IChatUser<TKey>
         where TContext : DbContext
         where TConversation : Conversation<TKey>
         where TAttendee : Attendee<TKey>
         where TMessage : Message<TKey>
+        where TNotificationConnection : NotificationConnection<TKey>
     {
         public ChatStore(TContext context)
         {
@@ -42,35 +43,36 @@ namespace ChatLe.Models
         public DbSet<TConversation> Conversations { get { return Context.Set<TConversation>(); } }
         public DbSet<TMessage> Messages { get { return Context.Set<TMessage>(); } }
         public DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
+        public DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
 
-        public async Task CreateMessageAsync(TMessage message)
+        public async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
         {            
             if(message == null)
             {
                 throw new ArgumentNullException("message");
             }
-            await Context.AddAsync(message);
-            await Context.SaveChangesAsync();
+            await Context.AddAsync(message, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task CreateAttendeeAsync(TAttendee attendee)
+        public async Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
         {
             if(attendee == null)
             {
                 throw new ArgumentNullException("attendee");
             }
-            await Context.AddAsync(attendee);
-            await Context.SaveChangesAsync();
+            await Context.AddAsync(attendee, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task CreateConversationAsync(TConversation conversation)
+        public async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (conversation == null)
             {
                 throw new ArgumentNullException("conversation");
             }
-            await Context.AddAsync(conversation);
-            await Context.SaveChangesAsync();
+            await Context.AddAsync(conversation, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<TUser> FindUserByNameAsync(string userName)
@@ -113,7 +115,50 @@ namespace ChatLe.Models
 
         public async Task<IEnumerable<TUser>> GetUsersConnectedAsync()
         {
-            return await Users.Where(u => u.IsConnected == true).ToListAsync();
+            var query = (from u in Users
+                         join nc in NotificationConnections
+                         on u.Id equals nc.UserId
+                         select u).Distinct();
+
+            return await query.ToListAsync();
+        }
+
+        public async Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException("connection");
+            }
+            await Context.AddAsync(connection, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException("connection");
+            }
+            Context.Delete(connection);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+        public async Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType)
+        {
+            if (notificationType == null)
+            {
+                throw new ArgumentNullException("connectionId");
+            }
+            if (notificationType == null)
+            {
+                throw new ArgumentNullException("connectionId");
+            }
+            return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
+        }
+
+        public void Init()
+        {
+            NotificationConnections.RemoveRange(NotificationConnections);
+            Context.SaveChanges();
         }
     }
 }

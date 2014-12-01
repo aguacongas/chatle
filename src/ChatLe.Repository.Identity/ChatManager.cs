@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
-    public class ChatManager : ChatManager<string, ChatLeUser, Conversation, Attendee, Message>
+    public class ChatManager : ChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>
     {
-        public ChatManager(IChatStore<string, ChatLeUser, Conversation, Attendee, Message> store) : base(store) { }
+        public ChatManager(IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> store) : base(store) { }
     }
 
-    public class ChatManager<TKey, TUser, TConversation, TAttendee, TMessage> : IChatManager<TKey, TUser, TConversation, TAttendee, TMessage> 
+    public class ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> : IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> 
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>, new()
         where TAttendee : Attendee<TKey>, new()
         where TMessage : Message<TKey>, new()
+        where TNotificationConnection : NotificationConnection<TKey>, new()
     {
-        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage> store)
+        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store)
         {
             if (store == null)
             {
@@ -26,9 +27,9 @@ namespace ChatLe.Models
             Store = store;
         }
 
-        public IChatStore<TKey, TUser, TConversation, TAttendee, TMessage> Store { get; private set; }
+        public IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> Store { get; private set; }
 
-        public async Task AddConnectionIdAsync(string userName, string connectionId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AddConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (userName == null)
             {
@@ -42,14 +43,21 @@ namespace ChatLe.Models
             var user = await Store.FindUserByNameAsync(userName);
             if (user != null)
             {
-                if (!user.SignalRConnectionIds.Contains(connectionId))
+                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType);
+                if (nc == null)
                 {
-                    user.SignalRConnectionIds.Add(connectionId);
+                    nc = new TNotificationConnection()
+                    {
+                        UserId = user.Id,
+                        ConnectionId = connectionId,
+                        NotificationType = notificationType
+                    };
+                    await Store.CreateNotificationConnectionAsync(nc, cancellationToken);
                 }
-                await Store.UpdateUserAsync(user, cancellationToken);
+                user.NotificationConnections.Add(nc);
             }
         }
-        public async Task RemoveConnectionIdAsync(string userName, string connectionId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (userName == null)
             {
@@ -63,11 +71,15 @@ namespace ChatLe.Models
             var user = await Store.FindUserByNameAsync(userName);
             if (user != null)
             {
-                user.SignalRConnectionIds.Remove(connectionId);
-                await Store.UpdateUserAsync(user, cancellationToken);
+                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType);
+                if (nc == null)
+                {
+                    await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
+                    user.NotificationConnections.Remove(nc);
+                }
             }
         }
-        public async Task AddMessageAsync(string fromName, TKey toConversationId, TMessage message)
+        public async Task AddMessageAsync(string fromName, TKey toConversationId, TMessage message, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (fromName == null)
             {
@@ -86,13 +98,13 @@ namespace ChatLe.Models
                 {
                     message.ConversationId = toConversationId;
                     message.UserId = user.Id;
-                    await Store.CreateMessageAsync(message);
+                    await Store.CreateMessageAsync(message, cancellationToken);
                     conv.Messages.Add(message);
                 }
             }
         }
 
-        public async Task<TConversation> GetOrCreateConversationAsync(string from, string to, string initialMessage = null)
+        public async Task<TConversation> GetOrCreateConversationAsync(string from, string to, string initialMessage = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (from == null)
             {
@@ -109,32 +121,32 @@ namespace ChatLe.Models
             if (conv == null)
             {
                 conv = new TConversation();
-                await Store.CreateConversationAsync(conv);
-                conv.Attendees.Add(await AddAttendeeAsyn(conv.Id, attendee1.Id));
-                conv.Attendees.Add(await AddAttendeeAsyn(conv.Id, attendee2.Id));
+                await Store.CreateConversationAsync(conv, cancellationToken);
+                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee1.Id, cancellationToken));
+                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee2.Id, cancellationToken));
             }
 
             if (initialMessage != null)
-                await AddMessageAsync(conv, attendee1, initialMessage);
+                await AddMessageAsync(conv, attendee1, initialMessage, cancellationToken);
 
             return conv;
         }
 
-        private async Task AddMessageAsync(TConversation conv, TUser user, string text)
+        private async Task AddMessageAsync(TConversation conv, TUser user, string text, CancellationToken cancellationToken)
         {
             var message = new TMessage();
             message.ConversationId = conv.Id;
             message.UserId = user.Id;
             message.Text = text;
-            await Store.CreateMessageAsync(message);
+            await Store.CreateMessageAsync(message, cancellationToken);
             conv.Messages.Add(message);
         }
-        private async Task<TAttendee> AddAttendeeAsyn(TKey convId, TKey userId)
+        private async Task<TAttendee> AddAttendeeAsync(TKey convId, TKey userId, CancellationToken cancellationToken)
         {
             var attendee = new TAttendee();
             attendee.ConversationId = convId;
             attendee.UserId = userId;
-            await Store.CreateAttendeeAsync(attendee);
+            await Store.CreateAttendeeAsync(attendee, cancellationToken);
             return attendee;
         }
 
