@@ -1,10 +1,22 @@
-﻿$(function () {
+﻿/**
+  * @desc chat management class
+  * @author Olivier Lefebvre
+*/
+$(function () {
     "use strict";
+    // only for debug
     $.connection.hub.logging = true;
-
+    // get the signalR hub named 'chat'
     var chatHub = $.connection.chat;
 
+    /**
+      * @desc main view model constructor
+    */
     var VM = function () {
+        /**
+          * @desc get or create a one to one conversation with the user and retrieve messages
+          * @param User user
+        */
         var showMessages = function (user) {
             var conv;
             $.each(this.conversations(), function (index, c) {
@@ -20,7 +32,6 @@
                 }
             });
             if (conv) {
-                this.currentConv(conv);
                 conv.getMessages();
             } else {
                 conv = new ConversationVM(
@@ -29,11 +40,14 @@
                         Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: UserName }],
                         Messages: null
                     })
-                this.conversations.unshift(conv);
             }
             this.currentConv(conv);
         };
-
+        /**
+          * @desc add the message received in the conversation having id = to
+          * @param String to, the conversation id
+          * @param Message data, the message
+        */
         var messageReceived = function (to, data) {
             if (!data || !to) {
                 return;
@@ -50,7 +64,10 @@
             }
             conv.messages.unshift(data);
         };
-
+        /**
+          * @desc add the current user in a new conversation
+          * @param Conv data, the conversation model
+        */
         var joinConversation = function (data) {
             if (!data) {
                 return;
@@ -61,7 +78,10 @@
             });
             this.conversations.unshift(new ConversationVM(data));
         };
-
+        /**
+          * @desc set the conv as the current conversation
+          * @param ConversationVM conv, the conversation model
+        */
         var showConversation = function (conv) {
             this.currentConv(conv);
         };
@@ -77,7 +97,14 @@
     };
 
     var viewModel = new VM();
+    /**
+      * @desc conversation view model constructor
+    */
     var ConversationVM = function (conv) {
+        /**
+          * @desc send a new message in the conversation
+          * @param String textBoxId, the id of the textbox containing the message to send
+        */
         var sendMessage = function (textBoxId) {
             var textBox = $(textBoxId);
             var message = textBox.val();
@@ -100,7 +127,9 @@
                 });
             }
         };
-
+        /**
+          * @desc get messages for the conversation
+        */
         var getMessages = function () {
             var self = this;
             $.getJSON('api/chat/' + this.id)
@@ -128,7 +157,10 @@
             getMessages: getMessages
         };
     };
-
+    /**
+      * @desc callback when a new user connect to the chat
+      * @param User user, the connected user
+    */
     chatHub.client.userConnected = function (user) {
         console.log("Chat Hub newUserConnected " + user.Id);
         var users = viewModel.users;
@@ -137,22 +169,32 @@
         });
         users.unshift(user);
     };
-
+    /**
+      * @desc callback when a new user disconnect the chat
+      * @param User user, the disconnected user
+    */
     chatHub.client.userDisconnected = function (user) {
         console.log("Chat Hub userDisconnected " + user.Id);
         viewModel.users.remove(function (u) {
             return u.Id === user.Id;
         });
     };
-
+    /**
+      * @desc callback when a message is received
+      * @param String to, the conversation id
+      * @param Message data, the message
+    */
     chatHub.client.messageReceived = function (to, data) {
         viewModel.messageReceived(to, data);
     };
-
+    /**
+      * @desc callback when a new conversation is create on server
+      * @param Conv data, the conversation model
+    */
     chatHub.client.joinConversation = function (data) {
         viewModel.joinConversation(data);
     };
-
+    // for debug only, callback on connection state change
     $.connection.hub.stateChanged(function (change) {
         var oldState = null,
             newState = null;
@@ -168,19 +210,19 @@
 
         console.log("Chat Hub state changed from " + oldState + " to " + newState);
     });
-
+    // for debug only, callback on connection reconnect
     $.connection.hub.reconnected(function () {
         console.log("Chat Hub reconnect");
     });
-
+    // for debug only, callback on connection error
     $.connection.hub.error(function (err) {
         console.log("Chat Hub error");
     });
-
+    // for debug only, callback on connection disconnect
     $.connection.hub.disconnected(function () {
         console.log("Chat Hub disconnected");
     });
-
+    // start the connection
     $.connection.hub.start()
         .done(function () {
             console.log("Chat Hub started");
@@ -189,6 +231,6 @@
                     viewModel.users(data);
                 });
         });
-
+    // apply the view model binding
     ko.applyBindings(viewModel);
 });

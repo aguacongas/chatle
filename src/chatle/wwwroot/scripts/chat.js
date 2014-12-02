@@ -1,10 +1,21 @@
-﻿$(function () {
+﻿/**
+  * @desc chat management class
+  * @author Olivier Lefebvre
+*/
+$(function () {
     "use strict";
+    // only for debug
     $.connection.hub.logging = true;
-
+    // get the signalR hub named 'chat'
     var chatHub = $.connection.chat;
 
+    /**
+      * @desc main view model constructor
+    */
     var VM = function () {
+        /**
+          * @desc main view model constructor
+        */
         var showMessages = function (user) {
             var conv;
             $.each(this.conversations(), function (index, c) {
@@ -28,8 +39,7 @@
                         Id: null,
                         Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: UserName }],
                         Messages: null
-                    })
-                this.conversations.unshift(conv);
+                    })                
             }
             this.currentConv(conv);
         };
