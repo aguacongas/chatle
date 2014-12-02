@@ -4,7 +4,7 @@ namespace chatle.Models
 {
     public class AttendeeViewModel
     {
-        public string UserName { get; set; }        
+        public string UserId { get; set; }        
     }
     public class MessageViewModel
     {

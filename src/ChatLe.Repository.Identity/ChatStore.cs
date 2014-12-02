@@ -158,7 +158,29 @@ namespace ChatLe.Models
         public void Init()
         {
             NotificationConnections.RemoveRange(NotificationConnections);
+            Attendees.RemoveRange(Attendees);
+            Conversations.RemoveRange(Conversations);
             Context.SaveChanges();
+        }
+
+        public async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType)
+        {
+            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
+        }
+
+        public async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv)
+        {
+            var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
+            var atts = conv.Attendees;
+            foreach(var attendee in attendees)
+            {
+                if (!atts.Any(a => a.UserId.Equals(attendee.UserId)))
+                {
+                    atts.Add(attendee);
+                }
+            }
+
+            return attendees;
         }
     }
 }

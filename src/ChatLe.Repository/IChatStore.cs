@@ -26,7 +26,8 @@ namespace ChatLe.Models
         Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken);
         Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken);
         Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType);
-
         void Init();
+        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType);
+        Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv);
     }
 }
