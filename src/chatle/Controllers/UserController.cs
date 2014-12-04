@@ -26,7 +26,7 @@ namespace ChatLe.Controllers
         /// <summary>
         /// Gets the conneted users list
         /// </summary>
-        /// <returns>a task with the connected user list as result</returns>
+        /// <returns>a <see cref="Task<IEnumerable<dynamic>>"/> with the connected user list as result</returns>
         // GET: /<controller>/
         [HttpGet()]
         public async Task<IEnumerable<dynamic>> Get()

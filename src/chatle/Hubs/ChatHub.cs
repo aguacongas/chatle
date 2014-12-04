@@ -40,7 +40,7 @@ namespace ChatLe.Hubs
         /// Called when the connection connects to this hub instance.
         /// <para>Create a signalR group for the connected user with is name</para>
         /// </summary>
-        /// <returns>an async task</returns>
+        /// <returns>a <see cref="Task"/></returns>
         public override async Task OnConnected()
         {
             string name = Context.User.Identity.Name;
@@ -54,7 +54,7 @@ namespace ChatLe.Hubs
         /// Called when the connection reconnects to this hub instance.
         /// <para>Create a signalR group for the connected user with is name</para>
         /// </summary>
-        /// <returns>an async task</returns>
+        /// <returns>a <see cref="Task"/></returns>
         public override async Task OnReconnected()
         {
             string name = Context.User.Identity.Name;
@@ -72,7 +72,7 @@ namespace ChatLe.Hubs
         /// <para>if the connection has been lost for longer than the Configuration.IConfigurationManager.DisconnectTimeout.</para>
         /// <para>Timeouts can be caused by clients reconnecting to another SignalR server in scaleout.</para>
         /// </param>
-        /// <returns></returns>
+        /// <returns>a <see cref="Task"/></returns>
         public override async Task OnDisconnected(bool stopCalled)
         {
             string name = Context.User.Identity.Name;

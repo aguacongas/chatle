@@ -39,7 +39,7 @@ namespace ChatLe.Controllers
         /// Get messages in a conversation asyncronously
         /// </summary>
         /// <param name="id">the conversation id</param>
-        /// <returns>a task with the messages list as result</returns>
+        /// <returns>a <see cref="Task<IEnumerable<MessageViewModel>>"/> with the messages list as result</returns>
         // GET: /<controller>/
         [HttpGet("{id}")]
         public async Task<IEnumerable<MessageViewModel>> Get(string id)
@@ -67,7 +67,7 @@ namespace ChatLe.Controllers
         /// </summary>
         /// <param name="to">the conversation id</param>
         /// <param name="text">the message content</param>
-        /// <returns>an async task</returns>
+        /// <returns>a <see cref="Task"/></returns>
         [HttpPost()]
         public async Task SendMessage(string to, string text)
         {
@@ -89,7 +89,7 @@ namespace ChatLe.Controllers
         /// </summary>
         /// <param name="to">the second user</param>
         /// <param name="text">the 1st message content</param>
-        /// <returns>a task with the conversation id as result or null if the user doesn't exist</returns>
+        /// <returns>a <see cref="Task<string>"/> with the conversation id as result or null if the user doesn't exist</returns>
         [HttpPost("conv")]
         public async Task<string> CreateConversation(string to, string text)
         {

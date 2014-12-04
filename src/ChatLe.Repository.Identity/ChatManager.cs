@@ -6,11 +6,26 @@ using System.Threading.Tasks;
 
 namespace ChatLe.Models
 {
+    /// <summary>
+    /// Default <see cref="ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>"/>
+    /// </summary>
     public class ChatManager : ChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="store">a chat store</param>
         public ChatManager(IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> store) : base(store) { }
     }
-
+    /// <summary>
+    /// Manage chat repository
+    /// </summary>
+    /// <typeparam name="TKey">type of primary key</typeparam>
+    /// <typeparam name="TUser">type of user, must implement <see cref="IChatUser<TKey>"/></typeparam>
+    /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation<TKey>"/></typeparam>
+    /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee<TKey>"/></typeparam>
+    /// <typeparam name="TMessage">type of message, must be a <see cref="Message<TKey>"/></typeparam>
+    /// <typeparam name="TNotificationConnection">type of notification's connection, must be a <see cref="NotificationConnection<TKey>"/></typeparam>
     public class ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> : IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> 
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>, new()
@@ -18,6 +33,10 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>, new()
         where TNotificationConnection : NotificationConnection<TKey>, new()
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="store">the store</param>
         public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store)
         {
             if (store == null)
@@ -28,7 +47,14 @@ namespace ChatLe.Models
         }
 
         public IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> Store { get; private set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="connectionId"></param>
+        /// <param name="notificationType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task AddConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (userName == null)
