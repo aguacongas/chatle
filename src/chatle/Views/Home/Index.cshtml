@@ -34,7 +34,7 @@
         <!-- /ko -->
     </div>
     <div class="col-xs-3">
-        <h6>UNREAD</h6>
+        <h6>CONV</h6>
         <ul data-bind="foreach: conversations">
             <li data-bind="click: function() { $parent.showConversation($data); }">
                 <span data-bind="text: messages() && messages()[0] ? messages()[0].From: null"></span><br />
