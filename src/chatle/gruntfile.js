@@ -12,21 +12,24 @@ module.exports = function (grunt) {
                 }
             }
         },
-        copy: {
-            main: {
-                expand: true,
-                src: "Scripts/*.js",
-                dest: "wwwroot/scripts/",
-                flatten: true,
-                filter: "isFile"
-            }
-        },
         uglify: {
-            my_target: {
+            ugli_target: {
                 files: {
-                    "wwwroot/scripts/chat-min.js": ["Scripts/chat.js"]
+                    "wwwroot/scripts/chat.js": ["Scripts/chat.js"]
                 }
-            }
+            },
+            beauty_target: {
+                options: {
+                    beautify: {
+                        beautify: true
+                    },
+                    mangle: false,
+                    sourceMap: true
+                },
+                files: {
+                    "wwwroot/scripts/chat.js": ["Scripts/chat.js"]
+        }
+    }
         }
     });
 
@@ -35,7 +38,6 @@ module.exports = function (grunt) {
 
     // The following line loads the grunt plugins.
     // This line needs to be at the end of this this file.
-    grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-bower-task");
 };

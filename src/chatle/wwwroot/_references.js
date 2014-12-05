@@ -6,6 +6,5 @@
 /// <reference path="lib/jquery/js/jquery.js" />
 /// <reference path="../scripts/chat.js" />
 /// <reference path="lib/knockout/knockout.js" />
-/// <reference path="scripts/chat-min.js" />
 /// <reference path="scripts/chat.js" />
 /// <reference path="lib/signalr/jquery.signalR.js" />
