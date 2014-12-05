@@ -25,28 +25,28 @@ namespace ChatLe.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<NotificationConnection>(b =>
+            builder.Entity<NotificationConnection<string>>(b =>
             {
                 b.Key(n => new { n.ConnectionId, n.NotificationType });
                 b.ForeignKey<ChatLeUser>(n => n.UserId);
                 b.ForRelational().Table("NotificationConnections");
             });
 
-            builder.Entity<Conversation>(b =>
+            builder.Entity<Conversation<string>>(b =>
             {
                 b.Key(c => c.Id);
                 b.ForRelational().Table("Conversations");
             });
 
-            builder.Entity<Message>((Action<ModelBuilder.EntityBuilder<Message>>)((ModelBuilder.EntityBuilder<Message> b) =>
+            builder.Entity<Message<string>>(b =>
             {
                 b.Key(m => m.Id);
-                b.ForeignKey<Models.ChatLeUser>(m => m.UserId);
+                b.ForeignKey<ChatLeUser>(m => m.UserId);
                 b.ForeignKey<Conversation>(m => m.ConversationId);
                 b.ForRelational().Table("Messages");
-            }));
+            });
 
-            builder.Entity<Attendee>(b =>
+            builder.Entity<Attendee<string>>(b =>
             {
                 b.Key(a => new { a.ConversationId, a.UserId });
                 b.ForeignKey<Conversation>(a => a.ConversationId);
@@ -54,5 +54,10 @@ namespace ChatLe.Models
             });            
         }
 
+        protected override void OnConfiguring(DbContextOptions options)
+        {
+            //options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=aspnet5-chatle-8aed7be5-ad19-4e43-91f6-a67ba01d2830;Trusted_Connection=True;MultipleActiveResultSets=true");
+            base.OnConfiguring(options);
+        }
     }
 }

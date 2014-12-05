@@ -1,5 +1,5 @@
 ﻿{
-    "DatabaseEngine": "Redis",
+    "DatabaseEngine": "SqlServer",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {
