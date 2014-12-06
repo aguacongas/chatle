@@ -19,5 +19,6 @@ namespace ChatLe.Models
         Task<IEnumerable<TUser>> GetUsersConnectedAsync();
         Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id);
         Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType);
+        Task<IEnumerable<TConversation>> GetConversationsAsync(string userName);
     }
 }

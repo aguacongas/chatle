@@ -36,7 +36,7 @@ namespace ChatLe.Controllers
             _userManager = userManager;
         }
         /// <summary>
-        /// Get messages in a conversation asyncronously
+        /// Get messages in a conversation
         /// </summary>
         /// <param name="id">the conversation id</param>
         /// <returns>a <see cref="Task<IEnumerable<MessageViewModel>>"/> with the messages list as result</returns>
@@ -63,10 +63,58 @@ namespace ChatLe.Controllers
         }
 
         /// <summary>
+        /// Gets conversations for the current user
+        /// </summary>
+        /// <returns>a <see cref="Task<IEnumerable<ConversationViewModel>>"/> with the conversations list as result</returns>
+        [HttpGet()]
+        public async Task<IEnumerable<ConversationViewModel>> Get()
+        {
+            var userName = Context.User.Identity.Name;
+            var conversations = await _chatManager.GetConversationsAsync(userName);
+            var length = conversations.Count();
+            var users = new List<ChatLeUser>(length);
+            var conversationsVM = new List<ConversationViewModel>(length);
+            foreach (var conv in conversations)
+            {
+                var attendees = conv.Attendees;
+                var attendeesVM = new List<AttendeeViewModel>(attendees.Count);
+                foreach (var attendee in attendees)
+                {
+                    var u = await _userManager.FindByIdAsync(attendee.UserId);
+                    if (u == null)
+                        continue;
+
+                    users.Add(u);
+                    attendeesVM.Add(new AttendeeViewModel() { UserId = u.UserName });
+                }
+
+                if (attendeesVM.Count < 2)
+                    continue;
+
+                var messages = conv.Messages;
+                var messagesVM = new List<MessageViewModel>(messages.Count());
+                foreach (var message in messages)
+                {
+                    var user = users.FirstOrDefault(u => u.Id == message.UserId);
+                    if (user == null)
+                    {
+                        user = await _userManager.FindByIdAsync(message.UserId);
+                        if (user == null)
+                            continue;
+                    }
+                    messagesVM.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
+                }
+
+                conversationsVM.Add(new ConversationViewModel() { Id = conv.Id, Attendees = attendeesVM, Messages = messagesVM });
+            }
+
+            return conversationsVM;
+        }
+
+        /// <summary>
         /// Send a message in a conversation asyncronously
         /// </summary>
         /// <param name="to">the conversation id</param>
-        /// <param name="text">the message content</param>
         /// <returns>a <see cref="Task"/></returns>
         [HttpPost()]
         public async Task SendMessage(string to, string text)
@@ -80,7 +128,7 @@ namespace ChatLe.Controllers
             {
                 var user = await _userManager.FindByIdAsync(attendee.UserId);
                 if (user != null && user.UserName != userName)
-                    _hub.Clients.Group(user.UserName).messageReceived(to, new MessageViewModel() { Date = message.Date, From = Context.User.Identity.Name, Text = text });
+                    _hub.Clients.Group(user.UserName).messageReceived(new MessageViewModel() { ConversationId = to, Date = message.Date, From = Context.User.Identity.Name, Text = text });
             }            
         }
 
@@ -98,8 +146,8 @@ namespace ChatLe.Controllers
             if (conversation == null)
                 return null;
 
-            var attendees = new List<AttendeeViewModel>(conversation.Attendees.Count);
             var users = new List<ChatLeUser>(conversation.Attendees.Count);
+            var attendees = new List<AttendeeViewModel>(conversation.Attendees.Count);
             foreach(var attendee in conversation.Attendees)
             {
                 var u = await _userManager.FindByIdAsync(attendee.UserId);
@@ -121,7 +169,7 @@ namespace ChatLe.Controllers
                 }
                 messages.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
             }
-            _hub.Clients.Group(to).joinConversation(new { Id = conversation.Id, Attendees = attendees, Messages = messages });
+            _hub.Clients.Group(to).joinConversation(new ConversationViewModel(){ Id = conversation.Id, Attendees = attendees, Messages = messages });
             
             return conversation.Id;
         }

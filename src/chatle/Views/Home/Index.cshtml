@@ -20,11 +20,13 @@
     <div class="col-xs-6">
         <!-- ko with: currentConv -->
         <h6 data-bind="text: title"></h6>
-        <input id="message" />
-        <button data-bind="click: function(data, event) { sendMessage('#message'); }">send</button>
+        <form class="form-inline">
+            <input id="message" class="form-control" />
+            <button type="submit" class="btn btn-default" data-bind="click: function(data, event) { sendMessage('#message'); }">send</button>
+        </form>
         <ul data-bind="foreach: messages">
             <li>
-                <span data-bind="text: From"></span><br />
+                <small data-bind="text: From"></small><br />
                 <span data-bind="text: Text"></span>
             </li>
         </ul>
@@ -36,8 +38,8 @@
     <div class="col-xs-3">
         <h6>CONV</h6>
         <ul data-bind="foreach: conversations">
-            <li data-bind="click: function() { $parent.showConversation($data); }">
-                <span data-bind="text: messages() && messages()[0] ? messages()[0].From: null"></span><br />
+            <li>
+                <a href="#" data-bind="text: title, click: function() { $parent.showConversation($data); }"></a>
                 <span data-bind="text: messages() && messages()[0] ? messages()[0].Text: null"></span>
             </li>
         </ul>

@@ -40,21 +40,21 @@ $(function () {
                         Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: UserName }],
                         Messages: null
                     })
+                this.conversations.unshift(conv);
             }
             this.currentConv(conv);
         };
         /**
           * @desc add the message received in the conversation having id = to
-          * @param String to, the conversation id
           * @param Message data, the message
         */
-        var messageReceived = function (to, data) {
-            if (!data || !to) {
+        var messageReceived = function (data) {
+            if (!data) {
                 return;
             }
             var conv;
             $.each(this.conversations(), function (index, c) {
-                if (c.id === to) {
+                if (c.id === data.ConversationId) {
                     conv = c;
                     return false;
                 }
@@ -74,7 +74,7 @@ $(function () {
             }
             var exist = false;
             this.conversations.remove(function (conv) {
-                return conv.Id === data.Id;
+                return conv.id === data.Id;
             });
             this.conversations.unshift(new ConversationVM(data));
         };
@@ -116,14 +116,14 @@ $(function () {
                     type: "POST"
                 }).done(function (data) {
                     self.id = data;
-                    self.messages.unshift({ From: "Me", Text: message });
+                    self.messages.unshift({ From: UserName, Text: message });
                 });
             } else {
                 $.ajax('api/chat', {
                     data: { to: self.id, text: message },
                     type: "POST"
                 }).done(function () {
-                    self.messages.unshift({ From: "Me", Text: message });
+                    self.messages.unshift({ From: UserName, Text: message });
                 });
             }
         };
@@ -157,6 +157,10 @@ $(function () {
             getMessages: getMessages
         };
     };
+
+    // apply the view model binding
+    ko.applyBindings(viewModel);
+
     /**
       * @desc callback when a new user connect to the chat
       * @param User user, the connected user
@@ -184,8 +188,8 @@ $(function () {
       * @param String to, the conversation id
       * @param Message data, the message
     */
-    chatHub.client.messageReceived = function (to, data) {
-        viewModel.messageReceived(to, data);
+    chatHub.client.messageReceived = function (data) {
+        viewModel.messageReceived(data);
     };
     /**
       * @desc callback when a new conversation is create on server
@@ -226,11 +230,21 @@ $(function () {
     $.connection.hub.start()
         .done(function () {
             console.log("Chat Hub started");
+            // get connected users
             $.getJSON("api/users")
-                .done(function (data) {
-                    viewModel.users(data);
+            .done(function (data) {
+                viewModel.users(data);
+            });
+
+            // get user conversations
+            $.getJSON("api/chat")
+            .done(function (data) {
+                if (!data) {
+                    return;
+                }
+                $.each(data, function (index, conv) {
+                    viewModel.conversations.unshift(new ConversationVM(conv));
                 });
+            });
         });
-    // apply the view model binding
-    ko.applyBindings(viewModel);
 });

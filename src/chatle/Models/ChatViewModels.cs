@@ -1,9 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace chatle.Models
 {
     /// <summary>
-    /// view model for attendee
+    /// View model for conversation
+    /// </summary>
+    public class ConversationViewModel
+    {
+        /// <summary>
+        /// Gets or sets the conversation id
+        /// </summary>
+        public string Id { get; set; }
+        /// <summary>
+        /// Gets or sets the attendees list
+        /// </summary>
+        public IEnumerable<AttendeeViewModel> Attendees { get; set; }
+        /// <summary>
+        /// Gets or sets the messages list
+        /// </summary>
+        public IEnumerable<MessageViewModel> Messages { get; set; }
+    }
+    /// <summary>
+    /// View model for attendee
     /// </summary>
     public class AttendeeViewModel
     {
@@ -13,10 +32,11 @@ namespace chatle.Models
         public string UserId { get; set; }        
     }
     /// <summary>
-    /// view model for message
+    /// View model for message
     /// </summary>
     public class MessageViewModel
     {
+        public string ConversationId { get; set; }
         /// <summary>
         /// Gets or sets the sender user name
         /// </summary>

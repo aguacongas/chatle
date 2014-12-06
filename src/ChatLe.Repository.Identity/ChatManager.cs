@@ -122,7 +122,9 @@ namespace ChatLe.Models
                 var conv = await Store.GetConversationAsync(toConversationId);
                 if (conv != null)
                 {
+                    // TODO: check if it's necessary when EF7 will be release
                     await Store.GetAttendeesAsync(conv);
+                    // Add the message
                     message.ConversationId = toConversationId;
                     message.UserId = user.Id;
                     await Store.CreateMessageAsync(message, cancellationToken);
@@ -193,6 +195,28 @@ namespace ChatLe.Models
         public Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType)
         {
             return Store.GetNotificationConnectionsAsync(userId, notificationType);
+        }
+
+        public async Task<IEnumerable<TConversation>> GetConversationsAsync(string userName)
+        {
+            if (userName == null)
+            {
+                throw new ArgumentNullException("userName");
+            }
+            var user = await Store.FindUserByNameAsync(userName);
+            var conversations = await Store.GetConversationsAsync(user.Id);
+            // TODO: check if it's necessary when EF7 will be release
+            foreach (var conv in conversations)
+            {
+                await Store.GetAttendeesAsync(conv);
+                var messages = await Store.GetMessagesAsync(conv.Id);
+                foreach (var message in messages)
+                {
+                    if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))
+                        conv.Messages.Add(message);
+                }
+            }
+            return conversations;
         }
     }
 }

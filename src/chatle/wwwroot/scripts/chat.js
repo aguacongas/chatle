@@ -10,7 +10,7 @@ $(function() {
                     var a = attendees[i];
                     if (a.UserId === user.Id) return conv = c, !1;
                 }
-            }), conv ? conv.getMessages() : conv = new ConversationVM({
+            }), conv ? conv.getMessages() : (conv = new ConversationVM({
                 Id: null,
                 Attendees: [ {
                     ConversattionId: null,
@@ -20,18 +20,18 @@ $(function() {
                     UserId: UserName
                 } ],
                 Messages: null
-            }), this.currentConv(conv);
-        }, messageReceived = function(to, data) {
-            if (data && to) {
+            }), this.conversations.unshift(conv)), this.currentConv(conv);
+        }, messageReceived = function(data) {
+            if (data) {
                 var conv;
                 $.each(this.conversations(), function(index, c) {
-                    return c.id === to ? (conv = c, !1) : void 0;
+                    return c.id === data.ConversationId ? (conv = c, !1) : void 0;
                 }), conv && conv.messages.unshift(data);
             }
         }, joinConversation = function(data) {
             if (data) {
                 this.conversations.remove(function(conv) {
-                    return conv.Id === data.Id;
+                    return conv.id === data.Id;
                 }), this.conversations.unshift(new ConversationVM(data));
             }
         }, showConversation = function(conv) {
@@ -59,7 +59,7 @@ $(function() {
                 type: "POST"
             }).done(function() {
                 self.messages.unshift({
-                    From: "Me",
+                    From: UserName,
                     Text: message
                 });
             }) : $.ajax("api/chat/conv", {
@@ -70,7 +70,7 @@ $(function() {
                 type: "POST"
             }).done(function(data) {
                 self.id = data, self.messages.unshift({
-                    From: "Me",
+                    From: UserName,
                     Text: message
                 });
             });
@@ -92,7 +92,7 @@ $(function() {
             getMessages: getMessages
         };
     };
-    chatHub.client.userConnected = function(user) {
+    ko.applyBindings(viewModel), chatHub.client.userConnected = function(user) {
         console.log("Chat Hub newUserConnected " + user.Id);
         var users = viewModel.users;
         users.remove(function(u) {
@@ -102,8 +102,8 @@ $(function() {
         console.log("Chat Hub userDisconnected " + user.Id), viewModel.users.remove(function(u) {
             return u.Id === user.Id;
         });
-    }, chatHub.client.messageReceived = function(to, data) {
-        viewModel.messageReceived(to, data);
+    }, chatHub.client.messageReceived = function(data) {
+        viewModel.messageReceived(data);
     }, chatHub.client.joinConversation = function(data) {
         viewModel.joinConversation(data);
     }, $.connection.hub.stateChanged(function(change) {
@@ -120,7 +120,11 @@ $(function() {
     }), $.connection.hub.start().done(function() {
         console.log("Chat Hub started"), $.getJSON("api/users").done(function(data) {
             viewModel.users(data);
+        }), $.getJSON("api/chat").done(function(data) {
+            data && $.each(data, function(index, conv) {
+                viewModel.conversations.unshift(new ConversationVM(conv));
+            });
         });
-    }), ko.applyBindings(viewModel);
+    });
 });
 //# sourceMappingURL=chat.js.map

@@ -182,5 +182,14 @@ namespace ChatLe.Models
 
             return attendees;
         }
+
+        public async Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId)
+        {
+            return await (from c in Conversations
+                          join a in Attendees
+                              on c.Id equals a.ConversationId
+                          where a.UserId.Equals(userId)
+                          select c).ToListAsync();
+        }
     }
 }

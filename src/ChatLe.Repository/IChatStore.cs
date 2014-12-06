@@ -29,5 +29,6 @@ namespace ChatLe.Models
         void Init();
         Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType);
         Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv);
+        Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId);
     }
 }

@@ -13,7 +13,7 @@ using System.Linq;
 namespace ChatLe.Repository.Text
 {
     public class ChatStoreTest
-    {       
+    {
         [Fact]
         public void Construtor1Test()
         {
@@ -29,7 +29,7 @@ namespace ChatLe.Repository.Text
         {
             return TestHelpers.GetServicesCollection();
         }
-        
+
         [Fact]
         public void Construtor2Test()
         {
@@ -39,17 +39,17 @@ namespace ChatLe.Repository.Text
             {
                 var store = new ChatStore<UserTest>(context);
             }
-        }        
+        }
 
-        [Fact]        
+        [Fact]
         public void ConstrutorFailTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));            
+            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
         }
 
         class FakeContextTest : DbContext
         {
-            public FakeContextTest(IServiceProvider provider) :base(provider) { }
+            public FakeContextTest(IServiceProvider provider) : base(provider) { }
         }
 
         [Fact]
@@ -119,7 +119,8 @@ namespace ChatLe.Repository.Text
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 var user = new UserTest()
                 {
-                    Id = "test", UserName = "test"
+                    Id = "test",
+                    UserName = "test"
                 };
                 await store.UpdateUserAsync(user);
             }
@@ -185,6 +186,32 @@ namespace ChatLe.Repository.Text
                 await store.CreateNotificationConnectionAsync(nc);
                 nc = await store.GetNotificationConnectionAsync("test", "test");
                 await store.DeleteNotificationConnectionAsync(nc);
+            }
+        }
+
+        [Fact]
+        public async Task GetConversationsAsyncTest()
+        {
+            ServiceCollection services = GetServicesCollection();
+
+            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            {
+                var conv = new Conversation();
+                context.Conversations.Add(conv);
+                var attendee = new Attendee()
+                {
+                    ConversationId = conv.Id,
+                    UserId = "test"
+                };
+                context.Attendee.Add(attendee);
+                context.SaveChanges();
+
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var convs = await store.GetConversationsAsync("test");
+                Assert.NotNull(convs);
+                Assert.True(convs.Count() == 1);
+                Assert.NotNull(convs.FirstOrDefault());
+                Assert.Equal(conv, convs.First());
             }
         }
     }
