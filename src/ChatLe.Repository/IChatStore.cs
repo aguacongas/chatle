@@ -71,14 +71,17 @@ namespace ChatLe.Models
         /// Gets a conversation by her id
         /// </summary>
         /// <param name="convId">the conversation id</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TConversation}"</returns>
         Task<TConversation> GetConversationAsync(TKey toConversationId, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Gets messages in a conversation
         /// </summary>
         /// <param name="convId">the conversation id</param>
+        /// <param name="max">max number of messages to get, default is 50</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TMessage}}"/></returns>
-        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Gets connected users
         /// </summary>

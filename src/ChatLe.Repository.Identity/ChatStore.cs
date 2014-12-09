@@ -197,11 +197,13 @@ namespace ChatLe.Models
         /// Gets messages in a conversation
         /// </summary>
         /// <param name="convId">the conversation id</param>
+        /// <param name="max">max number of messages to get, default is 50</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TMessage}}"/></returns>
-        public async Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Messages.Where(m => m.ConversationId.Equals(convId)).ToListAsync();
+            return await Messages.Where(m => m.ConversationId.Equals(convId)).OrderByDescending(m=>m.Date).Take(max).ToListAsync();
         }
         /// <summary>
         /// Gets connected users
