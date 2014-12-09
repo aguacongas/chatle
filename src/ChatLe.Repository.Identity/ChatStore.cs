@@ -22,7 +22,7 @@ namespace ChatLe.Models
     /// <summary>
     /// Chat store for TUser
     /// </summary>
-    /// <typeparam name="TUser"></typeparam>
+    /// <typeparam name="TUser">type of user, must a class and implement <see cref="IChatUser{string}"/></typeparam>
     public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection>
         where TUser : class, IChatUser<string>
     {
@@ -33,15 +33,15 @@ namespace ChatLe.Models
         public ChatStore(DbContext context) : base(context) { }
     }
     /// <summary>
-    /// Chat store
+    /// Chat store, implement <see cref="IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}"/>
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TUser"></typeparam>
-    /// <typeparam name="TContext"></typeparam>
-    /// <typeparam name="TConversation"></typeparam>
-    /// <typeparam name="TAttendee"></typeparam>
-    /// <typeparam name="TMessage"></typeparam>
-    /// <typeparam name="TNotificationConnection"></typeparam>
+    /// <typeparam name="TKey">type of primary key</typeparam>
+    /// <typeparam name="TUser">type of user, must be a class and implement <see cref="IChatUser{TKey}"/></typeparam>
+    /// <typeparam name="TContext">type of context, must be a <see cref="DbContext"/></typeparam>
+    /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation{TKey}"/></typeparam>
+    /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee{TKey}"/></typeparam>
+    /// <typeparam name="TMessage">type of message, must be a <see cref="Message{TKey}"/></typeparam>
+    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam>
     public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TKey : IEquatable<TKey>
         where TUser : class, IChatUser<TKey>
@@ -290,9 +290,15 @@ namespace ChatLe.Models
         {
             return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
         }
-
+        /// <summary>
+        /// Gets attendees in a conversation
+        /// </summary>
+        /// <param name="conv">the conversation</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
         public async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
             var atts = conv.Attendees;
             foreach(var attendee in attendees)
@@ -305,7 +311,12 @@ namespace ChatLe.Models
 
             return attendees;
         }
-
+        /// <summary>
+        /// Gets conversations for a user id
+        /// </summary>
+        /// <param name="userId">the user id</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
         public async Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await (from c in Conversations

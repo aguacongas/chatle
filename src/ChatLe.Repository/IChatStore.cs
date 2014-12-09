@@ -7,6 +7,16 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
+    /// <summary>
+    /// Chat store interface
+    /// </summary>
+    /// <typeparam name="TKey">type of primary key</typeparam>
+    /// <typeparam name="TUser">type of user, must be a class and implement <see cref="IChatUser{TKey}"/></typeparam>
+    /// <typeparam name="TContext">type of context, must be a <see cref="DbContext"/></typeparam>
+    /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation{TKey}"/></typeparam>
+    /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee{TKey}"/></typeparam>
+    /// <typeparam name="TMessage">type of message, must be a <see cref="Message{TKey}"/></typeparam>
+    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam>
     public interface IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>
@@ -14,21 +24,113 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
-        Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken);
-        Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken);
-        Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken);
-        Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken);
-        Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken);
-        Task UpdateUserAsync(TUser user, CancellationToken cancellationToken);
-        Task<TConversation> GetConversationAsync(TKey toConversationId, CancellationToken cancellationToken);
-        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken);
-        Task<IEnumerable<TUser>> GetUsersConnectedAsync(CancellationToken cancellationToken);
-        Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken);
-        Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken);
-        Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken);
+        /// <summary>
+        /// Find a user by her name
+        /// </summary>
+        /// <param name="userName">the user name</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{TUser}"/></returns>
+        Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Create a message on the database
+        /// </summary>
+        /// <param name="message">The message to create</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Create an attendee on the database
+        /// </summary>
+        /// <param name="attendee">The attendee to create</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Create a conversation on the database
+        /// </summary>
+        /// <param name="conversation">The conversation to create</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Update the user on the database
+        /// </summary>
+        /// <param name="user">The user to update</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets a conversation for 2 attendees
+        /// </summary>
+        /// <param name="attendee1">the 1st attendee</param>
+        /// <param name="attendee2">the 2dn attendee</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{TConversation}"/></returns>
+        Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets a conversation by her id
+        /// </summary>
+        /// <param name="convId">the conversation id</param>
+        /// <returns>a <see cref="Task{TConversation}"</returns>
+        Task<TConversation> GetConversationAsync(TKey toConversationId, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets messages in a conversation
+        /// </summary>
+        /// <param name="convId">the conversation id</param>
+        /// <returns>a <see cref="Task{IEnumerable{TMessage}}"/></returns>
+        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets connected users
+        /// </summary>
+        /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
+        Task<IEnumerable<TUser>> GetUsersConnectedAsync(CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Create a notification connection on the database
+        /// </summary>
+        /// <param name="connection">the notification connection</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Delete a notification connection on the database
+        /// </summary>
+        /// <param name="connection">the notification connection</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets a notification connection by her id and her type
+        /// </summary>
+        /// <param name="connectionId">the notification connection id</param>
+        /// <param name="notificationType">the type of notification</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{TNotificationConnection}"/></returns>
+        Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Initialise the database
+        /// </summary>
         void Init();
-        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken);
-        Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken);
-        Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken);
+        /// <summary>
+        /// Gets notification connections for a user id and notification type
+        /// </summary>
+        /// <param name="userId">the user id</param>
+        /// <param name="notificationType">the notification type</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
+        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets attendees in a conversation
+        /// </summary>
+        /// <param name="conv">the conversation</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
+        Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Gets conversations for a user id
+        /// </summary>
+        /// <param name="userId">the user id</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
+        Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
