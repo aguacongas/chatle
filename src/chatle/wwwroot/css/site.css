@@ -7,11 +7,25 @@ body {
     padding-bottom: 20px;
 }
 
+.console {
+    font-family: 'Lucida Console', Monaco, monospace;
+}
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.navbar.navbar-default {
+    background-color: #ffffff;
+}
+
+.title.navbar-brand:focus,
+.title.navbar-brand:hover,
+.nav.navbar-nav > li > a:hover {
+    color: #222222;
 }
 
 /* Set widths on the form inputs since otherwise they're 100% wide */
