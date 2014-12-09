@@ -6,17 +6,30 @@ using System.Diagnostics;
 
 namespace ChatLe.Models
 {
-
+    /// <summary>
+    /// Database context for ChatLe user
+    /// </summary>
     public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
     {
+        /// <summary>
+        /// Gets or sets the DbSet of messages
+        /// </summary>
         public DbSet<Message> Messages { get; set; }
-
+        /// <summary>
+        /// Gets or sets the DbSet of conversations
+        /// </summary>
         public DbSet<Conversation> Conversations { get; set; }
-
+        /// <summary>
+        /// Gets or sets the DbSet of attendees
+        /// </summary>
         public DbSet<Attendee> Attendees { get; set; }
-
+        /// <summary>
+        /// Gets or sets the DbSet of notification connections
+        /// </summary>
         public DbSet<NotificationConnection> NotificationConnections { get; set; }
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ChatLeIdentityDbContext()
         {
             Trace.TraceInformation("[ApplicationDbContext] constructor");
