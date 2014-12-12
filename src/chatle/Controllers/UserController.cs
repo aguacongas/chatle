@@ -24,12 +24,12 @@ namespace ChatLe.Controllers
             _manager = manager;
         }
         /// <summary>
-        /// Gets the conneted users list
+        /// Gets the a connected users list page
         /// </summary>
         /// <returns>a <see cref="Task<IEnumerable<dynamic>>"/> with the connected user list as result</returns>
         // GET: /<controller>/
         [HttpGet()]
-        public async Task<IEnumerable<dynamic>> Get()
+        public async Task<IEnumerable<dynamic>> Get(int pageIndex = 0)
         {
             var users = await _manager.GetUsersConnectedAsync();
             return users.Select(u => new { Id = u.UserName });

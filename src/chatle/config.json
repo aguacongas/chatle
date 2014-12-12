@@ -1,4 +1,5 @@
 ﻿{
+    "UserPerPage":  25,
     "DatabaseEngine": "Redis",
     "CreateDatabase": "false",
     "Data": {

@@ -10,5 +10,6 @@ namespace ChatLe.Models
         public TKey UserId { get; set; }
         public string ConnectionId { get; set; }
         public string NotificationType { get; set; }
+        public DateTime ConnectionDate { get; set; }
     }
 }

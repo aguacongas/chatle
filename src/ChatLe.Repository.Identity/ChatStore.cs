@@ -208,14 +208,20 @@ namespace ChatLe.Models
         /// <summary>
         /// Gets connected users
         /// </summary>
+        /// <param name="pageIndex">the 0 based page index</param>
+        /// <param name="pageLength">number of user per page</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
-        public async Task<IEnumerable<TUser>> GetUsersConnectedAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             var query = (from u in Users
                          join nc in NotificationConnections
-                         on u.Id equals nc.UserId
-                         select u).Distinct();
+                            on u.Id equals nc.UserId
+                         orderby nc.ConnectionDate descending
+                         select u).Distinct()
+                         .Skip(pageIndex * pageLength)
+                         .Take(pageLength);
 
             return await query.ToListAsync();
         }
@@ -324,8 +330,11 @@ namespace ChatLe.Models
             return await (from c in Conversations
                           join a in Attendees
                               on c.Id equals a.ConversationId
+                          join m in Messages
+                              on c.Id equals m.ConversationId
                           where a.UserId.Equals(userId)
-                          select c).ToListAsync();
+                          orderby m.Date descending                          
+                          select c).Distinct().ToListAsync();
         }
     }
 }

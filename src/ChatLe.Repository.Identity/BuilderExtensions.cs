@@ -22,16 +22,15 @@ namespace ChatLe.Models
 
         public static IServiceCollection AddChatLe(this IServiceCollection services)
         {
-            services.AddScoped<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>, ChatStore>();
-            services.AddScoped<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>, ChatManager>();
-            return services;
-
+            return services.AddChatLe<ChatLeUser, ChatLeIdentityDbContext, Conversation, Attendee, Message, NotificationConnection>();
         }
 
-        public static void UseChatLe(this IApplicationBuilder app)
+        public static void UseChatLe(this IApplicationBuilder app, int userPerPages = 50)
         {
             var store = app.ApplicationServices.GetRequiredService<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
             store.Init();
+            var manager = app.ApplicationServices.GetRequiredService<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+
         }
     }
 }

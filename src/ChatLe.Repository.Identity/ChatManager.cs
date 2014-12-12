@@ -76,7 +76,8 @@ namespace ChatLe.Models
                     {
                         UserId = user.Id,
                         ConnectionId = connectionId,
-                        NotificationType = notificationType
+                        NotificationType = notificationType,
+                        ConnectionDate = DateTime.UtcNow
                     };
                     await Store.CreateNotificationConnectionAsync(nc, cancellationToken);
                 }
@@ -94,10 +95,10 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("connectionId");
             }
 
-            var user = await Store.FindUserByNameAsync(userName);
+            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
             {
-                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType);
+                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
                 if (nc == null)
                 {
                     await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
@@ -116,14 +117,14 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("toConversationId");
             }
 
-            var user = await Store.FindUserByNameAsync(fromName);
+            var user = await Store.FindUserByNameAsync(fromName, cancellationToken);
             if (user != null)
             {
-                var conv = await Store.GetConversationAsync(toConversationId);
+                var conv = await Store.GetConversationAsync(toConversationId, cancellationToken);
                 if (conv != null)
                 {
                     // TODO: check if it's necessary when EF7 will be release
-                    await Store.GetAttendeesAsync(conv);
+                    await Store.GetAttendeesAsync(conv, cancellationToken);
                     // Add the message
                     message.ConversationId = toConversationId;
                     message.UserId = user.Id;
@@ -147,9 +148,9 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("to");
             }
 
-            var attendee1 = await Store.FindUserByNameAsync(from);
-            var attendee2 = await Store.FindUserByNameAsync(to);
-            var conv = await Store.GetConversationAsync(attendee1, attendee2);
+            var attendee1 = await Store.FindUserByNameAsync(from, cancellationToken);
+            var attendee2 = await Store.FindUserByNameAsync(to, cancellationToken);
+            var conv = await Store.GetConversationAsync(attendee1, attendee2, cancellationToken);
             if (conv == null)
             {
                 conv = new TConversation();
@@ -182,34 +183,34 @@ namespace ChatLe.Models
             return attendee;
         }
 
-        public Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId)
+        public Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Store.GetMessagesAsync(convId);
+            return Store.GetMessagesAsync(convId, cancellationToken: cancellationToken);
         }
 
-        public Task<IEnumerable<TUser>> GetUsersConnectedAsync()
+        public Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Store.GetUsersConnectedAsync();
+            return Store.GetUsersConnectedAsync(pageIndex, pageLength, cancellationToken);
         }
 
-        public Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType)
+        public Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Store.GetNotificationConnectionsAsync(userId, notificationType);
+            return Store.GetNotificationConnectionsAsync(userId, notificationType, cancellationToken);
         }
 
-        public async Task<IEnumerable<TConversation>> GetConversationsAsync(string userName)
+        public async Task<IEnumerable<TConversation>> GetConversationsAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (userName == null)
             {
                 throw new ArgumentNullException("userName");
             }
-            var user = await Store.FindUserByNameAsync(userName);
-            var conversations = await Store.GetConversationsAsync(user.Id);
+            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
+            var conversations = await Store.GetConversationsAsync(user.Id, cancellationToken);
             // TODO: check if it's necessary when EF7 will be release
             foreach (var conv in conversations)
             {
-                await Store.GetAttendeesAsync(conv);
-                var messages = await Store.GetMessagesAsync(conv.Id);
+                await Store.GetAttendeesAsync(conv, cancellationToken);
+                var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
                 foreach (var message in messages)
                 {
                     if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))

@@ -52,7 +52,7 @@ namespace ChatLe.Repository.Text
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var connected = new UserTest() { Id = "connected" };
             connected.NotificationConnections.Add(new NotificationConnection<string>() { UserId = "test", ConnectionId = "test", NotificationType = "test" });
-            storeMock.Setup(s => s.GetUsersConnectedAsync(default(CancellationToken))).ReturnsAsync(new UserTest[] { connected });
+            storeMock.Setup(s => s.GetUsersConnectedAsync(0, 50, default(CancellationToken))).ReturnsAsync(new UserTest[] { connected });
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
             var users = await manager.GetUsersConnectedAsync();
             Assert.True(users.Count() == 1);

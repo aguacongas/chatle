@@ -16,9 +16,9 @@ namespace ChatLe.Models
         Task RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
         Task<TConversation> GetOrCreateConversationAsync(string from, string to, string inialMessage = null, CancellationToken cancellationToken = default(CancellationToken));
         Task<TConversation> AddMessageAsync(string fromName, TKey toConversationId, TMessage message, CancellationToken cancellationToken = default(CancellationToken));
-        Task<IEnumerable<TUser>> GetUsersConnectedAsync();
-        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id);
-        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType);
-        Task<IEnumerable<TConversation>> GetConversationsAsync(string userName);
+        Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TConversation>> GetConversationsAsync(string userName, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

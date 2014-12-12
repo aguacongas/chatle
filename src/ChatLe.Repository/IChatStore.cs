@@ -85,8 +85,11 @@ namespace ChatLe.Models
         /// <summary>
         /// Gets connected users
         /// </summary>
+        /// <param name="pageIndex">the 1 based page index, default is 1</param>
+        /// <param name="pageLength">number of user per page, default is 50</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
-        Task<IEnumerable<TUser>> GetUsersConnectedAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Create a notification connection on the database
         /// </summary>
