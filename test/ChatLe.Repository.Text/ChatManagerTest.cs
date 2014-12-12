@@ -32,7 +32,7 @@ namespace ChatLe.Repository.Text
         public async Task AddConnectionIdAsyncConnectionIdNullTest()
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
-            storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
+            storeMock.Setup(s => s.FindUserByNameAsync("test", It.IsAny<CancellationToken>())).ReturnsAsync(new UserTest());
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
             await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync("test", null, "test"));
         }

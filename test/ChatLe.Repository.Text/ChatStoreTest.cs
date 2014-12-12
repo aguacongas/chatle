@@ -62,7 +62,7 @@ namespace ChatLe.Repository.Text
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
-                Assert.IsType<DbSet<Conversation<string>>>(conversations);
+                Assert.IsType<DbSet<Conversation>>(conversations);
             }
         }
         [Fact]
@@ -75,7 +75,7 @@ namespace ChatLe.Repository.Text
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
-                Assert.IsType<DbSet<Message<string>>>(messages);
+                Assert.IsType<DbSet<Message>>(messages);
             }
         }
         [Fact]
