@@ -18,19 +18,5 @@
     <DebugTarget>
     </DebugTarget>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\ChatLe.HttpUtility\RemoveResponseHeadersBuilderExtensions.cs">
-      <Link>HttpUtitity\RemoveResponseHeadersBuilderExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\ChatLe.HttpUtility\RemoveResponseHeadersMiddleware.cs">
-      <Link>HttpUtitity\RemoveResponseHeadersMiddleware.cs</Link>
-    </Compile>
-    <Compile Include="..\ChatLe.HttpUtility\RemoveResponseHeadersServicesExtensions.cs">
-      <Link>HttpUtitity\RemoveResponseHeadersServicesExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\ChatLe.HttpUtility\RemoveResponseHeardersOptions.cs">
-      <Link>HttpUtitity\RemoveResponseHeardersOptions.cs</Link>
-    </Compile>
-  </ItemGroup>
   <Import Project="$(VSToolsPath)\AspNet\Microsoft.Web.AspNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>
