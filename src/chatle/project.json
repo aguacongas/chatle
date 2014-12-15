@@ -4,6 +4,9 @@
     "version": "1.0.0-*",
     "authors": [ "Olivier Lefebvre" ],
     "description": "chatle is simple chat website using AST.NET 5 technologies",
+    "compilationOptions": {
+        "warningsAsErrors": true
+    },
     "dependencies": {
         "Kestrel": "1.0.0-beta1",
         "ChatLe.Repository.Identity": "",
@@ -33,7 +36,7 @@
         "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
         "gen": "Microsoft.Framework.CodeGeneration",
         "ef": "EntityFramework.Commands",
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5000"
+        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001"
     },
     "frameworks": {
         "aspnet50": { } /*,

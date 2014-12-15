@@ -7,6 +7,7 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using ChatLe.Models;
 using Microsoft.Data.Entity.Redis.Extensions;
+using ChatLe.HttpUtility;
 
 namespace ChatLe
 {
@@ -95,10 +96,11 @@ namespace ChatLe
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseBrowserLink()
+            app.UseRemoveResponseHeaders()
+                .UseBrowserLink()
                 .UseErrorPage()
                 .UseStaticFiles()
-                .UseIdentity()
+                .UseIdentity()                
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
