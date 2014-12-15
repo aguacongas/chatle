@@ -5,17 +5,33 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
 using System.Threading;
+using Microsoft.Framework.OptionsModel;
 
 namespace ChatLe.Repository.Text
 {
     public class ChatManagerTest
     {
+        class OptionsAccessor : IOptions<ChatOptions>
+        {
+            public ChatOptions Options
+            {
+                get
+                {
+                    return new ChatOptions();
+                }
+            }
+
+            public ChatOptions GetNamedOptions(string name)
+            {
+                return new ChatOptions();
+            }
+        }
         [Fact]
         public async Task AddConnectionIdAsyncTest()
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
-            storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());            
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await manager.AddConnectionIdAsync("test", "test", "test");
         }
 
@@ -24,7 +40,7 @@ namespace ChatLe.Repository.Text
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync(null, "test", "test"));
         }
 
@@ -33,7 +49,7 @@ namespace ChatLe.Repository.Text
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             storeMock.Setup(s => s.FindUserByNameAsync("test", It.IsAny<CancellationToken>())).ReturnsAsync(new UserTest());
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync("test", null, "test"));
         }
 
@@ -42,7 +58,7 @@ namespace ChatLe.Repository.Text
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(null);
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await manager.AddConnectionIdAsync("test", "test", "test");
         }
 
@@ -53,7 +69,7 @@ namespace ChatLe.Repository.Text
             var connected = new UserTest() { Id = "connected" };
             connected.NotificationConnections.Add(new NotificationConnection<string>() { UserId = "test", ConnectionId = "test", NotificationType = "test" });
             storeMock.Setup(s => s.GetUsersConnectedAsync(0, 50, default(CancellationToken))).ReturnsAsync(new UserTest[] { connected });
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             var users = await manager.GetUsersConnectedAsync();
             Assert.True(users.Count() == 1);
             Assert.True(users.First() == connected);
@@ -69,7 +85,7 @@ namespace ChatLe.Repository.Text
             var user2 = new UserTest() { Id = userId2, UserName = userId2 };
             storeMock.Setup(s => s.FindUserByNameAsync(userId1, default(CancellationToken))).ReturnsAsync(user1);
             storeMock.Setup(s => s.FindUserByNameAsync(userId2, default(CancellationToken))).ReturnsAsync(user2);
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object);
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             var conv = await manager.GetOrCreateConversationAsync(userId1, userId2, "test");
             Assert.True(conv.Attendees.Count == 2);
             Assert.True(conv.Messages.Count > 0);

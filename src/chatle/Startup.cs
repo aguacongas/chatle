@@ -90,7 +90,7 @@ namespace ChatLe
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
 
-            services.AddChatLe();
+            services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
         }
 
         public void Configure(IApplicationBuilder app)

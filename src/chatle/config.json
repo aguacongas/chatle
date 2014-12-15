@@ -1,5 +1,7 @@
 ﻿{
-    "UserPerPage":  25,
+    "ChatConfig": {
+        "UserPerPage": 25
+    },
     "DatabaseEngine": "Redis",
     "CreateDatabase": "false",
     "Data": {
