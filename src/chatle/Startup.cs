@@ -10,6 +10,9 @@ using Microsoft.Data.Entity.Redis.Extensions;
 using ChatLe.HttpUtility;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Diagnostics;
+using System.Net;
 
 namespace ChatLe
 {
@@ -25,7 +28,7 @@ namespace ChatLe
 
         public Startup(ILoggerFactory factory)
         {
-            factory.AddConsole();
+            //factory.AddConsole();
             /* 
             * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
             * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
@@ -38,6 +41,19 @@ namespace ChatLe
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
+        {
+            ConfigureEntity(services);
+
+            services.AddMvc();
+
+            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+
+            services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
+
+            services.AddRemoveResponseHeaders(Configuration.GetSubKey("RemoveResponseHeader"));
+        }
+
+        private void ConfigureEntity(IServiceCollection services)
         {
             var builder = services.AddEntityFramework();
 
@@ -89,22 +105,40 @@ namespace ChatLe
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
             });
-
-            services.AddMvc();
-
-            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
-
-            services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
-
-            services.AddRemoveResponseHeaders(Configuration.GetSubKey("RemoveResponseHeader"));
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseRemoveResponseHeaders()
-                .UseBrowserLink()
-                .UseErrorPage()
-                .UseStaticFiles()
+            app.UseRemoveResponseHeaders();
+            if (Configuration.Get("KRE_ENV") == "Production")
+            {
+                app.UseBrowserLink()
+                    .UseErrorPage();
+            }
+            else
+            {
+                app.UseErrorHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        context.Response.ContentType = "text/html";
+                        await context.Response.WriteAsync("<html><body>");
+                        await context.Response.WriteAsync("We're sorry, we encountered an un-expected issue with your application.<br>");
+
+                        var error = context.GetFeature<IErrorHandlerFeature>();
+                        if (error != null)
+                        {
+                            // This error would not normally be exposed to the client
+                            await context.Response.WriteAsync("<br>Error: " + WebUtility.HtmlEncode(error.Error.Message) + "<br>");
+                        }
+                        await context.Response.WriteAsync("<br><a href=\"/\">Home</a><br>");
+                        await context.Response.WriteAsync("</body></html>");
+                        await context.Response.WriteAsync(new string(' ', 512)); // Padding for IE
+                    });
+                });
+            }
+                app.UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {

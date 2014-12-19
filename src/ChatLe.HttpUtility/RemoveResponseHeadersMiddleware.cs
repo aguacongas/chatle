@@ -16,24 +16,30 @@ using System.Threading;
 
 namespace ChatLe.HttpUtility
 {
+    /// <summary>
+    /// Middleware to remove HTTP response headers
+    /// </summary>
     public class RemoveResponseHeadersMiddleware
     {
         readonly IEnumerable<string> _headersToRemove;
         readonly RequestDelegate _next;
-        public RemoveResponseHeadersMiddleware(RequestDelegate next, IOptions<RemoveResponseHeardersOptions> optionsAccessor)
+        /// <summary>
+        /// Create an instance of <see cref="RemoveResponseHeadersMiddleware"/>
+        /// </summary>
+        /// <param name="next">the next <see cref="RequestDelegate"/> to call in the pipeline</param>
+        /// <param name="optionsAccessor">the accessor to <see cref="CommaSeparatedListOptions"/> where headers to remove are configured</param>
+        public RemoveResponseHeadersMiddleware(RequestDelegate next, IOptions<CommaSeparatedListOptions> optionsAccessor)
         {
-            Trace.TraceInformation("[RemoveResponseHeadersMiddleware] constructor");
             if (next == null)
                 throw new ArgumentNullException("next");
-            if (optionsAccessor == null || optionsAccessor.Options == null)
+            if (optionsAccessor == null || optionsAccessor.Options == null || optionsAccessor.Options.List == null)
                 throw new ArgumentNullException("optionsAccessor");
             _next = next;
-            _headersToRemove = optionsAccessor.Options.Headers;
+            _headersToRemove = optionsAccessor.Options.List;
         }
 
         public async Task Invoke(HttpContext context)
         {
-            Trace.TraceInformation("[RemoveResponseHeadersMiddleware] Invoke " + context.Request.Path);
             await _next.Invoke(new RemoveHeaderHttpContext(context, _headersToRemove));            
         }
     }

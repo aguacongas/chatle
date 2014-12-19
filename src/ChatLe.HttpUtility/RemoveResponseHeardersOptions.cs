@@ -4,18 +4,23 @@ using System.Linq;
 
 namespace ChatLe.HttpUtility
 {
-    public class RemoveResponseHeardersOptions
+    /// <summary>
+    /// Headers to remove configuration
+    /// </summary>
+    public class CommaSeparatedListOptions
     {
-
-        public string HeadersList
+        /// <summary>
+        /// Gets or sets the comma separated list of header to remove
+        /// </summary>
+        public string Values
         {
-            get { return string.Join(",", Headers); }
+            get { return string.Join(",", List); }
             set
             {
-                Headers = new List<string>(value.Split(',').Select(v => v.Trim()));
+                List = new List<string>(value.Split(',').Select(v => v.Trim()));
             }
         }
-        internal ICollection<string> Headers { get; set; } = new List<string>();
+        internal ICollection<string> List { get; set; } = new List<string>();
 
     }
 }
