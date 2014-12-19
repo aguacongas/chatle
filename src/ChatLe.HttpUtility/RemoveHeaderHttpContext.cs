@@ -1,0 +1,170 @@
+﻿using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Http.Security;
+using System;
+using System.Collections.Generic;
+using System.Net.WebSockets;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ChatLe.HttpUtility
+{
+    /// <summary>
+    /// <see cref="HttpContext"/> decorator to remove unwanted HTTP response header added by other middleware
+    /// </summary>
+    public class RemoveHeaderHttpContext : HttpContext
+    {
+        readonly HttpContext _parent;
+        readonly HttpResponse _response;
+        /// <summary>
+        /// Create instance of <see cref="RemoveHeaderHttpContext"/>
+        /// </summary>
+        /// <param name="parent">the <see cref="HttpContext"/> to decorate/></param>
+        /// <param name="headersToRemove">a list of unwanted header</param>
+        public RemoveHeaderHttpContext(HttpContext parent, IEnumerable<string> headersToRemove)
+        {
+            if (parent == null)
+                throw new ArgumentNullException("parent");
+            if (headersToRemove == null)
+                throw new ArgumentNullException("headersToRemove");
+
+            _parent = parent;
+            _response = new RemoveHeaderHttpResponse(this, parent.Response, headersToRemove);
+        }
+
+        public override IServiceProvider ApplicationServices
+        {
+            get
+            {
+                return _parent.ApplicationServices;
+            }
+
+            set
+            {
+                _parent.ApplicationServices = value;
+            }
+        }
+
+        public override bool IsWebSocketRequest
+        {
+            get
+            {
+                return _parent.IsWebSocketRequest;
+            }
+        }
+
+        public override IDictionary<object, object> Items
+        {
+            get
+            {
+                return _parent.Items;
+            }
+        }
+
+        public override HttpRequest Request
+        {
+            get
+            {
+                return _parent.Request;
+            }
+        }
+
+        public override CancellationToken RequestAborted
+        {
+            get
+            {
+                return _parent.RequestAborted;
+            }
+        }
+
+        public override IServiceProvider RequestServices
+        {
+            get
+            {
+                return _parent.RequestServices;
+            }
+
+            set
+            {
+                _parent.RequestServices = value;
+            }
+        }
+
+        public override HttpResponse Response
+        {
+            get
+            {
+                return _response;
+            }
+        }
+
+        public override ISessionCollection Session
+        {
+            get
+            {
+                return _parent.Session;
+            }
+        }
+
+        public override ClaimsPrincipal User
+        {
+            get
+            {
+                return _parent.User;
+            }
+
+            set
+            {
+                _parent.User = value;
+            }
+        }
+
+        public override IList<string> WebSocketRequestedProtocols
+        {
+            get
+            {
+                return _parent.WebSocketRequestedProtocols;
+            }
+        }
+
+        public override void Abort()
+        {
+            _parent.Abort();
+        }
+
+        public override Task<WebSocket> AcceptWebSocketAsync(string subProtocol)
+        {
+            return _parent.AcceptWebSocketAsync(subProtocol);
+        }
+
+        public override IEnumerable<AuthenticationResult> Authenticate(IEnumerable<string> authenticationTypes)
+        {
+            return _parent.Authenticate(authenticationTypes);
+        }
+
+        public override Task<IEnumerable<AuthenticationResult>> AuthenticateAsync(IEnumerable<string> authenticationTypes)
+        {
+            return _parent.AuthenticateAsync(authenticationTypes);
+        }
+
+        public override void Dispose()
+        {
+            _parent.Dispose();
+        }
+
+        public override IEnumerable<AuthenticationDescription> GetAuthenticationTypes()
+        {
+            return _parent.GetAuthenticationTypes();
+        }
+
+        public override object GetFeature(Type type)
+        {
+            return _parent.GetFeature(type);
+        }
+
+        public override void SetFeature(Type type, object instance)
+        {
+            _parent.SetFeature(type, instance);
+        }
+    }
+}
