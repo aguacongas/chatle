@@ -19,5 +19,8 @@
             "RequireUppercase": "false",
             "RequireNonLetterOrDigit": "false"
         }
+    },
+    "RemoveResponseHeader": {
+        "HeadersList": "Server, ETag"
     }
 }

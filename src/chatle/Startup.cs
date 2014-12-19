@@ -8,6 +8,8 @@ using Microsoft.Framework.DependencyInjection;
 using ChatLe.Models;
 using Microsoft.Data.Entity.Redis.Extensions;
 using ChatLe.HttpUtility;
+using Microsoft.Framework.Logging;
+using Microsoft.Framework.Logging.Console;
 
 namespace ChatLe
 {
@@ -21,8 +23,9 @@ namespace ChatLe
             SQLite
         }
 
-        public Startup()
+        public Startup(ILoggerFactory factory)
         {
+            factory.AddConsole();
             /* 
             * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
             * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
@@ -92,6 +95,8 @@ namespace ChatLe
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
 
             services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
+
+            services.AddRemoveResponseHeaders(Configuration.GetSubKey("RemoveResponseHeader"));
         }
 
         public void Configure(IApplicationBuilder app)
@@ -100,7 +105,7 @@ namespace ChatLe
                 .UseBrowserLink()
                 .UseErrorPage()
                 .UseStaticFiles()
-                .UseIdentity()                
+                .UseIdentity()
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
