@@ -13,9 +13,36 @@ using Microsoft.Framework.Logging.Console;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Diagnostics;
 using System.Net;
+using Microsoft.AspNet.Hosting;
+using System.Diagnostics;
+using Microsoft.Framework.Runtime;
+using Microsoft.AspNet.Mvc.Razor;
+using System.IO;
 
 namespace ChatLe
 {
+    public class StartupDevelopment : Startup
+    {
+        public StartupDevelopment(IHostingEnvironment environment, ILoggerFactory factory) : base(environment, factory)
+        { }
+
+        protected override void ConfigureErrors(IApplicationBuilder app)
+        {
+            LoggerFactory.AddConsole((name, type) => type < TraceType.Information);
+            app.UseBrowserLink()
+                .UseErrorPage();
+        }
+
+        public override void Configure(IApplicationBuilder app)
+        {
+            base.Configure(app);
+        }
+
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            base.ConfigureServices(services);
+        }
+    }
     public class Startup
     {
         enum DBEngine
@@ -26,9 +53,12 @@ namespace ChatLe
             SQLite
         }
 
-        public Startup(ILoggerFactory factory)
+        readonly IHostingEnvironment _environment;
+        public ILoggerFactory LoggerFactory { get; private set; }
+        public Startup(IHostingEnvironment environment, ILoggerFactory factory)
         {
-            //factory.AddConsole();
+            LoggerFactory = factory;
+
             /* 
             * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
             * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
@@ -36,17 +66,19 @@ namespace ChatLe
             Configuration = new Configuration()
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables(); //All environment variables in the process's context flow in as configuration values.
+
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; private set; }
 
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             ConfigureEntity(services);
 
             services.AddMvc();
 
-            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
 
             services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
 
@@ -107,38 +139,12 @@ namespace ChatLe
             });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder app)
         {
             app.UseRemoveResponseHeaders();
-            if (Configuration.Get("KRE_ENV") == "Production")
-            {
-                app.UseBrowserLink()
-                    .UseErrorPage();
-            }
-            else
-            {
-                app.UseErrorHandler(errorApp =>
-                {
-                    errorApp.Run(async context =>
-                    {
-                        context.Response.StatusCode = 500;
-                        context.Response.ContentType = "text/html";
-                        await context.Response.WriteAsync("<html><body>");
-                        await context.Response.WriteAsync("We're sorry, we encountered an un-expected issue with your application.<br>");
+            ConfigureErrors(app);
 
-                        var error = context.GetFeature<IErrorHandlerFeature>();
-                        if (error != null)
-                        {
-                            // This error would not normally be exposed to the client
-                            await context.Response.WriteAsync("<br>Error: " + WebUtility.HtmlEncode(error.Error.Message) + "<br>");
-                        }
-                        await context.Response.WriteAsync("<br><a href=\"/\">Home</a><br>");
-                        await context.Response.WriteAsync("</body></html>");
-                        await context.Response.WriteAsync(new string(' ', 512)); // Padding for IE
-                    });
-                });
-            }
-                app.UseStaticFiles()
+            app.UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
@@ -149,6 +155,81 @@ namespace ChatLe
                 })
                 .UseSignalR()
                 .UseChatLe();
+        }
+
+        protected virtual void ConfigureErrors(IApplicationBuilder app)
+        {
+            app.UseErrorHandler(errorApp =>
+            {
+                errorApp.UseServices(services =>
+                {
+                    services.AddMvc();
+                    services.AddScoped<Controllers.HomeController>();
+                });
+                errorApp.Run(async context =>
+                {
+                    try
+                    {
+                        var errorController = errorApp.ApplicationServices.GetRequiredService<Controllers.HomeController>();
+                        await errorController.Error().ExecuteResultAsync(errorController.ActionContext);
+                    }
+                    catch(Exception e)
+                    {
+                        Trace.TraceError(e.ToString());
+                    }
+                });
+            });
+        }
+
+        class FileInfo : Microsoft.AspNet.FileSystems.IFileInfo
+        {
+            public FileInfo(string path)
+            {
+                PhysicalPath = path;
+            }
+
+            public bool IsDirectory
+            {
+                get
+                {
+                    return Directory.Exists(PhysicalPath);
+                }
+            }
+
+            public DateTime LastModified
+            {
+                get
+                {
+                    return File.GetLastWriteTime(PhysicalPath);
+                }
+            }
+
+            public long Length
+            {
+                get
+                {
+                    return new System.IO.FileInfo(PhysicalPath).Length;
+                }
+            }
+
+            public string Name
+            {
+                get
+                {
+                    return Path.GetFileName(PhysicalPath);
+                }
+            }
+
+            public string PhysicalPath
+            {
+                get;
+                private set;
+            }
+
+            public Stream CreateReadStream()
+            {
+                return File.OpenRead(PhysicalPath);
+            }
         }
     }
 }
