@@ -23,6 +23,7 @@ using Microsoft.AspNet.Mvc;
 using System.Collections.Generic;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using Microsoft.AspNet.Mvc.Routing;
+using ChatLe.Logging;
 
 namespace ChatLe
 {
@@ -32,8 +33,7 @@ namespace ChatLe
         { }
 
         protected override void ConfigureErrors(IApplicationBuilder app)
-        {
-            LoggerFactory.AddConsole((name, type) => type < TraceType.Information);
+        {            
             app.UseBrowserLink()
                 .UseErrorPage();
         }
@@ -48,6 +48,7 @@ namespace ChatLe
             base.ConfigureServices(services);
         }
     }
+
     public class Startup
     {
         enum DBEngine
@@ -63,7 +64,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment environment, ILoggerFactory factory)
         {
             LoggerFactory = factory;
-
+            LoggerFactory.AddProvider(new TraceLoggerProvider());
             /* 
             * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
             * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
@@ -166,6 +167,7 @@ namespace ChatLe
         {
             app.UseErrorHandler(errorApp =>
             {
+                var logger = LoggerFactory.Create("ErrorHanlder");
                 // add mvc services
                 errorApp.UseServices(services => services.AddMvc());
 
@@ -203,7 +205,10 @@ namespace ChatLe
                     // get the error and set it as view's model 
                     var error = context.GetFeature<IErrorHandlerFeature>();
                     if (error != null)
+                    {
                         viewData.Model = error.Error;
+                        logger.WriteError("Unandled exception occurs", error.Error);
+                    }                        
 
                     // get the view engine
                     var viewEngine = services.GetRequiredService<ICompositeViewEngine>();
@@ -220,57 +225,6 @@ namespace ChatLe
                     await result.ExecuteResultAsync(ac);
                 });
             });
-        }
-
-        class FileInfo : Microsoft.AspNet.FileSystems.IFileInfo
-        {
-            public FileInfo(string path)
-            {
-                PhysicalPath = path;
-            }
-
-            public bool IsDirectory
-            {
-                get
-                {
-                    return Directory.Exists(PhysicalPath);
-                }
-            }
-
-            public DateTime LastModified
-            {
-                get
-                {
-                    return File.GetLastWriteTime(PhysicalPath);
-                }
-            }
-
-            public long Length
-            {
-                get
-                {
-                    return new System.IO.FileInfo(PhysicalPath).Length;
-                }
-            }
-
-            public string Name
-            {
-                get
-                {
-                    return Path.GetFileName(PhysicalPath);
-                }
-            }
-
-            public string PhysicalPath
-            {
-                get;
-                private set;
-            }
-
-            public Stream CreateReadStream()
-            {
-                return File.OpenRead(PhysicalPath);
-            }
         }
     }
 }

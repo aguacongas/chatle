@@ -21,7 +21,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<UserTest>(context, new LoggerFactory());
             }
         }
 
@@ -37,14 +37,16 @@ namespace ChatLe.Repository.Text
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<UserTest>(context, new LoggerFactory());
             }
         }
 
         [Fact]
         public void ConstrutorFailTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
+            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null, new LoggerFactory()));
+            ServiceCollection services = GetServicesCollection();
+            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(new FakeContextTest(services.BuildServiceProvider()), null));
         }
 
         class FakeContextTest : DbContext
@@ -59,7 +61,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context,new LoggerFactory());
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsType<DbSet<Conversation>>(conversations);
@@ -72,7 +74,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsType<DbSet<Message>>(messages);
@@ -85,7 +87,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsType<DbSet<UserTest>>(users);
@@ -98,7 +100,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 var message = new Message()
                 {
                     ConversationId = "test",
@@ -116,7 +118,7 @@ namespace ChatLe.Repository.Text
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 var user = new UserTest()
                 {
                     Id = "test",
@@ -153,7 +155,7 @@ namespace ChatLe.Repository.Text
                 context.Users.Add(connected);
                 context.Users.Add(notConnected);
                 context.SaveChanges();
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
 
                 var users = await store.GetUsersConnectedAsync();
                 Assert.True(users.Count() == 1);
@@ -182,7 +184,7 @@ namespace ChatLe.Repository.Text
                     NotificationType = "test"
                 };
 
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 await store.CreateNotificationConnectionAsync(nc);
                 nc = await store.GetNotificationConnectionAsync("test", "test");
                 await store.DeleteNotificationConnectionAsync(nc);
@@ -206,7 +208,7 @@ namespace ChatLe.Repository.Text
                 context.Attendee.Add(attendee);
                 context.SaveChanges();
 
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new LoggerFactory());
                 var convs = await store.GetConversationsAsync("test");
                 Assert.NotNull(convs);
                 Assert.True(convs.Count() == 1);

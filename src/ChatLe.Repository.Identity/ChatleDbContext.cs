@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Framework.Logging;
 using System;
 using System.Diagnostics;
 
@@ -11,6 +12,10 @@ namespace ChatLe.Models
     /// </summary>
     public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        public ILogger Logger { get; private set; }
         /// <summary>
         /// Gets or sets the DbSet of messages
         /// </summary>
@@ -30,9 +35,13 @@ namespace ChatLe.Models
         /// <summary>
         /// Constructor
         /// </summary>
-        public ChatLeIdentityDbContext()
+        public ChatLeIdentityDbContext(ILoggerFactory loggerFactory)
         {
-            Trace.TraceInformation("[ApplicationDbContext] constructor");
+            if (loggerFactory == null)
+                throw new ArgumentNullException("loggerFactory");
+
+            Logger = loggerFactory.Create<ChatLeIdentityDbContext>();
+            Logger.WriteInformation("constructor");
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

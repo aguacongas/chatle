@@ -21,6 +21,6 @@
         }
     },
     "RemoveResponseHeader": {
-        "HeadersList": "Server, ETag"
+        "Values": "Server, ETag"
     }
 }

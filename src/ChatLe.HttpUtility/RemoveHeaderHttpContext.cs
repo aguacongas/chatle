@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Security;
+using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -21,15 +22,18 @@ namespace ChatLe.HttpUtility
         /// </summary>
         /// <param name="parent">the <see cref="HttpContext"/> to decorate/></param>
         /// <param name="headersToRemove">a list of unwanted header</param>
-        public RemoveHeaderHttpContext(HttpContext parent, IEnumerable<string> headersToRemove)
+        /// <param name="loggerFactory">the logger factory to create logger</param>
+        public RemoveHeaderHttpContext(HttpContext parent, IEnumerable<string> headersToRemove, ILoggerFactory loggerFactory)
         {
             if (parent == null)
                 throw new ArgumentNullException("parent");
             if (headersToRemove == null)
                 throw new ArgumentNullException("headersToRemove");
+            if (loggerFactory == null)
+                throw new ArgumentNullException("loggerFactory");
 
             _parent = parent;
-            _response = new RemoveHeaderHttpResponse(this, parent.Response, headersToRemove);
+            _response = new RemoveHeaderHttpResponse(this, parent.Response, headersToRemove, loggerFactory);
         }
 
         public override IServiceProvider ApplicationServices

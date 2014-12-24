@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Security;
+using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,15 +22,19 @@ namespace ChatLe.HttpUtility
         /// <param name="context">the <see cref="HttpContext"/> associated to the HTTP respone</param>
         /// <param name="parent">the <see cref="HttpResponse"/> to decorate</param>
         /// <param name="headersToRemove">a list of unwanted header</param>
-        public RemoveHeaderHttpResponse(HttpContext context, HttpResponse parent, IEnumerable<string> headersToRemove)
+        /// <param name="loggerFactory">the logger factory to create logger</param>
+        public RemoveHeaderHttpResponse(HttpContext context, HttpResponse parent, IEnumerable<string> headersToRemove, ILoggerFactory loggerFactory)
         {
             if (parent == null)
                 throw new ArgumentNullException("parent");
             if (headersToRemove == null)
                 throw new ArgumentNullException("headersToRemove");
+            if (loggerFactory == null)
+                throw new ArgumentNullException("loggerFactory");
+
             _parent = parent;
             _context = context;
-            _headers = new RemoveHeaderHeaderDictionary(parent.Headers, headersToRemove);
+            _headers = new RemoveHeaderHeaderDictionary(parent.Headers, headersToRemove, loggerFactory);
         }
 
         public override Stream Body

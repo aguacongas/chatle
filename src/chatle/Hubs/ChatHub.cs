@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.Diagnostics;
 using ChatLe.Models;
+using Microsoft.Framework.Logging;
 
 namespace ChatLe.Hubs
 {
@@ -24,16 +25,22 @@ namespace ChatLe.Hubs
             private set;
         }
         /// <summary>
+        /// Logger
+        /// </summary>
+        public ILogger Logger { get; private set; }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="manager">The chat repository manager</param>
-        public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager) :base()
+        public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager, ILoggerFactory loggerFactory) :base()
         {
             if (manager == null)
-            {
                 throw new ArgumentNullException("manager");
-            }
-            Trace.TraceInformation("[ChatHub] constructor");
+            if (loggerFactory == null)
+                throw new ArgumentNullException("loggerFactory");
+
+            Logger = loggerFactory.Create<ChatHub>();
+            Logger.WriteInformation("constructor");
             Manager = manager;
         }
         /// <summary>
@@ -44,7 +51,7 @@ namespace ChatLe.Hubs
         public override async Task OnConnected()
         {
             string name = Context.User.Identity.Name;
-            Trace.TraceInformation("[ChatHub] OnConnected " + name);
+            Logger.WriteInformation("OnConnected " + name);
             await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");            
             await Groups.Add(this.Context.ConnectionId, name);
             Clients.Others.userConnected(new { Id = name });
@@ -58,7 +65,7 @@ namespace ChatLe.Hubs
         public override async Task OnReconnected()
         {
             string name = Context.User.Identity.Name;
-            Trace.TraceInformation("[ChatHub] OnReconnected " + name);
+            Logger.WriteInformation("OnReconnected " + name);
             await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
             await Groups.Add(this.Context.ConnectionId, name);
             Clients.Others.userConnected(new { Id = name });
@@ -76,7 +83,7 @@ namespace ChatLe.Hubs
         public override async Task OnDisconnected(bool stopCalled)
         {
             string name = Context.User.Identity.Name;
-            Trace.TraceInformation("[ChatHub] OnDisconnected " + name);
+            Logger.WriteInformation("OnDisconnected " + name);
             await Manager.RemoveConnectionIdAsync(name, Context.ConnectionId, "signalR");
             await Groups.Remove(Context.ConnectionId, name);
             Clients.Others.userDisconnected(new { Id = name });

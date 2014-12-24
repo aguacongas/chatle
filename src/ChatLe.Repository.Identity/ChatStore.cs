@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Framework.Logging;
 
 namespace ChatLe.Models
 {
@@ -17,7 +18,8 @@ namespace ChatLe.Models
         /// Constructor
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        /// <param name="loggerFactory"></param>
+        public ChatStore(ChatLeIdentityDbContext context, ILoggerFactory loggerFactory) : base(context, loggerFactory) { }
     }
     /// <summary>
     /// Chat store for TUser
@@ -30,7 +32,8 @@ namespace ChatLe.Models
         /// Constructor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
-        public ChatStore(DbContext context) : base(context) { }
+        /// <param name="loggerFactory"></param>
+        public ChatStore(DbContext context, ILoggerFactory loggerFactory) : base(context, loggerFactory) { }
     }
     /// <summary>
     /// Chat store, implement <see cref="IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}"/>
@@ -55,15 +58,19 @@ namespace ChatLe.Models
         /// Construtor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
-        public ChatStore(TContext context)
+        /// <param name="loggerFactory"></param>
+        public ChatStore(TContext context, ILoggerFactory loggerFactory)
         {
             if (context == null)
-            {
                 throw new ArgumentNullException("context");
-            }
+            if (loggerFactory == null)
+                throw new ArgumentNullException("loggerFactory");
 
             Context = context;
+            Logger = loggerFactory.Create<ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection>>();
+
         }
+        public ILogger Logger { get; private set; }
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
@@ -98,9 +105,8 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(message == null)
-            {
                 throw new ArgumentNullException("message");
-            }
+
             await Context.AddAsync(message, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -130,9 +136,8 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (conversation == null)
-            {
                 throw new ArgumentNullException("conversation");
-            }
+
             await Context.AddAsync(conversation, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -157,9 +162,8 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
-            {
                 throw new ArgumentNullException("user");
-            }
+
             await Context.UpdateAsync(user, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -174,13 +178,10 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (attendee1 == null)
-            {
                 throw new ArgumentNullException("attendee1");
-            }
             if (attendee2 == null)
-            {
                 throw new ArgumentNullException("attendee2");
-            }
+
             return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
         }
         /// <summary>
@@ -235,9 +236,8 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
-            {
                 throw new ArgumentNullException("connection");
-            }
+
             await Context.AddAsync(connection, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -251,9 +251,8 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
-            {
                 throw new ArgumentNullException("connection");
-            }
+
             Context.Delete(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -267,14 +266,11 @@ namespace ChatLe.Models
         public async Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (notificationType == null)
-            {
+            if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
-            }
             if (notificationType == null)
-            {
-                throw new ArgumentNullException("connectionId");
-            }
+                throw new ArgumentNullException("notificationType");
+
             return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
         }
         /// <summary>
@@ -282,10 +278,17 @@ namespace ChatLe.Models
         /// </summary>
         public void Init()
         {
-            NotificationConnections.RemoveRange(NotificationConnections);
-            Attendees.RemoveRange(Attendees);
-            Conversations.RemoveRange(Conversations);
-            Context.SaveChanges();
+            try
+            {
+                NotificationConnections.RemoveRange(NotificationConnections);
+                Attendees.RemoveRange(Attendees);
+                Conversations.RemoveRange(Conversations);
+                Context.SaveChanges();
+            }
+            catch(Exception e)
+            {
+                Logger.WriteError("Init fail", e);
+            }
         }
         /// <summary>
         /// Gets notification connections for a user id and notification type
@@ -310,12 +313,8 @@ namespace ChatLe.Models
             var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
             var atts = conv.Attendees;
             foreach(var attendee in attendees)
-            {
                 if (!atts.Any(a => a.UserId.Equals(attendee.UserId)))
-                {
                     atts.Add(attendee);
-                }
-            }
 
             return attendees;
         }
