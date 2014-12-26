@@ -36,6 +36,14 @@ namespace ChatLe.HttpUtility
             _response = new RemoveHeaderHttpResponse(this, parent.Response, headersToRemove, loggerFactory);
         }
 
+        public override HttpResponse Response
+        {
+            get
+            {
+                return _response;
+            }
+        }
+
         public override IServiceProvider ApplicationServices
         {
             get
@@ -91,14 +99,6 @@ namespace ChatLe.HttpUtility
             set
             {
                 _parent.RequestServices = value;
-            }
-        }
-
-        public override HttpResponse Response
-        {
-            get
-            {
-                return _response;
             }
         }
 

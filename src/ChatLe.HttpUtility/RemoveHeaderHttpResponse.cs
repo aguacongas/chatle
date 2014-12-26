@@ -37,6 +37,14 @@ namespace ChatLe.HttpUtility
             _headers = new RemoveHeaderHeaderDictionary(parent.Headers, headersToRemove, loggerFactory);
         }
 
+        public override IHeaderDictionary Headers
+        {
+            get
+            {
+                return _headers;
+            }
+        }
+
         public override Stream Body
         {
             get
@@ -81,14 +89,6 @@ namespace ChatLe.HttpUtility
             get
             {
                 return _parent.Cookies;
-            }
-        }
-
-        public override IHeaderDictionary Headers
-        {
-            get
-            {
-                return _headers;
             }
         }
 
