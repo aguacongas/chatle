@@ -216,15 +216,20 @@ namespace ChatLe.Models
         public async Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var query = (from u in Users
-                         join nc in NotificationConnections
-                            on u.Id equals nc.UserId
-                         orderby nc.ConnectionDate descending
-                         select u).Distinct()
-                         .Skip(pageIndex * pageLength)
-                         .Take(pageLength);
+            var ids = new List<TKey>();
+            var q1 = (from nc in NotificationConnections
+                      group new { nc.UserId, nc.ConnectionDate } by nc.UserId into g
+                      select new { Id= g.Key, Date=g.Max(x => x.ConnectionDate) } )
+                      .OrderByDescending(x => x.Date)
+                     .Skip(pageIndex * pageLength)
+                     .Take(pageLength);
 
-            return await query.ToListAsync();
+            var query = from r in q1
+                        join u in Users
+                         on r.Id equals u.Id
+                        select u;
+
+            return await Task.FromResult(query.ToList());
         }
         /// <summary>
         /// Create a notification connection on the database
@@ -282,6 +287,7 @@ namespace ChatLe.Models
             {
                 NotificationConnections.RemoveRange(NotificationConnections);
                 Attendees.RemoveRange(Attendees);
+                Messages.RemoveRange(Messages);
                 Conversations.RemoveRange(Conversations);
                 Context.SaveChanges();
             }
@@ -300,6 +306,15 @@ namespace ChatLe.Models
         public async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
+        }
+        /// <summary>
+        /// Check if a user has connection
+        /// </summary>
+        /// <param name="user">the <see cref="TUser"/></param>
+        /// <returns>true if user has connection</returns>
+        public async Task<bool> UserHasConnectionAsync(TKey userId)
+        {
+            return await NotificationConnections.AnyAsync(n => n.UserId.Equals(userId));
         }
         /// <summary>
         /// Gets attendees in a conversation

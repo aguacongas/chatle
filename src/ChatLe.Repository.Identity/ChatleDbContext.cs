@@ -44,6 +44,17 @@ namespace ChatLe.Models
             Logger.WriteInformation("constructor");
         }
 
+        // TODO: uncomment this constructor to create an EF migration
+        //public ChatLeIdentityDbContext()
+        //{
+        //    var loggerFactory = new LoggerFactory();
+        //    if (loggerFactory == null)
+        //        throw new ArgumentNullException("loggerFactory");
+
+        //    Logger = loggerFactory.Create<ChatLeIdentityDbContext>();
+        //    Logger.WriteInformation("constructor");
+        //}
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -73,12 +84,13 @@ namespace ChatLe.Models
                 b.Key(a => new { a.ConversationId, a.UserId });
                 b.ForeignKey<Conversation>(a => a.ConversationId);
                 b.ForRelational().Table("Attendees");
-            });            
+            });
         }
 
         protected override void OnConfiguring(DbContextOptions options)
         {
-            //options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=aspnet5-chatle-8aed7be5-ad19-4e43-91f6-a67ba01d2830;Trusted_Connection=True;MultipleActiveResultSets=true");
+            // TODO: uncomment this line to create an EF migration
+            //options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true");
             base.OnConfiguring(options);
         }
     }

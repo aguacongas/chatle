@@ -98,9 +98,9 @@ $(function() {
         users.remove(function(u) {
             return u.Id === user.Id;
         }), users.unshift(user);
-    }, chatHub.client.userDisconnected = function(user) {
-        console.log("Chat Hub userDisconnected " + user.Id), viewModel.users.remove(function(u) {
-            return u.Id === user.Id;
+    }, chatHub.client.userDisconnected = function(id) {
+        console.log("Chat Hub userDisconnected " + id), viewModel.users.remove(function(u) {
+            return u.Id === id;
         });
     }, chatHub.client.messageReceived = function(data) {
         viewModel.messageReceived(data);

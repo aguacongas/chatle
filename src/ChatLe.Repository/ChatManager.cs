@@ -94,27 +94,25 @@ namespace ChatLe.Models
         /// <param name="notificationType">the type of notification</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>A Task</returns>
-        public async Task RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (userName == null)
-            {
                 throw new ArgumentNullException("userName");
-            }
             if (connectionId == null)
-            {
                 throw new ArgumentNullException("connectionId");
-            }
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
             {
                 var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
-                if (nc == null)
+                if (nc != null)
                 {
                     await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
-                    user.NotificationConnections.Remove(nc);
                 }
+                return await Store.UserHasConnectionAsync(user.Id);
             }
+
+            return false;
         }
         /// <summary>
         /// Adds a message to a conversation

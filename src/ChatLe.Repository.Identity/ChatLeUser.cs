@@ -15,6 +15,6 @@ namespace ChatLe.Models
             UserName = userName;
         }
 
-        public virtual ICollection<NotificationConnection<string>> NotificationConnections { get; } = new List<NotificationConnection<string>>();
+        public virtual ICollection<NotificationConnection<string>> NotificationConnections { get; set; } = new List<NotificationConnection<string>>();
     }
 }

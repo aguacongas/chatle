@@ -1,8 +1,5 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.Data.Entity;
 using System.Collections.Generic;
 
 namespace ChatLe.Models
@@ -90,6 +87,13 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
         Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Check if a user has connection
+        /// </summary>
+        /// <param name="userId">the <see cref="TKey"/> user id</param>
+        /// <returns>true if user has connection</returns>
+        Task<bool> UserHasConnectionAsync(TKey userId);
+
         /// <summary>
         /// Create a notification connection on the database
         /// </summary>

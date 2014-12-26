@@ -2,11 +2,11 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "DatabaseEngine": "Redis",
+    "DatabaseEngine": "SqlServer",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {
-            "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-chatle-8aed7be5-ad19-4e43-91f6-a67ba01d2830;Trusted_Connection=True;MultipleActiveResultSets=true"
+            "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true"
         },
         "Redis": {
             "Hostname": "localhost"

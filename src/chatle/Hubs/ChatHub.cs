@@ -84,9 +84,8 @@ namespace ChatLe.Hubs
         {
             string name = Context.User.Identity.Name;
             Logger.WriteInformation("OnDisconnected " + name);
-            await Manager.RemoveConnectionIdAsync(name, Context.ConnectionId, "signalR");
-            await Groups.Remove(Context.ConnectionId, name);
-            Clients.Others.userDisconnected(new { Id = name });
+            if (!await Manager.RemoveConnectionIdAsync(name, Context.ConnectionId, "signalR"))
+                Clients.Others.userDisconnected(name);
             await base.OnDisconnected(stopCalled);
         }
     }

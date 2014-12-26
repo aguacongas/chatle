@@ -175,12 +175,12 @@ $(function () {
     };
     /**
       * @desc callback when a new user disconnect the chat
-      * @param User user, the disconnected user
+      * @param id, the disconnected user id
     */
-    chatHub.client.userDisconnected = function (user) {
-        console.log("Chat Hub userDisconnected " + user.Id);
+    chatHub.client.userDisconnected = function (id) {
+        console.log("Chat Hub userDisconnected " + id);
         viewModel.users.remove(function (u) {
-            return u.Id === user.Id;
+            return u.Id === id;
         });
     };
     /**

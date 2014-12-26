@@ -45,7 +45,7 @@ namespace ChatLe.Models
         /// <param name="notificationType">the type of notification</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>A Task</returns>
-        Task RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Gets or creates a conversation
         /// </summary>
