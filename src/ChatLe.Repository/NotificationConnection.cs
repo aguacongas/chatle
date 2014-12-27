@@ -7,9 +7,9 @@ namespace ChatLe.Models
     }
     public class NotificationConnection<TKey>
     {
-        public TKey UserId { get; set; }
-        public string ConnectionId { get; set; }
-        public string NotificationType { get; set; }
-        public DateTime ConnectionDate { get; set; }
+        public virtual TKey UserId { get; set; }
+        public virtual string ConnectionId { get; set; }
+        public virtual string NotificationType { get; set; }
+        public virtual DateTime ConnectionDate { get; set; }
     }
 }

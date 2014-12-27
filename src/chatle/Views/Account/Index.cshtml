@@ -1,0 +1,22 @@
+﻿@model ChatLe.Models.LoginPageViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+
+<h2>@ViewBag.Title.</h2>
+<div class="row">
+    <div class="col-xs-6">
+        <section id="loginForm">
+            @await Html.PartialAsync("_AccountLoginPartial", Model.Login)
+        </section>
+    </div>
+    <div class="col-xs-6">
+        <section id="guessForm">
+            @await Html.PartialAsync("_GessPartial", Model.Guess)
+        </section>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Register", "Register") if you don't have a local account.
+
+</p>

@@ -43,6 +43,20 @@ namespace ChatLe.Models
         public bool RememberMe { get; set; }
     }
 
+    public class GuessViewModel
+    {
+        [Required]
+        [Display(Name = "User name")]
+        public string UserName { get; set; }
+
+    }
+
+    public class LoginPageViewModel
+    {
+        public LoginViewModel Login { get; set; } = new LoginViewModel();
+        public GuessViewModel Guess { get; set; } = new GuessViewModel();
+    }
+
     public class RegisterViewModel
     {
         [Required]

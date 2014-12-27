@@ -39,7 +39,7 @@
         <h6>CONV</h6>
         <ul data-bind="foreach: conversations">
             <li>
-                <a href="#" data-bind="text: title, click: function() { $parent.showConversation($data); }"></a>
+                <a href="#" data-bind="text: title, click: function() { $parent.showConversation($data); }"></a><br />
                 <span data-bind="text: messages() && messages()[0] ? messages()[0].Text: null"></span>
             </li>
         </ul>

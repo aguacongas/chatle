@@ -2,7 +2,7 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "DatabaseEngine": "SqlServer",
+    "DatabaseEngine": "Redis",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {

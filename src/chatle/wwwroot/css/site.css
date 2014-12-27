@@ -41,6 +41,9 @@ ul
     list-style-type: none;
 }
 
+small {
+    color: #666666;
+}
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {

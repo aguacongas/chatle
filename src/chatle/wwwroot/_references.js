@@ -6,3 +6,5 @@
 /// <reference path="lib/knockout/knockout.js" />
 /// <reference path="scripts/chat.js" />
 /// <reference path="lib/signalr/jquery.signalR.js" />
+/// <reference path="../gruntfile.js" />
+/// <reference path="../scripts/chat.js" />

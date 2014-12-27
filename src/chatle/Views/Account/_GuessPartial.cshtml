@@ -1,0 +1,20 @@
+﻿@model ChatLe.Models.GuessViewModel
+@using (Html.BeginForm("Gess", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <h4>Guess access.</h4>
+    <hr />
+    @Html.ValidationSummary(true)
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserName, new { @class = "col-xs-3 control-label" })
+        <div class="col-xs-9">
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.UserName)
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-offset-3 col-xs-9">
+            <input type="submit" value="Log in" class="btn btn-default" />
+        </div>
+    </div>
+}

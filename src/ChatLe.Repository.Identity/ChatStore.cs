@@ -70,15 +70,15 @@ namespace ChatLe.Models
             Logger = loggerFactory.Create<ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection>>();
 
         }
-        public ILogger Logger { get; private set; }
+        public virtual ILogger Logger { get; private set; }
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
-        public TContext Context { get; private set; }
+        public virtual TContext Context { get; private set; }
         /// <summary>
         /// Gets the <see cref="DbSet{TUser}"/>
         /// </summary>
-        public DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
+        public virtual DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
         /// <summary>
         /// Gets the <see cref="DbSet{TConversation}"/>
         /// </summary>
@@ -90,18 +90,18 @@ namespace ChatLe.Models
         /// <summary>
         /// Gets the <see cref="DbSet{TAttendee}"/>
         /// </summary>
-        public DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
+        public virtual DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
         /// <summary>
         /// Gets the <see cref="DbSet{TNotificationConnection}"/>
         /// </summary>
-        public DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
+        public virtual DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
         /// <summary>
         /// Create a message on the database
         /// </summary>
         /// <param name="message">The message to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(message == null)
@@ -116,7 +116,7 @@ namespace ChatLe.Models
         /// <param name="attendee">The attendee to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(attendee == null)
@@ -132,7 +132,7 @@ namespace ChatLe.Models
         /// <param name="conversation">The conversation to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (conversation == null)
@@ -147,7 +147,7 @@ namespace ChatLe.Models
         /// <param name="userName">the user name</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TUser}"/></returns>
-        public async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             return await Users.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
@@ -158,7 +158,7 @@ namespace ChatLe.Models
         /// <param name="user">The user to update</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
@@ -174,7 +174,7 @@ namespace ChatLe.Models
         /// <param name="attendee2">the 2dn attendee</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TConversation}"/></returns>
-        public async Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (attendee1 == null)
@@ -189,7 +189,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="convId">the conversation id</param>
         /// <returns>a <see cref="Task{TConversation}"</returns>
-        public async Task<TConversation> GetConversationAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TConversation> GetConversationAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             return await Conversations.FirstOrDefaultAsync(c => c.Id.Equals(convId));
@@ -201,7 +201,7 @@ namespace ChatLe.Models
         /// <param name="max">max number of messages to get, default is 50</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TMessage}}"/></returns>
-        public async Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             return await Messages.Where(m => m.ConversationId.Equals(convId)).OrderByDescending(m=>m.Date).Take(max).ToListAsync();
@@ -213,7 +213,7 @@ namespace ChatLe.Models
         /// <param name="pageLength">number of user per page</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
-        public async Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             var ids = new List<TKey>();
@@ -222,7 +222,8 @@ namespace ChatLe.Models
                       select new { Id= g.Key, Date=g.Max(x => x.ConnectionDate) } )
                       .OrderByDescending(x => x.Date)
                      .Skip(pageIndex * pageLength)
-                     .Take(pageLength);
+                     .Take(pageLength)
+                     .ToList();
 
             var query = from r in q1
                         join u in Users
@@ -237,7 +238,7 @@ namespace ChatLe.Models
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
@@ -252,7 +253,7 @@ namespace ChatLe.Models
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public async Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
@@ -268,7 +269,7 @@ namespace ChatLe.Models
         /// <param name="notificationType">the type of notification</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TNotificationConnection}"/></returns>
-        public async Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connectionId == null)
@@ -281,7 +282,7 @@ namespace ChatLe.Models
         /// <summary>
         /// Initialise the database
         /// </summary>
-        public void Init()
+        public virtual void Init()
         {
             try
             {
@@ -289,6 +290,7 @@ namespace ChatLe.Models
                 Attendees.RemoveRange(Attendees);
                 Messages.RemoveRange(Messages);
                 Conversations.RemoveRange(Conversations);
+                Users.RemoveRange(Users.Where(u => u.PasswordHash == null));
                 Context.SaveChanges();
             }
             catch(Exception e)
@@ -303,7 +305,7 @@ namespace ChatLe.Models
         /// <param name="notificationType">the notification type</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
-        public async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
         }
@@ -312,7 +314,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="user">the <see cref="TUser"/></param>
         /// <returns>true if user has connection</returns>
-        public async Task<bool> UserHasConnectionAsync(TKey userId)
+        public virtual async Task<bool> UserHasConnectionAsync(TKey userId)
         {
             return await NotificationConnections.AnyAsync(n => n.UserId.Equals(userId));
         }
@@ -322,7 +324,7 @@ namespace ChatLe.Models
         /// <param name="conv">the conversation</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
-        public async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
@@ -339,7 +341,7 @@ namespace ChatLe.Models
         /// <param name="userId">the user id</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
-        public async Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await (from c in Conversations
                           join a in Attendees

@@ -7,5 +7,7 @@ namespace ChatLe.Models
         TKey Id { get; set; }
         string UserName { get; set; }
         ICollection<NotificationConnection<TKey>> NotificationConnections { get; }
+
+        string PasswordHash { get; }
     }
 }

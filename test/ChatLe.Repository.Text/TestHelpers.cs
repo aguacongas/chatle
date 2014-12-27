@@ -26,7 +26,9 @@ namespace ChatLe.Repository.Text
         public ICollection<NotificationConnection<string>> NotificationConnections { get; } = new List<NotificationConnection<string>>();
 
         public string UserName { get; set; } = "test";
-       
+
+        public string PasswordHash { get; } = null;
+
     }
     public class ChatDbContext : DbContext
     {

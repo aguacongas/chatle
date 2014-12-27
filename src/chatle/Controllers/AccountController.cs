@@ -21,13 +21,13 @@ namespace ChatLe.Controllers
         public UserManager<ChatLeUser> UserManager { get; private set; }
         public SignInManager<ChatLeUser> SignInManager { get; private set; }
 
-        // GET: /Account/Login
+        // GET: /Account/Index
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Index(string returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            return View(new LoginPageViewModel());
         }
 
         //
@@ -52,7 +52,35 @@ namespace ChatLe.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return View("Index", new LoginPageViewModel() { Login = model });
+        }
+
+        //
+        // POST: /Account/Gess
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Guess(GuessViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ChatLeUser { UserName = model.UserName };
+                var existing = await UserManager.FindByNameAsync(user.UserName);
+                if (existing != null)
+                    await UserManager.DeleteAsync(existing);
+                    
+                var result = await UserManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                    AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View("Index", new LoginPageViewModel() { Guess = model });
         }
 
         //
@@ -81,9 +109,7 @@ namespace ChatLe.Controllers
                     return RedirectToAction("Index", "Home");
                 }
                 else
-                {
                     AddErrors(result);
-                }
             }
 
             // If we got this far, something failed, redisplay form
@@ -115,13 +141,9 @@ namespace ChatLe.Controllers
                 var user = await GetCurrentUserAsync();
                 var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
-                {
                     return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
-                }
                 else
-                {
                     AddErrors(result);
-                }
             }
 
             // If we got this far, something failed, redisplay form
@@ -143,9 +165,7 @@ namespace ChatLe.Controllers
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
-            {
                 ModelState.AddModelError("", error);
-            }
         }
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
@@ -162,13 +182,9 @@ namespace ChatLe.Controllers
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
-            {
                 return Redirect(returnUrl);
-            }
             else
-            {
                 return RedirectToAction("Index", "Home");
-            }
         }
         #endregion
     }

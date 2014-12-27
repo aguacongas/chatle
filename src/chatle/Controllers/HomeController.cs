@@ -12,7 +12,7 @@ namespace ChatLe.Controllers
             if (User.Identity.IsAuthenticated)
                 return View();
 
-            return RedirectToRoute(new { controller= "Account", action= "Login" });
+            return RedirectToRoute(new { controller= "Account", action= "Index" });
         }
 
         public IActionResult About()
