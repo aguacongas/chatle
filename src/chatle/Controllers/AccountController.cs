@@ -56,7 +56,7 @@ namespace ChatLe.Controllers
         }
 
         //
-        // POST: /Account/Gess
+        // POST: /Account/Guess
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
