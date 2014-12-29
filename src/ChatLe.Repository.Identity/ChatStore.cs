@@ -284,19 +284,12 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
-            try
-            {
-                NotificationConnections.RemoveRange(NotificationConnections);
-                Attendees.RemoveRange(Attendees);
-                Messages.RemoveRange(Messages);
-                Conversations.RemoveRange(Conversations);
-                Users.RemoveRange(Users.Where(u => u.PasswordHash == null));
-                Context.SaveChanges();
-            }
-            catch(Exception e)
-            {
-                Logger.WriteError("Init fail", e);
-            }
+            NotificationConnections.RemoveRange(NotificationConnections);
+            Attendees.RemoveRange(Attendees);
+            Messages.RemoveRange(Messages);
+            Conversations.RemoveRange(Conversations);
+            Users.RemoveRange(Users.Where(u => u.PasswordHash == null));
+            Context.SaveChanges();
         }
         /// <summary>
         /// Gets notification connections for a user id and notification type
