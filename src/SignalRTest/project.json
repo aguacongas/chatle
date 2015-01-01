@@ -21,6 +21,7 @@
     "dependencies": {
         "Kestrel": "1.0.0-beta1",
         "Microsoft.AspNet.Server.IIS": "1.0.0-beta1",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta1",
         "Microsoft.AspNet.Mvc": "6.0.0-beta1",
         "Microsoft.AspNet.SignalR.Server": "3.0.0-beta1"
     },

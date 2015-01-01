@@ -14,7 +14,8 @@ namespace SignalRTest
         }
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMvc()
+            app.UseStaticFiles()
+                .UseMvc()
                 .UseSignalR();
         }
     }
