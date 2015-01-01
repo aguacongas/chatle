@@ -1,0 +1,13 @@
+{
+    "name": "test",
+    "private": true,
+    "dependencies": {
+        "jquery": "~1.10.2",
+        "signalr": "~2.1.2"
+    },
+    "exportsOverride": {
+        "jquery": {
+            "js": "jquery.{js,min.js,min.map}"
+        }
+    }
+}

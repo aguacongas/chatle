@@ -1,0 +1,30 @@
+﻿{
+    "webroot": "wwwroot",
+    "version": "1.0.0-*",
+    "authors": ["Olivier Lefebvre"],
+    "exclude": [
+        "wwwroot",
+        "node_modules",
+        "bower_components"
+    ],
+    "packExclude": [
+        "node_modules",
+        "bower_components",
+        "**.kproj",
+        "**.user",
+        "**.vspscc"
+    ],
+    "scripts": {
+        "postrestore": "npm install",
+        "prepare": "grunt bower:install"
+    },
+    "dependencies": {
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta1",
+        "Microsoft.AspNet.Mvc": "6.0.0-beta1",
+        "Microsoft.AspNet.SignalR.Server": "3.0.0-beta1"
+    },
+    "frameworks" : {
+        "aspnet50" : { },
+        "aspnetcore50" : { }
+    }
+}

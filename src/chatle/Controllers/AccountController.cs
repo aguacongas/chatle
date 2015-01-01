@@ -64,11 +64,7 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ChatLeUser { UserName = model.UserName };
-                var existing = await UserManager.FindByNameAsync(user.UserName);
-                if (existing != null)
-                    await UserManager.DeleteAsync(existing);
-                    
+                var user = new ChatLeUser { UserName = model.UserName };                    
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
