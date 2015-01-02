@@ -10,13 +10,19 @@ namespace SignalRTest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+                .AddSignalR(options =>
+                {
+                    options.Hubs.EnableDetailedErrors = true;
+                    options.Transports.TransportConnectTimeout = TimeSpan.FromSeconds(10);
+                    options.Transports.LongPolling.PollDelay = TimeSpan.FromSeconds(5);
+                });
         }
         public void Configure(IApplicationBuilder app)
         {
-            app.UseStaticFiles()
-                .UseMvc()
-                .UseSignalR();
+            app.UseSignalR()
+                .UseStaticFiles()
+                .UseMvc();
+                
         }
     }
 }
