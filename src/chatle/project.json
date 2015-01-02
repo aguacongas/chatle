@@ -13,7 +13,7 @@
         "ChatLe.Repository.Identity": "",
         "ChatLe.Logging": "",
         "EntityFramework.InMemory": "7.0.0-beta1",
-        "EntityFramework.Redis": "7.0.0-beta1",
+        "EntityFramework.Redis": "",
         "EntityFramework.SQLite": "7.0.0-beta1",
         "EntityFramework.SqlServer": "7.0.0-beta1",
         "EntityFramework.Commands": "7.0.0-beta1",
