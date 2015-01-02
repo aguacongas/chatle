@@ -13,8 +13,6 @@ namespace SignalRTest
                 .AddSignalR(options =>
                 {
                     options.Hubs.EnableDetailedErrors = true;
-                    options.Transports.TransportConnectTimeout = TimeSpan.FromSeconds(10);
-                    options.Transports.LongPolling.PollDelay = TimeSpan.FromSeconds(5);
                 });
         }
         public void Configure(IApplicationBuilder app)
