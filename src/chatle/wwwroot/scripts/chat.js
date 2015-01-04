@@ -92,13 +92,7 @@ $(function() {
             getMessages: getMessages
         };
     };
-    ko.applyBindings(viewModel), $.getJSON("api/users").done(function(data) {
-        viewModel.users(data);
-    }), $.getJSON("api/chat").done(function(data) {
-        data && $.each(data, function(index, conv) {
-            viewModel.conversations.unshift(new ConversationVM(conv));
-        });
-    }), chatHub.client.userConnected = function(user) {
+    ko.applyBindings(viewModel), chatHub.client.userConnected = function(user) {
         console.log("Chat Hub newUserConnected " + user.Id);
         var users = viewModel.users;
         users.remove(function(u) {
@@ -124,7 +118,13 @@ $(function() {
     }), $.connection.hub.disconnected(function() {
         console.log("Chat Hub disconnected");
     }), $.connection.hub.start().done(function() {
-        console.log("Chat Hub started");
+        console.log("Chat Hub started"), $.getJSON("api/users").done(function(data) {
+            viewModel.users(data.Users);
+        }), $.getJSON("api/chat").done(function(data) {
+            data && $.each(data, function(index, conv) {
+                viewModel.conversations.unshift(new ConversationVM(conv));
+            });
+        });
     });
 });
 //# sourceMappingURL=chat.js.map

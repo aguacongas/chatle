@@ -132,7 +132,7 @@ namespace ChatLe
                         int database;
                         if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
                             port = 6379;
-                        int.TryParse(Configuration.Get("Data: Redis:Database"), out database);
+                        int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
 
                         options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
                         break;

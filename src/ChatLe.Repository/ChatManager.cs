@@ -101,7 +101,10 @@ namespace ChatLe.Models
                 if (nc != null)
                     await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
 
-                return await Store.UserHasConnectionAsync(user.Id);
+                var ret = await Store.UserHasConnectionAsync(user.Id);
+                if (!ret && user.PasswordHash == null)
+                    await Store.DeleteUserAsync(user, cancellationToken);
+                return ret;
             }
 
             return false;
@@ -219,7 +222,7 @@ namespace ChatLe.Models
         /// <param name="pageIndex">the page index</param>
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
-        public virtual Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Store.GetUsersConnectedAsync(pageIndex, Options.UserPerPage, cancellationToken);
         }
@@ -247,6 +250,14 @@ namespace ChatLe.Models
                         conv.Messages.Add(message);
             }
             return conversations;
+        }
+
+        public async Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (user == null)
+                throw new ArgumentNullException("user");
+
+            await Store.DeleteUserAsync(user, cancellationToken);
         }
     }
 }

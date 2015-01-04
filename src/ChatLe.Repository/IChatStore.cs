@@ -86,7 +86,15 @@ namespace ChatLe.Models
         /// <param name="pageLength">number of user per page, default is 50</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
-        Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Deletes a user 
+        /// </summary>
+        /// <param name="user">the user to delete</param>
+        /// <param name="cancellationToken"an optional cancellation token></param>
+        /// <returns>a <see cref="Task"/></returns>
+        Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
+
         /// <summary>
         /// Check if a user has connection
         /// </summary>

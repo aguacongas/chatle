@@ -70,7 +70,7 @@ namespace ChatLe.Models
         /// <param name="pageIndex">the page index</param>
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
-        Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Gets the messages list for a conversation
         /// </summary>
@@ -85,5 +85,12 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
         Task<IEnumerable<TConversation>> GetConversationsAsync(string userName, CancellationToken cancellationToken = default(CancellationToken));
+        /// <summary>
+        /// Removes a user
+        /// </summary>
+        /// <param name="user">the user to remove</param>
+        /// <param name="cancellationToken">an optional concellation token</param>
+        /// <returns>a Task</returns>
+        Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

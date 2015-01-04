@@ -161,23 +161,6 @@ $(function () {
     // apply the view model binding
     ko.applyBindings(viewModel);
 
-    // get connected users
-    $.getJSON("api/users")
-    .done(function (data) {
-        viewModel.users(data);
-    });
-
-    // get user conversations
-    $.getJSON("api/chat")
-    .done(function (data) {
-        if (!data) {
-            return;
-        }
-        $.each(data, function (index, conv) {
-            viewModel.conversations.unshift(new ConversationVM(conv));
-        });
-    });
-
     /**
       * @desc callback when a new user connect to the chat
       * @param User user, the connected user
@@ -247,5 +230,21 @@ $(function () {
     $.connection.hub.start()
         .done(function () {
             console.log("Chat Hub started");
+            // get connected users
+            $.getJSON("api/users")
+                .done(function (data) {
+                    viewModel.users(data.Users);
+            });
+
+            // get user conversations
+            $.getJSON("api/chat")
+                .done(function (data) {
+                    if (!data) {
+                        return;
+                    }
+                    $.each(data, function (index, conv) {
+                        viewModel.conversations.unshift(new ConversationVM(conv));
+                });
+            });
         });
 });

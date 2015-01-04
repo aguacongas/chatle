@@ -1,5 +1,8 @@
-﻿using System;
+﻿using ChatLe.Models;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace chatle.Models
 {
@@ -50,4 +53,44 @@ namespace chatle.Models
         /// </summary>
         public DateTime Date { get; set; }
     }
+
+    public class UserCollectionViewModel
+    {
+        private readonly Page<ChatLeUser> _model;
+        public UserCollectionViewModel(Page<ChatLeUser> model)
+        {
+            _model = model;
+        }
+
+        public int PageCount
+        {
+            get
+            {
+                return _model.PageCount;
+            }
+        }
+
+        public int PageIndex
+        {
+            get
+            {
+                return _model.PageIndex;
+            }
+        }
+
+        public IEnumerable<UserViewModel> Users
+        {
+            get
+            {
+                foreach (var user in _model)
+                    yield return new UserViewModel() { Id = user.UserName };
+            }
+        }
+    }
+
+    public class UserViewModel
+    {
+        public string Id { get; set; }
+    }
+
 }

@@ -47,7 +47,7 @@ CREATE TABLE [AspNetRoleClaims] (
     [Id] int NOT NULL IDENTITY,
     [ClaimType] nvarchar(max),
     [ClaimValue] nvarchar(max),
-    [RoleId] nvarchar(max),
+    [RoleId] nvarchar(128),
     CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id])
 )
 CREATE TABLE [AspNetUserClaims] (

@@ -12,14 +12,17 @@ namespace ChatLe.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ChatLeUser> userManager, SignInManager<ChatLeUser> signInManager)
+        public AccountController(UserManager<ChatLeUser> userManager, SignInManager<ChatLeUser> signInManager, IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            ChatManager = chatManager;
         }
 
         public UserManager<ChatLeUser> UserManager { get; private set; }
         public SignInManager<ChatLeUser> SignInManager { get; private set; }
+
+        public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> ChatManager { get; private set; }
 
         // GET: /Account/Index
         [HttpGet]
@@ -150,9 +153,15 @@ namespace ChatLe.Controllers
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LogOff()
+        public async Task<IActionResult> LogOff()
         {
-            SignInManager.SignOut();
+            var user = await GetCurrentUserAsync();
+
+            if (user != null && user.PasswordHash == null)
+            {
+                await ChatManager.RemoveUserAsync(user);
+            }
+            SignInManager.SignOut();            
             return RedirectToAction("Index", "Home");
         }
 

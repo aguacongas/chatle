@@ -213,24 +213,30 @@ namespace ChatLe.Models
         /// <param name="pageLength">number of user per page</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TUser}}"/></returns>
-        public virtual async Task<IEnumerable<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
+            var skip = pageIndex * pageLength;
             cancellationToken.ThrowIfCancellationRequested();
             var ids = new List<TKey>();
             var q1 = (from nc in NotificationConnections
                       group new { nc.UserId, nc.ConnectionDate } by nc.UserId into g
-                      select new { Id= g.Key, Date=g.Max(x => x.ConnectionDate) } )
-                      .OrderByDescending(x => x.Date)
-                     .Skip(pageIndex * pageLength)
+                      select new { Id = g.Key, Date = g.Max(x => x.ConnectionDate) })
+                      .OrderByDescending(x => x.Date);
+
+            var count = q1.Count();
+
+            var q2 = q1.Skip(skip)
                      .Take(pageLength)
                      .ToList();
 
-            var query = from r in q1
+            var query = from r in q2
                         join u in Users
                          on r.Id equals u.Id
                         select u;
 
-            return await Task.FromResult(query.ToList());
+            var pageCount = (int)Math.Floor(((double)count) / pageLength) + 1;
+
+            return await Task.FromResult(new Page<TUser>(query.ToList(), pageIndex, pageCount));
         }
         /// <summary>
         /// Create a notification connection on the database
@@ -300,6 +306,7 @@ namespace ChatLe.Models
         /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
         public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
         }
         /// <summary>
@@ -336,6 +343,7 @@ namespace ChatLe.Models
         /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
         public virtual async Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return await (from c in Conversations
                           join a in Attendees
                               on c.Id equals a.ConversationId
@@ -344,6 +352,25 @@ namespace ChatLe.Models
                           where a.UserId.Equals(userId)
                           orderby m.Date descending                          
                           select c).Distinct().ToListAsync();
+        }
+        /// <summary>
+        /// Deletes a user 
+        /// </summary>
+        /// <param name="user">the user to delete</param>
+        /// <param name="cancellationToken"an optional cancellation token></param>
+        /// <returns>a <see cref="Task"/></returns>
+        public virtual async Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null)
+                throw new ArgumentNullException("user");
+
+            Messages.RemoveRange(Messages.Where(m => m.UserId.Equals(user.Id)));
+            Attendees.RemoveRange(Attendees.Where(a => a.UserId.Equals(user.Id)));
+            Conversations.RemoveRange(Conversations.Where(c => c.Attendees.Count < 2));
+            NotificationConnections.RemoveRange(NotificationConnections.Where(n => n.UserId.Equals(user.Id)));
+            Users.Remove(user);
+            await Context.SaveChangesAsync(cancellationToken);
         }
     }
 }

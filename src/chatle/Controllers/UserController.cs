@@ -1,4 +1,5 @@
-﻿using ChatLe.Models;
+﻿using chatle.Models;
+using ChatLe.Models;
 using Microsoft.AspNet.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +27,13 @@ namespace ChatLe.Controllers
         /// <summary>
         /// Gets the a connected users list page
         /// </summary>
-        /// <returns>a <see cref="Task<IEnumerable<dynamic>>"/> with the connected user list as result</returns>
+        /// <returns>a <see cref="Task{UserCollectionViewModel}"/> with the connected user list as result</returns>
         // GET: /<controller>/
         [HttpGet()]
-        public async Task<IEnumerable<dynamic>> Get(int pageIndex = 0)
+        public async Task<UserCollectionViewModel> Get(int pageIndex = 0)
         {
-            var users = await _manager.GetUsersConnectedAsync();
-            return users.Select(u => new { Id = u.UserName });
+            var users = await _manager.GetUsersConnectedAsync(pageIndex);
+            return new UserCollectionViewModel(users);
         }
     }
 }
