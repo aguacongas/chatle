@@ -109,7 +109,13 @@ namespace ChatLe.Repository.Identity.Migrations
                         RoleId = c.String()
                     })
                 .PrimaryKey("PK_AspNetUserRoles", t => new { t.UserId, t.RoleId });
-            
+
+            migrationBuilder.Sql("ALTER TABLE [Attendees] ALTER COLUMNS [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [Messages] ALTER COLUMNS [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [NotificationConnections] ALTER COLUMNS [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [AspNetUserClaims] ALTER COLUMNS [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [AspNetUserLogins] ALTER COLUMNS [UserId] nvarchar(128)");
+
             migrationBuilder.AddForeignKey("Attendees", "FK_Attendees_Conversations_ConversationId", new[] { "ConversationId" }, "Conversations", new[] { "Id" }, cascadeDelete: false);
             
             migrationBuilder.AddForeignKey("Messages", "FK_Messages_AspNetUsers_UserId", new[] { "UserId" }, "AspNetUsers", new[] { "Id" }, cascadeDelete: false);

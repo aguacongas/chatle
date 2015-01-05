@@ -7,9 +7,25 @@ using System;
 namespace ChatLe.Repository.Identity.Migrations
 {
     [ContextType(typeof(ChatLeIdentityDbContext))]
-    public class ChatLeIdentityDbContextModelSnapshot : ModelSnapshot
+    public partial class attendeeuserid : IMigrationMetadata
     {
-        public override IModel Model
+        string IMigrationMetadata.MigrationId
+        {
+            get
+            {
+                return "201501051405468_attendee-userid";
+            }
+        }
+        
+        string IMigrationMetadata.ProductVersion
+        {
+            get
+            {
+                return "7.0.0-beta1-11518";
+            }
+        }
+        
+        IModel IMigrationMetadata.TargetModel
         {
             get
             {
