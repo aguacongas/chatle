@@ -110,14 +110,17 @@ namespace ChatLe.Repository.Identity.Migrations
                     })
                 .PrimaryKey("PK_AspNetUserRoles", t => new { t.UserId, t.RoleId });
 
-            migrationBuilder.Sql("ALTER TABLE [Attendees] ALTER COLUMNS [UserId] nvarchar(128)");
-            migrationBuilder.Sql("ALTER TABLE [Messages] ALTER COLUMNS [UserId] nvarchar(128)");
-            migrationBuilder.Sql("ALTER TABLE [NotificationConnections] ALTER COLUMNS [UserId] nvarchar(128)");
-            migrationBuilder.Sql("ALTER TABLE [AspNetUserClaims] ALTER COLUMNS [UserId] nvarchar(128)");
-            migrationBuilder.Sql("ALTER TABLE [AspNetUserLogins] ALTER COLUMNS [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [Messages] ALTER COLUMN [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [Messages] ALTER COLUMN [ConversationId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [NotificationConnections] ALTER COLUMN [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [AspNetUserClaims] ALTER COLUMN [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [AspNetUserLogins] ALTER COLUMN [UserId] nvarchar(128)");
+            migrationBuilder.Sql("ALTER TABLE [AspNetRoleClaims] ALTER COLUMN [RoleId] nvarchar(128)");
+
 
             migrationBuilder.AddForeignKey("Attendees", "FK_Attendees_Conversations_ConversationId", new[] { "ConversationId" }, "Conversations", new[] { "Id" }, cascadeDelete: false);
-            
+            migrationBuilder.AddForeignKey("Attendees", "FK_Attendees_AspNetUsers_UserId", new[] { "UserId" }, "AspNetUsers", new[] { "Id" }, cascadeDelete: false);
+
             migrationBuilder.AddForeignKey("Messages", "FK_Messages_AspNetUsers_UserId", new[] { "UserId" }, "AspNetUsers", new[] { "Id" }, cascadeDelete: false);
             
             migrationBuilder.AddForeignKey("Messages", "FK_Messages_Conversations_ConversationId", new[] { "ConversationId" }, "Conversations", new[] { "Id" }, cascadeDelete: false);

@@ -6,7 +6,7 @@ using System;
 
 namespace ChatLe.Repository.Identity.Migrations
 {
-    [ContextType(typeof(ChatLeIdentityDbContext))]
+    [ContextType(typeof(ChatLeIdentityDbContextSql))]
     public class ChatLeIdentityDbContextModelSnapshot : ModelSnapshot
     {
         public override IModel Model

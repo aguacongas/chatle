@@ -76,4 +76,4 @@ ALTER TABLE [NotificationConnections] ADD CONSTRAINT [FK_NotificationConnections
 ALTER TABLE [AspNetRoleClaims] ADD CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id])
 ALTER TABLE [AspNetUserClaims] ADD CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id])
 ALTER TABLE [AspNetUserLogins] ADD CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id])
-INSERT INTO [__MigrationHistory] ([MigrationId], [ContextKey], [ProductVersion]) VALUES ('201412260841356_initial', 'ChatLe.Models.ChatLeIdentityDbContext', '7.0.0-beta1-11518')
+INSERT INTO [__MigrationHistory] ([MigrationId], [ContextKey], [ProductVersion]) VALUES ('201412260841356_initial', 'ChatLe.Models.ChatLeIdentityDbContextSql', '7.0.0-beta1-11518')
