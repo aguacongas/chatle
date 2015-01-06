@@ -7,6 +7,19 @@
     "compilationOptions": {
         "warningsAsErrors": true
     },
+    "configurations": {
+        "Debug": {
+            "compilationOptions": {
+                "define": [ "DEBUG", "TRACE" ]
+            }
+        },
+        "Release": {
+            "compilationOptions": {
+                "define": [ "RELEASE", "TRACE" ],
+                "optimize": true
+            }
+        }
+    },
     "dependencies": {
         "Kestrel": "1.0.0-beta1",
         "ChatLe.HttpUtility": "",
@@ -42,14 +55,15 @@
     },
     "frameworks": {
         "aspnet50": {
-                    "StackExchange.Redis": "1.0.371.0"
+            "StackExchange.Redis": "1.0.371.0"
         } /*,
         "aspnetcore50": { }*/
     },
     "exclude": [
         "wwwroot",
         "node_modules",
-        "bower_components"
+        "bower_components",
+        "bin"
     ],
     "packExclude": [
         "node_modules",

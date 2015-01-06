@@ -5,6 +5,19 @@
     "compilationOptions": {
         "warningsAsErrors": true
     },
+    "configurations": {
+        "Debug": {
+            "compilationOptions": {
+                "define": [ "DEBUG", "TRACE" ]
+            }
+        },
+        "Release": {
+            "compilationOptions": {
+                "define": [ "RELEASE", "TRACE" ],
+                "optimize": true
+            }
+        }
+    },
     "dependencies": {
 	    "EntityFramework.SqlServer": "7.0.0-beta1",
 	    "EntityFramework.Commands": "7.0.0-beta1",

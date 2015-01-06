@@ -5,6 +5,19 @@
     "compilationOptions": {
         "warningsAsErrors": true
     },
+    "configurations": {
+        "Debug": {
+            "compilationOptions": {
+                "define": [ "DEBUG", "TRACE" ]
+            }
+        },
+        "Release": {
+            "compilationOptions": {
+                "define": [ "RELEASE", "TRACE" ],
+                "optimize": true
+            }
+        }
+    },
     "dependencies": {
         "Microsoft.AspNet.Http": "1.0.0-beta1",
         "Microsoft.AspNet.RequestContainer": "1.0.0-beta1",
