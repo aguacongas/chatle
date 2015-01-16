@@ -1,0 +1,22 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "ChatLe.Hosting.FastCGI": "",
+        "ChatLe.Logging": "",
+        "Xunit.KRunner": "1.0.0-beta1"
+    },
+    "commands": {
+        "test": "Xunit.KRunner"
+    },
+    "frameworks" : {
+        "aspnet50" : { 
+            "dependencies": {
+            }
+        },
+        "aspnetcore50" : { 
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22231"
+            }
+        }
+    }
+}

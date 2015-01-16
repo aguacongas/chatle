@@ -22,6 +22,7 @@ namespace ChatLe.Models
                 b.ForRelational().Table("NotificationConnections");
             });
 
+
             builder.Entity<Conversation>(b =>
             {
                 b.Key(c => c.Id);

@@ -18,7 +18,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle.test", "test\chatle.
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository", "src\ChatLe.Repository\ChatLe.Repository.kproj", "{A9750428-BF89-4C11-A7FC-B6001C00CFC8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Text", "test\ChatLe.Repository.Text\ChatLe.Repository.Text.kproj", "{69CC8E50-DBE6-415C-A1AD-49893735D74B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Test", "test\ChatLe.Repository.Text\ChatLe.Repository.Test.kproj", "{69CC8E50-DBE6-415C-A1AD-49893735D74B}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Identity", "src\ChatLe.Repository.Identity\ChatLe.Repository.Identity.kproj", "{C56024F4-6A06-4EA9-BC05-64F9D1AD73B0}"
 EndProject
@@ -27,6 +27,12 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Logging", "src\ChatLe.Logging\ChatLe.Logging.kproj", "{BF0FAC90-5CCF-469E-9ADB-E298DE6B7FEA}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Redis", "src\EntityFramework.Redis\EntityFramework.Redis.kproj", "{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.FastCGI", "src\ChatLe.FastCGI\ChatLe.FastCGI.kproj", "{341A47C7-A898-42DA-A506-673CFCAF8D89}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI", "src\ChatLe.Hosting.FastCGI\ChatLe.Hosting.FastCGI.kproj", "{C895D692-E36E-4711-92F0-130110242FBF}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI.Test", "test\ChatLe.Hosting.FastCGI.Test\ChatLe.Hosting.FastCGI.Test.kproj", "{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +72,18 @@ Global
 		{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}.Release|Any CPU.Build.0 = Release|Any CPU
+		{341A47C7-A898-42DA-A506-673CFCAF8D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{341A47C7-A898-42DA-A506-673CFCAF8D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{341A47C7-A898-42DA-A506-673CFCAF8D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{341A47C7-A898-42DA-A506-673CFCAF8D89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C895D692-E36E-4711-92F0-130110242FBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C895D692-E36E-4711-92F0-130110242FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C895D692-E36E-4711-92F0-130110242FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C895D692-E36E-4711-92F0-130110242FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,5 +97,8 @@ Global
 		{64A22FCF-4566-4C7B-8067-D1435E4E35B8} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
 		{BF0FAC90-5CCF-469E-9ADB-E298DE6B7FEA} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
 		{6147E1A1-F3CC-4A86-86DB-C3B14C52B366} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
+		{341A47C7-A898-42DA-A506-673CFCAF8D89} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
+		{C895D692-E36E-4711-92F0-130110242FBF} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
+		{D6F2C157-49E2-4DFE-860E-81B91BEFBD14} = {6542D5E3-3CF8-4E0B-AE55-6E6B8A044993}
 	EndGlobalSection
 EndGlobal

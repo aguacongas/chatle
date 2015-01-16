@@ -68,7 +68,7 @@ namespace ChatLe.Repository.Text
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var connected = new UserTest() { Id = "connected" };
             connected.NotificationConnections.Add(new NotificationConnection<string>() { UserId = "test", ConnectionId = "test", NotificationType = "test" });
-            storeMock.Setup(s => s.GetUsersConnectedAsync(0, 50, default(CancellationToken))).ReturnsAsync(new UserTest[] { connected });
+            storeMock.Setup(s => s.GetUsersConnectedAsync(0, 50, default(CancellationToken))).ReturnsAsync(new Page<UserTest>(new UserTest[] { connected }, 0, 1));
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             var users = await manager.GetUsersConnectedAsync();
             Assert.True(users.Count() == 1);

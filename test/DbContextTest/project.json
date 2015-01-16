@@ -1,21 +1,21 @@
-﻿{
-    "version": "1.0.0-*",
-    "dependencies": {
-        "EntityFramework.SqlServer": "7.0.0-beta1",
-        "EntityFramework.Commands": "7.0.0-beta1" 
-    },
-    "commands": {
-        "ef": "EntityFramework.Commands"
-    },
-    "frameworks" : {
-        "aspnet50" : { 
-            "dependencies": {
-            }
+﻿    {
+        "version": "1.0.0-*",
+        "dependencies": {
+            "EntityFramework.SqlServer": "7.0.0-beta1",
+            "EntityFramework.Commands": "7.0.0-beta1" 
         },
-        "aspnetcore50" : { 
-            "dependencies": {
-                "System.Runtime": "4.0.20-beta-22231"
+        "commands": {
+            "ef": "EntityFramework.Commands"
+        },
+        "frameworks" : {
+            "aspnet50" : { 
+                "dependencies": {
+                }
+            },
+            "aspnetcore50" : { 
+                "dependencies": {
+                    "System.Runtime": "4.0.20-beta-22231"
+                }
             }
         }
     }
-}
