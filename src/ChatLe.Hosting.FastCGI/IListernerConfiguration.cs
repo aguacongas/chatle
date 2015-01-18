@@ -1,6 +1,6 @@
 ﻿namespace ChatLe.Hosting.FastCGI
 {
-    public interface IConfiguration
+    public interface IListernerConfiguration
     {
         int MaxConnections { get; set; }
         int MaxRequests { get; set; }

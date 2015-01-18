@@ -12,10 +12,7 @@ namespace ChatLe.Hosting.FastCGI
 
     public interface IListener : IDisposable
     {
-        IConfiguration Configuration { get; }
+        IListernerConfiguration Configuration { get; }
         Func<object, Task> App { get; }
-        Context GetRequest(ushort id);
-        void SetRequest(Context request);
-        void RemoveRequest(ushort id);
     }
 }

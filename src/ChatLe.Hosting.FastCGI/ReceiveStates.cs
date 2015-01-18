@@ -20,7 +20,9 @@ namespace ChatLe.Hosting.FastCGI
         public Socket Socket { get; private set; }
         public IListener Listener { get; private set; }
 
-        public State(Socket socket, IListener listener, ILogger logger)
+        public IDictionary<ushort, Context> Contexts { get; protected set; }
+
+        protected State(Socket socket, IListener listener, ILogger logger)
         {
             if (socket == null)
                 throw new ArgumentNullException("soket");
@@ -32,6 +34,14 @@ namespace ChatLe.Hosting.FastCGI
             Socket = socket;
             Listener = listener;
             Logger = logger;
+        }
+
+        public State(State state)
+        {
+            Socket = state.Socket;
+            Listener = state.Listener;
+            Logger = state.Logger;
+            Contexts = state.Contexts;
         }
 
         static public void OnDisconnect(Socket client)
@@ -58,11 +68,30 @@ namespace ChatLe.Hosting.FastCGI
             catch
             { }
         }
+
+        public Context GetRequest(ushort id)
+        {
+            if (Contexts.ContainsKey(id))
+                return Contexts[id];
+
+            return null;
+        }
+
+        public void SetRequest(Context request)
+        {
+            Contexts[request.Id] = request;
+        }
+
+        public void RemoveRequest(ushort id)
+        {
+            Contexts.Remove(id);
+        }
+
     }
 
     abstract class ReceiveState :State
     {
-        public Record Record { get; set; } = new Record();
+        public Record Record { get; protected set; }
         byte[] _buffer;
         public virtual byte[] Buffer
         {
@@ -76,9 +105,11 @@ namespace ChatLe.Hosting.FastCGI
         }
 
 
-        public ReceiveState(Socket socket, IListener listener, ILogger logger) :base(socket, listener, logger)
+        protected ReceiveState(Socket socket, IListener listener, ILogger logger) :base(socket, listener, logger)
         { }
 
+        protected ReceiveState(State state):base(state)
+        { }
         protected int GetMaxToReadSize()
         {
             var toRead = Length - Offset;
@@ -130,7 +161,15 @@ namespace ChatLe.Hosting.FastCGI
     class HeaderState : ReceiveState
     {
         public HeaderState(Socket socket, IListener listener, ILogger logger) :base(socket, listener, logger)
-        { }
+        {
+            Contexts = new ConcurrentDictionary<ushort, Context>();
+            Record = new Record();
+        }
+
+        public HeaderState(State state) :base(state)
+        {
+            Record = new Record();
+        }
 
         public override void Process()
         {
@@ -141,7 +180,7 @@ namespace ChatLe.Hosting.FastCGI
             Record.Padding = Buffer[6];
 
             Logger.WriteVerbose(string.Format("HeaderState Process Record type {0} id {1} length {2} padding {3}", (RecordType) Record.Type, Record.RequestId, Record.Length, Record.Padding));
-            var bodyState = new BodyState(Socket, Listener, Logger) { Record = Record };
+            var bodyState = new BodyState(this);
             if (Record.Length > 0)
                 Socket.BeginReceive(bodyState.Buffer, 0, bodyState.Length, SocketFlags.None, EndReceive, bodyState);
             else
@@ -151,8 +190,10 @@ namespace ChatLe.Hosting.FastCGI
 
     class BodyState : ReceiveState
     {
-        public BodyState(Socket socket, IListener listener, ILogger logger) : base(socket, listener, logger)
-        { }
+        public BodyState(ReceiveState state) : base(state)
+        {
+            Record = state.Record;
+        }
 
         public override int Length
         {
@@ -181,7 +222,7 @@ namespace ChatLe.Hosting.FastCGI
             switch ((RecordType)Record.Type)
             {
                 case RecordType.BeginRequest:
-                    Listener.SetRequest(new Context(Record.RequestId, (Buffer[2] & 1) == 1));
+                    SetRequest(new Context(Record.RequestId, (Buffer[2] & 1) == 1, Socket));
                     Receive();
                     break;
                 case RecordType.AbortRequest:
@@ -201,7 +242,7 @@ namespace ChatLe.Hosting.FastCGI
 
         private void ProcessGetValues()
         {
-            var request = Listener.GetRequest(Record.RequestId);
+            var request = GetRequest(Record.RequestId);
             if (request != null)
             {                
                 var @params = NameValuePairsSerializer.Parse(Buffer);
@@ -236,12 +277,12 @@ namespace ChatLe.Hosting.FastCGI
         
         private void ProcessParams()
         {
-            var request = Listener.GetRequest(Record.RequestId);
+            var request = GetRequest(Record.RequestId);
             if (request != null)
             {
                 var @params = NameValuePairsSerializer.Parse(Buffer);
                 var feature = request as IHttpRequestFeature;
-                var headers = new Dictionary<string, string[]>();
+                var headers = feature.Headers;
                 foreach(var kv in @params)
                 {
                     var key = kv.Key;
@@ -250,11 +291,11 @@ namespace ChatLe.Hosting.FastCGI
                     {
                         key = FormatHeaderName(key.Substring(5));
                         if (!headers.ContainsKey(key))
-                            headers.Add(key, new string[] { kv.Value });
+                            headers.Add(key, kv.Value.Split(','));
                         else
                         {
                             var value = headers[key];
-                            headers[key] = value.Concat(new string[] { kv.Value }).ToArray();
+                            headers[key] = value.Concat(kv.Value.Split(',')).ToArray();
                         }
                     }
                     else
@@ -274,14 +315,14 @@ namespace ChatLe.Hosting.FastCGI
                                 var contentLength = !string.IsNullOrEmpty(kv.Value) ? long.Parse(kv.Value) : 0;
                                 feature.Body.SetLength(contentLength);
                                 break;
+                            case "HTTPS":
+                                feature.Protocol = "https";
+                                break;
                         }
                     }
                 }
-
-                feature.Protocol = @params.Any( p => "HTTPS" == p.Key) ? "https" : "http";
-
-                feature.Headers = headers;
             }
+
             Receive();
         }
 
@@ -312,27 +353,31 @@ namespace ChatLe.Hosting.FastCGI
         {
             if (Record.Padding > 0)
             {
-                var paddingState = new PaddingState(Socket, Listener, Logger) { Record = Record };
+                var paddingState = new PaddingState(this);
                 Socket.BeginReceive(paddingState.Buffer, 0, paddingState.Length, SocketFlags.None, EndReceive, paddingState);
                 return;
             }
 
-            var headerState = new HeaderState(Socket, Listener, Logger);
+            var headerState = new HeaderState(this);
             Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
         }
 
         private void ProcessStdInput()
         {
-            var request = Listener.GetRequest(Record.RequestId);
+            var request = GetRequest(Record.RequestId);
             if (request != null)
             {
                 var feature = request as IHttpRequestFeature;
+                var stream = feature.Body as RequestStream;
                 if (Record.Length > 0)
+                    stream.Append(Buffer);
+                else
+                    stream.Completed();
+                if (!request.Called)
                 {
-                    ((RequestStream)feature.Body).Append(Buffer);
+                    Listener.App.Invoke(request);
+                    request.Called = true;
                 }
-
-                Listener.App.Invoke(request);
 
                 if (!request.KeepAlive && Record.Length == 0)
                     return;
@@ -342,11 +387,11 @@ namespace ChatLe.Hosting.FastCGI
 
         private void ProcessAbort()
         {
-            var request = Listener.GetRequest(Record.RequestId);
+            var request = GetRequest(Record.RequestId);
             if (request != null)
             {
                 // TODO Implement
-                Listener.RemoveRequest(Record.RequestId);
+                RemoveRequest(Record.RequestId);
                 if (!request.KeepAlive)
                     return;
             }
@@ -358,8 +403,10 @@ namespace ChatLe.Hosting.FastCGI
 
     class PaddingState : ReceiveState
     {
-        public PaddingState(Socket socket, IListener listener, ILogger logger) : base(socket, listener, logger)
-        { }
+        public PaddingState(ReceiveState state) : base(state)
+        {
+            Record = state.Record;
+        }
 
         public override int Length
         {
@@ -371,7 +418,7 @@ namespace ChatLe.Hosting.FastCGI
         public override void Process()
         {
             Logger.WriteVerbose(string.Format("PaddingState Process Record type {0} id {1} length {2} padding {3}", (RecordType)Record.Type, Record.RequestId, Record.Length, Record.Padding));
-            var headerState = new HeaderState(Socket, Listener, Logger) { Record = Record };
+            var headerState = new HeaderState(this);
             Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
         }
     }

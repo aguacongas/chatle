@@ -69,6 +69,8 @@ namespace ChatLe.Hosting.FastCGI
             {
                 _event.WaitOne(TimeSpan.FromMinutes(1.5));
                 _event.Reset();
+                if (_index == _buffers.Count)
+                    return -1;
             }
                            
             var current = _buffers[_index];
@@ -117,6 +119,11 @@ namespace ChatLe.Hosting.FastCGI
                 }
                 disposedValue = true;
             }
+        }
+
+        internal void Completed()
+        {
+            _event.Set();
         }
     }
 }

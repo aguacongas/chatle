@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ChatLe.Hosting.FastCGI.Test
@@ -16,7 +17,7 @@ namespace ChatLe.Hosting.FastCGI.Test
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new Logging.TraceLoggerProvider());
-            var listener = new TcpListener(loggerFactory, new Configuration());
+            var listener = new TcpListener(loggerFactory, new ListernerConfiguration(), o => { return Task.FromResult<bool>(true); });
             var endpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9000);
             listener.Start(endpoint);
             using (var client = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
@@ -43,8 +44,8 @@ namespace ChatLe.Hosting.FastCGI.Test
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new Logging.TraceLoggerProvider());
-            var configuration = new Configuration();
-            var listener = new TcpListener(loggerFactory, configuration);
+            var configuration = new ListernerConfiguration();
+            var listener = new TcpListener(loggerFactory, configuration, o => { return Task.FromResult<bool>(true); });
             var endpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9000);
             listener.Start(endpoint);
             using (var client = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))

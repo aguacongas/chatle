@@ -5,6 +5,8 @@ using Microsoft.Framework.ConfigurationModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Framework.Logging;
+using ChatLe.Hosting.FastCGI;
+using System.Net;
 
 namespace ChatLe.FastCGI
 {
@@ -18,20 +20,21 @@ namespace ChatLe.FastCGI
         }
         public IServerInformation Initialize(IConfiguration configuration)
         {
-            return new ServerInformation();
+            var informatio =  new ServerInformation();
+            informatio.Initialize(configuration);
+            return informatio;
         }
 
         public IDisposable Start(IServerInformation serverInformation, Func<object, Task> application)
         {
-            var listeners = new ListenerList();
             var information = serverInformation as ServerInformation;
-            listeners.AddListeners(_loggerFactory, information);
-
-            return listeners;
+            var listener = new TcpListener(_loggerFactory, information, application);
+            listener.Start(new IPEndPoint(IPAddress.Loopback, information.Port));
+            return listener;
         }
     }
 
-    public class ServerInformation : IServerInformation
+    public class ServerInformation : ListernerConfiguration, IServerInformation
     {
         public string Name
         {
@@ -41,17 +44,28 @@ namespace ChatLe.FastCGI
             }
         }
 
-        public List<int> Ports { get; } = new List<int>();
+        public int Port { get; private set; } =9000;
         public void Initialize(IConfiguration configuration)
         {
-            string ports;
-            if(!configuration.TryGet("ports", out ports))
+            string port;
+            if(configuration.TryGet("port", out port))
             {
-                Ports.Add(9000);
+                Port = int.Parse(port);
             }
-            foreach(var port in ports.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+            string maxConnections;
+            if (configuration.TryGet("maxConnections", out maxConnections))
             {
-                Ports.Add(int.Parse(port));
+                MaxConnections = int.Parse(maxConnections);
+            }
+            string maxRequests;
+            if (configuration.TryGet("maxRequests", out maxRequests))
+            {
+                MaxRequests = int.Parse(maxRequests);
+            }
+            string supportMultiplexing;
+            if (configuration.TryGet("supportMultiplexing", out supportMultiplexing))
+            {
+                SupportMultiplexing = bool.Parse(supportMultiplexing);
             }
         }
     }

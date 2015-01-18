@@ -12,6 +12,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using System.Collections.Generic;
+using Microsoft.Framework.Logging;
 
 namespace chatle.test.Controllers
 {
@@ -59,7 +60,8 @@ namespace chatle.test.Controllers
             var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
             signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var metaDataProvider = new Mock<IModelMetadataProvider>().Object;
-            using (var controller = new AccountController(userManager.Object, signinManager.Object) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
+            var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
             {
                 var result = await controller.Register(new RegisterViewModel()
                 {
@@ -79,7 +81,8 @@ namespace chatle.test.Controllers
             var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
             signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var metaDataProvider = new Mock<IModelMetadataProvider>().Object;
-            using (var controller = new AccountController(userManager.Object, signinManager.Object) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
+            var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
             {
                 var result = await controller.Register(new RegisterViewModel()
                 {

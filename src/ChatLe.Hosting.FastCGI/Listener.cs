@@ -11,7 +11,7 @@ namespace ChatLe.Hosting.FastCGI
 {
     public class TcpListener : Listener<IPEndPoint>
     {
-        public TcpListener(ILoggerFactory loggerFactory, IConfiguration configuration) :base(loggerFactory, configuration)
+        public TcpListener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<object, Task> app) :base(loggerFactory, configuration, app)
         {
         }
         protected override Socket CreateSocket(IPEndPoint enpoint)
@@ -24,10 +24,9 @@ namespace ChatLe.Hosting.FastCGI
     public abstract class Listener<T> : IDisposable, IListener<T> where T : EndPoint
     {
         ILogger _logger;
-        public IConfiguration Configuration { get; private set; }
-        public IDictionary<ushort, Context> Requests { get; private set; } = new ConcurrentDictionary<ushort, Context>();
+        public IListernerConfiguration Configuration { get; private set; }
         public Func<object, Task> App { get; private set; }
-        public Listener(ILoggerFactory loggerFactory, IConfiguration configuration, Func<object, Task> app)
+        public Listener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<object, Task> app)
         {
             if (loggerFactory == null)
                 throw new ArgumentNullException("loggerFactory");
@@ -78,13 +77,14 @@ namespace ChatLe.Hosting.FastCGI
                     _logger.WriteError("UnHandled exception on EndAccecpt", e);
                     throw;
                 }
-                
+
+                BeginAccept();
+
                 if (client != null)
                 {
                     BeginRead(client);
                 }
 
-                BeginAccept();
             }, null);
         }
 
@@ -123,23 +123,6 @@ namespace ChatLe.Hosting.FastCGI
             Dispose(true);
         }
 
-        public Context GetRequest(ushort id)
-        {
-            if (Requests.ContainsKey(id))
-                return Requests[id];
-
-            return null;
-        }
-
-        public void SetRequest(Context request)
-        {
-            Requests[request.Id] = request;
-        }
-
-        public void RemoveRequest(ushort id)
-        {
-            Requests.Remove(id);
-        }
         #endregion
     }
 }

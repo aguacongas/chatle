@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "Kestrel": "1.0.0-beta1",
+        "ChatLe.FastCGI": "",
         "ChatLe.HttpUtility": "",
         "ChatLe.Repository.Identity": "",
         "ChatLe.Logging": "",
@@ -51,7 +52,8 @@
         "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
         "gen": "Microsoft.Framework.CodeGeneration",
         "ef": "EntityFramework.Commands",
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001"
+        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001",
+        "fastcgi": "Microsoft.AspNet.Hosting --server ChatLe.FastCGI --port 9000 --maxConnections 655535 --maxRequests 65535 --supportMultiplexing true"
     },
     "frameworks": {
         "aspnet50": {
