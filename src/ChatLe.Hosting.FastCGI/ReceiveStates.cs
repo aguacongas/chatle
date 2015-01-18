@@ -11,7 +11,7 @@ using System.Text;
 
 namespace ChatLe.Hosting.FastCGI
 {
-    abstract class State
+    public abstract class State
     {
         public const int HEADER_LENGTH = 8;
         public virtual int Length { get { return HEADER_LENGTH; } }
@@ -215,14 +215,14 @@ namespace ChatLe.Hosting.FastCGI
                 && Record.Type != 9)
             {
                 var buffer = new byte[] { Record.Version, (byte)RecordType.Unknown, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 2, 0, 0, Record.Type, 0 };
-                var state = new SendState(Socket, Listener, Logger, buffer);
+                var state = new SendState(this, buffer);
                 state.BeginSend();
             }
 
             switch ((RecordType)Record.Type)
             {
                 case RecordType.BeginRequest:
-                    SetRequest(new Context(Record.RequestId, (Buffer[2] & 1) == 1, Socket));
+                    SetRequest(new Context(Record.RequestId, (Buffer[2] & 1) == 1, this));
                     Receive();
                     break;
                 case RecordType.AbortRequest:
@@ -268,7 +268,7 @@ namespace ChatLe.Hosting.FastCGI
                     buffer = buffer.Concat(stream.ToArray()).ToArray();
                     buffer[4] = (byte)(stream.Length >> 8);
                     buffer[5] = (byte)stream.Length;
-                    var state = new SendState(Socket, Listener, Logger, buffer);
+                    var state = new SendState(this, buffer);
                     state.BeginSend();
                 }                
             }

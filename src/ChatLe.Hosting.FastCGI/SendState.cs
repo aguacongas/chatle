@@ -18,7 +18,7 @@ namespace ChatLe.Hosting.FastCGI
             get;
             private set;
         }
-        public SendState(Socket socket, IListener listener, ILogger logger, byte[] buffer) : base(socket, listener, logger)
+        public SendState(State state, byte[] buffer) : base(state.Socket, state.Listener, state.Logger)
         {
             Buffer = buffer;
         }

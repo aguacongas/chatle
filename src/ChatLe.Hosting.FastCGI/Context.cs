@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Sockets;
+using Microsoft.Framework.Logging;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -11,16 +12,16 @@ namespace ChatLe.Hosting.FastCGI
     {
         public ushort Id { get; private set; }
 
-        public bool KeepAlive { get; private set; }
+        public bool KeepAlive { get; set; }
 
-        public Socket Socket { get; private set; }
+        public State State { get; private set; }
 
         public bool Called { get; set; }
-        public Context(ushort id, bool keepAlive, Socket socket)
+        public Context(ushort id, bool keepAlive, State state)
         {
             Id = id;
             KeepAlive = keepAlive;
-            Socket = socket;
+            State = state;
             ((IHttpResponseFeature)this).Body = new ResponseStream(this);
         }
 
