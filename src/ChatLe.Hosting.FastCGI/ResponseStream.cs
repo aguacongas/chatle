@@ -149,7 +149,7 @@ namespace ChatLe.Hosting.FastCGI
                     if (buffer.Array == null)
                     {
                         // send end request
-                        buffer = new ArraySegment<byte>(new byte[] { Context.Version, (byte)RecordType.EndRequest, (byte)(Context.Id >> 8), (byte)Context.Id, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+                        buffer = new ArraySegment<byte>(new byte[] { Context.Version, (byte)RecordType.EndRequest, (byte)(Context.Id >> 8), (byte)Context.Id, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                         Buffers[_currentBufferId] = buffer;
                         _end = true;
                     }
@@ -206,7 +206,7 @@ namespace ChatLe.Hosting.FastCGI
 
             protected virtual void Sent(int currentBufferId)
             {
-                if (_end && Context.KeepAlive)
+                if (_end && !Context.KeepAlive)
                 {
                     OnDisconnect(Socket);
                 }
@@ -333,8 +333,6 @@ namespace ChatLe.Hosting.FastCGI
                     builder.Append('\r');
                     builder.Append('\n');
                 }
-
-                Context.KeepAlive = keepAlive;
 
                 return builder.ToString();
             }
