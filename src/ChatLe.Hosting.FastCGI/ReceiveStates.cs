@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -150,7 +151,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch (Exception e)
             {
-                Logger.WriteError("Unhanlded exception on EndReceive", e);
+                state.Logger.WriteError("Unhanlded exception on EndReceive", e);
                 OnDisconnect(client);
             }
         }
@@ -222,7 +223,7 @@ namespace ChatLe.Hosting.FastCGI
             switch ((RecordType)Record.Type)
             {
                 case RecordType.BeginRequest:
-                    SetRequest(new Context(Record.RequestId, (Buffer[2] & 1) == 1, this));
+                    SetRequest(new Context(Record.Version, Record.RequestId, (Buffer[2] & 1) == 1, this));
                     Receive();
                     break;
                 case RecordType.AbortRequest:
@@ -364,25 +365,55 @@ namespace ChatLe.Hosting.FastCGI
 
         private void ProcessStdInput()
         {
-            var request = GetRequest(Record.RequestId);
-            if (request != null)
+            var context = GetRequest(Record.RequestId);
+            if (context != null)
             {
-                var feature = request as IHttpRequestFeature;
+                var feature = context as IHttpRequestFeature;
                 var stream = feature.Body as RequestStream;
                 if (Record.Length > 0)
                     stream.Append(Buffer);
                 else
                     stream.Completed();
-                if (!request.Called)
+                if (!context.Called)
                 {
-                    Listener.App.Invoke(request);
-                    request.Called = true;
+                    context.Called = true;
+                    var executor = new Executor() { Context = context, App = Listener.App, Logger = Logger };
+                    executor.Run();
                 }
 
-                if (!request.KeepAlive && Record.Length == 0)
+                if (!context.KeepAlive && Record.Length == 0)
                     return;
             }
             Receive();
+        }
+
+        class Executor
+        {
+            public Func<object, Task> App { get; set; }
+            public Context Context { get; set; }
+
+            public ILogger Logger { get; set; }
+
+            public void Run()
+            {
+                Task.Run(Execute);
+            }
+
+            private async Task Execute()
+            {
+                try
+                {
+                    await App.Invoke(Context);
+                }
+                catch (Exception e)
+                {
+                    Logger.WriteError("Error on execute", e);
+                }
+                finally
+                {
+                    ((IHttpResponseFeature)Context).Body.Dispose();
+                }
+            }
         }
 
         private void ProcessAbort()
@@ -420,6 +451,80 @@ namespace ChatLe.Hosting.FastCGI
             Logger.WriteVerbose(string.Format("PaddingState Process Record type {0} id {1} length {2} padding {3}", (RecordType)Record.Type, Record.RequestId, Record.Length, Record.Padding));
             var headerState = new HeaderState(this);
             Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
+        }
+    }
+
+    class SendState : State
+    {
+        public override int Length
+        {
+            get
+            {
+                return Buffer.Length;
+            }
+        }
+        public virtual byte[] Buffer
+        {
+            get;
+            private set;
+        }
+        public SendState(State state, byte[] buffer) : base(state.Socket, state.Listener, state.Logger)
+        {
+            Buffer = buffer;
+        }
+
+        protected int GetMaxToWriteSize()
+        {
+            var toSend = Length - Offset;
+            return toSend > Socket.SendBufferSize ? Socket.SendBufferSize : toSend;
+        }
+        public void BeginSend()
+        {
+            try
+            {
+                Socket.BeginSend(Buffer, Offset, GetMaxToWriteSize(), SocketFlags.None, EndSend, this);
+            }
+            catch (ObjectDisposedException)
+            { }
+            catch (Exception e)
+            {
+                Logger.WriteError("UnHandled exception on BeginSend", e);
+                OnDisconnect(Socket);
+            }
+
+        }
+        private static void EndSend(IAsyncResult result)
+        {
+            var state = result.AsyncState as SendState;
+            if (state == null)
+                return;
+
+            Socket client = state.Socket;
+            if (client == null)
+                return;
+
+            try
+            {
+                SocketError error;
+                var written = client.EndSend(result, out error);
+                if (error != SocketError.Success || written <= 0)
+                {
+                    OnDisconnect(client);
+                    return;
+                }
+                if (state.Offset + written < state.Length)
+                {
+                    state.Offset += written;
+                    state.BeginSend();
+                }
+            }
+            catch (ObjectDisposedException)
+            { }
+            catch (Exception e)
+            {
+                state.Logger.WriteError("Exception on EndSend", e);
+                OnDisconnect(client);
+            }
         }
     }
 }

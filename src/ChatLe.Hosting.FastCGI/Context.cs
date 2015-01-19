@@ -10,6 +10,7 @@ namespace ChatLe.Hosting.FastCGI
 {
     public class Context : IHttpRequestFeature, IHttpResponseFeature
     {
+        public byte Version { get; private set; }
         public ushort Id { get; private set; }
 
         public bool KeepAlive { get; set; }
@@ -17,8 +18,9 @@ namespace ChatLe.Hosting.FastCGI
         public State State { get; private set; }
 
         public bool Called { get; set; }
-        public Context(ushort id, bool keepAlive, State state)
+        public Context(byte version, ushort id, bool keepAlive, State state)
         {
+            Version = version;
             Id = id;
             KeepAlive = keepAlive;
             State = state;
@@ -73,6 +75,12 @@ namespace ChatLe.Hosting.FastCGI
         void IHttpResponseFeature.OnSendingHeaders(Action<object> callback, object state)
         {
             _sendingHeaders.Add(new KeyValuePair<Action<object>, object>(callback, state));
+        }
+
+        internal void HeaderSent()
+        {
+            foreach (var kv in _sendingHeaders)
+                kv.Key.Invoke(kv.Value);
         }
     }
 }

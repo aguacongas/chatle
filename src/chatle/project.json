@@ -53,7 +53,7 @@
         "gen": "Microsoft.Framework.CodeGeneration",
         "ef": "EntityFramework.Commands",
         "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001",
-        "fastcgi": "Microsoft.AspNet.Hosting --server ChatLe.FastCGI --port 9000 --maxConnections 655535 --maxRequests 65535 --supportMultiplexing true"
+        "fastcgi": "Microsoft.AspNet.Hosting --server ChatLe.FastCGI --fastcgi.port 9000 --fastcgi.maxConnections 655535 --fastcgi.maxRequests 65535 --fastcgi.supportMultiplexing true"
     },
     "frameworks": {
         "aspnet50": {

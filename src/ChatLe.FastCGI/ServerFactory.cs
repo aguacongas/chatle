@@ -48,22 +48,22 @@ namespace ChatLe.FastCGI
         public void Initialize(IConfiguration configuration)
         {
             string port;
-            if(configuration.TryGet("port", out port))
+            if(configuration.TryGet("fastcgi.port", out port))
             {
                 Port = int.Parse(port);
             }
             string maxConnections;
-            if (configuration.TryGet("maxConnections", out maxConnections))
+            if (configuration.TryGet("fastcgi.maxConnections", out maxConnections))
             {
                 MaxConnections = int.Parse(maxConnections);
             }
             string maxRequests;
-            if (configuration.TryGet("maxRequests", out maxRequests))
+            if (configuration.TryGet("fastcgi.maxRequests", out maxRequests))
             {
                 MaxRequests = int.Parse(maxRequests);
             }
             string supportMultiplexing;
-            if (configuration.TryGet("supportMultiplexing", out supportMultiplexing))
+            if (configuration.TryGet("fastcgi.supportMultiplexing", out supportMultiplexing))
             {
                 SupportMultiplexing = bool.Parse(supportMultiplexing);
             }

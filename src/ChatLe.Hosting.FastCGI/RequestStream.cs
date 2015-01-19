@@ -57,6 +57,7 @@ namespace ChatLe.Hosting.FastCGI
         {
             throw new NotImplementedException();
         }
+
         ManualResetEvent _event = new ManualResetEvent(false);
         int _index;
         int _currentPossition;
