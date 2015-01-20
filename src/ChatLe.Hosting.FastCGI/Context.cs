@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNet.HttpFeature;
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
-using Microsoft.Framework.Logging;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatLe.Hosting.FastCGI
 {
-    public class Context : IHttpRequestFeature, IHttpResponseFeature
+    public class Context : IHttpRequestFeature, IHttpResponseFeature, IHttpUpgradeFeature, IDisposable
     {
         public byte Version { get; private set; }
         public ushort Id { get; private set; }
@@ -82,5 +82,59 @@ namespace ChatLe.Hosting.FastCGI
             foreach (var kv in _sendingHeaders)
                 kv.Key.Invoke(kv.Value);
         }
+
+
+        bool IHttpUpgradeFeature.IsUpgradableRequest
+        {
+            get
+            {
+                string[] values;
+                var feature = this as IHttpRequestFeature;
+                if (feature.Headers.TryGetValue("Connection", out values))
+                {
+                    return values.Any(value => value.IndexOf("upgrade", StringComparison.OrdinalIgnoreCase) != -1);
+                }
+                return false;
+            }
+        }
+
+        Task<Stream> IHttpUpgradeFeature.UpgradeAsync()
+        {
+            var feature = this as IHttpResponseFeature;
+            feature.StatusCode = 101;
+            feature.ReasonPhrase = "Switching Protocols";
+            var headers = feature.Headers;
+            headers["Connection"] = new string[] { "Upgrade" };
+            if (!headers.ContainsKey("Upgrade"))
+            {
+                string[] values;
+                if (headers.TryGetValue("Upgrade", out values))
+                    headers["Upgrade"] = values;
+            }
+            return Task.FromResult<Stream>(new UpgradeStream(((IHttpResponseFeature)this).Body, feature.Body));
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    ((IHttpRequestFeature)this).Body.Dispose();
+                    ((IHttpResponseFeature)this).Body.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        
+        #endregion
     }
 }

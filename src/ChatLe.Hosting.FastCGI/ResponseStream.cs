@@ -91,16 +91,16 @@ namespace ChatLe.Hosting.FastCGI
         {
             var tcs = new TaskCompletionSource<int>();
             _writeState.ProcessStart();            
-            _writeState = _writeState.Process(tcs, buffer, offset, count);
+            _writeState = _writeState.Process(tcs, buffer, offset, count);            
             return tcs.Task;
         }
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            var tcs = new TaskCompletionSource<int>();
             _writeState.ProcessStart();
-            _writeState.Buffers.Add(new ArraySegment<byte>());
+            _writeState.Buffers.Add(new ArraySegment<byte>(new byte[] { _context.Version, (byte)RecordType.EndRequest, (byte)(_context.Id >> 8), (byte)_context.Id, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }));
+            _writeState.End = true;
             _writeState.BeginSend();
         }
 
@@ -140,29 +140,22 @@ namespace ChatLe.Hosting.FastCGI
             }
 
             int _currentBufferId;
-            bool _end;
+            public bool End { get; set; }
             public void BeginSend()
             {
                 try
                 {
                     var buffer = Buffers[_currentBufferId];
-                    if (buffer.Array == null)
-                    {
-                        // send end request
-                        buffer = new ArraySegment<byte>(new byte[] { Context.Version, (byte)RecordType.EndRequest, (byte)(Context.Id >> 8), (byte)Context.Id, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-                        Buffers[_currentBufferId] = buffer;
-                        _end = true;
-                    }
-
                     Socket.BeginSend(buffer.Array, buffer.Offset, buffer.Count, SocketFlags.None, EndSend, this);
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    TaskCompletionSource.SetException(ode);
+                    Logger.WriteError("BeginSend ObjectDisposedException");
+                    TaskCompletionSource?.SetException(ode);
                 }
                 catch (Exception e)
                 {
-                    TaskCompletionSource.SetException(e);
+                    TaskCompletionSource?.SetException(e);
                     Logger.WriteError("UnHandled exception on BeginSend", e);
                     State.OnDisconnect(Socket);
                 }
@@ -175,6 +168,7 @@ namespace ChatLe.Hosting.FastCGI
                 {
                     SocketError error;
                     var written = state.Socket.EndSend(result, out error);
+
                     if (error != SocketError.Success || written <= 0)
                     {
                         OnDisconnect(state.Socket);
@@ -194,26 +188,31 @@ namespace ChatLe.Hosting.FastCGI
                 }
                 catch (ObjectDisposedException ode)
                 {
+                    state.Logger.WriteError("EndSend ObjectDisposedException");
                     state.TaskCompletionSource?.SetException(ode);
                 }
                 catch (Exception e)
                 {
                     state.TaskCompletionSource?.SetException(e);
-                    state.Logger.WriteError("UnHandled exception on EndSend", e);
-                    State.OnDisconnect(state.Socket);
+                    state.Logger.WriteError("EndSend UnHandled exception on EndSend", e);
+                    OnDisconnect(state.Socket);
                 }
             }
 
-            protected virtual void Sent(int currentBufferId)
+            protected virtual void Sent(int bufferId)
             {
-                if (_end && !Context.KeepAlive)
-                {
-                    OnDisconnect(Socket);
-                }
                 if (++_currentBufferId < Buffers.Count)
                     BeginSend();
                 else
+                {
+                    if (End && !Context.KeepAlive)
+                    {
+                        Logger.WriteInformation("Close socket");
+                        OnDisconnect(Socket);
+                    }
+
                     TaskCompletionSource?.SetResult(0);
+                }                    
             }
 
             protected IEnumerable<ArraySegment<byte>> GetSegments(byte[] buffer, int offset, int count)
@@ -239,6 +238,7 @@ namespace ChatLe.Hosting.FastCGI
 
             public override WriteState Process(TaskCompletionSource<int> tcs, byte[] buffer, int offset, int count)
             {
+                this.TaskCompletionSource = tcs;
                 Buffers.AddRange(GetSegments(buffer, offset, count));
                 BeginSend();
                 return new BobyState(Context);
@@ -251,13 +251,13 @@ namespace ChatLe.Hosting.FastCGI
                 _endHeaderId = Buffers.Count - 1;
             }
 
-            protected override void Sent(int _currentBufferId)
+            protected override void Sent(int bufferId)
             {
-                if (_currentBufferId == _endHeaderId)
+                if (bufferId == _endHeaderId)
                 {
                     Context.HeaderSent();
                 }
-                base.Sent(_currentBufferId);
+                base.Sent(bufferId);
             }
 
             private string CreateResponseHeader()
@@ -268,7 +268,7 @@ namespace ChatLe.Hosting.FastCGI
                 builder.Append(' ');
                 builder.Append(feature.StatusCode);
                 builder.Append(' ');
-                builder.Append(feature.ReasonPhrase);
+                builder.Append(string.IsNullOrEmpty(feature.ReasonPhrase) ? GetReasonPhraseFromCode(feature.StatusCode) : feature.ReasonPhrase);
                 builder.Append('\r');
                 builder.Append('\n');
 
@@ -334,7 +334,121 @@ namespace ChatLe.Hosting.FastCGI
                     builder.Append('\n');
                 }
 
-                return builder.ToString();
+                var result = builder.ToString();
+                return result;
+            }
+
+            private string GetReasonPhraseFromCode(int statusCode)
+            {
+                switch (statusCode)
+                {
+                    case 100:
+                        return "Continue";
+                    case 101:
+                        return "Switching Protocols";
+                    case 102:
+                        return "Processing";
+                    case 200:
+                        return "OK";
+                    case 201:
+                        return "Created";
+                    case 202:
+                        return "Accepted";
+                    case 203:
+                        return "Non-Authoritative Information";
+                    case 204:
+                        return "No Content";
+                    case 205:
+                        return "Reset Content";
+                    case 206:
+                        return "Partial Content";
+                    case 207:
+                        return "Multi-Status";
+                    case 226:
+                        return "IM Used";
+                    case 300:
+                        return "Multiple Choices";
+                    case 301:
+                        return "Moved Permanently";
+                    case 302:
+                        return "Found";
+                    case 303:
+                        return "See Other";
+                    case 304:
+                        return "Not Modified";
+                    case 305:
+                        return "Use Proxy";
+                    case 306:
+                        return "Reserved";
+                    case 307:
+                        return "Temporary Redirect";
+                    case 400:
+                        return "Bad Request";
+                    case 401:
+                        return "Unauthorized";
+                    case 402:
+                        return "Payment Required";
+                    case 403:
+                        return "Forbidden";
+                    case 404:
+                        return "Not Found";
+                    case 405:
+                        return "Method Not Allowed";
+                    case 406:
+                        return "Not Acceptable";
+                    case 407:
+                        return "Proxy Authentication Required";
+                    case 408:
+                        return "Request Timeout";
+                    case 409:
+                        return "Conflict";
+                    case 410:
+                        return "Gone";
+                    case 411:
+                        return "Length Required";
+                    case 412:
+                        return "Precondition Failed";
+                    case 413:
+                        return "Request Entity Too Large";
+                    case 414:
+                        return "Request-URI Too Long";
+                    case 415:
+                        return "Unsupported Media Type";
+                    case 416:
+                        return "Requested Range Not Satisfiable";
+                    case 417:
+                        return "Expectation Failed";
+                    case 418:
+                        return "I'm a Teapot";
+                    case 422:
+                        return "Unprocessable Entity";
+                    case 423:
+                        return "Locked";
+                    case 424:
+                        return "Failed Dependency";
+                    case 426:
+                        return "Upgrade Required";
+                    case 500:
+                        return "Internal Server Error";
+                    case 501:
+                        return "Not Implemented";
+                    case 502:
+                        return "Bad Gateway";
+                    case 503:
+                        return "Service Unavailable";
+                    case 504:
+                        return "Gateway Timeout";
+                    case 505:
+                        return "HTTP Version Not Supported";
+                    case 506:
+                        return "Variant Also Negotiates";
+                    case 507:
+                        return "Insufficient Storage";
+                    case 510:
+                        return "Not Extended";
+                    default:
+                        return null;
+                }
             }
         }
 
@@ -345,6 +459,7 @@ namespace ChatLe.Hosting.FastCGI
 
             public override WriteState Process(TaskCompletionSource<int> tcs, byte[] buffer, int offset, int count)
             {
+                this.TaskCompletionSource = tcs;
                 Buffers.AddRange(GetSegments(buffer, offset, count));
                 BeginSend();
                 return new BobyState(Context);

@@ -180,7 +180,6 @@ namespace ChatLe.Hosting.FastCGI
             Record.Length = (ushort)((Buffer[4] << 8) + Buffer[5]);
             Record.Padding = Buffer[6];
 
-            Logger.WriteVerbose(string.Format("HeaderState Process Record type {0} id {1} length {2} padding {3}", (RecordType) Record.Type, Record.RequestId, Record.Length, Record.Padding));
             var bodyState = new BodyState(this);
             if (Record.Length > 0)
                 Socket.BeginReceive(bodyState.Buffer, 0, bodyState.Length, SocketFlags.None, EndReceive, bodyState);
@@ -206,8 +205,6 @@ namespace ChatLe.Hosting.FastCGI
 
         public override void Process()
         {
-            Logger.WriteVerbose(string.Format("BodyState Process Record type {0} id {1} length {2} padding {3}", (RecordType)Record.Type, Record.RequestId, Record.Length, Record.Padding));
-
             if (Record.Type != 0
                 && Record.Type != 1
                 && Record.Type != 2
@@ -287,23 +284,19 @@ namespace ChatLe.Hosting.FastCGI
                 foreach(var kv in @params)
                 {
                     var key = kv.Key;
-                    Logger.WriteVerbose(string.Format("Receive params from server {0}={1}", key, kv.Value));
+
                     if (key.StartsWith("HTTP_"))
                     {
-                        key = FormatHeaderName(key.Substring(5));
-                        if (!headers.ContainsKey(key))
-                            headers.Add(key, kv.Value.Split(','));
-                        else
-                        {
-                            var value = headers[key];
-                            headers[key] = value.Concat(kv.Value.Split(',')).ToArray();
-                        }
+                        SetRequestHeader(headers, key.Substring(5), kv.Value);
                     }
                     else
                     {
                         switch (key)
-                        {                            
-                            case "REQUEST_URI":
+                        {
+                            case "REQUEST_METHOD":
+                                feature.Method = kv.Value;
+                                break;
+                            case "SCRIPT_NAME":
                                 feature.Path = kv.Value;
                                 break;
                             case "QUERY_STRING":
@@ -312,12 +305,12 @@ namespace ChatLe.Hosting.FastCGI
                             case "SERVER_PROTOCOL":
                                 feature.Protocol = kv.Value;
                                 break;
-                            case "CONTENT_LENGHT":
-                                var contentLength = !string.IsNullOrEmpty(kv.Value) ? long.Parse(kv.Value) : 0;
-                                feature.Body.SetLength(contentLength);
-                                break;
                             case "HTTPS":
                                 feature.Protocol = "https";
+                                break;
+                            case "CONTENT_LENGTH":
+                                if (!string.IsNullOrEmpty(kv.Value))
+                                    feature.Body.SetLength(int.Parse(kv.Value));
                                 break;
                         }
                     }
@@ -327,7 +320,21 @@ namespace ChatLe.Hosting.FastCGI
             Receive();
         }
 
-        private string FormatHeaderName(string name)
+        static private string SetRequestHeader(IDictionary<string, string[]> headers, string key, string value)
+        {
+            key = FormatHeaderName(key);
+            if (!headers.ContainsKey(key))
+                headers.Add(key, value.Split(','));
+            else
+            {
+                var v = headers[key];
+                headers[key] = v.Concat(value.Split(',')).ToArray();
+            }
+
+            return key;
+        }
+
+        static private string FormatHeaderName(string name)
         {
             char[] formated = new char[name.Length];
 
@@ -377,7 +384,7 @@ namespace ChatLe.Hosting.FastCGI
                 if (!context.Called)
                 {
                     context.Called = true;
-                    var executor = new Executor() { Context = context, App = Listener.App, Logger = Logger };
+                    var executor = new Executor() { State = this, Context = context };
                     executor.Run();
                 }
 
@@ -389,10 +396,9 @@ namespace ChatLe.Hosting.FastCGI
 
         class Executor
         {
-            public Func<object, Task> App { get; set; }
             public Context Context { get; set; }
 
-            public ILogger Logger { get; set; }
+            public State State { get; set; }
 
             public void Run()
             {
@@ -403,15 +409,16 @@ namespace ChatLe.Hosting.FastCGI
             {
                 try
                 {
-                    await App.Invoke(Context);
+                    await State.Listener.App.Invoke(Context);
                 }
                 catch (Exception e)
                 {
-                    Logger.WriteError("Error on execute", e);
+                    State.Logger.WriteError("Error on execute", e);
                 }
                 finally
                 {
-                    ((IHttpResponseFeature)Context).Body.Dispose();
+                    Context.Dispose();
+                    State.RemoveRequest(Context.Id);
                 }
             }
         }
@@ -448,7 +455,6 @@ namespace ChatLe.Hosting.FastCGI
         }
         public override void Process()
         {
-            Logger.WriteVerbose(string.Format("PaddingState Process Record type {0} id {1} length {2} padding {3}", (RecordType)Record.Type, Record.RequestId, Record.Length, Record.Padding));
             var headerState = new HeaderState(this);
             Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
         }

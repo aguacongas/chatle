@@ -63,15 +63,15 @@ namespace ChatLe.Hosting.FastCGI
         int _currentPossition;
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (_position == _length - 1)
-                return -1;
+            if (_position == _length)
+                return 0;
 
             if (_index == _buffers.Count)
             {
                 _event.WaitOne(TimeSpan.FromMinutes(1.5));
                 _event.Reset();
                 if (_index == _buffers.Count)
-                    return -1;
+                    return 0;
             }
                            
             var current = _buffers[_index];
