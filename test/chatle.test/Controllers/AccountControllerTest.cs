@@ -29,10 +29,11 @@ namespace chatle.test.Controllers
         {
             var store = new Mock<IUserStore<TUser>>();
             var options = new OptionsManager<IdentityOptions>(null);
+            var passwordOptions = new OptionsManager<PasswordHasherOptions>(null);
             return new Mock<UserManager<TUser>>(
                 store.Object,
                 options,
-                new PasswordHasher<TUser>(),
+                new PasswordHasher<TUser>(passwordOptions),
                 new UserValidator<TUser>(),
                 new PasswordValidator<TUser>(),
                 new UpperInvariantUserNameNormalizer(),

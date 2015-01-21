@@ -384,7 +384,7 @@ namespace ChatLe.Hosting.FastCGI
                 if (!context.Called)
                 {
                     context.Called = true;
-                    var executor = new Executor() { State = this, Context = context };
+                    var executor = new Runner() { State = this, Context = context };
                     executor.Run();
                 }
 
@@ -394,7 +394,7 @@ namespace ChatLe.Hosting.FastCGI
             Receive();
         }
 
-        class Executor
+        class Runner
         {
             public Context Context { get; set; }
 

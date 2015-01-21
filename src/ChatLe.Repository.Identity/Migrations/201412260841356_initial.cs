@@ -1,7 +1,5 @@
 using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Migrations.Builders;
-using Microsoft.Data.Entity.Relational.Model;
-using System;
 
 namespace ChatLe.Repository.Identity.Migrations
 {

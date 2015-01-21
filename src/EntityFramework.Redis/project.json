@@ -18,7 +18,7 @@
         }
     },
     "dependencies": {
-        "EntityFramework": "7.0.0-beta1",
+        "EntityFramework": "7.0.0-beta2",
         "StackExchange.Redis": "1.0.322"
     },
     "code": [ "**\\*.cs", "..\\Shared\\*.cs" ],

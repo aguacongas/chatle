@@ -27,8 +27,7 @@ namespace ChatLe
 
         protected override void ConfigureErrors(IApplicationBuilder app)
         {            
-            app.UseBrowserLink()
-                .UseErrorPage();
+            app.UseErrorPage();
         }
 
         public override void Configure(IApplicationBuilder app)
@@ -86,17 +85,17 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework();
+            var builder = services.AddEntityFramework(null);
 
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
             switch (dbEngine)
             {
-                case DBEngine.InMemory:
-                    builder.AddInMemoryStore();
-                    break;
-                case DBEngine.SQLite:
-                    builder.AddSQLite();
-                    break;
+                //case DBEngine.InMemory:
+                //    builder.AddInMemoryStore();
+                //    break;
+                //case DBEngine.SQLite:
+                //    builder.AddSQLite();
+                //    break;
                 case DBEngine.SqlServer:
                     builder.AddSqlServer();
                     break;
@@ -111,15 +110,15 @@ namespace ChatLe
             {
                 switch (dbEngine)
                 {
-                    case DBEngine.InMemory:
-                        options.UseInMemoryStore(true);
-                        break;
+                    //case DBEngine.InMemory:
+                    //    options.UseInMemoryStore(true);
+                    //    break;
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
                         break;
-                    case DBEngine.SQLite:
-                        options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
-                        break;
+                    //case DBEngine.SQLite:
+                    //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
+                    //    break;
                     case DBEngine.Redis:
                         int port;
                         int database;
@@ -132,7 +131,7 @@ namespace ChatLe
                 }
             });
 
-            services.AddDefaultIdentity<ChatLeIdentityDbContext, ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
+            services.AddIdentity<ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
             });
@@ -174,7 +173,7 @@ namespace ChatLe
                 errorApp.Run(async context =>
                 {
                     // create a route
-                    var routeData = new RouteData() { Values = new Dictionary<string, object>() };
+                    var routeData = new RouteData();
                     routeData.Routers.Add(router);
                     // if we want to use a controller view : eg Home
                     // routeData.Values.Add("controller", "Home");
@@ -193,7 +192,7 @@ namespace ChatLe
                     accessor.SetValue(ac);
                     
                     // create a view data dictionary to pass data to the view
-                    var viewData = new ViewDataDictionary<Exception>(new DataAnnotationsModelMetadataProvider());
+                    var viewData = new ViewDataDictionary<Exception>(new DataAnnotationsModelMetadataProvider(), new ModelStateDictionary());
                     
                     // get the error and set it as view's model 
                     var error = context.GetFeature<IErrorHandlerFeature>();

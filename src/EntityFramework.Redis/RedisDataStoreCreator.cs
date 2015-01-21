@@ -14,24 +14,24 @@ namespace Microsoft.Data.Entity.Redis
 {
     public class RedisDataStoreCreator : DataStoreCreator
     {
-        private readonly LazyRef<RedisDatabase> _database;
+        private readonly RedisDataStore _datastore;
 
-        public RedisDataStoreCreator([NotNull] DbContextConfiguration configuration)
+        public RedisDataStoreCreator([NotNull] RedisDataStore dataStore)
         {
-            Check.NotNull(configuration, "configuration");
+            Check.NotNull(dataStore, "dataStore");
 
-            _database = new LazyRef<RedisDatabase>(() => (RedisDatabase)configuration.Database);
+            _datastore = dataStore;
         }
 
         public override bool EnsureDeleted(IModel model)
         {
-            _database.Value.FlushDatabase();
+            _datastore.FlushDatabase();
             return true;
         }
 
         public override async Task<bool> EnsureDeletedAsync(IModel model, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _database.Value.FlushDatabaseAsync(cancellationToken).WithCurrentCulture();
+            await _datastore.FlushDatabaseAsync(cancellationToken).WithCurrentCulture();
 
             return true;
         }

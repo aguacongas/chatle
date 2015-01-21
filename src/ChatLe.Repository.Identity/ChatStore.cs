@@ -163,8 +163,8 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
                 throw new ArgumentNullException("user");
-
-            await Context.UpdateAsync(user, cancellationToken);
+            
+            Context.Update(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -265,7 +265,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Delete(connection);
+            Context.Remove(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -290,11 +290,11 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
-            NotificationConnections.RemoveRange(NotificationConnections);
-            Attendees.RemoveRange(Attendees);
-            Messages.RemoveRange(Messages);
-            Conversations.RemoveRange(Conversations);
-            Users.RemoveRange(Users.Where(u => u.PasswordHash == null));
+            NotificationConnections.Remove(NotificationConnections.ToArray());
+            Attendees.Remove(Attendees.ToArray());
+            Messages.Remove(Messages.ToArray());
+            Conversations.Remove(Conversations.ToArray());
+            Users.Remove(Users.Where(u => u.PasswordHash == null).ToArray());
             Context.SaveChanges();
         }
         /// <summary>
@@ -365,10 +365,10 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            Messages.RemoveRange(Messages.Where(m => m.UserId.Equals(user.Id)));
-            Attendees.RemoveRange(Attendees.Where(a => a.UserId.Equals(user.Id)));
-            Conversations.RemoveRange(Conversations.Where(c => c.Attendees.Count < 2));
-            NotificationConnections.RemoveRange(NotificationConnections.Where(n => n.UserId.Equals(user.Id)));
+            Messages.Remove(await Messages.Where(m => m.UserId.Equals(user.Id)).ToArrayAsync());
+            Attendees.Remove(await Attendees.Where(a => a.UserId.Equals(user.Id)).ToArrayAsync());
+            Conversations.Remove(await Conversations.Where(c => c.Attendees.Count < 2).ToArrayAsync());
+            NotificationConnections.Remove(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }

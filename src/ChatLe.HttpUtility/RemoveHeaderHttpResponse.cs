@@ -113,6 +113,14 @@ namespace ChatLe.HttpUtility
             }
         }
 
+        public override bool HeadersSent
+        {
+            get
+            {
+                return _parent.HeadersSent;
+            }
+        }
+
         public override void Challenge(AuthenticationProperties properties, IEnumerable<string> authenticationTypes)
         {
             _parent.Challenge(properties, authenticationTypes);

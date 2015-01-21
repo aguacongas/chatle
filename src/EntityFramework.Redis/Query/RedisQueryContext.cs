@@ -11,33 +11,33 @@ namespace Microsoft.Data.Entity.Redis.Query
 {
     public class RedisQueryContext : QueryContext
     {
-        protected RedisDatabase _redisDatabase;
+        protected RedisDataStore _redisDataStore;
 
         public RedisQueryContext(
             [NotNull] ILogger logger,
             [NotNull] IQueryBuffer queryBuffer,
-            [NotNull] RedisDatabase redisDatabase)
+            [NotNull] RedisDataStore redisDataStore)
             : base(
                 Check.NotNull(logger, "logger"),
                 Check.NotNull(queryBuffer, "queryBuffer"))
         {
-            Check.NotNull(redisDatabase, "redisDatabase");
+            Check.NotNull(redisDataStore, "redisDatabase");
 
-            _redisDatabase = redisDatabase;
+            _redisDataStore = redisDataStore;
         }
 
         public virtual IEnumerable<object[]> GetResultsEnumerable([NotNull] RedisQuery redisQuery)
         {
             Check.NotNull(redisQuery, "redisQuery");
 
-            return _redisDatabase.GetResultsEnumerable(redisQuery);
+            return _redisDataStore.GetResultsEnumerable(redisQuery);
         }
 
         public virtual IAsyncEnumerable<object[]> GetResultsAsyncEnumerable([NotNull] RedisQuery redisQuery)
         {
             Check.NotNull(redisQuery, "redisQuery");
 
-            return _redisDatabase.GetResultsAsyncEnumerable(redisQuery);
+            return _redisDataStore.GetResultsAsyncEnumerable(redisQuery);
         }
     }
 }

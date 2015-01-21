@@ -13,8 +13,7 @@ namespace chatle.test
     {
         public static IServiceProvider GetServiceProvider()
         {
-            var services = new ServiceCollection();
-            services.Add(HostingServices.GetDefaultServices());
+            var services = HostingServices.Create();
             services.AddEntityFramework()
                 .AddInMemoryStore()
                 .AddDbContext<ChatLeIdentityDbContext>();

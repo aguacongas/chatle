@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.WebSockets;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -81,7 +82,18 @@ namespace ChatLe.Hosting.FastCGI
         {
             foreach (var kv in _sendingHeaders)
                 kv.Key.Invoke(kv.Value);
+            _headerSent = true;
         }
+
+        private bool _headerSent;
+        bool IHttpResponseFeature.HeadersSent
+        {
+            get
+            {
+                return _headerSent;
+            }
+        }
+
 
 
         bool IHttpUpgradeFeature.IsUpgradableRequest
@@ -97,6 +109,7 @@ namespace ChatLe.Hosting.FastCGI
                 return false;
             }
         }
+
 
         Task<Stream> IHttpUpgradeFeature.UpgradeAsync()
         {
@@ -133,8 +146,6 @@ namespace ChatLe.Hosting.FastCGI
         {
             Dispose(true);
         }
-
-        
         #endregion
     }
 }

@@ -16,6 +16,8 @@ using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Redis.Query;
 using Microsoft.Data.Entity.Redis.Utilities;
 using StackExchange.Redis;
+using Microsoft.Data.Entity.Storage;
+using Microsoft.Framework.Logging;
 
 namespace Microsoft.Data.Entity.Redis
 {
@@ -51,8 +53,8 @@ namespace Microsoft.Data.Entity.Redis
         private static readonly ConcurrentDictionary<string, ConnectionMultiplexer> _connectionMultiplexers
             = new ConcurrentDictionary<string, ConnectionMultiplexer>(); // key = ConfigurationOptions.ToString()
 
-        public RedisDatabase([NotNull] DbContextConfiguration configuration)
-            : base(configuration)
+        public RedisDatabase([NotNullAttribute]DbContextService<IModel> model, [NotNullAttribute]DataStoreCreator dataStoreCreator, [NotNullAttribute]DataStoreConnection connection, [NotNullAttribute]ILoggerFactory loggerFactory)
+            : base(model, dataStoreCreator, connection, loggerFactory)
         {
         }
 
@@ -60,7 +62,7 @@ namespace Microsoft.Data.Entity.Redis
         {
             get
             {
-                var connection = (RedisConnection)Configuration.Connection;
+                var connection = (RedisConnection)Connection;
                 var configurationOptions = ConfigurationOptions.Parse(connection.ConnectionString);
 
                 configurationOptions.AllowAdmin = true; // require Admin access for Server commands
@@ -86,13 +88,13 @@ namespace Microsoft.Data.Entity.Redis
         public virtual IDatabase GetUnderlyingDatabase()
         {
             return ConnectionMultiplexer
-                .GetDatabase(((RedisConnection)Configuration.Connection).Database);
+                .GetDatabase(((RedisConnection)Connection).Database);
         }
 
         public virtual IServer GetUnderlyingServer()
         {
             return ConnectionMultiplexer
-                .GetServer(((RedisConnection)Configuration.Connection).ConnectionString);
+                .GetServer(((RedisConnection)Connection).ConnectionString);
         }
 
         public virtual int SaveChanges(
@@ -201,7 +203,7 @@ namespace Microsoft.Data.Entity.Redis
         /// </summary>
         public virtual void FlushDatabase()
         {
-            var connection = (RedisConnection)Configuration.Connection;
+            var connection = (RedisConnection)Connection;
             GetUnderlyingServer().FlushDatabase(connection.Database);
         }
 
@@ -213,7 +215,7 @@ namespace Microsoft.Data.Entity.Redis
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var connection = (RedisConnection)Configuration.Connection;
+            var connection = (RedisConnection)Connection;
 
             await GetUnderlyingServer().FlushDatabaseAsync(connection.Database).WithCurrentCulture();
         }
