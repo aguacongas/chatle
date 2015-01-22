@@ -3,6 +3,7 @@
 
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Infrastructure;
+using Microsoft.Data.Entity.Redis.Extensions;
 using Microsoft.Data.Entity.Storage;
 
 namespace Microsoft.Data.Entity.Redis
@@ -17,6 +18,11 @@ namespace Microsoft.Data.Entity.Redis
         public override string Name
         {
             get { return typeof(RedisDataStore).Name; }
+        }
+
+        public override void AutoConfigure()
+        {
+            ContextOptions.UseRedis();
         }
     }
 }

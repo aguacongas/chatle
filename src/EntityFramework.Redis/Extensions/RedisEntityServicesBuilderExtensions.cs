@@ -3,6 +3,8 @@
 
 using JetBrains.Annotations;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Identity;
+using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Redis;
 using Microsoft.Data.Entity.Redis.Utilities;
 using Microsoft.Data.Entity.Storage;
@@ -16,16 +18,16 @@ namespace Microsoft.Framework.DependencyInjection
             Check.NotNull(builder, "builder");
 
             builder.ServiceCollection
-                .AddSingleton<RedisValueGeneratorSelector>()
-                .AddSingleton<RedisValueGeneratorCache>()
                 .AddScoped<DataStoreSource, RedisDataStoreSource>()
-                .AddScoped<RedisOptionsExtension>()
-                .AddScoped<RedisDataStore>()
-                .AddScoped<RedisDataStoreServices>()
-                .AddScoped<RedisConnection>()
-                .AddScoped<RedisDataStoreCreator>()
-                .AddScoped<RedisDatabase>()
-                .AddScoped<RedisValueGeneratorFactory>();
+                .TryAdd(new ServiceCollection()
+                    .AddScoped<RedisValueGeneratorSelector>()
+                    .AddScoped<RedisValueGeneratorCache>()                
+                    .AddScoped<RedisDataStoreServices>()
+                    .AddScoped<RedisDataStore>()
+                    .AddScoped<RedisConnection>()
+                    .AddScoped<RedisDatabase>()
+                    .AddScoped<RedisValueGeneratorFactory>()
+                    .AddScoped<RedisDataStoreCreator>());
 
             return builder;
         }

@@ -17,12 +17,12 @@ namespace ChatLe.Logging
             return null;
         }
 
-        public bool IsEnabled(TraceType eventType)
+        public bool IsEnabled(LogLevel eventType)
         {
             return true;
         }
 
-        public void Write(TraceType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void Write(LogLevel eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
         {
             var builder = new StringBuilder();
             builder.Append("[");
@@ -44,15 +44,15 @@ namespace ChatLe.Logging
 
             switch (eventType)
             {
-                case TraceType.Verbose:
-                case TraceType.Information:
+                case LogLevel.Verbose:
+                case LogLevel.Information:
                     Trace.TraceInformation(builder.ToString());
                     break;
-                case TraceType.Warning:
+                case LogLevel.Warning:
                     Trace.TraceWarning(builder.ToString());
                     break;
-                case TraceType.Critical:
-                case TraceType.Error:
+                case LogLevel.Critical:
+                case LogLevel.Error:
                     Trace.TraceError(builder.ToString());
                     break;
             }

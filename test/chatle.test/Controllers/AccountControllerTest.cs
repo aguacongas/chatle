@@ -45,7 +45,7 @@ namespace chatle.test.Controllers
             var context = new Mock<HttpContext>();
             var contextAccessor = new Mock<IContextAccessor<HttpContext>>();
             contextAccessor.Setup(a => a.Value).Returns(context.Object);
-            var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object, new RoleValidator<TestRole>());
+            var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object,new RoleValidator<TestRole>[] { new RoleValidator<TestRole>() });
             var identityOptions = new IdentityOptions();
             var options = new Mock<IOptions<IdentityOptions>>();
             options.Setup(a => a.Options).Returns(identityOptions);

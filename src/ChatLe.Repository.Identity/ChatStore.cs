@@ -290,10 +290,18 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
-            NotificationConnections.Remove(NotificationConnections.ToArray());
-            Attendees.Remove(Attendees.ToArray());
+            var connections = NotificationConnections.ToArray();
+            foreach (var connection in connections)
+                NotificationConnections.Remove(connection);
+            Context.SaveChanges();
+            var attendees = Attendees.ToArray();
+            foreach(var attendee in attendees)
+                Attendees.Remove(attendees);
+            Context.SaveChanges();
             Messages.Remove(Messages.ToArray());
+            Context.SaveChanges();
             Conversations.Remove(Conversations.ToArray());
+            Context.SaveChanges();
             Users.Remove(Users.Where(u => u.PasswordHash == null).ToArray());
             Context.SaveChanges();
         }

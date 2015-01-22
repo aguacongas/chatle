@@ -53,10 +53,9 @@ namespace Microsoft.Data.Entity.Redis
         private static readonly ConcurrentDictionary<string, ConnectionMultiplexer> _connectionMultiplexers
             = new ConcurrentDictionary<string, ConnectionMultiplexer>(); // key = ConfigurationOptions.ToString()
 
-        public RedisDatabase([NotNullAttribute]DbContextService<IModel> model, [NotNullAttribute]DataStoreCreator dataStoreCreator, [NotNullAttribute]DataStoreConnection connection, [NotNullAttribute]ILoggerFactory loggerFactory)
+        public RedisDatabase([NotNull]DbContextService<IModel> model, [NotNull]RedisDataStoreCreator dataStoreCreator, [NotNull]RedisConnection connection, [NotNull]ILoggerFactory loggerFactory)
             : base(model, dataStoreCreator, connection, loggerFactory)
-        {
-        }
+        { }       
 
         private ConnectionMultiplexer ConnectionMultiplexer
         {

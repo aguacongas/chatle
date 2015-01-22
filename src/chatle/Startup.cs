@@ -85,7 +85,7 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework(null);
+            var builder = services.AddEntityFramework(Configuration);
 
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
             switch (dbEngine)
