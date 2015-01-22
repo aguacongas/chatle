@@ -16,7 +16,7 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using System;
-using System.Collections.Generic;
+
 
 namespace ChatLe
 {
@@ -81,6 +81,7 @@ namespace ChatLe
             services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
 
             services.AddRemoveResponseHeaders(Configuration.GetSubKey("RemoveResponseHeader"));
+
         }
 
         private void ConfigureEntity(IServiceCollection services)
@@ -134,7 +135,8 @@ namespace ChatLe
             services.AddIdentity<ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
-            });
+            })
+            .AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
         public virtual void Configure(IApplicationBuilder app)
@@ -143,6 +145,7 @@ namespace ChatLe
             ConfigureErrors(app);
 
             app.UseStaticFiles()
+                .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
