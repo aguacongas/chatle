@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
+using System.Threading;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -26,9 +27,16 @@ namespace ChatLe.Hosting.FastCGI
             KeepAlive = keepAlive;
             State = state;
             ((IHttpResponseFeature)this).Body = new ResponseStream(this);
+            _featureStream = _requestStream;
         }
 
-        Stream IHttpRequestFeature.Body { get; set; } = new RequestStream();
+        internal RequestStream _requestStream = new RequestStream();
+        Stream _featureStream;
+        Stream IHttpRequestFeature.Body
+        {
+            get { return _featureStream; }
+            set { _featureStream = value; }
+        }
 
         IDictionary<string, string[]> IHttpRequestFeature.Headers { get; set; } = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
@@ -94,8 +102,6 @@ namespace ChatLe.Hosting.FastCGI
             }
         }
 
-
-
         bool IHttpUpgradeFeature.IsUpgradableRequest
         {
             get
@@ -110,6 +116,7 @@ namespace ChatLe.Hosting.FastCGI
             }
         }
 
+        public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
 
         Task<Stream> IHttpUpgradeFeature.UpgradeAsync()
         {
@@ -124,7 +131,7 @@ namespace ChatLe.Hosting.FastCGI
                 if (headers.TryGetValue("Upgrade", out values))
                     headers["Upgrade"] = values;
             }
-            return Task.FromResult<Stream>(new UpgradeStream(((IHttpResponseFeature)this).Body, feature.Body));
+            return Task.FromResult<Stream>(new UpgradeStream(((IHttpRequestFeature)this).Body, feature.Body));
         }
 
         #region IDisposable Support
@@ -136,6 +143,7 @@ namespace ChatLe.Hosting.FastCGI
             {
                 if (disposing)
                 {
+                    _requestStream.Dispose();
                     ((IHttpRequestFeature)this).Body.Dispose();
                     ((IHttpResponseFeature)this).Body.Dispose();
                 }

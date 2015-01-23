@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -104,8 +106,6 @@ namespace ChatLe.Hosting.FastCGI
                 return _buffer;
             }
         }
-
-
         protected ReceiveState(Socket socket, IListener listener, ILogger logger) :base(socket, listener, logger)
         { }
 
@@ -118,6 +118,23 @@ namespace ChatLe.Hosting.FastCGI
         }
 
         public abstract void Process();
+
+        public void BeginRead()
+        {
+            try
+            {
+                Socket.BeginReceive(Buffer, 0, Length, SocketFlags.None, EndReceive, this);
+            }
+            catch (ObjectDisposedException)
+            { }
+            catch (SocketException)
+            { }
+            catch (Exception e)
+            {
+                Logger.WriteError("Error on begin read", e);
+                OnDisconnect(Socket);
+            }
+        }
 
         public void EndReceive(IAsyncResult result)
         {
@@ -135,19 +152,21 @@ namespace ChatLe.Hosting.FastCGI
                 var read = client.EndReceive(result, out error);
                 if (error != SocketError.Success || read <= 0)
                 {
-                    OnDisconnect(client);
+                    state.Process();
                     return;
                 }
-                
+
                 if (state.Offset + read < state.Length)
                 {
                     state.Offset += read;
-                    client.BeginReceive(state.Buffer, state.Offset, state.GetMaxToReadSize(), SocketFlags.None, EndReceive, state);                    
+                    state.BeginRead();                    
                 }                    
                 else
                     state.Process();
             }
             catch(ObjectDisposedException)
+            { }
+            catch (SocketException)
             { }
             catch (Exception e)
             {
@@ -182,7 +201,7 @@ namespace ChatLe.Hosting.FastCGI
 
             var bodyState = new BodyState(this);
             if (Record.Length > 0)
-                Socket.BeginReceive(bodyState.Buffer, 0, bodyState.Length, SocketFlags.None, EndReceive, bodyState);
+                bodyState.BeginRead();
             else
                 bodyState.Process();
         }
@@ -221,7 +240,6 @@ namespace ChatLe.Hosting.FastCGI
             {
                 case RecordType.BeginRequest:
                     SetRequest(new Context(Record.Version, Record.RequestId, (Buffer[2] & 1) == 1, this));
-                    Receive();
                     break;
                 case RecordType.AbortRequest:
                     ProcessAbort();
@@ -236,88 +254,89 @@ namespace ChatLe.Hosting.FastCGI
                     ProcessGetValues();
                     break;
             }
+
+            Receive();
         }
 
         private void ProcessGetValues()
         {
             var request = GetRequest(Record.RequestId);
-            if (request != null)
-            {                
-                var @params = NameValuePairsSerializer.Parse(Buffer);
-                var buffer = new byte[] { Record.Version, (byte)RecordType.GetValuesResult, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 0, 0 };
-                
-                using (var stream = new MemoryStream())
+            if (request == null)
+                return;
+
+            var @params = NameValuePairsSerializer.Parse(Buffer);
+            var buffer = new byte[] { Record.Version, (byte)RecordType.GetValuesResult, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 0, 0 };
+
+            using (var stream = new MemoryStream())
+            {
+                foreach (var kv in @params)
                 {
-                    foreach (var kv in @params)
+                    switch (kv.Key)
                     {
-                        switch (kv.Key)
-                        {
-                            case "FCGI_MAX_CONNS":
-                                NameValuePairsSerializer.Write(stream, "FCGI_MAX_CONNS", Listener.Configuration.MaxConnections.ToString());
-                                break;
-                            case "FCGI_MAX_REQS":
-                                NameValuePairsSerializer.Write(stream, "FCGI_MAX_REQS", Listener.Configuration.MaxRequests.ToString());
-                                break;
-                            case "FCGI_MPXS_CONNS":
-                                NameValuePairsSerializer.Write(stream, "FCGI_MPXS_CONNS", Listener.Configuration.SupportMultiplexing ? "1" : "0");
-                                break;
-                        }
+                        case "FCGI_MAX_CONNS":
+                            NameValuePairsSerializer.Write(stream, "FCGI_MAX_CONNS", Listener.Configuration.MaxConnections.ToString());
+                            break;
+                        case "FCGI_MAX_REQS":
+                            NameValuePairsSerializer.Write(stream, "FCGI_MAX_REQS", Listener.Configuration.MaxRequests.ToString());
+                            break;
+                        case "FCGI_MPXS_CONNS":
+                            NameValuePairsSerializer.Write(stream, "FCGI_MPXS_CONNS", Listener.Configuration.SupportMultiplexing ? "1" : "0");
+                            break;
                     }
-                    buffer = buffer.Concat(stream.ToArray()).ToArray();
-                    buffer[4] = (byte)(stream.Length >> 8);
-                    buffer[5] = (byte)stream.Length;
-                    var state = new SendState(this, buffer);
-                    state.BeginSend();
-                }                
+                }
+                buffer = buffer.Concat(stream.ToArray()).ToArray();
+                buffer[4] = (byte)(stream.Length >> 8);
+                buffer[5] = (byte)stream.Length;
+                var state = new SendState(this, buffer);
+                state.BeginSend();
             }
-            Receive();
         }
         
         private void ProcessParams()
         {
             var request = GetRequest(Record.RequestId);
-            if (request != null)
-            {
-                var @params = NameValuePairsSerializer.Parse(Buffer);
-                var feature = request as IHttpRequestFeature;
-                var headers = feature.Headers;
-                foreach(var kv in @params)
-                {
-                    var key = kv.Key;
+            if (request == null)
+                return;
 
-                    if (key.StartsWith("HTTP_"))
+            var @params = NameValuePairsSerializer.Parse(Buffer);
+            var feature = request as IHttpRequestFeature;
+            var headers = feature.Headers;
+            foreach(var kv in @params)
+            {
+                var key = kv.Key;
+
+                if (key.StartsWith("HTTP_"))
+                {
+                    SetRequestHeader(headers, key.Substring(5), kv.Value);
+                }
+                else
+                {
+                    switch (key)
                     {
-                        SetRequestHeader(headers, key.Substring(5), kv.Value);
-                    }
-                    else
-                    {
-                        switch (key)
-                        {
-                            case "REQUEST_METHOD":
-                                feature.Method = kv.Value;
-                                break;
-                            case "SCRIPT_NAME":
-                                feature.Path = kv.Value;
-                                break;
-                            case "QUERY_STRING":
-                                feature.QueryString = kv.Value;
-                                break;
-                            case "SERVER_PROTOCOL":
-                                feature.Protocol = kv.Value;
-                                break;
-                            case "HTTPS":
-                                feature.Protocol = "https";
-                                break;
-                            case "CONTENT_LENGTH":
-                                if (!string.IsNullOrEmpty(kv.Value))
-                                    feature.Body.SetLength(int.Parse(kv.Value));
-                                break;
-                        }
+                        case "REQUEST_METHOD":
+                            feature.Method = kv.Value;
+                            break;
+                        case "SCRIPT_NAME":
+                            feature.Path = kv.Value;
+                            break;
+                        case "QUERY_STRING":
+                            feature.QueryString = kv.Value;
+                            break;
+                        case "SERVER_PROTOCOL":
+                            feature.Protocol = kv.Value;
+                            break;
+                        case "HTTPS":
+                            feature.Protocol = "https";
+                            break;
+                        case "CONTENT_LENGTH":
+                            if (!string.IsNullOrEmpty(kv.Value))
+                                feature.Body.SetLength(int.Parse(kv.Value));
+                            break;
                     }
                 }
             }
 
-            Receive();
+            Debug.WriteLine(string.Format("{0} {1} {2}\r\n{3}\r\n", feature.Method, feature.Path, feature.Protocol, string.Join("\r\n", headers.Select(h => h.Key + "=" + string.Join(",", h.Value)))));
         }
 
         static private string SetRequestHeader(IDictionary<string, string[]> headers, string key, string value)
@@ -362,79 +381,50 @@ namespace ChatLe.Hosting.FastCGI
             if (Record.Padding > 0)
             {
                 var paddingState = new PaddingState(this);
-                Socket.BeginReceive(paddingState.Buffer, 0, paddingState.Length, SocketFlags.None, EndReceive, paddingState);
+                paddingState.BeginRead();
                 return;
             }
 
             var headerState = new HeaderState(this);
-            Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
+            headerState.BeginRead();
         }
 
         private void ProcessStdInput()
         {
             var context = GetRequest(Record.RequestId);
-            if (context != null)
+            if (context == null)
+                return;
+
+            var feature = context as IHttpRequestFeature;
+
+            if (Record.Length > 0)
+                context._requestStream.Append(Buffer);
+            else
+                context._requestStream.Completed();
+
+            if (!context.Called)
             {
-                var feature = context as IHttpRequestFeature;
-                var stream = feature.Body as RequestStream;
-                if (Record.Length > 0)
-                    stream.Append(Buffer);
-                else
-                    stream.Completed();
-                if (!context.Called)
-                {
-                    context.Called = true;
-                    var executor = new Runner() { State = this, Context = context };
-                    executor.Run();
-                }
+                context.Called = true;
+                Listener.App.Invoke(context).ContinueWith(t =>
+                    {
+                        if (t.Exception != null)
+                            Logger.WriteError("Error on execute", t.Exception);
 
-                if (!context.KeepAlive && Record.Length == 0)
-                    return;
-            }
-            Receive();
-        }
-
-        class Runner
-        {
-            public Context Context { get; set; }
-
-            public State State { get; set; }
-
-            public void Run()
-            {
-                Task.Run(Execute);
-            }
-
-            private async Task Execute()
-            {
-                try
-                {
-                    await State.Listener.App.Invoke(Context);
-                }
-                catch (Exception e)
-                {
-                    State.Logger.WriteError("Error on execute", e);
-                }
-                finally
-                {
-                    Context.Dispose();
-                    State.RemoveRequest(Context.Id);
-                }
+                        context.Dispose();
+                        RemoveRequest(context.Id);
+                    }, context.CancellationTokenSource.Token);
             }
         }
 
         private void ProcessAbort()
         {
-            var request = GetRequest(Record.RequestId);
-            if (request != null)
+            var context = GetRequest(Record.RequestId);
+            if (context != null)
             {
-                // TODO Implement
+                context.CancellationTokenSource.Cancel();
                 RemoveRequest(Record.RequestId);
-                if (!request.KeepAlive)
-                    return;
+                context.Dispose();
             }
-
-            Receive();
         }
         
     }
@@ -456,7 +446,7 @@ namespace ChatLe.Hosting.FastCGI
         public override void Process()
         {
             var headerState = new HeaderState(this);
-            Socket.BeginReceive(headerState.Buffer, 0, headerState.Length, SocketFlags.None, EndReceive, headerState);
+            headerState.BeginRead();
         }
     }
 

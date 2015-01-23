@@ -44,7 +44,6 @@ namespace ChatLe.HttpUtility
         bool IsAllowedHeader(string header)
         {
             var allowed = !_headersToRemove.Any(h => h == header);
-            Logger.WriteInformation(string.Format("{0} is {1}", header, allowed ? "allowed" : "not allowed"));
             return allowed;
         }
 

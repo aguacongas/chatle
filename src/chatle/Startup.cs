@@ -145,6 +145,7 @@ namespace ChatLe
             ConfigureErrors(app);
 
             app.UseStaticFiles()
+                .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {

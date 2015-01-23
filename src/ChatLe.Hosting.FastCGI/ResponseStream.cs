@@ -3,6 +3,7 @@ using Microsoft.AspNet.HttpFeature;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -150,8 +151,11 @@ namespace ChatLe.Hosting.FastCGI
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    Logger.WriteError("BeginSend ObjectDisposedException");
                     TaskCompletionSource?.SetException(ode);
+                }
+                catch (SocketException se)
+                {
+                    TaskCompletionSource?.SetException(se);
                 }
                 catch (Exception e)
                 {
@@ -335,6 +339,9 @@ namespace ChatLe.Hosting.FastCGI
                 }
 
                 var result = builder.ToString();
+
+                Debug.WriteLine(result + "\r\n");
+
                 return result;
             }
 

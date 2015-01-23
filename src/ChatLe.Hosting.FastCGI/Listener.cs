@@ -93,8 +93,12 @@ namespace ChatLe.Hosting.FastCGI
             try
             {
                 var state = new HeaderState(client, this, _logger);
-                client.BeginReceive(state.Buffer, 0, state.Length, SocketFlags.None, state.EndReceive, state);
+                state.BeginRead();
             }
+            catch (ObjectDisposedException)
+            { }
+            catch (SocketException)
+            { }
             catch(Exception e)
             {
                 _logger.WriteError("Error on Read", e);
