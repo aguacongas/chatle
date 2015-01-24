@@ -221,22 +221,13 @@ namespace ChatLe.Hosting.FastCGI
 
         public override void Process()
         {
-            if (Record.Type != 0
-                && Record.Type != 1
-                && Record.Type != 2
-                && Record.Type != 4
-                && Record.Type != 5
-                && Record.Type != 9)
-            {
-                var buffer = new byte[] { Record.Version, (byte)RecordType.Unknown, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 2, 0, 0, Record.Type, 0 };
-                var state = new SendState(this, buffer);
-                state.BeginSend();                
-            }
-
             Debug.WriteLineIf(Record.Type != 0, string.Format("\r\nProcessing request id: {0}, RecordType:{1}\r\n", Record.RequestId, (RecordType)Record.Type));
 
             switch ((RecordType)Record.Type)
             {
+                case RecordType.None:
+                    OnDisconnect(Socket);
+                    return;
                 case RecordType.BeginRequest:
                     SetRequest(new Context(Record.Version, Record.RequestId, (Buffer[2] & 1) == 1, this));
                     break;
@@ -252,6 +243,11 @@ namespace ChatLe.Hosting.FastCGI
                 case RecordType.GetValues:
                     ProcessGetValues();
                     break;
+                default:
+                    var buffer = new byte[] { Record.Version, (byte)RecordType.Unknown, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 2, 0, 0, Record.Type, 0 };
+                    var state = new SendState(this, buffer);
+                    state.BeginSend();
+                    return;
             }
 
             Receive();
@@ -497,7 +493,10 @@ namespace ChatLe.Hosting.FastCGI
                 SocketError error;
                 var written = client.EndSend(result, out error);
                 if (error != SocketError.Success || written <= 0)
+                {
+                    OnDisconnect(client);
                     return;
+                }                    
 
                 if (state.Offset + written < state.Length)
                 {
