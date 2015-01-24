@@ -97,8 +97,6 @@ namespace ChatLe.Hosting.FastCGI
             }
             catch (ObjectDisposedException)
             { }
-            catch (SocketException)
-            { }
             catch(Exception e)
             {
                 _logger.WriteError("Error on Read", e);

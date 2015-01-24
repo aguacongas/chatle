@@ -91,18 +91,29 @@ namespace ChatLe.Hosting.FastCGI
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<int>();
+            Debug.WriteLine("\r\nResponseStream: WriteAsync " + Encoding.UTF8.GetString(buffer, offset, count) + "\r\n");
             _writeState.ProcessStart();            
             _writeState = _writeState.Process(tcs, buffer, offset, count);            
             return tcs.Task;
         }
 
+        private bool disposedValue = false; // To detect redundant calls
+
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-            _writeState.ProcessStart();
-            _writeState.Buffers.Add(new ArraySegment<byte>(new byte[] { _context.Version, (byte)RecordType.EndRequest, (byte)(_context.Id >> 8), (byte)_context.Id, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }));
-            _writeState.End = true;
-            _writeState.BeginSend();
+            Debug.WriteLine("\r\nResponseStream: Dispose disposing: {0} disposedValue: {1}", disposing, disposedValue);
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _writeState.End = true;
+                    _writeState.ProcessStart();
+                    _writeState.Buffers.Add(new ArraySegment<byte>(new byte[] { _context.Version, (byte)RecordType.EndRequest, (byte)(_context.Id >> 8), (byte)_context.Id, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }));
+                    _writeState.BeginSend();
+                    base.Dispose(disposing);
+                }
+                disposedValue = true;
+            }
         }
 
         public override void SetLength(long value)
@@ -153,10 +164,6 @@ namespace ChatLe.Hosting.FastCGI
                 {
                     TaskCompletionSource?.SetException(ode);
                 }
-                catch (SocketException se)
-                {
-                    TaskCompletionSource?.SetException(se);
-                }
                 catch (Exception e)
                 {
                     TaskCompletionSource?.SetException(e);
@@ -174,10 +181,7 @@ namespace ChatLe.Hosting.FastCGI
                     var written = state.Socket.EndSend(result, out error);
 
                     if (error != SocketError.Success || written <= 0)
-                    {
-                        OnDisconnect(state.Socket);
                         return;
-                    }
 
                     var buffer = state.Buffers[state._currentBufferId];
 

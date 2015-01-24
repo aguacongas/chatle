@@ -20,7 +20,7 @@ namespace ChatLe.Hosting.FastCGI
         public virtual int Length { get { return HEADER_LENGTH; } }
         public ILogger Logger { get; private set; }
         public int Offset { get; set; }
-        public Socket Socket { get; private set; }
+        public Socket Socket { get; set; }
         public IListener Listener { get; private set; }
 
         public IDictionary<ushort, Context> Contexts { get; protected set; }
@@ -128,8 +128,6 @@ namespace ChatLe.Hosting.FastCGI
             }
             catch (ObjectDisposedException)
             { }
-            catch (SocketException)
-            { }
             catch (Exception e)
             {
                 Logger.WriteError("Error on begin read", e);
@@ -166,8 +164,6 @@ namespace ChatLe.Hosting.FastCGI
                     state.Process();
             }
             catch(ObjectDisposedException)
-            { }
-            catch (SocketException)
             { }
             catch (Exception e)
             {
@@ -501,10 +497,8 @@ namespace ChatLe.Hosting.FastCGI
                 SocketError error;
                 var written = client.EndSend(result, out error);
                 if (error != SocketError.Success || written <= 0)
-                {
-                    OnDisconnect(client);
                     return;
-                }
+
                 if (state.Offset + written < state.Length)
                 {
                     state.Offset += written;
