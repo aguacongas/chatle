@@ -295,7 +295,7 @@ namespace ChatLe.Hosting.FastCGI
         private void ProcessParams()
         {
             var request = GetRequest(Record.RequestId);
-            if (request == null)
+            if (request == null || Record.Length == 0)
                 return;
 
             var @params = NameValuePairsSerializer.Parse(Buffer);
@@ -397,6 +397,7 @@ namespace ChatLe.Hosting.FastCGI
 
             var feature = context as IHttpRequestFeature;
 
+            Debug.WriteLine(Encoding.UTF8.GetString(Buffer));
             if (Record.Length > 0)
                 context._requestStream.Append(Buffer);
             else

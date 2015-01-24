@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -64,14 +65,21 @@ namespace ChatLe.Hosting.FastCGI
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_length.HasValue && _position == _length)
+            {
+                Debug.WriteLine("End of request stream");
                 return 0;
+            }
 
             if (_index == _buffers.Count)
             {
+                Debug.WriteLine("Waiting for new data");
                 _event.WaitOne(TimeSpan.FromMinutes(1.5));
                 _event.Reset();
                 if (_index == _buffers.Count)
+                {
+                    Debug.WriteLine("End of request stream");
                     return 0;
+                }
             }
                            
             var current = _buffers[_index];
