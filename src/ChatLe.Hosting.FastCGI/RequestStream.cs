@@ -32,12 +32,11 @@ namespace ChatLe.Hosting.FastCGI
                 return false;
             }
         }
-        long? _length;
         public override long Length
         {
             get
             {
-                return _length ?? 0;
+                throw new NotImplementedException();
             }
         }
 
@@ -65,12 +64,6 @@ namespace ChatLe.Hosting.FastCGI
         int _currentPossition;
         public override int Read(byte[] buffer, int offset, int count)
         {
-            //if (_length.HasValue && _position == _length)
-            //{
-            //    Debug.WriteLine("\r\nRequestStream: End of request stream\r\n");
-            //    return 0;
-            //}
-
             if (_index == _buffers.Count)
             {
                 Debug.WriteLine("\r\nRequestStream: Waiting for new data\r\n");
@@ -88,7 +81,7 @@ namespace ChatLe.Hosting.FastCGI
             var length = maxLength >= count ? count : maxLength;
             Buffer.BlockCopy(current, _currentPossition, buffer, offset, length);
 
-            Debug.WriteLine("\r\nRequestStream: Read" + Encoding.UTF8.GetString(buffer, offset, count) +"\r\n");
+            Debug.WriteLine("\r\nRequestStream: Read: " + Encoding.UTF8.GetString(buffer, offset, count) +"\r\n");
 
             if (length == maxLength)
             {
@@ -106,7 +99,7 @@ namespace ChatLe.Hosting.FastCGI
 
         public override void SetLength(long value)
         {
-            _length = value;
+            throw new NotImplementedException();
         }
 
         public override void Write(byte[] buffer, int offset, int count)
@@ -117,27 +110,23 @@ namespace ChatLe.Hosting.FastCGI
         internal void Append(byte[] buffer)
         {
             _buffers.Add(buffer);
+            Debug.WriteLine("\r\nRequestStream: Append buffer: " + Encoding.UTF8.GetString(buffer) + "\r\n");
             _event.Set();
         }
 
         private bool disposedValue = false; // To detect redundant calls
         protected override void Dispose(bool disposing)
         {
+            Debug.WriteLine("\r\nRequestStream: Dispose disposing: {0} disposedValue: {1}", disposing, disposedValue);
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    _event.Set();
                     _event.Dispose();
                     base.Dispose(disposing);
                 }
                 disposedValue = true;
             }
-        }
-
-        internal void Completed()
-        {
-            _event.Set();
         }
     }
 }

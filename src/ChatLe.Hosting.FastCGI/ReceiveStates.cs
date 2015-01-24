@@ -331,10 +331,6 @@ namespace ChatLe.Hosting.FastCGI
                         case "HTTPS":
                             feature.Protocol = "https";
                             break;
-                        case "CONTENT_LENGTH":
-                            if (!string.IsNullOrEmpty(kv.Value))
-                                request._requestStream.SetLength(int.Parse(kv.Value));
-                            break;
                     }
                 }
             }
