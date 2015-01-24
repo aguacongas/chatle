@@ -59,7 +59,7 @@ namespace ChatLe.Hosting.FastCGI
             throw new NotImplementedException();
         }
 
-        ManualResetEvent _event = new ManualResetEvent(false);
+        EventWaitHandle _event = new AutoResetEvent(false);
         int _index;
         int _currentPossition;
         public override int Read(byte[] buffer, int offset, int count)
@@ -67,8 +67,7 @@ namespace ChatLe.Hosting.FastCGI
             if (_index == _buffers.Count)
             {
                 Debug.WriteLine("\r\nRequestStream: Waiting for new data\r\n");
-                _event.WaitOne(TimeSpan.FromMinutes(1.5));
-                _event.Reset();
+                _event.WaitOne();
                 if (_index == _buffers.Count)
                 {
                     Debug.WriteLine("\r\nRequestStream: End of request stream\r\n");
