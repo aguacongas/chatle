@@ -67,6 +67,7 @@ namespace ChatLe.Hosting.FastCGI
             if (_index == _buffers.Count)
             {
                 Debug.WriteLine("\r\nRequestStream: Waiting for new data\r\n");
+                _event.Reset();
                 _event.WaitOne();
                 if (_index == _buffers.Count)
                 {
