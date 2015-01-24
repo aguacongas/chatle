@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace ChatLe.Hosting.FastCGI
@@ -64,20 +65,20 @@ namespace ChatLe.Hosting.FastCGI
         int _currentPossition;
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (_length.HasValue && _position == _length)
-            {
-                Debug.WriteLine("End of request stream");
-                return 0;
-            }
+            //if (_length.HasValue && _position == _length)
+            //{
+            //    Debug.WriteLine("\r\nRequestStream: End of request stream\r\n");
+            //    return 0;
+            //}
 
             if (_index == _buffers.Count)
             {
-                Debug.WriteLine("Waiting for new data");
+                Debug.WriteLine("\r\nRequestStream: Waiting for new data\r\n");
                 _event.WaitOne(TimeSpan.FromMinutes(1.5));
                 _event.Reset();
                 if (_index == _buffers.Count)
                 {
-                    Debug.WriteLine("End of request stream");
+                    Debug.WriteLine("\r\nRequestStream: End of request stream\r\n");
                     return 0;
                 }
             }
@@ -86,6 +87,9 @@ namespace ChatLe.Hosting.FastCGI
             var maxLength = current.Length - _currentPossition;
             var length = maxLength >= count ? count : maxLength;
             Buffer.BlockCopy(current, _currentPossition, buffer, offset, length);
+
+            Debug.WriteLine("\r\nRequestStream: Read" + Encoding.UTF8.GetString(buffer, offset, count) +"\r\n");
+
             if (length == maxLength)
             {
                 _index++;
@@ -123,6 +127,7 @@ namespace ChatLe.Hosting.FastCGI
             {
                 if (disposing)
                 {
+                    _event.Set();
                     _event.Dispose();
                     base.Dispose(disposing);
                 }

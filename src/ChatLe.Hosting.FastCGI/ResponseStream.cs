@@ -340,7 +340,7 @@ namespace ChatLe.Hosting.FastCGI
 
                 var result = builder.ToString();
 
-                Debug.WriteLine(result + "\r\n");
+                Debug.WriteLine("\r\n" + result + "\r\n");
 
                 return result;
             }

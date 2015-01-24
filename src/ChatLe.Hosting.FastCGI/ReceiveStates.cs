@@ -52,6 +52,7 @@ namespace ChatLe.Hosting.FastCGI
             if (client == null)
                 return;
 
+            Debug.WriteLine("\r\nSocket Shutdown\r\n");
             try
             {
                 client.Shutdown(SocketShutdown.Both);
@@ -233,8 +234,10 @@ namespace ChatLe.Hosting.FastCGI
             {
                 var buffer = new byte[] { Record.Version, (byte)RecordType.Unknown, (byte)(Record.RequestId >> 8), (byte)Record.RequestId, 0, 2, 0, 0, Record.Type, 0 };
                 var state = new SendState(this, buffer);
-                state.BeginSend();
+                state.BeginSend();                
             }
+
+            Debug.WriteLineIf(Record.Type != 0, string.Format("\r\nProcessing request id: {0}, RecordType:{1}\r\n", Record.RequestId, (RecordType)Record.Type));
 
             switch ((RecordType)Record.Type)
             {
@@ -336,7 +339,7 @@ namespace ChatLe.Hosting.FastCGI
                 }
             }
 
-            Debug.WriteLine(string.Format("{0} {1} {2}\r\n{3}\r\n", feature.Method, feature.Path, feature.Protocol, string.Join("\r\n", headers.Select(h => h.Key + "=" + string.Join(",", h.Value)))));
+            Debug.WriteLine(string.Format("\r\n{0} {1} {2}\r\n{3}\r\n", feature.Method, feature.Path, feature.Protocol, string.Join("\r\n", headers.Select(h => h.Key + "=" + string.Join(",", h.Value)))));
         }
 
         static private string SetRequestHeader(IDictionary<string, string[]> headers, string key, string value)
@@ -397,11 +400,8 @@ namespace ChatLe.Hosting.FastCGI
 
             var feature = context as IHttpRequestFeature;
 
-            Debug.WriteLine(Encoding.UTF8.GetString(Buffer));
-            if (Record.Length > 0)
-                context._requestStream.Append(Buffer);
-            else
-                context._requestStream.Completed();
+            Debug.WriteLine("\r\n" + Encoding.UTF8.GetString(Buffer) + "\r\n");
+            context._requestStream.Append(Buffer);
 
             if (!context.Called)
             {
