@@ -30,12 +30,12 @@ namespace ChatLe.Hosting.FastCGI
                 return false;
             }
         }
-        long _length;
+        long? _length;
         public override long Length
         {
             get
             {
-                return _length;
+                return _length ?? 0;
             }
         }
 
@@ -63,7 +63,7 @@ namespace ChatLe.Hosting.FastCGI
         int _currentPossition;
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (_position == _length)
+            if (_length.HasValue && _position == _length)
                 return 0;
 
             if (_index == _buffers.Count)

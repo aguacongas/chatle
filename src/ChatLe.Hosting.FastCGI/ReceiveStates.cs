@@ -330,7 +330,7 @@ namespace ChatLe.Hosting.FastCGI
                             break;
                         case "CONTENT_LENGTH":
                             if (!string.IsNullOrEmpty(kv.Value))
-                                feature.Body.SetLength(int.Parse(kv.Value));
+                                request._requestStream.SetLength(int.Parse(kv.Value));
                             break;
                     }
                 }
