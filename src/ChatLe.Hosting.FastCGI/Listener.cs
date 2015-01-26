@@ -49,7 +49,7 @@ namespace ChatLe.Hosting.FastCGI
             {
                 _listener = CreateSocket(endpoint);
                 _listener.Bind(endpoint);
-                _listener.Listen(Configuration.MaxConnections);
+                _listener.Listen(-1);
                 BeginAccept();
             }
             catch (Exception e)

@@ -1,6 +1,4 @@
 ﻿/// <autosync enabled="true" />
-/// <reference path="../gruntfile.js" />
-/// <reference path="../Scripts/chat.js" />
 /// <reference path="lib/knockout/knockout.js" />
 /// <reference path="lib/signalr/jquery.signalr.js" />
 /// <reference path="lib/bootstrap/js/bootstrap.js" />

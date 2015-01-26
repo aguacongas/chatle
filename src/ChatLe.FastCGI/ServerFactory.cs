@@ -40,7 +40,7 @@ namespace ChatLe.FastCGI
         {
             get
             {
-                return "ChatLe.FastCGI";
+                return "ChatLe";
             }
         }
 
