@@ -86,19 +86,22 @@ namespace ChatLe.Hosting.FastCGI
             _sendingHeaders.Add(new KeyValuePair<Action<object>, object>(callback, state));
         }
 
-        internal void HeaderSent()
+        internal void SendingsHeader()
         {
             foreach (var kv in _sendingHeaders)
                 kv.Key.Invoke(kv.Value);
-            _headerSent = true;
+        }
+        internal void HeadersSent()
+        {            
+            _headersSent = true;
         }
 
-        private bool _headerSent;
+        private bool _headersSent;
         bool IHttpResponseFeature.HeadersSent
         {
             get
             {
-                return _headerSent;
+                return _headersSent;
             }
         }
 

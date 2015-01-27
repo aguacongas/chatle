@@ -254,6 +254,7 @@ namespace ChatLe.Hosting.FastCGI
 
             public override void ProcessStart()
             {
+                Context.SendingsHeader();
                 var header = Encoding.ASCII.GetBytes(CreateResponseHeader());
                 Buffers.AddRange(GetSegments(header, 0, header.Length));
                 _endHeaderId = Buffers.Count - 1;
@@ -263,7 +264,7 @@ namespace ChatLe.Hosting.FastCGI
             {
                 if (bufferId == _endHeaderId)
                 {
-                    Context.HeaderSent();
+                    Context.HeadersSent();
                 }
                 base.Sent(bufferId);
             }
