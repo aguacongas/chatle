@@ -16,7 +16,9 @@ using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using System;
-
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ChatLe
 {
@@ -66,6 +68,12 @@ namespace ChatLe
                 .AddEnvironmentVariables(); //All environment variables in the process's context flow in as configuration values.
 
             _environment = environment;
+
+            int io, worker;
+            ThreadPool.GetMinThreads(out worker, out io);
+            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
+            ThreadPool.GetMaxThreads(out worker, out io);
+            Console.WriteLine("Startup max worker thread {0}, min io thread {1}", worker, io);
         }
 
         public IConfiguration Configuration { get; private set; }
