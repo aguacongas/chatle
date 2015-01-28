@@ -91,9 +91,9 @@ namespace ChatLe
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
             switch (dbEngine)
             {
-                //case DBEngine.InMemory:
-                //    builder.AddInMemoryStore();
-                //    break;
+                case DBEngine.InMemory:
+                    builder.AddInMemoryStore();
+                    break;
                 //case DBEngine.SQLite:
                 //    builder.AddSQLite();
                 //    break;
@@ -111,9 +111,9 @@ namespace ChatLe
             {
                 switch (dbEngine)
                 {
-                    //case DBEngine.InMemory:
-                    //    options.UseInMemoryStore(true);
-                    //    break;
+                    case DBEngine.InMemory:
+                        options.UseInMemoryStore(true);
+                        break;
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
                         break;
