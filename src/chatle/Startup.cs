@@ -141,11 +141,11 @@ namespace ChatLe
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            app.UseRemoveResponseHeaders();
+            //app.UseRemoveResponseHeaders();
             ConfigureErrors(app);
 
             app.UseStaticFiles()
-                //.UseWebSockets()
+                .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
