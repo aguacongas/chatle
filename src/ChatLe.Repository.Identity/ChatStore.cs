@@ -19,7 +19,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context, ILoggerFactory loggerFactory) : base(context, loggerFactory) { }
+        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
     }
     /// <summary>
     /// Chat store for TUser
@@ -33,7 +33,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context, ILoggerFactory loggerFactory) : base(context, loggerFactory) { }
+        public ChatStore(DbContext context) : base(context) { }
     }
     /// <summary>
     /// Chat store, implement <see cref="IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}"/>
@@ -59,18 +59,12 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context, ILoggerFactory loggerFactory)
+        public ChatStore(TContext context)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            if (loggerFactory == null)
-                throw new ArgumentNullException("loggerFactory");
-
             Context = context;
-            Logger = loggerFactory.Create<ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection>>();
-
         }
-        public virtual ILogger Logger { get; private set; }
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
