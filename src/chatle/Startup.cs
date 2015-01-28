@@ -73,7 +73,13 @@ namespace ChatLe
             ThreadPool.GetMinThreads(out worker, out io);
             Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
             ThreadPool.GetMaxThreads(out worker, out io);
-            Console.WriteLine("Startup max worker thread {0}, min io thread {1}", worker, io);
+            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
+            ThreadPool.SetMaxThreads(32767, 1000);
+            ThreadPool.SetMinThreads(50, 50);
+            ThreadPool.GetMinThreads(out worker, out io);
+            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
+            ThreadPool.GetMaxThreads(out worker, out io);
+            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
         }
 
         public IConfiguration Configuration { get; private set; }
