@@ -58,10 +58,6 @@ namespace ChatLe.Models
     public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
     {
         /// <summary>
-        /// Logger
-        /// </summary>
-        public ILogger Logger { get; private set; }
-        /// <summary>
         /// Gets or sets the DbSet of messages
         /// </summary>
         public DbSet<Message> Messages { get; set; }
@@ -77,17 +73,6 @@ namespace ChatLe.Models
         /// Gets or sets the DbSet of notification connections
         /// </summary>
         public DbSet<NotificationConnection> NotificationConnections { get; set; }
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public ChatLeIdentityDbContext(ILoggerFactory loggerFactory)
-        {
-            if (loggerFactory == null)
-                throw new ArgumentNullException("loggerFactory");
-
-            Logger = loggerFactory.Create<ChatLeIdentityDbContext>();
-            Logger.WriteInformation("constructor");
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
