@@ -9,9 +9,6 @@ namespace ChatLe.Models
 {
     public class ChatLeIdentityDbContextSql : ChatLeIdentityDbContext
     {
-        public ChatLeIdentityDbContextSql() :base(new LoggerFactory())
-        {
-        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
