@@ -6,7 +6,7 @@ chatle is projects samples for
 
 A website using [MVC 6](https://github.com/aspnet/mvc), [SingleR](https://github.com/aspnet/signalR-Server), [EF 7] (https://github.com/aspnet/EntityFramework) ...
 
-A [FastCGI] (http://www.fastcgi.com/) application server has been tested with [NginX] (http://nginx.org/)
+A [FastCGI] (http://www.fastcgi.com/) application server, tested with [NginX] (http://nginx.org/)
 
 A middleware sample that remove http response headers
 
