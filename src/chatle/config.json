@@ -9,7 +9,7 @@
             "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true"
         },
         "Redis": {
-            "Hostname": "localhost"
+            "Hostname": "127.0.0.1"
         }
     },
     "Identity": {
