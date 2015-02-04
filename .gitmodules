@@ -1,0 +1,3 @@
+[submodule "src/firefly"]
+	path = src/firefly
+	url = https://github.com/aguacongas/firefly.git
