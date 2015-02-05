@@ -2,7 +2,7 @@ chatle
 ======
 
 chatle is projects samples for 
-[ASP.NET MVC 5](https://github.com/aspnet/home)
+[ASP.NET 5](https://github.com/aspnet/home)
 
 A website using [MVC 6](https://github.com/aspnet/mvc), [SingleR](https://github.com/aspnet/signalR-Server), [EF 7] (https://github.com/aspnet/EntityFramework) ...
 
