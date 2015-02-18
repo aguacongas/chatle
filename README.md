@@ -2,6 +2,8 @@ chatle
 ======
 [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/master?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/master)
 
+[![version](https://img.shields.io/badge/chatle-v1.0.0--beta2-yellow.svg?style=flat)](https://www.myget.org/F/chatle/)
+
 chatle is projects samples for 
 [ASP.NET 5](https://github.com/aspnet/home)
 
