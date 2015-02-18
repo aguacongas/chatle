@@ -1,8 +1,8 @@
 chatle
 ======
-[![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/master?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/master)
+AppVeyor build status: [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/master?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/master)
 
-[![version](https://img.shields.io/myget/chatle/v/ChatLe.HttpUtility.svg?style=flat)](https://www.myget.org/F/chatle/)
+Latest version on myget: [![version](https://img.shields.io/myget/chatle/v/ChatLe.HttpUtility.svg?style=flat)](https://www.myget.org/F/chatle/)
 
 chatle is projects samples for 
 [ASP.NET 5](https://github.com/aspnet/home)
