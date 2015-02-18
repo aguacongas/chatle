@@ -30,14 +30,20 @@ namespace chatle.test.Controllers
             var store = new Mock<IUserStore<TUser>>();
             var options = new OptionsManager<IdentityOptions>(null);
             var passwordOptions = new OptionsManager<PasswordHasherOptions>(null);
+            var userValidators = new List<UserValidator<TUser>>(1);
+            userValidators.Add(new UserValidator<TUser>());
+            var passwordValidators = new List<PasswordValidator<TUser>>(1);
+            passwordValidators.Add(new PasswordValidator<TUser>());
+
             return new Mock<UserManager<TUser>>(
                 store.Object,
                 options,
                 new PasswordHasher<TUser>(passwordOptions),
-                new UserValidator<TUser>(),
-                new PasswordValidator<TUser>(),
+                userValidators,
+                passwordValidators,
                 new UpperInvariantUserNameNormalizer(),
-                new List<IUserTokenProvider<TUser>>());
+                new List<IUserTokenProvider<TUser>>(),
+                new List<IIdentityMessageProvider>());
         }
 
         private static Mock<SignInManager<TUser>> MockSigninManager<TUser>(UserManager<TUser> userManager) where TUser : class
@@ -60,9 +66,9 @@ namespace chatle.test.Controllers
             userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Success).Verifiable();
             var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
             signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
-            var metaDataProvider = new Mock<IModelMetadataProvider>().Object;
             var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
-            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = new ViewDataDictionary(metaDataProvider, new ModelStateDictionary()) })
+            var viewData = new ViewDataDictionary(new DataAnnotationsModelMetadataProvider(), new ModelStateDictionary());
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = viewData })
             {
                 var result = await controller.Register(new RegisterViewModel()
                 {
