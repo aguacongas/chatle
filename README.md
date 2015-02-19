@@ -1,5 +1,9 @@
 chatle
 ======
+AppVeyor build status: [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/master?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/master)
+
+Latest version on myget: [![version](https://img.shields.io/myget/chatle/v/ChatLe.HttpUtility.svg?style=flat)](https://www.myget.org/F/chatle/)
+
 
 chatle is projects samples for 
 [ASP.NET 5](https://github.com/aspnet/home)
@@ -11,3 +15,4 @@ A [FastCGI] (http://www.fastcgi.com/) application server, tested with [NginX] (h
 A middleware sample that remove http response headers
 
 A logging utility to log using Trace.
+
