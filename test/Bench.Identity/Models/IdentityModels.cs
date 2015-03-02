@@ -15,7 +15,7 @@ namespace Bench.Identity.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        private static bool _created = false;
+        //private static bool _created = false;
         
         public ApplicationDbContext()
         {            

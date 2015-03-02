@@ -51,7 +51,7 @@ namespace ChatLe.Repository.Text
             builder.Entity<NotificationConnection>(b =>
             {
                 b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.ForeignKey<ChatLeUser>(n => n.UserId);
+                b.HasOne<ChatLeUser>().WithMany().ForeignKey(n => n.UserId);
             });
 
             builder.Entity<Conversation>(b =>
@@ -62,14 +62,14 @@ namespace ChatLe.Repository.Text
             builder.Entity<Message>(b =>
             {
                 b.Key(m => m.Id);
-                b.ForeignKey<UserTest>(m => m.UserId);
-                b.ForeignKey<Conversation>(m => m.ConversationId);
+                b.HasOne<UserTest>().WithMany().ForeignKey(m => m.UserId);
+                b.HasOne<Conversation>().WithMany().ForeignKey(m => m.ConversationId);
             });
 
             builder.Entity<Attendee>(b =>
             {
                 b.Key(a => new { a.ConversationId, a.UserId });
-                b.ForeignKey<Conversation>(a => a.ConversationId);
+                b.HasOne<Conversation>().WithMany().ForeignKey(a => a.ConversationId);
             });
 
         }

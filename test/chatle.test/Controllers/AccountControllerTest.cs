@@ -13,6 +13,7 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using System.Collections.Generic;
 using Microsoft.Framework.Logging;
+using Microsoft.AspNet.Hosting;
 
 namespace chatle.test.Controllers
 {
@@ -41,7 +42,7 @@ namespace chatle.test.Controllers
                 new PasswordHasher<TUser>(passwordOptions),
                 userValidators,
                 passwordValidators,
-                new UpperInvariantUserNameNormalizer(),
+                new UpperInvariantLookupNormalizer(),
                 new List<IUserTokenProvider<TUser>>(),
                 new List<IIdentityMessageProvider>());
         }
@@ -49,7 +50,7 @@ namespace chatle.test.Controllers
         private static Mock<SignInManager<TUser>> MockSigninManager<TUser>(UserManager<TUser> userManager) where TUser : class
         {            
             var context = new Mock<HttpContext>();
-            var contextAccessor = new Mock<IContextAccessor<HttpContext>>();
+            var contextAccessor = new Mock<IHttpContextAccessor>();
             contextAccessor.Setup(a => a.Value).Returns(context.Object);
             var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object,new RoleValidator<TestRole>[] { new RoleValidator<TestRole>() });
             var identityOptions = new IdentityOptions();

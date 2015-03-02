@@ -9,39 +9,6 @@ namespace ChatLe.Models
 {
     public class ChatLeIdentityDbContextSql : ChatLeIdentityDbContext
     {
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-            builder.Entity<NotificationConnection>(b =>
-            {
-                b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.HasOne<ChatLeUser>(n => n.UserId);
-                b.ForRelational().Table("NotificationConnections");
-            });
-
-
-            builder.Entity<Conversation>(b =>
-            {
-                b.Key(c => c.Id);
-                b.ForRelational().Table("Conversations");
-            });
-
-            builder.Entity<Message>(b =>
-            {
-                b.Key(m => m.Id);
-                b.ForeignKey<ChatLeUser>(m => m.UserId);
-                b.ForeignKey<Conversation>(m => m.ConversationId);
-                b.ForRelational().Table("Messages");
-            });
-
-            builder.Entity<Attendee>(b =>
-            {
-                b.Key(a => new { a.ConversationId, a.UserId });
-                b.ForeignKey<Conversation>(a => a.ConversationId);
-                b.ForeignKey<ChatLeUser>(a => a.UserId);
-                b.ForRelational().Table("Attendees");
-            });
-        }
         protected override void OnConfiguring(DbContextOptions options)
         {
             // TODO: uncomment this line to create an EF migration
@@ -77,9 +44,10 @@ namespace ChatLe.Models
             builder.Entity<NotificationConnection>(b =>
             {
                 b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.ForeignKey<ChatLeUser>(n => n.UserId);
+                b.HasOne<ChatLeUser>().WithMany().ForeignKey(n => n.UserId);
                 b.ForRelational().Table("NotificationConnections");
             });
+
 
             builder.Entity<Conversation>(b =>
             {
@@ -90,20 +58,20 @@ namespace ChatLe.Models
             builder.Entity<Message>(b =>
             {
                 b.Key(m => m.Id);
-                b.ForeignKey<ChatLeUser>(m => m.UserId);
-                b.ForeignKey<Conversation>(m => m.ConversationId);
+                b.HasOne<ChatLeUser>().WithMany().ForeignKey(m => m.UserId);
+                b.HasOne<Conversation>().WithMany().ForeignKey(m => m.ConversationId);
                 b.ForRelational().Table("Messages");
             });
 
             builder.Entity<Attendee>(b =>
             {
                 b.Key(a => new { a.ConversationId, a.UserId });
-                b.ForeignKey<Conversation>(a => a.ConversationId);
-                b.ForeignKey<ChatLeUser>(a => a.UserId);
+                b.HasOne<Conversation>().WithMany().ForeignKey(a => a.ConversationId);
+                b.HasOne<ChatLeUser>().WithMany().ForeignKey(a => a.UserId);
                 b.ForRelational().Table("Attendees");
             });
         }
 
-        
+
     }
 }
