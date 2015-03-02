@@ -15,8 +15,11 @@ namespace Microsoft.Data.Entity.Redis
 
         public RedisValueGeneratorSelector(
             [NotNull] SimpleValueGeneratorFactory<GuidValueGenerator> guidFactory,
+            [NotNull]SimpleValueGeneratorFactory<TemporaryIntegerValueGenerator> integerFactory,
+            [NotNull]SimpleValueGeneratorFactory<TemporaryStringValueGenerator> stringFactory, 
+            [NotNull]SimpleValueGeneratorFactory<TemporaryBinaryValueGenerator> binaryFactory,
             [NotNull] RedisValueGeneratorFactory redisValueGeneratorFactory)
-            : base(guidFactory)
+            : base(guidFactory, integerFactory, stringFactory, binaryFactory)
         {
             Check.NotNull(redisValueGeneratorFactory, "redisValueGeneratorFactory");
 

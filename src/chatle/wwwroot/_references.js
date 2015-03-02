@@ -6,3 +6,5 @@
 /// <reference path="scripts/chat.js" />
 /// <reference path="lib/jquery-validation/jquery.validate.js" />
 /// <reference path="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" />
+/// <reference path="../gruntfile.js" />
+/// <reference path="../Scripts/chat.js" />
