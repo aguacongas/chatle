@@ -201,6 +201,16 @@ namespace ChatLe.Repository.Text
                     UserId = "test"
                 };
                 context.Attendee.Add(attendee);
+
+                var message = new Message()
+                {
+                    ConversationId = conv.Id,
+                    UserId = "test",
+                    Text = "test",
+                    Date = DateTime.UtcNow
+                };
+
+                context.Messages.Add(message);
                 context.SaveChanges();
 
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
