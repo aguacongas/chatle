@@ -3,7 +3,7 @@
     "dependencies": {
         "ChatLe.Repository": "",
         "ChatLe.Repository.Identity": "",
-        "EntityFramework.InMemory": "7.0.0-beta2",
+        "EntityFramework.InMemory": "7.0.0-beta3",
         "Xunit.KRunner": "1.0.0-beta1"
     },
     "commands": {

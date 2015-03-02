@@ -19,7 +19,7 @@
         }
     },
     "dependencies": {
-        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta2"
+        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta3"
     },
     "frameworks": {
         "aspnet50": {

@@ -43,15 +43,12 @@ namespace ChatLe.Controllers
             if (ModelState.IsValid)
             {
                 var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
-                switch (signInStatus)
-                {
-                    case SignInStatus.Success:
-                        return RedirectToLocal(returnUrl);
-                    case SignInStatus.Failure:
-                    default:
-                        ModelState.AddModelError("", "Invalid username or password.");
-                        return View(model);
-                }
+
+                if (signInStatus.Succeeded)
+                    return RedirectToLocal(returnUrl);
+
+                ModelState.AddModelError("", "Invalid username or password.");
+                return View(model);
             }
 
             // If we got this far, something failed, redisplay form
@@ -170,7 +167,7 @@ namespace ChatLe.Controllers
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
-                ModelState.AddModelError("", error);
+                ModelState.AddModelError(error.Code, error.Description);
         }
 
         private async Task<ChatLeUser> GetCurrentUserAsync()

@@ -12,9 +12,9 @@
 		"**.vspscc"
 	],
 	"dependencies": {
-		"Microsoft.AspNet.Server.IIS": "1.0.0-beta2",
-		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta2",
-		"Kestrel": "1.0.0-beta2",
+		"Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
+		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3",
+		"Kestrel": "1.0.0-beta3",
 		"ChatLe.FastCGI": "",
 		"Firefly": ""
 	},

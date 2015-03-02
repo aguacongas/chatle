@@ -2,8 +2,8 @@
     "version": "1.0.0-*",
     "dependencies": {
         "chatle": "",
-        "EntityFramework.InMemory": "7.0.0-beta2",
-        "Microsoft.AspNet.Hosting": "1.0.0-beta2",
+        "EntityFramework.InMemory": "7.0.0-beta3",
+        "Microsoft.AspNet.Hosting": "1.0.0-beta3",
         "Xunit.KRunner": "1.0.0-beta1"
     },
     "commands": {

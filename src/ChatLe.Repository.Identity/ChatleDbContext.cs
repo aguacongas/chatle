@@ -15,7 +15,7 @@ namespace ChatLe.Models
             builder.Entity<NotificationConnection>(b =>
             {
                 b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.ForeignKey<ChatLeUser>(n => n.UserId);
+                b.HasOne<ChatLeUser>(n => n.UserId);
                 b.ForRelational().Table("NotificationConnections");
             });
 

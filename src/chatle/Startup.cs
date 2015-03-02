@@ -137,7 +137,8 @@ namespace ChatLe
             //app.UseRemoveResponseHeaders();
             ConfigureErrors(app);
 
-            app.UseStaticFiles()
+            app.UseRemoveResponseHeaders()
+                .UseStaticFiles()             
                 .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>

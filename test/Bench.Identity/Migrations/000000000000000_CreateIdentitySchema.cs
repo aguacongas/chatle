@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations;
-using Microsoft.Data.Entity.Migrations.Builders;
-using Microsoft.Data.Entity.Migrations.Infrastructure;
+using Microsoft.Data.Entity.Relational.Migrations;
+using Microsoft.Data.Entity.Relational.Migrations.Infrastructure;
+using Microsoft.Data.Entity.Relational.Migrations.Builders;
 
 namespace Bench.Identity.Migrations
 {
@@ -137,7 +137,7 @@ namespace Bench.Identity.Migrations
         {
             get
             {
-                return "7.0.0-beta2";
+                return "7.0.0-beta3";
             }
         }
 

@@ -1,11 +1,10 @@
 ﻿using ChatLe.Hosting.FastCGI.Payloads;
-using Microsoft.AspNet.HttpFeature;
+using Microsoft.AspNet.Http.Interfaces;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;

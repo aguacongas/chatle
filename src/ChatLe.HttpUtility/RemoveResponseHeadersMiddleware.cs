@@ -1,18 +1,9 @@
 ﻿using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
-using Microsoft.AspNet.HttpFeature;
 using Microsoft.Framework.OptionsModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Linq;
-using System.IO;
-using Microsoft.AspNet.Http.Security;
-using System.Security.Claims;
-using System.Net.WebSockets;
-using System.Threading;
 using Microsoft.Framework.Logging;
 
 namespace ChatLe.HttpUtility

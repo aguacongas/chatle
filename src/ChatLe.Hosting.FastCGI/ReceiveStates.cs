@@ -1,5 +1,4 @@
 ﻿using ChatLe.Hosting.FastCGI.Payloads;
-using Microsoft.AspNet.HttpFeature;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -8,9 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Diagnostics;
+using Microsoft.AspNet.Http.Interfaces;
 
 namespace ChatLe.Hosting.FastCGI
 {
