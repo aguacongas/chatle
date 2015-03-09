@@ -3,6 +3,7 @@
         "src",
         "firefly/src/main",
         "EntityFramework/src",
-		"EntityFramework/StackExchange.Redis/StackExchange.Redis"
+		"EntityFramework/StackExchange.Redis/StackExchange.Redis",
+		"wrap"
     ]
 }

@@ -4,3 +4,4 @@
 [submodule "EntityFramework"]
 	path = EntityFramework
 	url = https://github.com/aguacongas/EntityFramework.git
+	branch = beta3
