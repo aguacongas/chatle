@@ -1,3 +1,6 @@
 [submodule "firefly"]
 	path = firefly
 	url = https://github.com/aguacongas/firefly.git
+[submodule "EntityFramework"]
+	path = EntityFramework
+	url = https://github.com/aguacongas/EntityFramework.git
