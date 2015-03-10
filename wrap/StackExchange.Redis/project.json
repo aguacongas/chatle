@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "wrappedProject": "../../EntityFramework/StackExchange.Redis/StackExchange.Redis/StackExchange.Redis.csproj",
+      "bin": {
+        "assembly": "../../EntityFramework/StackExchange.Redis/StackExchange.Redis/obj/{configuration}/StackExchange.Redis.dll",
+        "pdb": "../../EntityFramework/StackExchange.Redis/StackExchange.Redis/obj/{configuration}/StackExchange.Redis.pdb"
+      }
+    }
+  }
+}

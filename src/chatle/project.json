@@ -26,16 +26,14 @@
 		"ChatLe.HttpUtility": "",
 		"ChatLe.Repository.Identity": "",
 		"ChatLe.Logging": "",
-		"EntityFramework": "7.0.0-beta3",
+		"EntityFramework.Core": "7.0.0-beta3",
 		"EntityFramework.InMemory": "7.0.0-beta3",
 		"EntityFramework.Redis": "",
 		//"EntityFramework.SQLite": "7.0.0-beta1",
 		"EntityFramework.SqlServer": "7.0.0-beta3",
-		"EntityFramework.Commands": "7.0.0-beta3",
 		"Microsoft.AspNet.Mvc": "6.0.0-beta3",
 		//"Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta1",
 		"Microsoft.AspNet.Diagnostics": "1.0.0-beta3",
-		"Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta3",
 		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3",
 		"Microsoft.AspNet.Security.Cookies": "1.0.0-beta3",
 		"Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
@@ -45,7 +43,7 @@
 		"Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta3",
 		"Microsoft.Framework.Logging": "1.0.0-beta3",
 		"Microsoft.Framework.Logging.Console": "1.0.0-beta3",
-		"Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1",
+		"Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta3",
 		"Microsoft.AspNet.SignalR.Server": "3.0.0-beta3",
 		"Microsoft.AspNet.WebSockets.Server": "1.0.0.0-beta3",
 		"Firefly": ""
@@ -61,7 +59,6 @@
 	},
 	"frameworks": {
 		"aspnet50": {
-			"StackExchange.Redis": "1.0.371.0"
 		} /*,
         "aspnetcore50": { }*/
 	},

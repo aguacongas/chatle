@@ -3,10 +3,10 @@
     "dependencies": {
         "ChatLe.Hosting.FastCGI": "",
         "ChatLe.Logging": "",
-        "Xunit.KRunner": "1.0.0-beta1"
+        "xunit.runner.kre": "1.0.0-*"
     },
     "commands": {
-        "test": "Xunit.KRunner"
+        "test": "xunit.runner.kre"
     },
     "frameworks" : {
         "aspnet50" : { 
