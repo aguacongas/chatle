@@ -1,9 +1,8 @@
-set PATH=%USERPROFILE%/.k/bin;%PATH%
+set PATH=%USERPROFILE%/.k/bin;C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 set KRE_HOME=%USERPROFILE%/.k
-kvm upgrade
-git submodule update --init --recursive
-set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-kpm restore %APPVEYOR_BUILD_FOLDER%
+call kvm upgrade
+call git submodule update --init --recursive
+call kpm restore %APPVEYOR_BUILD_FOLDER%
 if %ERRORLEVEL% NEQ 0 (
    exit /b 0
 )
