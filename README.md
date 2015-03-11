@@ -17,10 +17,6 @@ A logging utility to log using Trace.
 
 **build**
 
-<<<<<<< HEAD
-this project contains git submodules, runs:
-=======
 this project contains git submodules run:
->>>>>>> 1b9dcabf2f154465312e9eb0af2b3e79a1599397
 
     git submodule update --init --recursive
