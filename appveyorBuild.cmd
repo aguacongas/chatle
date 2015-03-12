@@ -5,6 +5,7 @@ call git submodule update --init --recursive
 cd %APPVEYOR_BUILD_FOLDER%\EntityFramework
 call git checkout beta3
 call git submodule update --init --recursive
+cd ..
 call kpm restore %APPVEYOR_BUILD_FOLDER%
 if %ERRORLEVEL% NEQ 0 (
   exit /b 0
