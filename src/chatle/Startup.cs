@@ -1,24 +1,17 @@
-﻿using ChatLe.HttpUtility;
+﻿using System;
+using System.Threading;
+using ChatLe.HttpUtility;
 using ChatLe.Logging;
 using ChatLe.Models;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Routing;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Redis.Extensions;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Data.Entity;
 
 namespace ChatLe
 {
@@ -125,11 +118,10 @@ namespace ChatLe
                 }
             });
 
-            services.AddIdentity<ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
+            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
-            })
-            .AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+            }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
         public virtual void Configure(IApplicationBuilder app)

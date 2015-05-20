@@ -3,12 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Microsoft.AspNet.Http.Interfaces;
+using Microsoft.AspNet.FeatureModel;
+using Microsoft.AspNet.Http;
 
 namespace ChatLe.Hosting.FastCGI
 {
     public class Context : IHttpRequestFeature, IHttpResponseFeature, /*IHttpUpgradeFeature,*/ IDisposable
     {
+        public IFeatureCollection Features { private set; get; } = new FeatureCollection();
         public byte Version { get; private set; }
         public ushort Id { get; private set; }
 
@@ -25,6 +27,9 @@ namespace ChatLe.Hosting.FastCGI
             State = state;
             ((IHttpResponseFeature)this).Body = new ResponseStream(this);
             _featureStream = _requestStream;
+            Features.Add(typeof(IHttpRequestFeature), this);
+            Features.Add(typeof(IHttpResponseFeature), this);
+            //Features.Add(typeof(IHttpUpgradeFeature), this);
         }
 
         internal RequestStream _requestStream = new RequestStream();
@@ -154,6 +159,11 @@ namespace ChatLe.Hosting.FastCGI
         public void Dispose()
         {
             Dispose(true);
+        }
+
+        public void OnResponseCompleted(Action<object> callback, object state)
+        {
+            callback(state);
         }
         #endregion
     }

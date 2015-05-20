@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Microsoft.AspNet.FeatureModel;
 
 namespace ChatLe.Hosting.FastCGI
 {
     public class TcpListener : Listener<IPEndPoint>
     {
-        public TcpListener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<object, Task> app) :base(loggerFactory, configuration, app)
+        public TcpListener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<IFeatureCollection, Task> app) :base(loggerFactory, configuration, app)
         {
         }
         protected override Socket CreateSocket(IPEndPoint enpoint)
@@ -25,8 +26,8 @@ namespace ChatLe.Hosting.FastCGI
     {
         ILogger _logger;
         public IListernerConfiguration Configuration { get; private set; }
-        public Func<object, Task> App { get; private set; }
-        public Listener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<object, Task> app)
+        public Func<IFeatureCollection, Task> App { get; private set; }
+        public Listener(ILoggerFactory loggerFactory, IListernerConfiguration configuration, Func<IFeatureCollection, Task> app)
         {
             if (loggerFactory == null)
                 throw new ArgumentNullException("loggerFactory");
@@ -35,7 +36,7 @@ namespace ChatLe.Hosting.FastCGI
             if (app == null)
                 throw new ArgumentNullException("app");
 
-            _logger = loggerFactory.Create<Listener<T>>();
+            _logger = loggerFactory.CreateLogger<Listener<T>>();
             Configuration = configuration;
             App = app;
         }
@@ -54,7 +55,7 @@ namespace ChatLe.Hosting.FastCGI
             }
             catch (Exception e)
             {
-                _logger.WriteError("UnHandled exception on Start", e);
+                _logger.LogError("UnHandled exception on Start", e);
                 throw;
             }
         }
@@ -74,7 +75,7 @@ namespace ChatLe.Hosting.FastCGI
                 }
                 catch(Exception e)
                 {
-                    _logger.WriteError("UnHandled exception on EndAccecpt", e);
+                    _logger.LogError("UnHandled exception on EndAccecpt", e);
                     throw;
                 }
 
@@ -99,7 +100,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch(Exception e)
             {
-                _logger.WriteError("Error on Read", e);
+                _logger.LogError("Error on Read", e);
                 ReceiveState.OnDisconnect(client);
             }
         }

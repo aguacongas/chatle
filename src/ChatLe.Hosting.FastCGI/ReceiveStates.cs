@@ -8,7 +8,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Diagnostics;
-using Microsoft.AspNet.Http.Interfaces;
+using Microsoft.AspNet.Http;
 
 namespace ChatLe.Hosting.FastCGI
 {
@@ -128,7 +128,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch (Exception e)
             {
-                Logger.WriteError("Error on begin read", e);
+                Logger.LogError("Error on begin read", e);
                 OnDisconnect(Socket);
             }
         }
@@ -165,7 +165,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch (Exception e)
             {
-                state.Logger.WriteError("Unhanlded exception on EndReceive", e);
+                state.Logger.LogError("Unhanlded exception on EndReceive", e);
                 OnDisconnect(client);
             }
         }
@@ -392,10 +392,10 @@ namespace ChatLe.Hosting.FastCGI
             if (!context.Called)
             {
                 context.Called = true;
-                Listener.App.Invoke(context).ContinueWith(t =>
+                Listener.App.Invoke(context.Features).ContinueWith(t =>
                     {
                         if (t.Exception != null)
-                            Logger.WriteError("Error on execute", t.Exception);
+                            Logger.LogError("Error on execute", t.Exception);
 
                         context.Dispose();
                         RemoveRequest(context.Id);
@@ -471,7 +471,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch (Exception e)
             {
-                Logger.WriteError("UnHandled exception on BeginSend", e);
+                Logger.LogError("UnHandled exception on BeginSend", e);
                 OnDisconnect(Socket);
             }
 
@@ -506,7 +506,7 @@ namespace ChatLe.Hosting.FastCGI
             { }
             catch (Exception e)
             {
-                state.Logger.WriteError("Exception on EndSend", e);
+                state.Logger.LogError("Exception on EndSend", e);
                 OnDisconnect(client);
             }
         }

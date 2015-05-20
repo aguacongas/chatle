@@ -34,7 +34,7 @@ namespace ChatLe.HttpUtility
             if (loggerFactory == null)
                 throw new ArgumentNullException("loggerFactory");
 
-            Logger = loggerFactory.Create<RemoveHeaderHeaderDictionary>();
+            Logger = loggerFactory.CreateLogger<RemoveHeaderHeaderDictionary>();
             _parent = parent;
             _headersToRemove = headersToRemove;
             foreach (var header in headersToRemove)

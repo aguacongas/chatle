@@ -1,6 +1,8 @@
 ﻿using Microsoft.Framework.Logging;
 using System;
+#if !DNXCORE50
 using System.Diagnostics;
+#endif
 using System.Text;
 
 namespace ChatLe.Logging
@@ -22,7 +24,7 @@ namespace ChatLe.Logging
             return true;
         }
 
-        public void Write(LogLevel eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void Log(LogLevel logLevel, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
         {
             var builder = new StringBuilder();
             builder.Append("[");
@@ -42,18 +44,30 @@ namespace ChatLe.Logging
                 }
             }
 
-            switch (eventType)
+            switch (logLevel)
             {
                 case LogLevel.Verbose:
                 case LogLevel.Information:
+#if !DNXCORE50
                     Trace.TraceInformation(builder.ToString());
+#else
+                    Console.WriteLine(builder.ToString());
+#endif
                     break;
                 case LogLevel.Warning:
+#if !DNXCORE50
                     Trace.TraceWarning(builder.ToString());
+#else
+                    Console.WriteLine(builder.ToString());
+#endif
                     break;
                 case LogLevel.Critical:
                 case LogLevel.Error:
+#if !DNXCORE50
                     Trace.TraceError(builder.ToString());
+#else
+                    Console.WriteLine(builder.ToString());
+#endif
                     break;
             }
         }

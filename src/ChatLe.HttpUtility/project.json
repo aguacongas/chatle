@@ -19,6 +19,7 @@
         }
     },
     "dependencies": {
+        "Microsoft.Framework.OptionsModel": "1.0.0-beta4",
         "Microsoft.AspNet.Http": "1.0.0-beta4",
         "Microsoft.AspNet.Hosting": "1.0.0-beta4",
         "Microsoft.AspNet.Http.Interfaces": "1.0.0-beta4",

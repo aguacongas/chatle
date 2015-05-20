@@ -7880,6 +7880,108 @@
         "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.xml"
       ]
     },
+    "System.Console/4.0.0-beta-22816": {
+      "serviceable": false,
+      "sha": "Nj6lappTB2mN/jfONYJ88FTG+vtPWa4/KHlkjukULmOrhoA0x5IfZrbCZJdyZ9lYoS0s1o3DOerwnlw8KSS5jQ==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [
+            "mscorlib"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Console.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/aspnetcore50/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Console.dll"
+          ]
+        },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [
+            "mscorlib"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Console.dll"
+          ]
+        },
+        "Asp.Net,Version=v5.0": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [
+            "mscorlib"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Console.dll"
+          ]
+        },
+        "Asp.NetCore,Version=v5.0": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/aspnetcore50/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Console.dll"
+          ]
+        },
+        ".NETFramework,Version=v4.5.1": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [
+            "mscorlib"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Console.dll"
+          ]
+        }
+      },
+      "files": [
+        "License.rtf",
+        "System.Console.4.0.0-beta-22816.nupkg",
+        "System.Console.4.0.0-beta-22816.nupkg.sha512",
+        "System.Console.nuspec",
+        "lib/aspnetcore50/System.Console.dll",
+        "lib/contract/System.Console.dll",
+        "lib/net45/System.Console.dll",
+        "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Console.dll"
+      ]
+    },
     "System.IO/4.0.10-beta-22816": {
       "serviceable": false,
       "sha": "/wVhoi2uVXw5IZFU+JrPlyVgKrtMPtzQaYQ3DKUxH9nqiX64BChTFGNDcwZK3iNWTIWESxJhj9JR3lbqbG/PIg==",

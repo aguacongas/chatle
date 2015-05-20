@@ -19,7 +19,7 @@
         }
     },
     "dependencies": {
-        "EntityFramework.Core": "7.0.0-beta4"
+        "EntityFramework.Core": "7.0.0-*"
     },
     "frameworks": {
         "dnx451": {

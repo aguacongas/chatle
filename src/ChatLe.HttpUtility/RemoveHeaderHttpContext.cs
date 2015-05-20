@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Security;
+using Microsoft.AspNet.Http.Authentication;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
@@ -141,14 +141,14 @@ namespace ChatLe.HttpUtility
             return _parent.AcceptWebSocketAsync(subProtocol);
         }
 
-        public override IEnumerable<AuthenticationResult> Authenticate(IEnumerable<string> authenticationTypes)
+        public override AuthenticationResult Authenticate(string authenticationScheme)
         {
-            return _parent.Authenticate(authenticationTypes);
+            return _parent.Authenticate(authenticationScheme);
         }
 
-        public override Task<IEnumerable<AuthenticationResult>> AuthenticateAsync(IEnumerable<string> authenticationTypes)
+        public override Task<AuthenticationResult> AuthenticateAsync(string authenticationScheme)
         {
-            return _parent.AuthenticateAsync(authenticationTypes);
+            return _parent.AuthenticateAsync(authenticationScheme);
         }
 
         public override void Dispose()
@@ -156,9 +156,9 @@ namespace ChatLe.HttpUtility
             _parent.Dispose();
         }
 
-        public override IEnumerable<AuthenticationDescription> GetAuthenticationTypes()
+        public override IEnumerable<AuthenticationDescription> GetAuthenticationSchemes()
         {
-            return _parent.GetAuthenticationTypes();
+            return _parent.GetAuthenticationSchemes();
         }
 
         public override object GetFeature(Type type)
@@ -169,6 +169,6 @@ namespace ChatLe.HttpUtility
         public override void SetFeature(Type type, object instance)
         {
             _parent.SetFeature(type, instance);
-        }
+        }        
     }
 }

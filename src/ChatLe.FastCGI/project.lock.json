@@ -1318,6 +1318,50 @@
         "lib/contract/System.Console.dll"
       ]
     },
+    "System.Console/4.0.0-beta-22816": {
+      "serviceable": false,
+      "sha": "Nj6lappTB2mN/jfONYJ88FTG+vtPWa4/KHlkjukULmOrhoA0x5IfZrbCZJdyZ9lYoS0s1o3DOerwnlw8KSS5jQ==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [
+            "mscorlib"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Console.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "System.IO": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/aspnetcore50/System.Console.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Console.dll"
+          ]
+        }
+      },
+      "files": [
+        "License.rtf",
+        "System.Console.4.0.0-beta-22816.nupkg",
+        "System.Console.4.0.0-beta-22816.nupkg.sha512",
+        "System.Console.nuspec",
+        "lib/aspnetcore50/System.Console.dll",
+        "lib/contract/System.Console.dll",
+        "lib/net45/System.Console.dll",
+        "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Console.dll"
+      ]
+    },
     "System.Diagnostics.Contracts/4.0.0-beta-22816": {
       "serviceable": false,
       "sha": "VOIJ0WOsEqObJGjbotKqxMi2zd5Axrfp0cgQm4BmJcfUwLX1uSgd2cNk5QIKnRsduIUzm/dhHWOhN8CErORuYw==",
@@ -1890,27 +1934,34 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Net.Primitives.dll"
       ]
     },
-    "System.Net.Sockets/4.0.0-beta-22231": {
+    "System.Net.Sockets/4.0.0-beta-22816": {
       "serviceable": false,
-      "sha": "JuR/lOGxxuDlOpGMGHV/ycUVS8udBk5VY0ajALVvlZIbysmht+XaEnNlsVYodBqlL0BuQ8dJE050Bz3fotom4A==",
+      "sha": "k4QNo+wewz2+sJHgJf5I5d8oeM+NlYe1tMxbjm+QOZ2G4L+8EGKwVcj2abPcUoqmH3NFNxmG2JJnX8IuAgr+KQ==",
       "frameworks": {
         "DNX,Version=v4.5.1": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22231",
-            "System.Net.Primitives": "4.0.10-beta-22231",
-            "System.Runtime": "4.0.0-beta-22231",
-            "System.Threading.Tasks": "4.0.0-beta-22231"
+            "System.IO": "4.0.10-beta-22816",
+            "System.Net.Primitives": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816",
+            "System.Threading.Tasks": "4.0.10-beta-22816"
           },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
+          "frameworkAssemblies": [
+            "mscorlib",
+            "System"
+          ],
+          "runtimeAssemblies": [
+            "lib/net45/System.Net.Sockets.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Net.Sockets.dll"
+          ]
         },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22231",
-            "System.Net.Primitives": "4.0.10-beta-22231",
-            "System.Runtime": "4.0.0-beta-22231",
-            "System.Threading.Tasks": "4.0.0-beta-22231"
+            "System.IO": "4.0.10-beta-22816",
+            "System.Net.Primitives": "4.0.10-beta-22816",
+            "System.Runtime": "4.0.20-beta-22816",
+            "System.Threading.Tasks": "4.0.10-beta-22816"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1923,11 +1974,13 @@
       },
       "files": [
         "License.rtf",
-        "System.Net.Sockets.4.0.0-beta-22231.nupkg",
-        "System.Net.Sockets.4.0.0-beta-22231.nupkg.sha512",
+        "System.Net.Sockets.4.0.0-beta-22816.nupkg",
+        "System.Net.Sockets.4.0.0-beta-22816.nupkg.sha512",
         "System.Net.Sockets.nuspec",
         "lib/aspnetcore50/System.Net.Sockets.dll",
-        "lib/contract/System.Net.Sockets.dll"
+        "lib/contract/System.Net.Sockets.dll",
+        "lib/net45/System.Net.Sockets.dll",
+        "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Net.Sockets.dll"
       ]
     },
     "System.Reflection/4.0.10-beta-22816": {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Security;
+using Microsoft.AspNet.Http.Authentication;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
@@ -136,14 +136,24 @@ namespace ChatLe.HttpUtility
             _parent.Redirect(location, permanent);
         }
 
-        public override void SignIn(AuthenticationProperties properties, IEnumerable<ClaimsIdentity> identities)
+        public override void SignIn(string authenticationScheme, ClaimsPrincipal principal, AuthenticationProperties properties = null)
         {
-            _parent.SignIn(properties, identities);
+            _parent.SignIn(authenticationScheme, principal, properties);
         }
 
-        public override void SignOut(IEnumerable<string> authenticationTypes)
+        public override void SignOut(string authenticationScheme, AuthenticationProperties properties)
         {
-            _parent.SignOut(authenticationTypes);
+            _parent.SignOut(authenticationScheme, properties);
+        }
+
+        public override void SignOut(string authenticationScheme)
+        {
+            _parent.SignOut(authenticationScheme);
+        }
+
+        public override void OnResponseCompleted(Action<object> callback, object state)
+        {
+            _parent.OnResponseCompleted(callback, state);
         }
     }
 }

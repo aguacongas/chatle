@@ -19,17 +19,18 @@
         }
     },
     "dependencies": {
-        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4"
+        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4",
+        "System.Console": "4.0.0-beta-22816"
     },
     "frameworks": {
         "dnx451": {
             "dependencies": {
             }
-        }/*,
+        },
         "dnxcore50": {
             "dependencies": {
-                "System.Runtime": "4.0.20-beta-22231"
+                "System.Runtime": "4.0.20-beta-*"
             }
-        }*/
+        }
     }
 }

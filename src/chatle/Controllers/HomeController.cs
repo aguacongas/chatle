@@ -13,7 +13,7 @@ namespace ChatLe.Controllers
         public HomeController(ILoggerFactory factory)
         {
             if (_logger == null)
-                _logger = factory.Create("Unhandled Error");
+                _logger = factory.CreateLogger("Unhandled Error");
         }
         public IActionResult Index()
         {
@@ -41,7 +41,7 @@ namespace ChatLe.Controllers
         {
             var feature = Context.GetFeature<IErrorHandlerFeature>();
             var error = feature?.Error;
-            _logger.WriteError("Oops!", error);
+            _logger.LogError("Oops!", error);
             return View("~/Views/Shared/Error.cshtml", error);
         }
     }

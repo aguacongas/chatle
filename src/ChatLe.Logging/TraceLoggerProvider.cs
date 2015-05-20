@@ -8,7 +8,7 @@ namespace ChatLe.Logging
     /// </summary>
     public class TraceLoggerProvider : ILoggerProvider
     {
-        public ILogger Create(string name)
+        public ILogger CreateLogger(string name)
         {
             return new TraceLogger(name);
         }

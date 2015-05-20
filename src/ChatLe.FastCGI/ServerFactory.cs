@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.Framework.Logging;
 using ChatLe.Hosting.FastCGI;
 using System.Net;
+using Microsoft.AspNet.FeatureModel;
 
 namespace ChatLe.FastCGI
 {
@@ -25,7 +26,7 @@ namespace ChatLe.FastCGI
             return informatio;
         }
 
-        public IDisposable Start(IServerInformation serverInformation, Func<object, Task> application)
+        public IDisposable Start(IServerInformation serverInformation, Func<IFeatureCollection, Task> application)
         {
             var information = serverInformation as ServerInformation;
             var listener = new TcpListener(_loggerFactory, information, application);

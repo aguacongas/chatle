@@ -1,5 +1,5 @@
 ﻿using ChatLe.Hosting.FastCGI.Payloads;
-using Microsoft.AspNet.Http.Interfaces;
+using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
 using System;
 using System.Collections.Generic;
@@ -166,7 +166,7 @@ namespace ChatLe.Hosting.FastCGI
                 catch (Exception e)
                 {
                     TaskCompletionSource?.SetException(e);
-                    Logger.WriteError("UnHandled exception on BeginSend", e);
+                    Logger.LogError("UnHandled exception on BeginSend", e);
                     State.OnDisconnect(Socket);
                 }
             }
@@ -195,13 +195,13 @@ namespace ChatLe.Hosting.FastCGI
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    state.Logger.WriteError("EndSend ObjectDisposedException");
+                    state.Logger.LogError("EndSend ObjectDisposedException");
                     state.TaskCompletionSource?.SetException(ode);
                 }
                 catch (Exception e)
                 {
                     state.TaskCompletionSource?.SetException(e);
-                    state.Logger.WriteError("EndSend UnHandled exception on EndSend", e);
+                    state.Logger.LogError("EndSend UnHandled exception on EndSend", e);
                     OnDisconnect(state.Socket);
                 }
             }
@@ -214,7 +214,7 @@ namespace ChatLe.Hosting.FastCGI
                 {
                     if (End && !Context.KeepAlive)
                     {
-                        Logger.WriteInformation("Close socket");
+                        Logger.LogInformation("Close socket");
                         OnDisconnect(Socket);
                     }
 

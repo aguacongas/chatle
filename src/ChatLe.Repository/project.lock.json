@@ -3,7 +3,7 @@
   "version": -9998,
   "projectFileDependencyGroups": {
     "": [
-      "EntityFramework.Core >= 7.0.0-beta4"
+      "EntityFramework.Core >= 7.0.0-*"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": [
