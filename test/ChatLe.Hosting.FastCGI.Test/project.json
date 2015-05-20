@@ -9,7 +9,7 @@
         "test": "xunit.runner.kre"
     },
     "frameworks" : {
-        "aspnet50" : { 
+        "dnx451" : { 
             "dependencies": {
             }
         }

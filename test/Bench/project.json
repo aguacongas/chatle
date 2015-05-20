@@ -12,9 +12,9 @@
 		"**.vspscc"
 	],
 	"dependencies": {
-		"Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
-		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3",
-		"Kestrel": "1.0.0-beta3",
+		"Microsoft.AspNet.Server.IIS": "1.0.0-beta4",
+		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta4",
+		"Kestrel": "1.0.0-beta4",
 		"ChatLe.FastCGI": "",
 		"Firefly": ""
 	},
@@ -25,7 +25,7 @@
 		"firefly": "Microsoft.AspNet.Hosting --server Firefly --server.urls http://localhost:5002"
 	},
     "frameworks" : {
-        "aspnet50" : { },
-        "aspnetcore50" : { }
+        "dnx451" : { },
+        "dnxcore50" : { }
     }
 }

@@ -137,7 +137,7 @@ namespace Bench.Identity.Migrations
         {
             get
             {
-                return "7.0.0-beta3";
+                return "7.0.0-beta4";
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22609.0
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9BDC16D7-7C2E-4387-82D9-0043C630D5FB}"
 EndProject
@@ -15,35 +15,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6542D5E3-3CF8-4E0B-AE55-6E6B8A044993}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle", "src\chatle\chatle.kproj", "{148ECCF8-46F0-4FF9-9465-FF09538F4091}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle", "src\chatle\chatle.xproj", "{148ECCF8-46F0-4FF9-9465-FF09538F4091}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle.test", "test\chatle.test\chatle.test.kproj", "{3CD74F78-03DA-4509-A240-520B83BE873D}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "chatle.test", "test\chatle.test\chatle.test.xproj", "{3CD74F78-03DA-4509-A240-520B83BE873D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository", "src\ChatLe.Repository\ChatLe.Repository.kproj", "{A9750428-BF89-4C11-A7FC-B6001C00CFC8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository", "src\ChatLe.Repository\ChatLe.Repository.xproj", "{A9750428-BF89-4C11-A7FC-B6001C00CFC8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Identity", "src\ChatLe.Repository.Identity\ChatLe.Repository.Identity.kproj", "{C56024F4-6A06-4EA9-BC05-64F9D1AD73B0}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Identity", "src\ChatLe.Repository.Identity\ChatLe.Repository.Identity.xproj", "{C56024F4-6A06-4EA9-BC05-64F9D1AD73B0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.HttpUtility", "src\ChatLe.HttpUtility\ChatLe.HttpUtility.kproj", "{64A22FCF-4566-4C7B-8067-D1435E4E35B8}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.HttpUtility", "src\ChatLe.HttpUtility\ChatLe.HttpUtility.xproj", "{64A22FCF-4566-4C7B-8067-D1435E4E35B8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Logging", "src\ChatLe.Logging\ChatLe.Logging.kproj", "{BF0FAC90-5CCF-469E-9ADB-E298DE6B7FEA}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Logging", "src\ChatLe.Logging\ChatLe.Logging.xproj", "{BF0FAC90-5CCF-469E-9ADB-E298DE6B7FEA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.FastCGI", "src\ChatLe.FastCGI\ChatLe.FastCGI.kproj", "{341A47C7-A898-42DA-A506-673CFCAF8D89}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.FastCGI", "src\ChatLe.FastCGI\ChatLe.FastCGI.xproj", "{341A47C7-A898-42DA-A506-673CFCAF8D89}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI", "src\ChatLe.Hosting.FastCGI\ChatLe.Hosting.FastCGI.kproj", "{C895D692-E36E-4711-92F0-130110242FBF}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI", "src\ChatLe.Hosting.FastCGI\ChatLe.Hosting.FastCGI.xproj", "{C895D692-E36E-4711-92F0-130110242FBF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI.Test", "test\ChatLe.Hosting.FastCGI.Test\ChatLe.Hosting.FastCGI.Test.kproj", "{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Hosting.FastCGI.Test", "test\ChatLe.Hosting.FastCGI.Test\ChatLe.Hosting.FastCGI.Test.xproj", "{D6F2C157-49E2-4DFE-860E-81B91BEFBD14}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench", "test\Bench\Bench.kproj", "{C11DFF9D-FC4D-42AE-AFA3-81FBA05A51B7}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench", "test\Bench\Bench.xproj", "{C11DFF9D-FC4D-42AE-AFA3-81FBA05A51B7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench.MVC", "test\Bench.MVC\Bench.MVC.kproj", "{81109269-2FCB-4247-B280-0309022F4660}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench.MVC", "test\Bench.MVC\Bench.MVC.xproj", "{81109269-2FCB-4247-B280-0309022F4660}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench.Identity", "test\Bench.Identity\Bench.Identity.kproj", "{3964880D-E738-4B6F-B91D-009327615430}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bench.Identity", "test\Bench.Identity\Bench.Identity.xproj", "{3964880D-E738-4B6F-B91D-009327615430}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Firefly", "firefly\src\main\Firefly\Firefly.kproj", "{BFDED39B-06C8-4462-8739-A7DE9AF305B5}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Firefly", "firefly\src\main\Firefly\Firefly.xproj", "{BFDED39B-06C8-4462-8739-A7DE9AF305B5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Redis", "EntityFramework\src\EntityFramework.Redis\EntityFramework.Redis.kproj", "{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EntityFramework.Redis", "EntityFramework\src\EntityFramework.Redis\EntityFramework.Redis.xproj", "{6147E1A1-F3CC-4A86-86DB-C3B14C52B366}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Test", "test\ChatLe.Repository.Test\ChatLe.Repository.Test.kproj", "{69CC8E50-DBE6-415C-A1AD-49893735D74B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChatLe.Repository.Test", "test\ChatLe.Repository.Test\ChatLe.Repository.Test.xproj", "{69CC8E50-DBE6-415C-A1AD-49893735D74B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

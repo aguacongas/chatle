@@ -2,15 +2,15 @@
     "version": "1.0.0-*",
     "dependencies": {
         "chatle": "",
-        "EntityFramework.InMemory": "7.0.0-beta3",
-        "Microsoft.AspNet.Hosting": "1.0.0-beta3",
+        "EntityFramework.InMemory": "7.0.0-beta4",
+        "Microsoft.AspNet.Hosting": "1.0.0-beta4",
         "xunit.runner.kre": "1.0.0-*"
     },
     "commands": {
         "test": "xunit.runner.kre"
     },
     "frameworks": {
-        "aspnet50": {
+        "dnx451": {
             "dependencies": {
                 "Moq": "4.2.1312.1622"
             }

@@ -3,25 +3,25 @@
 	"webroot": "wwwroot",
 	"version": "1.0.0-*",
 	"dependencies": {
-		"Kestrel": "1.0.0-beta3",
+		"Kestrel": "1.0.0-beta4",
 		"Firefly": "",
 		"ChatLe.FastCGI": "",
-		"EntityFramework.SqlServer": "7.0.0-beta3",
-		"EntityFramework.Commands": "7.0.0-beta3",
-		"EntityFramework.InMemory": "7.0.0-beta3",
-		"Microsoft.AspNet.Mvc": "6.0.0-beta3",
-		/* "Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta3", */
-		"Microsoft.AspNet.Diagnostics": "1.0.0-beta3",
-		"Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta3",
-		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3",
-		"Microsoft.AspNet.Security.Cookies": "1.0.0-beta3",
-		"Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
-		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta3",
-		"Microsoft.AspNet.StaticFiles": "1.0.0-beta3",
-		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3",
-		"Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta3",
-		"Microsoft.Framework.Logging": "1.0.0-beta3",
-		"Microsoft.Framework.Logging.Console": "1.0.0-beta3",
+		"EntityFramework.SqlServer": "7.0.0-beta4",
+		"EntityFramework.Commands": "7.0.0-beta4",
+		"EntityFramework.InMemory": "7.0.0-beta4",
+		"Microsoft.AspNet.Mvc": "6.0.0-beta4",
+		/* "Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta4", */
+		"Microsoft.AspNet.Diagnostics": "1.0.0-beta4",
+		"Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta4",
+		"Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta4",
+		"Microsoft.AspNet.Authentication.Cookies": "1.0.0-beta4",
+		"Microsoft.AspNet.Server.IIS": "1.0.0-beta4",
+		"Microsoft.AspNet.Server.WebListener": "1.0.0-beta4",
+		"Microsoft.AspNet.StaticFiles": "1.0.0-beta4",
+		"Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta4",
+		"Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta4",
+		"Microsoft.Framework.Logging": "1.0.0-beta4",
+		"Microsoft.Framework.Logging.Console": "1.0.0-beta4",
 		"Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta1"
 	},
     "commands": {
@@ -34,8 +34,8 @@
 		"firefly": "Microsoft.AspNet.Hosting --server Firefly --server.urls http://localhost:5002"
     },
     "frameworks": {
-        "aspnet50": { },
-        "aspnetcore50": { }
+        "dnx451": { },
+        "dnxcore50": { }
     },
     "exclude": [
         "wwwroot",
