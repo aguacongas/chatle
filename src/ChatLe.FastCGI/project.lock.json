@@ -8,7 +8,7 @@
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": [
-      "System.Console >= 4.0.0-beta-22231"
+      "System.Console >= 4.0.0-beta-*"
     ]
   },
   "libraries": {
@@ -1280,42 +1280,6 @@
         "lib/contract/System.ComponentModel.dll",
         "lib/net45/System.ComponentModel.dll",
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.dll"
-      ]
-    },
-    "System.Console/4.0.0-beta-22231": {
-      "serviceable": false,
-      "sha": "wcQkJH7yyIbQy4joBZYEYtcP6+GtIYIyoHa1FXniE9T4yC6dkD+sXq1XHa2nO6K3k4CyhW0dIUpcAzlhk6L3Kw==",
-      "frameworks": {
-        "DNX,Version=v4.5.1": {
-          "dependencies": {
-            "System.IO": "4.0.0-beta-22231",
-            "System.Runtime": "4.0.0-beta-22231"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "DNXCore,Version=v5.0": {
-          "dependencies": {
-            "System.IO": "4.0.0-beta-22231",
-            "System.Runtime": "4.0.0-beta-22231"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [
-            "lib/aspnetcore50/System.Console.dll"
-          ],
-          "compileAssemblies": [
-            "lib/contract/System.Console.dll"
-          ]
-        }
-      },
-      "files": [
-        "License.rtf",
-        "System.Console.4.0.0-beta-22231.nupkg",
-        "System.Console.4.0.0-beta-22231.nupkg.sha512",
-        "System.Console.nuspec",
-        "lib/aspnetcore50/System.Console.dll",
-        "lib/contract/System.Console.dll"
       ]
     },
     "System.Console/4.0.0-beta-22816": {

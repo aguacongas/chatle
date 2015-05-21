@@ -3739,9 +3739,9 @@
         "lib/portable-net45+wp80+wpa81+win/Remotion.Linq.xml"
       ]
     },
-    "System.Collections.Immutable/1.1.32-beta": {
+    "System.Collections.Immutable/1.1.33-beta": {
       "serviceable": true,
-      "sha": "ckfFUM6keywtdZ+DT7/KWSmQ0YRLHu4OCnKKWbumvO8uDcKtCoxjLKcaWNzguGCSTy2r2Ap9gojazgCwMYw0bQ==",
+      "sha": "Qnv6M/BRf0w1xNoD5tH7V+jK0kdO+OZymwQS5Lj6FALt3AZMGVeJs+lHXi1PsKFll67UtGY+I7r8WDhRzspXCA==",
       "frameworks": {
         "DNX,Version=v4.5.1": {
           "dependencies": {},
@@ -3806,8 +3806,8 @@
       },
       "files": [
         "License-Stable.rtf",
-        "System.Collections.Immutable.1.1.32-beta.nupkg",
-        "System.Collections.Immutable.1.1.32-beta.nupkg.sha512",
+        "System.Collections.Immutable.1.1.33-beta.nupkg",
+        "System.Collections.Immutable.1.1.33-beta.nupkg.sha512",
         "System.Collections.Immutable.nuspec",
         "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll",
         "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.xml"

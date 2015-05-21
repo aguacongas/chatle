@@ -1,11 +1,12 @@
 ﻿{
 	/* Click to learn more about project.json  http://go.microsoft.com/fwlink/?LinkID=517074 */
-	"webroot": "wwwroot",
+    "webroot": "wwwroot",
+    "userSecretsId": "aspnet5-Bench.Identity-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27",
 	"version": "1.0.0-*",
 	"dependencies": {
 		"Kestrel": "1.0.0-beta4",
 		"Firefly": "",
-		"ChatLe.FastCGI": "",
+        "ChatLe.FastCGI": "",
 		"EntityFramework.SqlServer": "7.0.0-beta4",
 		"EntityFramework.Commands": "7.0.0-beta4",
 		"EntityFramework.InMemory": "7.0.0-beta4",
@@ -42,7 +43,7 @@
         "node_modules",
         "bower_components"
     ],
-    "packExclude": [
+    "publishExclude": [
         "node_modules",
         "bower_components",
         "**.kproj",

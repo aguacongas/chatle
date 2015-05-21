@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using ChatLe.Models;
 using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Identity;
+using System.Security.Claims;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Identity;
 
 namespace ChatLe.Controllers
 {
@@ -169,7 +170,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.FindByIdAsync(Context.User.Identity.GetUserId());
+            return await UserManager.FindByIdAsync(Context.User.GetUserId());
         }
 
         public enum ManageMessageId

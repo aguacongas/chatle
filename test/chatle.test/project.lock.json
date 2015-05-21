@@ -5,7 +5,7 @@
     "": [
       "chatle ",
       "EntityFramework.InMemory >= 7.0.0-beta4",
-      "Microsoft.AspNet.Hosting >= 1.0.0-beta4",
+      "Microsoft.AspNet.Hosting >= 1.0.0-*",
       "xunit.runner.kre >= 1.0.0-*"
     ],
     "DNX,Version=v4.5.1": [

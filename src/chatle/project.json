@@ -1,6 +1,7 @@
 { 
     /* Click to learn more about project.json  http://go.microsoft.com/fwlink/?LinkID=517074 */
     "webroot": "wwwroot",
+    "userSecretsId": "aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27",
     "version": "1.0.0-*",
     "authors": [ "Olivier Lefebvre" ],
     "description": "chatle is simple chat website using AST.NET 5 technologies",
@@ -26,11 +27,10 @@
         "ChatLe.HttpUtility": "",
         "ChatLe.Repository.Identity": "",
         "ChatLe.Logging": "",
-        "EntityFramework.Core": "7.0.0-*",
-        "EntityFramework.InMemory": "7.0.0-*",
+        "EntityFramework.InMemory": "7.0.0-beta4",
         "EntityFramework.Redis": "",
         //"EntityFramework.SQLite": "7.0.0-beta1",
-        "EntityFramework.SqlServer": "7.0.0-*",
+        "EntityFramework.SqlServer": "7.0.0-beta4",
         "Microsoft.AspNet.Mvc": "6.0.0-beta4",
         "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta4",
         //"Microsoft.AspNet.Mvc.WebApiCompatShim": "6.0.0-beta1",
