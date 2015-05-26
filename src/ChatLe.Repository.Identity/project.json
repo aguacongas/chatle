@@ -1,4 +1,4 @@
-﻿{
+{
     "version": "1.0.0-beta4",
     "authors": [ "Olivier Lefebvre" ],
     "description": "ChatLe repository implementation for Identity framework",
@@ -33,7 +33,7 @@
         },
         "dnxcore50": {
             "dependencies": {
-                "System.Runtime": "4.0.20-beta-22231"                
+                "System.Runtime": "4.0.20-beta-22231"
             }
         }
     }

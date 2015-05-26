@@ -5,7 +5,8 @@
     "": [
       "EntityFramework.SqlServer >= 7.0.0-beta4",
       "Microsoft.AspNet.Identity.EntityFramework >= 3.0.0-beta4",
-      "ChatLe.Repository "
+      "ChatLe.Repository ",
+      "EntityFramework.Core >= 7.0.0-beta4"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": [
