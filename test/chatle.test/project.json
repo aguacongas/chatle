@@ -4,10 +4,10 @@
         "chatle": "",
         "EntityFramework.InMemory": "7.0.0-beta4",
         "Microsoft.AspNet.Hosting": "1.0.0-*",
-        "xunit.runner.kre": "1.0.0-*"
+        "xunit.runner.aspnet": "2.0.0-beta4"
     },
     "commands": {
-        "test": "xunit.runner.kre"
+        "test": "xunit.runner.aspnet"
     },
     "frameworks": {
         "dnx451": {

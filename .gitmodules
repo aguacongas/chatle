@@ -1,7 +1,7 @@
-[submodule "EntityFramework"]
-	path = EntityFramework
-	url = https://github.com/aguacongas/EntityFramework.git
-	branch = beta3
 [submodule "firefly"]
 	path = firefly
 	url = https://github.com/aguacongas/firefly.git
+[submodule "EntityFramework"]
+	path = EntityFramework
+	url = https://github.com/aguacongas/EntityFramework.git
+	branch = beta4
