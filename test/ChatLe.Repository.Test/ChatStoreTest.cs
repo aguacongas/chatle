@@ -1,7 +1,6 @@
 ﻿using ChatLe.Models;
 using Microsoft.Data.Entity;
 using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.DependencyInjection.Fallback;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

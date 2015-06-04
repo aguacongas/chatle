@@ -28,7 +28,7 @@
         "ChatLe.Repository.Identity": "",
         "ChatLe.Logging": "",
         "EntityFramework.InMemory": "7.0.0-beta4",
-        "EntityFramework.Redis": "",
+        "EntityFramework.Redis": "7.0.0-beta4",
         //"EntityFramework.SQLite": "7.0.0-beta1",
         "EntityFramework.SqlServer": "7.0.0-beta4",
         "Microsoft.AspNet.Mvc": "6.0.0-beta4",
@@ -46,8 +46,8 @@
         "Microsoft.Framework.Logging.Console": "1.0.0-beta4",
         "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta4",
         "Microsoft.AspNet.SignalR.Server": "3.0.0-beta4",
-        "Microsoft.AspNet.WebSockets.Server": "1.0.0.0-beta4",
-        "Firefly": ""
+        "Microsoft.AspNet.WebSockets.Server": "1.0.0.0-beta4"
+        //"Firefly": ""
     },
     "commands": {
         /* Change the port number when you are self hosting this application */
@@ -56,7 +56,7 @@
         "ef": "EntityFramework.Commands",
         "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001",
         "fastcgi": "Microsoft.AspNet.Hosting --server ChatLe --fastcgi.port 9000 --fastcgi.maxConnections 655535 --fastcgi.maxRequests 65535 --fastcgi.supportMultiplexing true",
-        "firefly": "Microsoft.AspNet.Hosting --server Firefly --server.urls http://localhost:5002"
+        //"firefly": "Microsoft.AspNet.Hosting --server Firefly --server.urls http://localhost:5002"
     },
     "frameworks": {
         "dnx451": {

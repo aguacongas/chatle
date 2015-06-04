@@ -1,11 +1,9 @@
 ﻿using Microsoft.Data.Entity;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Framework.Logging;
 
 namespace ChatLe.Models
 {
@@ -101,7 +99,7 @@ namespace ChatLe.Models
             if(message == null)
                 throw new ArgumentNullException("message");
 
-            await Context.AddAsync(message, cancellationToken);
+            Context.Add(message);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -117,7 +115,7 @@ namespace ChatLe.Models
             {
                 throw new ArgumentNullException("attendee");
             }
-            await Context.AddAsync(attendee, cancellationToken);
+            Context.Add(attendee);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -132,7 +130,7 @@ namespace ChatLe.Models
             if (conversation == null)
                 throw new ArgumentNullException("conversation");
 
-            await Context.AddAsync(conversation, cancellationToken);
+            Context.Add(conversation);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -244,7 +242,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            await Context.AddAsync(connection, cancellationToken);
+            Context.Add(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
@@ -284,19 +282,15 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
-            var connections = NotificationConnections.ToArray();
-            foreach (var connection in connections)
-                NotificationConnections.Remove(connection);
+            NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();
-            var attendees = Attendees.ToArray();
-            foreach(var attendee in attendees)
-                Attendees.Remove(attendees);
+            Attendees.RemoveRange(Attendees.ToArray());
             Context.SaveChanges();
-            Messages.Remove(Messages.ToArray());
+            Messages.RemoveRange(Messages.ToArray());
             Context.SaveChanges();
-            Conversations.Remove(Conversations.ToArray());
+            Conversations.RemoveRange(Conversations.ToArray());
             Context.SaveChanges();
-            Users.Remove(Users.Where(u => u.PasswordHash == null).ToArray());
+            Users.RemoveRange(Users.Where(u => u.PasswordHash == null).ToArray());
             Context.SaveChanges();
         }
         /// <summary>
@@ -367,10 +361,10 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            Messages.Remove(await Messages.Where(m => m.UserId.Equals(user.Id)).ToArrayAsync());
-            Attendees.Remove(await Attendees.Where(a => a.UserId.Equals(user.Id)).ToArrayAsync());
-            Conversations.Remove(await Conversations.Where(c => c.Attendees.Count < 2).ToArrayAsync());
-            NotificationConnections.Remove(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
+            Messages.RemoveRange(await Messages.Where(m => m.UserId.Equals(user.Id)).ToArrayAsync());
+            Attendees.RemoveRange(await Attendees.Where(a => a.UserId.Equals(user.Id)).ToArrayAsync());
+            Conversations.RemoveRange(await Conversations.Where(c => c.Attendees.Count < 2).ToArrayAsync());
+            NotificationConnections.RemoveRange(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }

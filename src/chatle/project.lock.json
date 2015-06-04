@@ -9,7 +9,7 @@
       "ChatLe.Repository.Identity ",
       "ChatLe.Logging ",
       "EntityFramework.InMemory >= 7.0.0-beta4",
-      "EntityFramework.Redis ",
+      "EntityFramework.Redis >= 7.0.0-beta4",
       "EntityFramework.SqlServer >= 7.0.0-beta4",
       "Microsoft.AspNet.Mvc >= 6.0.0-beta4",
       "Microsoft.AspNet.Mvc.TagHelpers >= 6.0.0-beta4",
@@ -25,8 +25,7 @@
       "Microsoft.Framework.Logging.Console >= 1.0.0-beta4",
       "Microsoft.VisualStudio.Web.BrowserLink.Loader >= 14.0.0-beta4",
       "Microsoft.AspNet.SignalR.Server >= 3.0.0-beta4",
-      "Microsoft.AspNet.WebSockets.Server >= 1.0.0.0-beta4",
-      "Firefly "
+      "Microsoft.AspNet.WebSockets.Server >= 1.0.0.0-beta4"
     ],
     "DNX,Version=v4.5.1": []
   },
@@ -51,7 +50,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "EntityFramework.Commands": "7.0.0-beta4"
           },
@@ -59,7 +58,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Commands": "7.0.0-beta4"
           },
@@ -124,6 +123,12 @@
             "lib/dnxcore50/EntityFramework.Commands.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Relational": "7.0.0-beta4",
@@ -144,12 +149,6 @@
           "compileAssemblies": [
             "lib/net451/EntityFramework.Commands.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -236,7 +235,7 @@
             "lib/dnxcore50/EntityFramework.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Ix-Async": "1.2.3",
             "Microsoft.Framework.Caching.Memory": "1.0.0-beta4",
@@ -259,7 +258,7 @@
             "lib/net45/EntityFramework.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Ix-Async": "1.2.3",
             "Microsoft.Framework.Caching.Memory": "1.0.0-beta4",
@@ -332,6 +331,12 @@
             "lib/dnxcore50/EntityFramework.Relational.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Core": "7.0.0-beta4"
@@ -349,12 +354,6 @@
           "compileAssemblies": [
             "lib/net451/EntityFramework.Relational.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -410,6 +409,12 @@
             "lib/dnxcore50/EntityFramework.Relational.Design.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Core": "7.0.0-beta4",
@@ -428,12 +433,6 @@
           "compileAssemblies": [
             "lib/net451/EntityFramework.Relational.Design.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -485,6 +484,12 @@
             "lib/dnxcore50/EntityFramework.SqlServer.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Relational": "7.0.0-beta4"
@@ -501,12 +506,6 @@
           "compileAssemblies": [
             "lib/net451/EntityFramework.SqlServer.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -558,6 +557,12 @@
             "lib/dnxcore50/EntityFramework.SqlServer.Design.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "EntityFramework.Relational.Design": "7.0.0-beta4",
@@ -575,12 +580,6 @@
           "compileAssemblies": [
             "lib/net451/EntityFramework.SqlServer.Design.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -622,7 +621,7 @@
             "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/System.Interactive.Async.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "System",
@@ -635,7 +634,7 @@
             "lib/net45/System.Interactive.Async.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "System",
@@ -697,13 +696,13 @@
             "lib/dnxcore50/Kestrel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -761,13 +760,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Authentication.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -819,13 +818,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Authentication.Cookies.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -879,13 +878,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Authorization.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -940,13 +939,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Cors.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1003,13 +1002,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Cors.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1064,6 +1063,12 @@
             "lib/dnxcore50/Microsoft.AspNet.Cryptography.Internal.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
@@ -1078,12 +1083,6 @@
           "compileAssemblies": [
             "lib/net451/Microsoft.AspNet.Cryptography.Internal.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -1133,6 +1132,12 @@
             "lib/dnxcore50/Microsoft.AspNet.Cryptography.KeyDerivation.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.Cryptography.Internal": "1.0.0-beta4"
@@ -1149,12 +1154,6 @@
           "compileAssemblies": [
             "lib/net451/Microsoft.AspNet.Cryptography.KeyDerivation.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -1225,6 +1224,12 @@
             "lib/dnxcore50/Microsoft.AspNet.DataProtection.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.Cryptography.Internal": "1.0.0-beta4",
@@ -1248,12 +1253,6 @@
           "compileAssemblies": [
             "lib/net451/Microsoft.AspNet.DataProtection.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -1308,6 +1307,12 @@
             "lib/dnxcore50/Microsoft.AspNet.DataProtection.Interfaces.dll"
           ]
         },
+        ".NETFramework,Version=v4.5": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
         ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
@@ -1322,12 +1327,6 @@
           "compileAssemblies": [
             "lib/net451/Microsoft.AspNet.DataProtection.Interfaces.dll"
           ]
-        },
-        ".NETFramework,Version=v4.5": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
         }
       },
       "files": [
@@ -1384,13 +1383,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Diagnostics.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1438,13 +1437,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Diagnostics.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1498,13 +1497,13 @@
             "lib/dnxcore50/Microsoft.AspNet.FeatureModel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1562,7 +1561,7 @@
             "lib/dnxcore50/Microsoft.AspNet.FileProviders.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.AspNet.FileProviders.Interfaces": "1.0.0-beta4"
           },
@@ -1579,7 +1578,7 @@
             "lib/net45/Microsoft.AspNet.FileProviders.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.FileProviders.Interfaces": "1.0.0-beta4"
           },
@@ -1643,7 +1642,7 @@
             "lib/dnxcore50/Microsoft.AspNet.FileProviders.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.Caching.Interfaces": "1.0.0-beta4"
           },
@@ -1660,7 +1659,7 @@
             "lib/net45/Microsoft.AspNet.FileProviders.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.Caching.Interfaces": "1.0.0-beta4"
           },
@@ -1738,13 +1737,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Hosting.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1800,13 +1799,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Hosting.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1870,13 +1869,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Http.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1951,13 +1950,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Http.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2018,13 +2017,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Http.Extensions.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2076,13 +2075,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Http.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2174,13 +2173,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Identity.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2248,13 +2247,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Identity.EntityFramework.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2311,13 +2310,13 @@
             "lib/dnxcore50/Microsoft.AspNet.JsonPatch.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2381,13 +2380,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Loader.IIS.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2420,13 +2419,13 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2481,13 +2480,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2562,13 +2561,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2634,13 +2633,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.ModelBinding.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2706,13 +2705,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.Razor.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2769,7 +2768,7 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.Razor.Host.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.AspNet.FileProviders": "1.0.0-beta4",
             "Microsoft.AspNet.Razor.Runtime": "4.0.0-beta4",
@@ -2788,7 +2787,7 @@
             "lib/net45/Microsoft.AspNet.Mvc.Razor.Host.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.FileProviders": "1.0.0-beta4",
             "Microsoft.AspNet.Razor.Runtime": "4.0.0-beta4",
@@ -2859,13 +2858,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Mvc.TagHelpers.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2913,13 +2912,13 @@
             "lib/dnxcore50/Microsoft.AspNet.PageExecutionInstrumentation.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -2979,7 +2978,7 @@
             "lib/dnxcore50/Microsoft.AspNet.Razor.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -2994,7 +2993,7 @@
             "lib/net45/Microsoft.AspNet.Razor.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -3057,7 +3056,7 @@
             "lib/dnxcore50/Microsoft.AspNet.Razor.Runtime.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.AspNet.Razor": "4.0.0-beta4"
           },
@@ -3074,7 +3073,7 @@
             "lib/net45/Microsoft.AspNet.Razor.Runtime.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.Razor": "4.0.0-beta4"
           },
@@ -3143,13 +3142,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Routing.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3188,7 +3187,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.AspNet.Loader.IIS.Interop": "1.0.0-beta4",
             "Microsoft.AspNet.Loader.IIS": "1.0.0-beta4"
@@ -3197,7 +3196,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.AspNet.Loader.IIS.Interop": "1.0.0-beta4",
             "Microsoft.AspNet.Loader.IIS": "1.0.0-beta4"
@@ -3261,13 +3260,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Server.Kestrel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3334,13 +3333,13 @@
             "lib/dnxcore50/Microsoft.AspNet.Server.WebListener.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3406,13 +3405,13 @@
             "lib/dnxcore50/Microsoft.AspNet.SignalR.Messaging.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3486,13 +3485,13 @@
             "lib/dnxcore50/Microsoft.AspNet.SignalR.Server.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3552,13 +3551,13 @@
             "lib/dnxcore50/Microsoft.AspNet.StaticFiles.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3618,7 +3617,7 @@
             "lib/dnxcore50/Microsoft.AspNet.WebSockets.Protocol.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -3633,7 +3632,7 @@
             "lib/net45/Microsoft.AspNet.WebSockets.Protocol.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -3695,13 +3694,13 @@
             "lib/dnxcore50/Microsoft.AspNet.WebSockets.Server.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3757,13 +3756,13 @@
             "lib/dnxcore50/Microsoft.AspNet.WebUtilities.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -3798,7 +3797,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "System"
@@ -3806,7 +3805,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "System"
@@ -3862,7 +3861,7 @@
             "lib/portable-net45+win8/Microsoft.CodeAnalysis.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Collections.Immutable": "[1.1.33-beta]",
             "System.Reflection.Metadata": "[1.0.18-beta]",
@@ -3878,7 +3877,7 @@
             "lib/net45/Microsoft.CodeAnalysis.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Collections.Immutable": "[1.1.33-beta]",
             "System.Reflection.Metadata": "[1.0.18-beta]",
@@ -3938,7 +3937,7 @@
             "lib/portable-net45+win8/Microsoft.CodeAnalysis.CSharp.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.CodeAnalysis.Common": "[1.0.0-rc2]"
           },
@@ -3952,7 +3951,7 @@
             "lib/net45/Microsoft.CodeAnalysis.CSharp.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.CodeAnalysis.Common": "[1.0.0-rc2]"
           },
@@ -4011,7 +4010,7 @@
             "lib/dnxcore50/Microsoft.Framework.Caching.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -4026,7 +4025,7 @@
             "lib/net45/Microsoft.Framework.Caching.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -4091,7 +4090,7 @@
             "lib/dnxcore50/Microsoft.Framework.Caching.Memory.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.OptionsModel": "1.0.0-beta4",
             "Microsoft.Framework.Caching.Interfaces": "1.0.0-beta4"
@@ -4109,7 +4108,7 @@
             "lib/net45/Microsoft.Framework.Caching.Memory.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.OptionsModel": "1.0.0-beta4",
             "Microsoft.Framework.Caching.Interfaces": "1.0.0-beta4"
@@ -4180,13 +4179,13 @@
             "lib/dnxcore50/Microsoft.Framework.CodeGeneration.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4251,13 +4250,13 @@
             "lib/dnxcore50/Microsoft.Framework.CodeGeneration.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4316,13 +4315,13 @@
             "lib/dnxcore50/Microsoft.Framework.CodeGeneration.EntityFramework.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4376,13 +4375,13 @@
             "lib/dnxcore50/Microsoft.Framework.CodeGeneration.Templating.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4441,13 +4440,13 @@
             "lib/dnxcore50/Microsoft.Framework.CodeGenerators.Mvc.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4526,13 +4525,13 @@
             "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -4596,7 +4595,7 @@
             "lib/dnxcore50/Microsoft.Framework.ConfigurationModel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel.Interfaces": "1.0.0-beta4"
           },
@@ -4613,7 +4612,7 @@
             "lib/net45/Microsoft.Framework.ConfigurationModel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel.Interfaces": "1.0.0-beta4"
           },
@@ -4682,7 +4681,7 @@
             "lib/dnxcore50/Microsoft.Framework.ConfigurationModel.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -4697,7 +4696,7 @@
             "lib/net45/Microsoft.Framework.ConfigurationModel.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -4762,7 +4761,7 @@
             "lib/dnxcore50/Microsoft.Framework.ConfigurationModel.Json.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Newtonsoft.Json": "6.0.6",
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4"
@@ -4780,7 +4779,7 @@
             "lib/net45/Microsoft.Framework.ConfigurationModel.Json.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Newtonsoft.Json": "6.0.6",
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4"
@@ -4849,7 +4848,7 @@
             "lib/dnxcore50/Microsoft.Framework.DependencyInjection.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4",
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4"
@@ -4867,7 +4866,7 @@
             "lib/net45/Microsoft.Framework.DependencyInjection.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4",
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4"
@@ -4937,7 +4936,7 @@
             "lib/dnxcore50/Microsoft.Framework.DependencyInjection.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -4952,7 +4951,7 @@
             "lib/net45/Microsoft.Framework.DependencyInjection.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5017,7 +5016,7 @@
             "lib/dnxcore50/Microsoft.Framework.FileSystemGlobbing.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5032,7 +5031,7 @@
             "lib/net45/Microsoft.Framework.FileSystemGlobbing.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5102,7 +5101,7 @@
             "lib/dnxcore50/Microsoft.Framework.Logging.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4",
             "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4"
@@ -5121,7 +5120,7 @@
             "lib/net45/Microsoft.Framework.Logging.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4",
             "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4"
@@ -5192,7 +5191,7 @@
             "lib/dnxcore50/Microsoft.Framework.Logging.Console.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4"
           },
@@ -5209,7 +5208,7 @@
             "lib/net45/Microsoft.Framework.Logging.Console.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4"
           },
@@ -5277,7 +5276,7 @@
             "lib/dnxcore50/Microsoft.Framework.Logging.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5292,7 +5291,7 @@
             "lib/net45/Microsoft.Framework.Logging.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5360,7 +5359,7 @@
             "lib/dnxcore50/Microsoft.Framework.OptionsModel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4",
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4"
@@ -5378,7 +5377,7 @@
             "lib/net45/Microsoft.Framework.OptionsModel.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4",
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4"
@@ -5482,13 +5481,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5541,13 +5540,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5603,13 +5602,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.Loader.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5671,13 +5670,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.Roslyn.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5730,13 +5729,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.Roslyn.Common.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5789,13 +5788,13 @@
             "lib/dnxcore50/Microsoft.Framework.Runtime.Roslyn.Interfaces.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -5849,7 +5848,7 @@
             "lib/dnxcore50/Microsoft.Framework.WebEncoders.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4",
             "Microsoft.Framework.OptionsModel": "1.0.0-beta4",
@@ -5868,7 +5867,7 @@
             "lib/net45/Microsoft.Framework.WebEncoders.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.DependencyInjection.Interfaces": "1.0.0-beta4",
             "Microsoft.Framework.OptionsModel": "1.0.0-beta4",
@@ -5936,7 +5935,7 @@
             "lib/dnxcore50/Microsoft.Framework.WebEncoders.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -5951,7 +5950,7 @@
             "lib/net45/Microsoft.Framework.WebEncoders.Core.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6015,7 +6014,7 @@
             "lib/dnxcore50/Microsoft.Net.Http.Headers.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6030,7 +6029,7 @@
             "lib/net45/Microsoft.Net.Http.Headers.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6098,7 +6097,7 @@
             "lib/dnxcore50/Microsoft.Net.Http.Server.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Framework.Logging": "1.0.0-beta4",
             "Microsoft.Net.WebSockets": "1.0.0-beta4"
@@ -6116,7 +6115,7 @@
             "lib/net45/Microsoft.Net.Http.Server.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Framework.Logging": "1.0.0-beta4",
             "Microsoft.Net.WebSockets": "1.0.0-beta4"
@@ -6179,7 +6178,7 @@
             "lib/dnxcore50/Microsoft.Net.WebSocketAbstractions.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6194,7 +6193,7 @@
             "lib/net45/Microsoft.Net.WebSocketAbstractions.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6268,7 +6267,7 @@
             "lib/dnxcore50/Microsoft.Net.WebSockets.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "Microsoft.Net.WebSocketAbstractions": "1.0.0-beta4"
           },
@@ -6285,7 +6284,7 @@
             "lib/net45/Microsoft.Net.WebSockets.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "Microsoft.Net.WebSocketAbstractions": "1.0.0-beta4"
           },
@@ -6358,13 +6357,13 @@
             "lib/dnxcore50/Microsoft.VisualStudio.Web.BrowserLink.Loader.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -6403,7 +6402,7 @@
             "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6413,7 +6412,7 @@
             "lib/net45/Newtonsoft.Json.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6469,7 +6468,7 @@
             "lib/portable-net45+win+wpa81+wp80/Remotion.Linq.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6479,7 +6478,7 @@
             "lib/portable-net45+win+wpa81+wp80/Remotion.Linq.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6518,7 +6517,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6528,7 +6527,7 @@
             "lib/net45/StackExchange.Redis.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6576,7 +6575,7 @@
             "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6586,7 +6585,7 @@
             "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -6638,7 +6637,7 @@
             "lib/contract/System.Console.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.IO": "4.0.10-beta-22816",
             "System.Runtime": "4.0.20-beta-22816"
@@ -6653,7 +6652,7 @@
             "lib/net45/System.Console.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.IO": "4.0.10-beta-22816",
             "System.Runtime": "4.0.20-beta-22816"
@@ -6715,7 +6714,7 @@
             "lib/contract/System.IO.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816",
             "System.Text.Encoding": "4.0.10-beta-22816",
@@ -6732,7 +6731,7 @@
             "lib/net45/System.IO.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816",
             "System.Text.Encoding": "4.0.10-beta-22816",
@@ -6789,7 +6788,7 @@
             "lib/portable-net45+win8/System.Reflection.Metadata.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Collections.Immutable": "1.1.33-beta"
           },
@@ -6801,7 +6800,7 @@
             "lib/portable-net45+win8/System.Reflection.Metadata.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Collections.Immutable": "1.1.33-beta"
           },
@@ -6852,7 +6851,7 @@
             "lib/contract/System.Runtime.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6867,7 +6866,7 @@
             "lib/net45/System.Runtime.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {},
           "frameworkAssemblies": [
             "mscorlib",
@@ -6926,7 +6925,7 @@
             "lib/contract/System.Security.Cryptography.Hashing.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.IO": "4.0.10-beta-22816",
             "System.Runtime": "4.0.20-beta-22816"
@@ -6941,7 +6940,7 @@
             "lib/net45/System.Security.Cryptography.Hashing.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.IO": "4.0.10-beta-22816",
             "System.Runtime": "4.0.20-beta-22816"
@@ -7000,7 +6999,7 @@
             "lib/contract/System.Security.Cryptography.Hashing.Algorithms.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816",
             "System.Security.Cryptography.Hashing": "4.0.0-beta-22816"
@@ -7015,7 +7014,7 @@
             "lib/net45/System.Security.Cryptography.Hashing.Algorithms.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816",
             "System.Security.Cryptography.Hashing": "4.0.0-beta-22816"
@@ -7072,7 +7071,7 @@
             "lib/contract/System.Text.Encoding.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816"
           },
@@ -7086,7 +7085,7 @@
             "lib/net45/System.Text.Encoding.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816"
           },
@@ -7143,7 +7142,7 @@
             "lib/contract/System.Threading.Tasks.dll"
           ]
         },
-        ".NETFramework,Version=v4.5.1": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816"
           },
@@ -7158,7 +7157,7 @@
             "lib/net45/System.Threading.Tasks.dll"
           ]
         },
-        ".NETFramework,Version=v4.5": {
+        ".NETFramework,Version=v4.5.1": {
           "dependencies": {
             "System.Runtime": "4.0.20-beta-22816"
           },

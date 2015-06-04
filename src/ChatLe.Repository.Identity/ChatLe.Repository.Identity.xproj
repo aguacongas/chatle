@@ -15,7 +15,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-    <DevelopmentServerPort>0</DevelopmentServerPort>
     <CommandLineArguments>migration apply initial</CommandLineArguments>
     <DebugTarget>ef</DebugTarget>
   </PropertyGroup>

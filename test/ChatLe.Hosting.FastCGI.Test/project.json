@@ -3,7 +3,7 @@
     "dependencies": {
         "ChatLe.Hosting.FastCGI": "",
         "ChatLe.Logging": "",
-        "xunit.runner.aspnet": "2.0.0-beat4"
+        "xunit.runner.aspnet": "2.0.0-rc2-build50"
     },
     "commands": {
         "test": "xunit.runner.aspnet"

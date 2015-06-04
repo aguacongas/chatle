@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
+using Microsoft.Data.Entity;
 
 namespace ChatLe
 {
@@ -70,7 +71,7 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework(Configuration);
+            var builder = services.AddEntityFramework();
 
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
             switch (dbEngine)
@@ -84,9 +85,9 @@ namespace ChatLe
                 case DBEngine.SqlServer:
                     builder.AddSqlServer();
                     break;
-                case DBEngine.Redis:
-                    builder.AddRedis();
-                    break;
+                //case DBEngine.Redis:
+                //    builder.AddRedis();
+                //    break;
                 default:
                     throw new InvalidOperationException("Database engine unsupported");
             }
@@ -96,7 +97,7 @@ namespace ChatLe
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
-                        options.UseInMemoryStore(true);
+                        //options.UseInMemoryStore();
                         break;
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
@@ -104,15 +105,15 @@ namespace ChatLe
                     //case DBEngine.SQLite:
                     //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
                     //    break;
-                    case DBEngine.Redis:
-                        int port;
-                        int database;
-                        if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
-                            port = 6379;
-                        int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
+                    //case DBEngine.Redis:
+                    //    int port;
+                    //    int database;
+                    //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
+                    //        port = 6379;
+                    //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
 
-                        options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
-                        break;
+                    //    options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
+                    //    break;
                 }
             });
 
