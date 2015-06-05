@@ -26,10 +26,8 @@ namespace ChatLe
 
         readonly IHostingEnvironment _environment;
         public ILoggerFactory LoggerFactory { get; private set; }
-        public Startup(IHostingEnvironment environment, ILoggerFactory factory)
+        public Startup(IHostingEnvironment environment)
         {
-            LoggerFactory = factory;
-            LoggerFactory.AddProvider(new TraceLoggerProvider());
             /* 
             * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
             * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
@@ -57,6 +55,7 @@ namespace ChatLe
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
+
             ConfigureEntity(services);
 
             services.AddMvc();
@@ -85,9 +84,9 @@ namespace ChatLe
                 case DBEngine.SqlServer:
                     builder.AddSqlServer();
                     break;
-                //case DBEngine.Redis:
-                //    builder.AddRedis();
-                //    break;
+                case DBEngine.Redis:
+                    //builder.AddRedis();
+                    break;
                 default:
                     throw new InvalidOperationException("Database engine unsupported");
             }
@@ -97,7 +96,7 @@ namespace ChatLe
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
-                        //options.UseInMemoryStore();
+                        options.UseInMemoryStore();
                         break;
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
@@ -105,15 +104,15 @@ namespace ChatLe
                     //case DBEngine.SQLite:
                     //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
                     //    break;
-                    //case DBEngine.Redis:
-                    //    int port;
-                    //    int database;
-                    //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
-                    //        port = 6379;
-                    //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
-
-                    //    options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
-                    //    break;
+                    case DBEngine.Redis:
+                        int port;
+                        int database;
+                        if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
+                            port = 6379;
+                        int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
+                        
+                        //options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
+                        break;
                 }
             });
 
@@ -125,6 +124,9 @@ namespace ChatLe
 
         public virtual void Configure(IApplicationBuilder app)
         {
+            LoggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
+            LoggerFactory.AddProvider(new TraceLoggerProvider());
+
             //app.UseRemoveResponseHeaders();
             ConfigureErrors(app);
 

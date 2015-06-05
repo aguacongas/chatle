@@ -37,6 +37,8 @@ namespace ChatLe.Models
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.Entity<NotificationConnection>(b =>
             {
                 b.Key(n => new { n.ConnectionId, n.NotificationType });
@@ -66,8 +68,7 @@ namespace ChatLe.Models
                 b.Reference<ChatLeUser>().InverseCollection().ForeignKey(a => a.UserId);
                 b.ForRelational().Table("Attendees");
             });
-
-            base.OnModelCreating(builder);
+            
         }
 
 
