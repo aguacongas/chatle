@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNet.Hosting.Server;
 using System;
 using Microsoft.AspNet.Builder;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Framework.Logging;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Builder;
 using Microsoft.Data.Entity;
-using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using System;
 

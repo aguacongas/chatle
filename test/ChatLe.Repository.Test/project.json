@@ -3,8 +3,8 @@
     "dependencies": {
         "ChatLe.Repository": "",
         "ChatLe.Repository.Identity": "",
-        "EntityFramework.InMemory": "7.0.0-beta4",
-        "xunit.runner.aspnet": "2.0.0-beta4"
+        "EntityFramework.InMemory": "7.0.0-beta5",
+        "xunit.runner.aspnet": "2.0.0-beta5"
     },
     "commands": {
         "test": "xunit.runner.aspnet"

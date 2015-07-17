@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-beta4",
+    "version": "1.0.0-beta5",
     "authors": [ "Olivier Lefebvre" ],
     "description": "ChatLe repository implementation for Identity framework",
     "compilationOptions": {
@@ -19,8 +19,8 @@
         }
     },
     "dependencies": {
-        "EntityFramework.Commands": "7.0.0-beta4",
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta4",
+        "EntityFramework.Commands": "7.0.0-beta5",
+        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta5",
         "ChatLe.Repository": ""
     },
     "commands": {

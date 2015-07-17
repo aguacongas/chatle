@@ -1,5 +1,5 @@
 ﻿{
-    "version": "1.0.0-beta4",
+    "version": "1.0.0-beta5",
     "authors": [ "Olivier Lefebvre" ],
     "description": "http logger for chatle",
     "compilationOptions": {
@@ -19,7 +19,7 @@
         }
     },
     "dependencies": {
-        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4",
+        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta5",
         "System.Console": "4.0.0-beta-22816"
     },
     "frameworks": {
