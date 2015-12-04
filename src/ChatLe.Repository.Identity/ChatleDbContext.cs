@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using System;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 
 namespace ChatLe.Models
@@ -11,27 +12,35 @@ namespace ChatLe.Models
             base.OnConfiguring(options);
         }
     }
+
+    public class ChatLeIdentityDbContext:ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
+    { }
     /// <summary>
     /// Database context for ChatLe user
     /// </summary>
-    public class ChatLeIdentityDbContext : IdentityDbContext<ChatLeUser>
+    public class ChatLeIdentityDbContext<TKey, TMessage, TAttendee, TConversation, TNotificationConnection> : IdentityDbContext<ChatLeUser> 
+        where TKey: IEquatable<TKey>
+        where TMessage : Message<TKey>
+        where TAttendee : Attendee<TKey>
+        where TConversation : Conversation<TKey>
+        where TNotificationConnection : NotificationConnection<TKey>
     {
         /// <summary>
         /// Gets or sets the DbSet of messages
         /// </summary>
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<TMessage> Messages { get; set; }
         /// <summary>
         /// Gets or sets the DbSet of conversations
         /// </summary>
-        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<TConversation> Conversations { get; set; }
         /// <summary>
         /// Gets or sets the DbSet of attendees
         /// </summary>
-        public DbSet<Attendee> Attendees { get; set; }
+        public DbSet<TAttendee> Attendees { get; set; }
         /// <summary>
         /// Gets or sets the DbSet of notification connections
         /// </summary>
-        public DbSet<NotificationConnection> NotificationConnections { get; set; }
+        public DbSet<TNotificationConnection> NotificationConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -40,14 +49,14 @@ namespace ChatLe.Models
             builder.Entity<ChatLeUser>()
                 .HasMany(u => u.NotificationConnections).WithOne().HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType });
 
-            builder.Entity<NotificationConnection>(b =>
+            builder.Entity<NotificationConnection<TKey>>(b =>
             {
                 b.HasKey(n => new { n.ConnectionId, n.NotificationType });
                 b.ToTable("NotificationConnections");
             });
 
 
-            builder.Entity<Conversation>(b =>
+            builder.Entity<Conversation<TKey>>(b =>
             {
                 b.HasKey(c => c.Id);
                 b.ToTable("Conversations");
@@ -56,13 +65,13 @@ namespace ChatLe.Models
                 b.HasMany(c => c.Messages).WithOne().HasForeignKey(m => m.ConversationId);
             });
 
-            builder.Entity<Message>(b =>
+            builder.Entity<Message<TKey>>(b =>
             {
                 b.HasKey(m => m.Id);
                 b.ToTable("Messages");
             });
 
-            builder.Entity<Attendee>(b =>
+            builder.Entity<Attendee<TKey>>(b =>
             {
                 b.HasKey(a => new { a.ConversationId, a.UserId });
                 b.ToTable("Attendees");                

@@ -26,8 +26,8 @@ namespace ChatLe
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile("config.json")
+                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
             {
@@ -75,7 +75,7 @@ namespace ChatLe
         {
             var builder = services.AddEntityFramework();
 
-            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
+            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
             switch (dbEngine)
             {
                 case DBEngine.InMemory:
@@ -102,7 +102,7 @@ namespace ChatLe
                         options.UseInMemoryDatabase();
                         break;
                     case DBEngine.SqlServer:
-                        options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
+                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
                         break;
                     //case DBEngine.SQLite:
                     //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
