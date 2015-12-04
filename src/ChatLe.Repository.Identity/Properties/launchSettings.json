@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ef": {
-      "commandName": "ef",
-      "commandLineArgs": "migration add initial -c ChatLeIdentityDbContextSql"
-    }
-  }
-}
