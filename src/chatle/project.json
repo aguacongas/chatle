@@ -1,75 +1,74 @@
-{    
-    "webroot": "wwwroot",
-    "userSecretsId": "aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27",
-    "version": "1.0.0-*",
-    "authors": [ "Olivier Lefebvre" ],
-    "description": "chatle is simple chat website using AST.NET 5 technologies",
-    "compilationOptions": {
-        "warningsAsErrors": true
+{
+  "webroot": "wwwroot",
+  "userSecretsId": "aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27",
+  "version": "1.0.0-*",
+  "authors": [ "Olivier Lefebvre" ],
+  "description": "chatle is simple chat website using AST.NET 5 technologies",
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
     },
-    "configurations": {
-        "Debug": {
-            "compilationOptions": {
-                "define": [ "DEBUG", "TRACE" ]
-            }
-        },
-        "Release": {
-            "compilationOptions": {
-                "define": [ "RELEASE", "TRACE" ],
-                "optimize": true
-            }
-        }
-    },
-    "dependencies": {
-        "ChatLe.FastCGI": "",
-        "ChatLe.HttpUtility": "",
-        "ChatLe.Logging": "",
-        "ChatLe.Repository.Identity": "",
-        "EntityFramework.InMemory": "",
-        "EntityFramework.Redis": "",
-        "EntityFramework.SqlServer": "",
-        "Kestrel": "1.0.0-beta5",
-        "Microsoft.AspNet.Authentication.Cookies": "1.0.0-beta5",
-        "Microsoft.AspNet.Diagnostics": "1.0.0-beta5",
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta5",
-        "Microsoft.AspNet.Mvc": "6.0.0-beta5",
-        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta5",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta5",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5",
-        "Microsoft.AspNet.SignalR.Server": "3.0.0-beta5",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5",
-        "Microsoft.AspNet.WebSockets.Server": "1.0.0.0-beta5",
-        "Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta5",
-        "Microsoft.Framework.Configuration.Json": "1.0.0-beta5",
-        "Microsoft.Framework.Logging": "1.0.0-beta5",
-        "Microsoft.Framework.Logging.Console": "1.0.0-beta5",
-        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta5"
-    },
-    "commands": {
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
-        "gen": "Microsoft.Framework.CodeGeneration",
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001",
-        "fastcgi": "Microsoft.AspNet.Hosting --server ChatLe --fastcgi.port 9000 --fastcgi.maxConnections 655535 --fastcgi.maxRequests 65535 --fastcgi.supportMultiplexing true",
-
-    },
-    "frameworks": {
-        "dnx451": {
-        } 
-    },
-    "exclude": [
-        "wwwroot",
-        "node_modules",
-        "bower_components"
-    ],
-    "publishExclude": [
-        "node_modules",
-        "bower_components",
-        "**.kproj",
-        "**.user",
-        "**.vspscc"
-    ],
-    "scripts": {
-        "postrestore": "npm install",
-        "prepare": "grunt bower:install"
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true
+      }
     }
+  },
+  "dependencies": {
+    "ChatLe.Repository.Identity": "",
+    "EntityFramework.Commands": "7.0.0-rc1-final",
+    "EntityFramework.InMemory": "7.0.0-rc1-final",
+    "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
+    "Microsoft.AspNet.Authentication.Cookies": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-rc1-final",
+    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
+    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
+    "Microsoft.Extensions.CodeGenerators.Mvc": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
+    "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final",
+    "Microsoft.AspNet.SignalR.Server": "3.0.0-rc1-final",
+    "Microsoft.AspNet.WebSockets.Server": "1.0.0-rc1-final"
+  },
+  "commands": {
+    "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:5000",
+    "gen": "Microsoft.Framework.CodeGeneration",
+    "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:5001",
+  },
+  "frameworks": {
+    "dnx451": {
+    },
+    "dnxcore50": { }
+  },
+  "exclude": [
+    "wwwroot",
+    "node_modules",
+    "bower_components"
+  ],
+  "publishExclude": [
+    "node_modules",
+    "bower_components",
+    "**.kproj",
+    "**.user",
+    "**.vspscc"
+  ],
+  "scripts": {
+    "postrestore": "npm install",
+    "prepare": "grunt bower:install"
+  }
 }

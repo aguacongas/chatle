@@ -69,7 +69,7 @@ namespace ChatLe.Controllers
         [HttpGet()]
         public async Task<IEnumerable<ConversationViewModel>> Get()
         {
-            var userName = Context.User.Identity.Name;
+            var userName = HttpContext.User.Identity.Name;
             var conversations = await _chatManager.GetConversationsAsync(userName);
             var length = conversations.Count();
             var users = new List<ChatLeUser>(length);
@@ -119,7 +119,7 @@ namespace ChatLe.Controllers
         [HttpPost()]
         public async Task SendMessage(string to, string text)
         {
-            var userName = Context.User.Identity.Name;
+            var userName = HttpContext.User.Identity.Name;
             var message = new Message() { ConversationId = to, Text  = text, Date = DateTime.Now };
             var conv = await _chatManager.AddMessageAsync(userName, to, message);
             if (conv == null)
@@ -128,7 +128,7 @@ namespace ChatLe.Controllers
             {
                 var user = await _userManager.FindByIdAsync(attendee.UserId);
                 if (user != null && user.UserName != userName)
-                    _hub.Clients.Group(user.UserName).messageReceived(new MessageViewModel() { ConversationId = to, Date = message.Date, From = Context.User.Identity.Name, Text = text });
+                    _hub.Clients.Group(user.UserName).messageReceived(new MessageViewModel() { ConversationId = to, Date = message.Date, From = HttpContext.User.Identity.Name, Text = text });
             }            
         }
 
@@ -141,7 +141,7 @@ namespace ChatLe.Controllers
         [HttpPost("conv")]
         public async Task<string> CreateConversation(string to, string text)
         {
-            var userName = Context.User.Identity.Name;
+            var userName = HttpContext.User.Identity.Name;
             var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
             if (conversation == null)
                 return null;

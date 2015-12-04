@@ -1,12 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using System.Collections.Generic;
-using System.Linq;
 using System;
-using System.Diagnostics;
 using ChatLe.Models;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Hubs
 {

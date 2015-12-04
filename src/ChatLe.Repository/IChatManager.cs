@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,8 @@ namespace ChatLe.Models
     /// <typeparam name="TAttendee">type of attendee, must be <see cref="Attendee{TKey}"/></typeparam>
     /// <typeparam name="TMessage">type of message, must be <see cref="Message{TKey}"/></typeparam>
     /// <typeparam name="TNotificationConnection">type of notification connecction, must be <see cref="NotificationConnection{TKey}"/></typeparam>
-    public interface IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> 
+    public interface IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
+        where TKey : IEquatable<TKey>
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>
         where TAttendee : Attendee<TKey>

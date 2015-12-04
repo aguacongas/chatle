@@ -5,11 +5,11 @@ namespace ChatLe.Models
     public class Attendee:Attendee<string>
     { 
     }
-    public class Attendee<TKey>
-    {        
-        public TKey ConversationId { get; set; }
 
-        public TKey UserId { get; set; }
+    public class Attendee<TKey> where TKey : IEquatable<TKey>
+    {
+        public virtual TKey ConversationId { get; set; }
 
-    }
+        public virtual TKey UserId { get; set; }
+    }   
 }

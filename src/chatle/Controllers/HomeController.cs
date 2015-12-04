@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Diagnostics;
+using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers
 {
@@ -36,7 +37,7 @@ namespace ChatLe.Controllers
 
         public IActionResult Error()
         {
-            var feature = Context.GetFeature<IErrorHandlerFeature>();
+            var feature = this.HttpContext.Features.Get<IExceptionHandlerFeature>();
             var error = feature?.Error;
             _logger.LogError("Oops!", error);
             return View("~/Views/Shared/Error.cshtml", error);

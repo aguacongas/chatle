@@ -6,14 +6,11 @@ using Moq;
 using Xunit;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using System.Threading;
 using Microsoft.AspNet.Http;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using System.Collections.Generic;
-using Microsoft.Framework.Logging;
-using Microsoft.AspNet.Hosting;
 
 namespace chatle.test.Controllers
 {

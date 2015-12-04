@@ -10,7 +10,7 @@ namespace ChatLe.Models
             Id = Guid.NewGuid().ToString("N");
         }
     }
-    public class Conversation<TKey>
+    public class Conversation<TKey> where TKey : IEquatable<TKey>
     {
         public virtual TKey Id { get; set; }
         public virtual ICollection<Attendee<TKey>> Attendees { get; } = new List<Attendee<TKey>>();

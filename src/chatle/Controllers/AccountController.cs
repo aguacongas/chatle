@@ -40,7 +40,7 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (signInStatus.Succeeded)
                     return RedirectToLocal(returnUrl);
@@ -156,7 +156,7 @@ namespace ChatLe.Controllers
             {
                 await ChatManager.RemoveUserAsync(user);
             }
-            SignInManager.SignOut();            
+            await SignInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
@@ -170,7 +170,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.FindByIdAsync(Context.User.GetUserId());
+            return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         public enum ManageMessageId

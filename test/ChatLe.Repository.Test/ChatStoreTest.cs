@@ -1,6 +1,6 @@
 ﻿using ChatLe.Models;
 using Microsoft.Data.Entity;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace ChatLe.Repository.Text
         [Fact]
         public void Construtor1Test()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<DbContext>();
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
@@ -21,15 +21,15 @@ namespace ChatLe.Repository.Text
             }
         }
 
-        private ServiceCollection GetServicesCollection()
+        private ServiceCollection GetServicesCollection<T>() where T : DbContext
         {
-            return TestHelpers.GetServicesCollection();
+            return TestHelpers.GetServicesCollection<T>();
         }
 
         [Fact]
         public void Construtor2Test()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<DbContext>();
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
@@ -51,46 +51,49 @@ namespace ChatLe.Repository.Text
         [Fact]
         public void ConversationsPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<FakeContextTest>();
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
-                Assert.IsType<DbSet<Conversation>>(conversations);
+                Assert.IsAssignableFrom<DbSet<Conversation>>(conversations);
             }
         }
+
         [Fact]
         public void MessagesPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<FakeContextTest>();
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
-                Assert.IsType<DbSet<Message>>(messages);
+                Assert.IsAssignableFrom<DbSet<Message>>(messages);
             }
         }
+
         [Fact]
         public void UsersPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<FakeContextTest>();
 
             using (var context = new FakeContextTest(services.BuildServiceProvider()))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var users = store.Users;
                 Assert.NotNull(users);
-                Assert.IsType<DbSet<UserTest>>(users);
+                Assert.IsAssignableFrom<DbSet<UserTest>>(users);
             }
         }
+
         [Fact]
         public async Task CreateMessageAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
@@ -105,19 +108,24 @@ namespace ChatLe.Repository.Text
                 await store.CreateMessageAsync(message);
             }
         }
+
         [Fact]
         public async Task UpdateUserAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
+                await context.Database.EnsureCreatedAsync();
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 var user = new UserTest()
                 {
                     Id = "test",
                     UserName = "test"
                 };
+                store.Context.Add(user);
+                await store.Context.SaveChangesAsync();
+
                 await store.UpdateUserAsync(user);
             }
         }
@@ -125,15 +133,17 @@ namespace ChatLe.Repository.Text
         [Fact]
         public async Task GetUsersConnectedAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
                 var connected = new UserTest()
                 {
                     Id = "connected",
-                    UserName = "connected",
+                    UserName = "connected"
                 };
+                context.Users.Add(connected);
+
                 var nc = new NotificationConnection()
                 {
                     ConnectionId = "test",
@@ -141,13 +151,14 @@ namespace ChatLe.Repository.Text
                     NotificationType = "test"
                 };
                 context.NotificationConnections.Add(nc);
+
                 var notConnected = new UserTest()
                 {
                     Id = "notConnected",
                     UserName = "notConnected",
-                };
-                context.Users.Add(connected);
+                };                
                 context.Users.Add(notConnected);
+
                 context.SaveChanges();
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
 
@@ -156,10 +167,11 @@ namespace ChatLe.Repository.Text
                 Assert.True(users.FirstOrDefault() == connected);
             }
         }
+
         [Fact]
         public async Task NotificationConnectionAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
@@ -188,7 +200,7 @@ namespace ChatLe.Repository.Text
         [Fact]
         public async Task GetConversationsAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection();
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {

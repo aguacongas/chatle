@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
 
 namespace ChatLe.Models
 {
@@ -8,7 +7,6 @@ namespace ChatLe.Models
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            // TODO: uncomment this line to create an EF migration
             options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true");
             base.OnConfiguring(options);
         }
@@ -39,38 +37,36 @@ namespace ChatLe.Models
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<ChatLeUser>()
+                .HasMany(u => u.NotificationConnections).WithOne().HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType });
+
             builder.Entity<NotificationConnection>(b =>
             {
-                b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.Reference<ChatLeUser>().InverseCollection().ForeignKey(n => n.UserId);
-                b.ForRelational().Table("NotificationConnections");
+                b.HasKey(n => new { n.ConnectionId, n.NotificationType });
+                b.ToTable("NotificationConnections");
             });
 
 
             builder.Entity<Conversation>(b =>
             {
-                b.Key(c => c.Id);
-                b.ForRelational().Table("Conversations");
+                b.HasKey(c => c.Id);
+                b.ToTable("Conversations");
+
+                b.HasMany(c => c.Attendees).WithOne().HasForeignKey(a => a.ConversationId);
+                b.HasMany(c => c.Messages).WithOne().HasForeignKey(m => m.ConversationId);
             });
 
             builder.Entity<Message>(b =>
             {
-                b.Key(m => m.Id);
-                b.Reference<ChatLeUser>().InverseCollection().ForeignKey(m => m.UserId);
-                b.Reference<Conversation>().InverseCollection().ForeignKey(m => m.ConversationId);
-                b.ForRelational().Table("Messages");
+                b.HasKey(m => m.Id);
+                b.ToTable("Messages");
             });
 
             builder.Entity<Attendee>(b =>
             {
-                b.Key(a => new { a.ConversationId, a.UserId });
-                b.Reference<Conversation>().InverseCollection().ForeignKey(a => a.ConversationId);
-                b.Reference<ChatLeUser>().InverseCollection().ForeignKey(a => a.UserId);
-                b.ForRelational().Table("Attendees");
-            });
-            
+                b.HasKey(a => new { a.ConversationId, a.UserId });
+                b.ToTable("Attendees");                
+            });            
         }
-
-
     }
 }

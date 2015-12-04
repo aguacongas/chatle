@@ -1,9 +1,7 @@
 ﻿using ChatLe.Models;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace chatle.test
@@ -12,9 +10,10 @@ namespace chatle.test
     {
         public static IServiceProvider GetServiceProvider()
         {
-            var services = HostingServices.Create();
+            var services = new ServiceCollection();
+            services.AddMvc();
             services.AddEntityFramework()
-                .AddInMemoryStore()
+                .AddInMemoryDatabase()
                 .AddDbContext<ChatLeIdentityDbContext>();
             services.AddInstance<ILoggerFactory>(new LoggerFactory());
             services.AddIdentity<ChatLeUser, IdentityRole>();
