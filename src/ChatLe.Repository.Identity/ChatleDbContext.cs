@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 
 namespace ChatLe.Models
 {
@@ -47,7 +48,10 @@ namespace ChatLe.Models
             base.OnModelCreating(builder);
 
             builder.Entity<ChatLeUser>()
-                .HasMany(u => u.NotificationConnections).WithOne().HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType });
+                .HasMany(u => u.NotificationConnections)
+                .WithOne()
+                .HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType })
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<NotificationConnection<TKey>>(b =>
             {
@@ -61,8 +65,15 @@ namespace ChatLe.Models
                 b.HasKey(c => c.Id);
                 b.ToTable("Conversations");
 
-                b.HasMany(c => c.Attendees).WithOne().HasForeignKey(a => a.ConversationId);
-                b.HasMany(c => c.Messages).WithOne().HasForeignKey(m => m.ConversationId);
+                b.HasMany(c => c.Attendees)
+                    .WithOne()
+                    .HasForeignKey(a => a.ConversationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasMany(c => c.Messages)
+                    .WithOne()
+                    .HasForeignKey(m => m.ConversationId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Message<TKey>>(b =>

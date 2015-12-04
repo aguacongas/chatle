@@ -8,6 +8,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace ChatLe
 {
@@ -23,7 +24,7 @@ namespace ChatLe
 
         readonly IHostingEnvironment _environment;
         public ILoggerFactory LoggerFactory { get; private set; }
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
@@ -33,6 +34,7 @@ namespace ChatLe
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
+                loggerFactory.AddDebug();
             }
 
             builder.AddEnvironmentVariables();
@@ -40,7 +42,10 @@ namespace ChatLe
             Configuration = builder.Build();
 
             _environment = env;
+            LoggerFactory = loggerFactory;
 
+            loggerFactory.AddConsole();
+            
 #if DNX451
             int io, worker;
             ThreadPool.GetMinThreads(out worker, out io);
@@ -53,6 +58,9 @@ namespace ChatLe
             Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
             ThreadPool.GetMaxThreads(out worker, out io);
             Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
+
+            var sourceSwitch = new SourceSwitch("chatle");
+            loggerFactory.AddTraceSource(sourceSwitch, new ConsoleTraceListener());
 #endif
         }
 
