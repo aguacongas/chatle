@@ -1,8 +1,7 @@
 ﻿using ChatLe.Models;
 using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -10,68 +9,98 @@ namespace ChatLe.Repository.Text
 {
     public static class TestHelpers
     {
-        public static ServiceCollection GetServicesCollection()
+        public static ServiceCollection GetServicesCollection<T>() where T :DbContext
         {
             var services = new ServiceCollection();
             services.AddEntityFramework()
-                .AddInMemoryStore();
+                .AddInMemoryDatabase()
+                .AddDbContext<T>(options => options.UseInMemoryDatabase());
             services.AddInstance<ILoggerFactory>(new LoggerFactory());
+
             return services;
         }
     }
-    public class UserTest : IChatUser<string>
-    {
-        public string Id { get; set; } = "test";
 
-        public ICollection<NotificationConnection<string>> NotificationConnections { get; } = new List<NotificationConnection<string>>();
+    public class UserTest: UserTest<string>
+    {
+        public UserTest()
+        {
+            Id = "test";
+        }
+    }
+
+    public class UserTest<TKey> : IChatUser<TKey> where TKey: IEquatable<TKey>
+    {
+        public TKey Id { get; set; }
+
+        public ICollection<NotificationConnection<TKey>> NotificationConnections { get; set; } = new List<NotificationConnection<TKey>>();
 
         public string UserName { get; set; } = "test";
 
-        public string PasswordHash { get; } = null;
+        public string PasswordHash { get; set; } = null;
 
     }
-    public class ChatDbContext : DbContext
+
+    public class ChatDbContext:ChatDbContext<string, UserTest, Message, Attendee, Conversation, NotificationConnection>
+    {
+        public ChatDbContext(IServiceProvider provider) : base(provider) { }
+    }
+
+    public class ChatDbContext<TKey, TUser, TMessage, TAttendee, TConversation, TNotificationConnection> : DbContext 
+        where TKey:IEquatable<TKey>
+        where TUser : UserTest<TKey>
+        where TMessage: Message<TKey>
+        where TAttendee : Attendee<TKey>
+        where TConversation : Conversation<TKey>
+        where TNotificationConnection : NotificationConnection<TKey>
     {
         public ChatDbContext(IServiceProvider provider) : base(provider) { }
 
-        public DbSet<UserTest> Users { get; set; }
-        public DbSet<Message> Messages { get; set; }
-        public DbSet<Attendee> Attendee { get; set; }
-        public DbSet<Conversation> Conversations { get; set; }
-        public DbSet<NotificationConnection> NotificationConnections { get; set; }
+        public DbSet<TUser> Users { get; set; }
+        public DbSet<TMessage> Messages { get; set; }
+        public DbSet<TAttendee> Attendee { get; set; }
+        public DbSet<TConversation> Conversations { get; set; }
+        public DbSet<TNotificationConnection> NotificationConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
             builder.Entity<UserTest>(b =>
             {
-                b.Key(u => u.Id);
+                b.HasKey(u => u.Id);
+                b.ToTable("TestUsers");
+
+                b.HasMany(u => u.NotificationConnections).WithOne().HasForeignKey(nc => nc.UserId);
+                
             });
 
-            builder.Entity<NotificationConnection>(b =>
+            builder.Entity<Message<TKey>>(b =>
             {
-                b.Key(n => new { n.ConnectionId, n.NotificationType });
-                b.HasOne<ChatLeUser>().WithMany().ForeignKey(n => n.UserId);
+                b.HasKey(m => m.Id);
+                b.ToTable("Messages");
             });
 
-            builder.Entity<Conversation>(b =>
+            builder.Entity<Conversation<TKey>>(b =>
             {
-                b.Key(c => c.Id);
+                b.HasKey(c => c.Id);
+                b.ToTable("Conversations");
+
+                b.HasMany(c => c.Attendees).WithOne().HasForeignKey(a => a.ConversationId);
+                b.HasMany(c => c.Messages).WithOne().HasForeignKey(m => m.ConversationId);                
             });
 
-            builder.Entity<Message>(b =>
+            builder.Entity<NotificationConnection<TKey>>(b =>
             {
-                b.Key(m => m.Id);
-                b.HasOne<UserTest>().WithMany().ForeignKey(m => m.UserId);
-                b.HasOne<Conversation>().WithMany().ForeignKey(m => m.ConversationId);
+                b.HasKey(n => new { n.ConnectionId, n.NotificationType });
+                b.ToTable("NotificationConnections");
             });
 
-            builder.Entity<Attendee>(b =>
+            
+            builder.Entity<Attendee<TKey>>(b => 
             {
-                b.Key(a => new { a.ConversationId, a.UserId });
-                b.HasOne<Conversation>().WithMany().ForeignKey(a => a.ConversationId);
+                b.HasKey(a => new { a.UserId, a.ConversationId });
+                b.ToTable("Attendees");
             });
-
+                
         }
     }
 }

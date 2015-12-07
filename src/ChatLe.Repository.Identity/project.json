@@ -1,5 +1,5 @@
-﻿{
-    "version": "1.0.0-beta3",
+{
+    "version": "1.0.0-rc1",
     "authors": [ "Olivier Lefebvre" ],
     "description": "ChatLe repository implementation for Identity framework",
     "compilationOptions": {
@@ -18,23 +18,23 @@
             }
         }
     },
-    "dependencies": {
-	    "EntityFramework.SqlServer": "7.0.0-beta3",
-        "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta3",
-        "ChatLe.Repository": ""
-    },
+  "dependencies": {
+    "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
+    "ChatLe.Repository": "",
+    "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final"
+  },
     "commands": {
         "ef": "EntityFramework.Commands"
     },
-    "frameworks": {
-        "aspnet50": {
-            "dependencies": {
-            }
-        },
-        "aspnetcore50": {
-            "dependencies": {
-                "System.Runtime": "4.0.20-beta-22231"                
-            }
-        }
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Runtime": "4.0.21-beta-23516"
+      }
     }
+  }
 }

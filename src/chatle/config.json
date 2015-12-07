@@ -2,7 +2,7 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "DatabaseEngine": "Redis",
+    "DatabaseEngine": "InMemory",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {

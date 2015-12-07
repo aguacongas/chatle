@@ -6,14 +6,12 @@ using Moq;
 using Xunit;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 using System.Threading;
 using Microsoft.AspNet.Http;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Mvc.ModelBinding;
 using System.Collections.Generic;
-using Microsoft.Framework.Logging;
-using Microsoft.AspNet.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace chatle.test.Controllers
 {
@@ -43,19 +41,19 @@ namespace chatle.test.Controllers
                 userValidators,
                 passwordValidators,
                 new UpperInvariantLookupNormalizer(),
-                new List<IUserTokenProvider<TUser>>(),
-                new List<IIdentityMessageProvider>());
+                new IdentityErrorDescriber(),
+                new ServiceCollection());
         }
 
         private static Mock<SignInManager<TUser>> MockSigninManager<TUser>(UserManager<TUser> userManager) where TUser : class
         {            
             var context = new Mock<HttpContext>();
             var contextAccessor = new Mock<IHttpContextAccessor>();
-            contextAccessor.Setup(a => a.Value).Returns(context.Object);
+            contextAccessor.Setup(a => a.HttpContext).Returns(context.Object);
             var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object,new RoleValidator<TestRole>[] { new RoleValidator<TestRole>() });
             var identityOptions = new IdentityOptions();
             var options = new Mock<IOptions<IdentityOptions>>();
-            options.Setup(a => a.Options).Returns(identityOptions);
+            options.Setup(a => a.Value).Returns(identityOptions);
             var claimsFactory = new Mock<ClaimsIdentityFactory<TUser, TestRole>>(userManager, roleManager, options.Object);
             return new Mock<SignInManager<TUser>>(userManager, contextAccessor.Object, claimsFactory.Object, options.Object);
         }
@@ -64,7 +62,7 @@ namespace chatle.test.Controllers
         public async Task RegisterTest()
         {            
             var userManager = MockUserManager<ChatLeUser>();
-            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Success).Verifiable();
+            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success).Verifiable();
             var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
             signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
@@ -85,7 +83,7 @@ namespace chatle.test.Controllers
         public async Task RegisterFailedTest()
         {
             var userManager = MockUserManager<ChatLeUser>();
-            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), CancellationToken.None)).ReturnsAsync(IdentityResult.Failed()).Verifiable();
+            userManager.Setup(m => m.CreateAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Failed()).Verifiable();
             var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
             signinManager.Setup(m => m.SignInAsync(It.IsAny<ChatLeUser>(), It.IsAny<bool>(), null, CancellationToken.None)).Returns(Task.FromResult(0)).Verifiable();
             var metaDataProvider = new Mock<IModelMetadataProvider>().Object;

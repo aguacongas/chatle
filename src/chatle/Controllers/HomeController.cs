@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNet.Diagnostics;
+using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Diagnostics;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers
 {
@@ -13,7 +11,7 @@ namespace ChatLe.Controllers
         public HomeController(ILoggerFactory factory)
         {
             if (_logger == null)
-                _logger = factory.Create("Unhandled Error");
+                _logger = factory.CreateLogger("Unhandled Error");
         }
         public IActionResult Index()
         {
@@ -39,9 +37,9 @@ namespace ChatLe.Controllers
 
         public IActionResult Error()
         {
-            var feature = Context.GetFeature<IErrorHandlerFeature>();
+            var feature = this.HttpContext.Features.Get<IExceptionHandlerFeature>();
             var error = feature?.Error;
-            _logger.WriteError("Oops!", error);
+            _logger.LogError("Oops!", error);
             return View("~/Views/Shared/Error.cshtml", error);
         }
     }

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
+﻿using System.Threading.Tasks;
 using ChatLe.Models;
+using Microsoft.AspNet.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Identity;
 
 namespace ChatLe.Controllers
 {
@@ -42,7 +40,7 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (signInStatus.Succeeded)
                     return RedirectToLocal(returnUrl);
@@ -158,7 +156,7 @@ namespace ChatLe.Controllers
             {
                 await ChatManager.RemoveUserAsync(user);
             }
-            SignInManager.SignOut();            
+            await SignInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
@@ -172,7 +170,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.FindByIdAsync(Context.User.Identity.GetUserId());
+            return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         public enum ManageMessageId

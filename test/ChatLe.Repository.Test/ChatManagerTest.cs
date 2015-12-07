@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
 using System.Threading;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.OptionsModel;
 
 namespace ChatLe.Repository.Text
 {
@@ -13,7 +13,7 @@ namespace ChatLe.Repository.Text
     {
         class OptionsAccessor : IOptions<ChatOptions>
         {
-            public ChatOptions Options
+            public ChatOptions Value
             {
                 get
                 {
@@ -26,6 +26,7 @@ namespace ChatLe.Repository.Text
                 return new ChatOptions();
             }
         }
+
         [Fact]
         public async Task AddConnectionIdAsyncTest()
         {

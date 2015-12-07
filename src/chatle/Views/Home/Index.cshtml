@@ -12,7 +12,7 @@
                 <a href="#" data-bind="text: Id, click: function() { $parent.showMessage($data); }"></a>
                 <!-- /ko -->
                 <!-- ko if: UserName === Id -->
-                @Html.ActionLink(User.Identity.GetUserName(), "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
+                @Html.ActionLink(User.Identity.Name, "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
                 <!-- /ko -->
             </li>
         </ul>
@@ -53,6 +53,6 @@
     <script src="/signalr/js"></script>
     <script src="~/scripts/chat.js"></script>
     <script>
-        var UserName = '@User.Identity.GetUserName()';
+        var UserName = '@User.Identity.Name';
     </script>
 }

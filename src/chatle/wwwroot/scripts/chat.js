@@ -113,7 +113,7 @@ $(function() {
         console.log("Chat Hub state changed from " + oldState + " to " + newState);
     }), $.connection.hub.reconnected(function() {
         console.log("Chat Hub reconnect");
-    }), $.connection.hub.error(function() {
+    }), $.connection.hub.error(function(err) {
         console.log("Chat Hub error");
     }), $.connection.hub.disconnected(function() {
         console.log("Chat Hub disconnected");

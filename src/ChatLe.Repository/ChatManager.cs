@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.OptionsModel;
+﻿using Microsoft.Extensions.OptionsModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,8 @@ namespace ChatLe.Models
     /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee<TKey>"/></typeparam>
     /// <typeparam name="TMessage">type of message, must be a <see cref="Message<TKey>"/></typeparam>
     /// <typeparam name="TNotificationConnection">type of notification's connection, must be a <see cref="NotificationConnection<TKey>"/></typeparam>
-    public class ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> : IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> 
+    public class ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> : IChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
+        where TKey : IEquatable<TKey>
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>, new()
         where TAttendee : Attendee<TKey>, new()
@@ -31,11 +32,11 @@ namespace ChatLe.Models
         {
             if (store == null)
                 throw new ArgumentNullException("store");
-            if (optionsAccessor == null || optionsAccessor.Options == null)
+            if (optionsAccessor == null || optionsAccessor.Value == null)
                 throw new ArgumentNullException("optionsAccessor");
 
             Store = store;
-            Options = optionsAccessor.Options;
+            Options = optionsAccessor.Value;
         }
         /// <summary>
         /// Gets the store

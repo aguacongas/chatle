@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System;
 
 namespace ChatLe.Models
 {
@@ -9,12 +10,12 @@ namespace ChatLe.Models
     /// </summary>
     /// <typeparam name="TKey">type of primary key</typeparam>
     /// <typeparam name="TUser">type of user, must be a class and implement <see cref="IChatUser{TKey}"/></typeparam>
-    /// <typeparam name="TContext">type of context, must be a <see cref="DbContext"/></typeparam>
     /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation{TKey}"/></typeparam>
     /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee{TKey}"/></typeparam>
     /// <typeparam name="TMessage">type of message, must be a <see cref="Message{TKey}"/></typeparam>
     /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam>
     public interface IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
+        where TKey : IEquatable<TKey>
         where TUser : IChatUser<TKey>
         where TConversation : Conversation<TKey>
         where TAttendee : Attendee<TKey>

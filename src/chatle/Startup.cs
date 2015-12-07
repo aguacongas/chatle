@@ -1,24 +1,14 @@
-﻿using ChatLe.HttpUtility;
-using ChatLe.Logging;
+﻿using System;
+using System.Threading;
 using ChatLe.Models;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.AspNet.Mvc.Routing;
-using Microsoft.AspNet.Routing;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Redis.Extensions;
-using Microsoft.Framework.ConfigurationModel;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
-using System;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChatLe
 {
@@ -34,20 +24,29 @@ namespace ChatLe
 
         readonly IHostingEnvironment _environment;
         public ILoggerFactory LoggerFactory { get; private set; }
-        public Startup(IHostingEnvironment environment, ILoggerFactory factory)
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            LoggerFactory = factory;
-            LoggerFactory.AddProvider(new TraceLoggerProvider());
-            /* 
-            * Below code demonstrates usage of multiple configuration sources. For instance a setting say 'setting1' is found in both the registered sources, 
-            * then the later source will win. By this way a Local config can be overridden by a different setting while deployed remotely.
-            */
-            Configuration = new Configuration()
+            var builder = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
-                .AddEnvironmentVariables(); //All environment variables in the process's context flow in as configuration values.
+                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
-            _environment = environment;
+            if (env.IsDevelopment())
+            {
+                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
+                builder.AddUserSecrets();
+                loggerFactory.AddDebug();
+            }
 
+            builder.AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+
+            _environment = env;
+            LoggerFactory = loggerFactory;
+
+            loggerFactory.AddConsole();
+            
+#if DNX451
             int io, worker;
             ThreadPool.GetMinThreads(out worker, out io);
             Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
@@ -59,33 +58,36 @@ namespace ChatLe
             Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
             ThreadPool.GetMaxThreads(out worker, out io);
             Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
+
+            var sourceSwitch = new SourceSwitch("chatle");
+            loggerFactory.AddTraceSource(sourceSwitch, new ConsoleTraceListener());
+#endif
         }
 
         public IConfiguration Configuration { get; private set; }
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
+
             ConfigureEntity(services);
 
             services.AddMvc();
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
 
-            services.AddChatLe(Configuration.GetSubKey("ChatCongig"));
-
-            services.AddRemoveResponseHeaders(Configuration.GetSubKey("RemoveResponseHeader"));
+            services.AddChatLe(Configuration);
 
         }
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework(Configuration);
+            var builder = services.AddEntityFramework();
 
-            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration.Get("DatabaseEngine"));
+            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
             switch (dbEngine)
             {
                 case DBEngine.InMemory:
-                    builder.AddInMemoryStore();
+                    builder.AddInMemoryDatabase();
                     break;
                 //case DBEngine.SQLite:
                 //    builder.AddSQLite();
@@ -93,9 +95,9 @@ namespace ChatLe
                 case DBEngine.SqlServer:
                     builder.AddSqlServer();
                     break;
-                case DBEngine.Redis:
-                    builder.AddRedis();
-                    break;
+                //case DBEngine.Redis:
+                //    //builder.AddRedis();
+                //    break;
                 default:
                     throw new InvalidOperationException("Database engine unsupported");
             }
@@ -105,40 +107,37 @@ namespace ChatLe
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
-                        options.UseInMemoryStore(true);
+                        options.UseInMemoryDatabase();
                         break;
                     case DBEngine.SqlServer:
-                        options.UseSqlServer(Configuration.Get("Data:DefaultConnection:ConnectionString"));
+                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
                         break;
                     //case DBEngine.SQLite:
                     //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
                     //    break;
-                    case DBEngine.Redis:
-                        int port;
-                        int database;
-                        if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
-                            port = 6379;
-                        int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
-
-                        options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
-                        break;
+                    //case DBEngine.Redis:
+                    //    int port;
+                    //    int database;
+                    //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
+                    //        port = 6379;
+                    //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
+                        
+                    //    //options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
+                    //    break;
                 }
             });
 
-            services.AddIdentity<ChatLeUser, IdentityRole>(Configuration.GetSubKey("Identity"), options =>
+            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
-            })
-            .AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+            }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            //app.UseRemoveResponseHeaders();
             ConfigureErrors(app);
 
-            app.UseRemoveResponseHeaders()
-                .UseStaticFiles()             
+            app.UseStaticFiles()             
                 .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
@@ -157,13 +156,13 @@ namespace ChatLe
             if (string.Equals(_environment.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
             {
                 app.UseBrowserLink();
-                app.UseErrorPage(ErrorPageOptions.ShowAll);
+                app.UseDeveloperExceptionPage();
             }
             else
             {
                 // Add Error handling middleware which catches all application specific errors and
                 // send the request to the following path or controller action.
-                app.UseErrorHandler("/Home/Error");
+                app.UseExceptionHandler("/Home/Error");
             }            
         }
     }

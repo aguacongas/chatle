@@ -1,7 +1,9 @@
 {
-    "sources": [
+    "projects": [
         "src",
-        "firefly/src/main",
-        "EntityFramework/src"
-    ]
+        "test"
+    ],
+    "sdk": {
+        "version": "1.0.0-rc1-update1"
+    }
 }
