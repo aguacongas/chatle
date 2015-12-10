@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-rc1",
+    "version": "1.0.0-rc1-final",
     "authors": [ "Olivier Lefebvre" ],
     "description": "ChatLe repository implementation for Identity framework",
     "compilationOptions": {
