@@ -1,34 +1,39 @@
 ﻿{
-    "version": "1.0.0-rc1",
-    "authors": [ "Olivier Lefebvre" ],
-    "description": "ChatLe repository",
-    "compilationOptions": {
-        "warningsAsErrors": true
+  "version": "1.0.0-rc1",
+  "authors": [ "Olivier Lefebvre" ],
+  "description": "ChatLe repository",
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
+  "configurations": {
+    "Debug": {
+      "compilationOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
     },
-    "configurations": {
-        "Debug": {
-            "compilationOptions": {
-                "define": [ "DEBUG", "TRACE" ]
-            }
-        },
-        "Release": {
-            "compilationOptions": {
-                "define": [ "RELEASE", "TRACE" ],
-                "optimize": true
-            }
-        }
-    },
+    "Release": {
+      "compilationOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true
+      }
+    }
+  },
   "dependencies": {
     "EntityFramework.Core": "7.0.0-rc1-final"
   },
   "frameworks": {
-    "dnx451": {
-      "dependencies": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.0.0"
       }
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
-        "System.Runtime": "4.0.21-beta-23516"
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
       }
     }
   }
