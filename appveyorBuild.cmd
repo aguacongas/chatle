@@ -1,5 +1,5 @@
 call dnvm upgrade
-call dnu restore %APPVEYOR_BUILD_FOLDER%
+call dnu restore
 if %ERRORLEVEL% NEQ 0 (
   exit /b 0
 )
