@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -2190,7 +2190,7 @@
       }
     },
     "DNXCore,Version=v5.0": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -2208,12 +2208,7 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
-          "Microsoft.CSharp": "4.0.1-beta-23516",
-          "System.Collections": "4.0.11-beta-23516",
-          "System.Linq": "4.0.1-beta-23516",
-          "System.Runtime": "4.0.21-beta-23516",
-          "System.Threading": "4.0.11-beta-23516"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -5044,7 +5039,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -7234,7 +7229,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -9424,7 +9419,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x86": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -9442,12 +9437,7 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
-          "Microsoft.CSharp": "4.0.1-beta-23516",
-          "System.Collections": "4.0.11-beta-23516",
-          "System.Linq": "4.0.1-beta-23516",
-          "System.Runtime": "4.0.21-beta-23516",
-          "System.Threading": "4.0.11-beta-23516"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -12785,7 +12775,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x64": {
-      "ChatLe.Repository/1.0.0-rc1": {
+      "ChatLe.Repository/1.0.0": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -12803,12 +12793,7 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
-          "Microsoft.CSharp": "4.0.1-beta-23516",
-          "System.Collections": "4.0.11-beta-23516",
-          "System.Linq": "4.0.1-beta-23516",
-          "System.Runtime": "4.0.21-beta-23516",
-          "System.Threading": "4.0.11-beta-23516"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -16147,7 +16132,7 @@
     }
   },
   "libraries": {
-    "ChatLe.Repository/1.0.0-rc1": {
+    "ChatLe.Repository/1.0.0": {
       "type": "project",
       "path": "../ChatLe.Repository/project.json"
     },
