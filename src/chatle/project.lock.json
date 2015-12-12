@@ -1968,6 +1968,9 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
+      },
       "Remotion.Linq/2.0.1": {
         "type": "package",
         "compile": {
@@ -2208,7 +2211,12 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
+          "Microsoft.CSharp": "4.0.1-beta-23516",
+          "System.Collections": "4.0.11-beta-23516",
+          "System.Linq": "4.0.1-beta-23516",
+          "System.Runtime": "4.0.21-beta-23516",
+          "System.Threading": "4.0.11-beta-23516"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -3958,6 +3966,9 @@
         "runtime": {
           "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll": {}
         }
+      },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
       },
       "Remotion.Linq/2.0.1": {
         "type": "package",
@@ -7007,6 +7018,9 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
+      },
       "Remotion.Linq/2.0.1": {
         "type": "package",
         "compile": {
@@ -9197,6 +9211,9 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
+      },
       "Remotion.Linq/2.0.1": {
         "type": "package",
         "compile": {
@@ -9437,7 +9454,12 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
+          "Microsoft.CSharp": "4.0.1-beta-23516",
+          "System.Collections": "4.0.11-beta-23516",
+          "System.Linq": "4.0.1-beta-23516",
+          "System.Runtime": "4.0.21-beta-23516",
+          "System.Threading": "4.0.11-beta-23516"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -11191,6 +11213,9 @@
           "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll": {}
         }
       },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
+      },
       "Remotion.Linq/2.0.1": {
         "type": "package",
         "compile": {
@@ -12793,7 +12818,12 @@
         "dependencies": {
           "ChatLe.Repository": null,
           "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
-          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final"
+          "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-rc1-final",
+          "Microsoft.CSharp": "4.0.1-beta-23516",
+          "System.Collections": "4.0.11-beta-23516",
+          "System.Linq": "4.0.1-beta-23516",
+          "System.Runtime": "4.0.21-beta-23516",
+          "System.Threading": "4.0.11-beta-23516"
         }
       },
       "EntityFramework.Commands/7.0.0-rc1-final": {
@@ -14546,6 +14576,9 @@
         "runtime": {
           "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll": {}
         }
+      },
+      "NuGet.CommandLine/3.3.0": {
+        "type": "package"
       },
       "Remotion.Linq/2.0.1": {
         "type": "package",
@@ -17011,7 +17044,7 @@
     },
     "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
       "type": "package",
-      "sha512": "E7VdmGw6xO3VHWapC+pNLZmo6yncS53UY3bmb5WZm9wliJBB1A6brgzKA4fcqiLrmJFx71r0M2zEbRDphRLUNg==",
+      "sha512": "2+V/VDgZu59Thrlp+FQH38H/SmPBegMKsG0ie1ZZyHtx7kJNEozIx/p9zs0UrolX0uyYX7Ouoj3Q3Be15lqXxA==",
       "files": [
         "analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll",
         "analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll",
@@ -17784,6 +17817,16 @@
         "tools/install.ps1"
       ]
     },
+    "NuGet.CommandLine/3.3.0": {
+      "type": "package",
+      "sha512": "6YrMwIwj8LJxQ/E8mgPpwb7Vt/paAeE/SiZFC3n64DkJuUT+qQV9+KEc8oVa4ko0/T595GMBVChya6u79PxLxg==",
+      "files": [
+        "NuGet.CommandLine.3.3.0.nupkg",
+        "NuGet.CommandLine.3.3.0.nupkg.sha512",
+        "NuGet.CommandLine.nuspec",
+        "tools/NuGet.exe"
+      ]
+    },
     "Remotion.Linq/2.0.1": {
       "type": "package",
       "sha512": "SIO6HDH6CU9GC2IZGBrc6q5X5vRhfatXrg9cVavCEG9W6v5e88b+vXjmLGQEorch4sYEIImRr+ODyUMyrmrqAg==",
@@ -17885,7 +17928,7 @@
     "runtime.win7.System.Diagnostics.Process/4.1.0-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "WQ9fNSFkKk/aaKiVS9YA0b1W6CpXt60zvUY2HdmY5N9Js6h/mxhXavxCowYR9qVW95gqA42zcxb3FElWsCqqEw==",
+      "sha512": "hXKdXyMDMGkSwaOQOgNlQsJuROb0rs+B/nGdvEDQZLZj0J9mH2jZ1/sXOB6nfgm/quboh0/EhV8oqC/1pzmBog==",
       "files": [
         "lib/win8/_._",
         "lib/wp8/_._",
@@ -20440,7 +20483,7 @@
     "System.Reflection.TypeExtensions/4.0.1-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "n8m144jjCwhN/qtLih35a2sO33fLWm1U3eg51KxqAcAjJcw0nq1zWie8FZognBTPv7BXdW/G8xGbbvDGFoJwZA==",
+      "sha512": "Q3FiCsJ/4s2nuyhOHAFhc0Te10LzPjv6QzVcywA3oWI1msfDg583RIXQ9YifDfOuig+wg+SX0p133qV71HVfyw==",
       "files": [
         "lib/DNXCore50/de/System.Reflection.TypeExtensions.xml",
         "lib/DNXCore50/es/System.Reflection.TypeExtensions.xml",
@@ -21056,7 +21099,7 @@
     "System.Runtime.Serialization.Primitives/4.0.11-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "AQywM01eG8EgYde/RRrJDVdHmOOI3KkgK9GEjLQqvTLsrWsamNHN/j7Pxwa3XX7klSSrfDpvTNfUl40855idVg==",
+      "sha512": "0JLo0iSVWtuVwNo51/ArH+WtTTriWs80roj32aBMDiFBtSMoNbBDQ5BxzqbbDjLw17mtLFHMBqIjeUVsGeRMlQ==",
       "files": [
         "lib/dotnet/de/System.Runtime.Serialization.Primitives.xml",
         "lib/dotnet/es/System.Runtime.Serialization.Primitives.xml",
@@ -22097,7 +22140,8 @@
       "Microsoft.Extensions.Logging.Debug >= 1.0.0-rc1-final",
       "Microsoft.VisualStudio.Web.BrowserLink.Loader >= 14.0.0-rc1-final",
       "Microsoft.AspNet.SignalR.Server >= 3.0.0-rc1-final",
-      "Microsoft.AspNet.WebSockets.Server >= 1.0.0-rc1-final"
+      "Microsoft.AspNet.WebSockets.Server >= 1.0.0-rc1-final",
+      "NuGet.CommandLine >= 3.3.0"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": []
