@@ -8,12 +8,11 @@ NC='\033[0m'
 DNVM_LOCATION=~/.dnx/dnvm/dnvm.sh
 
 if [ ! -e $DNVM_LOCATION ]; then
-    mkdir -p `dirname $DNVM_LOCATION`
     curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
 fi
 
-source $DNVM_LOCATION
 dnvm upgrade -u -r coreclr
+dnvm list
 dnu restore --quiet
 
 ERRORS=()
@@ -51,5 +50,5 @@ else
     printf "${GREEN}All tests passed${NC}\n"
     rc=0
 fi
-rm $DNVM_LOCATION
+
 exit $rc
