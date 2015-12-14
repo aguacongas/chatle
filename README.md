@@ -1,8 +1,10 @@
 chatle
 ======
-AppVeyor build status: [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/master?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/master)
+AppVeyor build status: [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv/branch/dev?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle/branch/dev)
 
 Latest version on myget: [![version](https://img.shields.io/myget/chatle/v/ChatLe.HttpUtility.svg?style=flat)](https://www.myget.org/F/chatle/)
+
+Code coverage: [![Coverage Status](https://coveralls.io/repos/aguacongas/chatle/badge.svg?branch=dev&service=github)](https://coveralls.io/github/aguacongas/chatle?branch=dev)
 
 chatle is projects samples for 
 
