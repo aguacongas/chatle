@@ -5,15 +5,15 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-DNVM_LOCATION=packages/dnvm.sh
+DNVM_LOCATION=~/.dnx/dnvm/dnvm.sh
 
 if [ ! -e $DNVM_LOCATION ]; then
     mkdir -p `dirname $DNVM_LOCATION`
-    curl -sSL -o $DNVM_LOCATION https://raw.githubusercontent.com/aspnet/Home/dev/dnvm.sh
+    curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
 fi
 
 source $DNVM_LOCATION
-DNX_UNSTABLE_FEED=https://www.myget.org/F/aspnetcidev/ dnvm upgrade -u -r coreclr
+dnvm upgrade -u -r coreclr
 dnu restore --quiet
 
 ERRORS=()
