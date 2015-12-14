@@ -10,8 +10,8 @@ addons:
     - libunwind8
     - zlib1g
 install:
-	- curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
-	- dnvm upgrade -r mono
-	- dnu restore
+  - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
+  - dnvm upgrade -r mono
+  - dnu restore
 script:
   - ./travis-build.sh
