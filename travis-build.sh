@@ -5,18 +5,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-printf "${GREEN}Install DNVM\n"
-sudo apt-get install unzip curl
-curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
-
-printf "${GREEN}dnvm upgrade\n"
-dnvm upgrade -u -r coreclr
-dnvm list
-printf "${GREEN}dnvm upgrade\n"
-dnu restore
-
 ERRORS=()
 SKIPPED=()
+
+printf "${GREEN}Start tests\n"
 
 for t in `grep -l "xunit.runner" test/*/project.json`; do
     TEST_DIR=$(dirname $t)
