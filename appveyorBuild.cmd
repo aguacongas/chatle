@@ -1,6 +1,7 @@
 call npm install -g grunt-cli
 call dnvm install latest -a x64 -r coreclr -Alias core
-call dnvm install latest -a x64 -r clr -Alias clr -p
+call dnvm install latest -a x64 -r clr -Alias clr
+call dnvm install latest -a x86 -r clr -Alias default -p
 call dnvm list
 call dnu restore --quiet
 if %ERRORLEVEL% NEQ 0 (
