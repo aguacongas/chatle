@@ -1,7 +1,5 @@
 language: csharp
 dist: trusty
-os:
-  - linux
 addons:
   apt:
     packages:
@@ -11,8 +9,6 @@ addons:
     - libssl-dev
     - libunwind8
     - zlib1g
-before_install:
-   - if test "$TRAVIS_OS_NAME" == "osx"; then brew update; brew install icu4c; fi
 install:
 	- curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
 	- dnvm upgrade -r mono
