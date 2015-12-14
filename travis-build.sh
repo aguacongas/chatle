@@ -5,15 +5,15 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-DNVM_LOCATION=~/.dnx/dnvm/dnvm.sh
+printf "${GREEN}Install DNVM\n"
+sudo apt-get install unzip curl
+curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
 
-if [ ! -e $DNVM_LOCATION ]; then
-    curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
-fi
-
+printf "${GREEN}dnvm upgrade\n"
 dnvm upgrade -u -r coreclr
 dnvm list
-dnu restore --quiet
+printf "${GREEN}dnvm upgrade\n"
+dnu restore
 
 ERRORS=()
 SKIPPED=()
