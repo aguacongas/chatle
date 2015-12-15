@@ -1,0 +1,19 @@
+language: csharp
+dist: trusty
+addons:
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - zlib1g
+before_install:
+ - chmod +x build.sh
+install:
+  - curl -sSL https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.sh | DNX_BRANCH=dev sh && source ~/.dnx/dnvm/dnvm.sh
+  - dnvm upgrade -r mono
+  - dnu restore
+script:
+  - ./build.sh
