@@ -28,30 +28,34 @@ namespace ChatLe.Repository.Text
         }
 
         [Fact]
+        public void Constructor_should_throw_ArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(null, new OptionsAccessor()));
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
+            Assert.Throws<ArgumentNullException>(() => new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, null));
+        }
+
+        [Fact]
         public async Task AddConnectionIdAsyncTest()
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());            
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await manager.AddConnectionIdAsync("test", "test", "test");
+            storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection());
+            await manager.AddConnectionIdAsync("test", "test", "test");
         }
 
-        [Fact]
-        public async Task AddConnectionIdAsyncUserNameNullTest()
+        [Theory]
+        [InlineData(null, "test", "test")]
+        [InlineData("test", null, "test")]
+        [InlineData("test", "test", null)]
+        public async Task AddConnectionIdAsync_should_throw_ArgumentNullException(string userName, string connectionId, string notificationType)
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync(null, "test", "test"));
-        }
-
-        [Fact]
-        public async Task AddConnectionIdAsyncConnectionIdNullTest()
-        {
-            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
-            storeMock.Setup(s => s.FindUserByNameAsync("test", It.IsAny<CancellationToken>())).ReturnsAsync(new UserTest());
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync("test", null, "test"));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync(userName, connectionId, notificationType));
         }
 
         [Fact]
@@ -75,6 +79,19 @@ namespace ChatLe.Repository.Text
             Assert.True(users.Count() == 1);
             Assert.True(users.First() == connected);
         }
+
+        [Theory]
+        [InlineData (null, "test", "test")]
+        [InlineData("test", null, "test")]
+        [InlineData("test", "test", null)]
+        public async Task RemoveConnectionIdAsync_Should_ThrowArgumentNullException(string userName, string connectionId, string notificationType)
+        {
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(userName, connectionId, notificationType));
+        }
+
+
 
         [Theory,
             InlineData("1","2")

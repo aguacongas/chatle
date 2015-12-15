@@ -61,6 +61,8 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("userName");
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
+            if (notificationType == null)
+                throw new ArgumentNullException("notificationType");
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
@@ -94,6 +96,8 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("userName");
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
+            if (notificationType == null)
+                throw new ArgumentNullException("notificationType");
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
