@@ -248,7 +248,11 @@ namespace ChatLe.Models
             // TODO: check if it's necessary when EF7 will be release
             foreach (var conv in conversations)
             {
-                await Store.GetAttendeesAsync(conv, cancellationToken);
+                var attendees = await Store.GetAttendeesAsync(conv, cancellationToken);
+                foreach (var attendee in attendees)
+                    if (!conv.Attendees.Any(a => a.UserId.Equals(attendee.UserId)))
+                        conv.Attendees.Add(attendee);
+
                 var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
                 foreach (var message in messages)
                     if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))

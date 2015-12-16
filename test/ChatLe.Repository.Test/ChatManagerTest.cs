@@ -6,6 +6,7 @@ using Xunit;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.OptionsModel;
+using System.Collections.Generic;
 
 namespace ChatLe.Repository.Text
 {
@@ -53,8 +54,7 @@ namespace ChatLe.Repository.Text
         [InlineData("test", "test", null)]
         public async Task AddConnectionIdAsync_should_throw_ArgumentNullException(string userName, string connectionId, string notificationType)
         {
-            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());                        
+            var manager = CreateManager();
             await Assert.ThrowsAsync<ArgumentNullException>(() => manager.AddConnectionIdAsync(userName, connectionId, notificationType));
         }
 
@@ -87,8 +87,7 @@ namespace ChatLe.Repository.Text
         [InlineData("test", "test", null)]
         public async Task RemoveConnectionIdAsync_Should_ThrowArgumentNullException(string userName, string connectionId, string notificationType)
         {
-            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
-            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
+            var manager = CreateManager();
             await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(userName, connectionId, notificationType));
         }
 
@@ -106,6 +105,15 @@ namespace ChatLe.Repository.Text
             Assert.True(await manager.RemoveConnectionIdAsync("test", "test", "test"));
             storeMock.Setup(s => s.UserHasConnectionAsync("test1")).ReturnsAsync(false);
             Assert.False(await manager.RemoveConnectionIdAsync("test1", "test", "test"));
+        }
+
+        [Theory]
+        [InlineData(null, "test")]
+        [InlineData("test", null)]
+        public async Task GetOrCreateConversationAsync_should_throw_ArgumentNullException(string from, string to)
+        {
+            var manager = CreateManager();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.GetOrCreateConversationAsync(from, to, "test"));
         }
 
         [Theory,
@@ -145,6 +153,90 @@ namespace ChatLe.Repository.Text
             Assert.Null(await manager.AddMessageAsync("test", "test", new Message() { Text = "Test" }));
             storeMock.Setup(s => s.GetConversationAsync("test", default(CancellationToken))).ReturnsAsync(new Conversation());
             Assert.NotNull(await manager.AddMessageAsync("test", "test", new Message() { Text = "Test" }));
+        }
+
+        [Fact]
+        public async Task GetMessagesTest()
+        {
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
+            storeMock.Setup(s => s.GetMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Message>() { new Message() });
+            var list = await manager.GetMessagesAsync("test");
+            Assert.NotEmpty(list);            
+        }
+
+        [Fact]
+        public async Task GetConversationsAsync_should_throw_ArgumentNullException()
+        {
+            var manager = CreateManager();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.GetConversationsAsync(null));
+        }
+
+        private static ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection> CreateManager()
+        {
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
+            return new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
+        }
+
+        [Fact]
+        public async Task GetConversationsAsyncTest()
+        {
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
+            var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
+            storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new UserTest() { Id = "test" });
+            storeMock.Setup(s => s.GetConversationsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Conversation>()
+            {
+                new Conversation()
+                {
+                    Id = "test",
+                }
+            });
+            storeMock.Setup(s => s.GetAttendeesAsync(It.IsAny<Conversation>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Attendee>()
+            {
+                new Attendee()
+                {
+                    ConversationId = "test",
+                    UserId = "test"
+                }
+            });
+            storeMock.Setup(s => s.GetMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Message>()
+            {
+                new Message()
+                {
+                    ConversationId = "test",
+                    Id = "test",
+                    Date = DateTime.Now,
+                    Text = "test",
+                    UserId = "test"
+                },
+                new Message()
+                {
+                    ConversationId = "test",
+                    Id = "test",
+                    Date = DateTime.Now,
+                    Text = "test",
+                    UserId = "test"
+                },
+            });
+
+            var conversations = await manager.GetConversationsAsync("test");
+            Assert.NotEmpty(conversations);
+            Assert.NotEmpty(conversations.First().Attendees);
+            Assert.NotEmpty(conversations.First().Messages);
+        }
+
+        [Fact]
+        public async Task RemoveUserAsync_should_throw_ArgumentNullException()
+        {
+            var manager = CreateManager();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveUserAsync(null, CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task RemoveUserAsyncTest()
+        {
+            var manager = CreateManager();
+            await manager.RemoveUserAsync(new UserTest());
         }
     }
 }
