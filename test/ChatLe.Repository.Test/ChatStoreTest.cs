@@ -38,9 +38,20 @@ namespace ChatLe.Repository.Text
         }
 
         [Fact]
-        public void ConstrutorFailTest()
+        public void Constructor3Test()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
+            ServiceCollection services = GetServicesCollection<DbContext>();
+
+            using (var context = new DbContext(services.BuildServiceProvider()))
+            {
+                var store = new ChatStore<ChatLeUser>(context);
+            }
+        }
+
+        [Fact]
+        public void Construtor_should_throw_argumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
         }
 
         class FakeContextTest : DbContext
@@ -87,6 +98,18 @@ namespace ChatLe.Repository.Text
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsAssignableFrom<DbSet<UserTest>>(users);
+            }
+        }
+
+        [Fact]
+        public async Task CreateMessageAsync_should_throw_ArgumentNullException()
+        {
+            ServiceCollection services = GetServicesCollection<ChatDbContext>();
+
+            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            {
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
             }
         }
 

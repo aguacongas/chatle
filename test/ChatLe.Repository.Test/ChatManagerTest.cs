@@ -238,5 +238,13 @@ namespace ChatLe.Repository.Text
             var manager = CreateManager();
             await manager.RemoveUserAsync(new UserTest());
         }
+
+        [Fact]
+        public void IdentityConstructorCoverage()
+        {
+            var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            var manager = new ChatManager(storeMock.Object, new OptionsAccessor());
+        }
+
     }
 }
