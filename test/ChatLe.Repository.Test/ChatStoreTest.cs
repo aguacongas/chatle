@@ -21,19 +21,19 @@ namespace ChatLe.Repository.Text
             }
         }
 
-        private ServiceCollection GetServicesCollection<T>() where T : DbContext
+        private static ServiceCollection GetServicesCollection<T>() where T : DbContext
         {
             return TestHelpers.GetServicesCollection<T>();
         }
 
         [Fact]
-        public void Construtor2Test()
+        public void Constructor2Test()
         {
             ServiceCollection services = GetServicesCollection<DbContext>();
 
             using (var context = new DbContext(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<ChatLeUser>(context);
             }
         }
 
@@ -42,9 +42,9 @@ namespace ChatLe.Repository.Text
         {
             ServiceCollection services = GetServicesCollection<DbContext>();
 
-            using (var context = new DbContext(services.BuildServiceProvider()))
+            using (var context = new ChatLeIdentityDbContext())
             {
-                var store = new ChatStore<ChatLeUser>(context);
+                var store = new ChatStore(context);
             }
         }
 
@@ -113,14 +113,22 @@ namespace ChatLe.Repository.Text
             }
         }
 
-        [Fact]
-        public async Task CreateMessageAsyncTest()
+        static async Task ExecuteTest(Func<ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>, Task> action)
         {
             ServiceCollection services = GetServicesCollection<ChatDbContext>();
 
             using (var context = new ChatDbContext(services.BuildServiceProvider()))
             {
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                await action(store);
+            }
+        }
+
+        [Fact]
+        public async Task CreateMessageAsyncTest()
+        {
+            await ExecuteTest(async (store) =>
+            {
                 var message = new Message()
                 {
                     ConversationId = "test",
@@ -129,18 +137,23 @@ namespace ChatLe.Repository.Text
                     UserId = "test",
                 };
                 await store.CreateMessageAsync(message);
-            }
+            });
+        }
+
+        [Fact]
+        public async Task UpdateUserAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async (store) =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.UpdateUserAsync(null));
+            });
         }
 
         [Fact]
         public async Task UpdateUserAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
-
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            await ExecuteTest(async (store) =>
             {
-                await context.Database.EnsureCreatedAsync();
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 var user = new UserTest()
                 {
                     Id = "test",
@@ -150,16 +163,15 @@ namespace ChatLe.Repository.Text
                 await store.Context.SaveChangesAsync();
 
                 await store.UpdateUserAsync(user);
-            }
+            });
         }
 
         [Fact]
         public async Task GetUsersConnectedAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
-
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            await ExecuteTest(async (store) =>
             {
+                var context = store.Context;
                 var connected = new UserTest()
                 {
                     Id = "connected",
@@ -179,25 +191,23 @@ namespace ChatLe.Repository.Text
                 {
                     Id = "notConnected",
                     UserName = "notConnected",
-                };                
+                };
                 context.Users.Add(notConnected);
 
                 context.SaveChanges();
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
 
                 var users = await store.GetUsersConnectedAsync();
                 Assert.True(users.Count() == 1);
                 Assert.True(users.FirstOrDefault() == connected);
-            }
+            });
         }
 
         [Fact]
         public async Task NotificationConnectionAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
-
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            await ExecuteTest(async (store) =>
             {
+                var context = store.Context;
                 var user = new UserTest()
                 {
                     Id = "test",
@@ -213,20 +223,27 @@ namespace ChatLe.Repository.Text
                     NotificationType = "test"
                 };
 
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 await store.CreateNotificationConnectionAsync(nc);
                 nc = await store.GetNotificationConnectionAsync("test", "test");
                 await store.DeleteNotificationConnectionAsync(nc);
-            }
+            });
+        }
+
+        [Fact]
+        public async Task CreateNotificationConnectionAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async (store) =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateNotificationConnectionAsync(null));
+            });
         }
 
         [Fact]
         public async Task GetConversationsAsyncTest()
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
-
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            await ExecuteTest(async (store) =>
             {
+                var context = store.Context;
                 var conv = new Conversation();
                 context.Conversations.Add(conv);
                 var attendee = new Attendee()
@@ -247,13 +264,248 @@ namespace ChatLe.Repository.Text
                 context.Messages.Add(message);
                 context.SaveChanges();
 
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 var convs = await store.GetConversationsAsync("test");
                 Assert.NotNull(convs);
                 Assert.True(convs.Count() == 1);
                 Assert.NotNull(convs.FirstOrDefault());
                 Assert.Equal(conv, convs.First());
-            }
+            });
+        }
+
+        [Fact]
+        public async Task CreateAttendeeAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async store =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateAttendeeAsync(null));
+            });
+        }
+
+        [Fact]
+        public async Task CreateAttendeeAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                await store.CreateAttendeeAsync(new Attendee() { ConversationId = "test", UserId = "test" });
+            });
+        }
+
+        [Fact]
+        public async Task InitTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                await store.Context.Database.EnsureCreatedAsync();
+                store.Init();
+            });
+        }
+
+        [Fact]
+        public async Task CreateConversationAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async store =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateConversationAsync(null));
+            });
+        }
+
+        [Fact]
+        public async Task CreateConversationAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                await store.CreateConversationAsync(new Conversation());
+            });
+        }
+
+        [Fact]
+        public async Task FindUserByNameTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                await store.FindUserByNameAsync("test");
+            });
+        }
+
+        [Fact]
+        public async Task GetConversationAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async store =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetConversationAsync(null, null));
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetConversationAsync(new UserTest(), null));
+            });
+        }
+
+        [Fact]
+        public async Task GetConversationAsync_with_attendees()
+        {
+            await ExecuteTest(async store =>
+            {
+                AddConv(store);
+                Assert.NotNull(await store.GetConversationAsync(new UserTest() { Id = "test1" }, new UserTest() { Id = "test2" }));
+            });
+        }
+
+        private static Conversation AddConv(ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection> store)
+        {
+            var context = store.Context;
+            var conv = new Conversation();
+            context.Conversations.Add(conv);
+            var attendee1 = new Attendee()
+            {
+                ConversationId = conv.Id,
+                UserId = "test1"
+            };
+            context.Attendee.Add(attendee1);
+            var attendee2 = new Attendee()
+            {
+                ConversationId = conv.Id,
+                UserId = "test2"
+            };
+            context.Attendee.Add(attendee2);
+
+            var message = new Message()
+            {
+                ConversationId = conv.Id,
+                UserId = "test1",
+                Text = "test",
+                Date = DateTime.UtcNow
+            };
+
+            context.Messages.Add(message);
+            context.SaveChanges();
+            return conv;
+        }
+
+        [Fact]
+        public async Task GetConversationAsync_with_convId()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                Assert.NotNull(await store.GetConversationAsync(conv.Id));
+            });
+        }
+
+        [Fact]
+        public async Task GetMessagesAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var messages = await store.GetMessagesAsync(conv.Id);
+                Assert.NotNull(messages);
+                Assert.NotNull(messages.FirstOrDefault());
+            });
+        }
+
+        [Fact]
+        public async Task DeleteNotificationConnectionAsync_should_throw_ArgumentNullException()
+        {
+            await ExecuteTest(async store =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.DeleteNotificationConnectionAsync(null));
+            });
+        }
+
+        [Theory]
+        [InlineData("test", null)]
+        [InlineData(null, "test")]
+        public async Task GetNotificationConnectionAsync_should_throw_ArgumentNullException(string conversationId, string notificationId)
+        {
+            await ExecuteTest(async store =>
+            {
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetNotificationConnectionAsync(conversationId, notificationId));
+            });
+        }
+
+        [Fact]
+        public async Task GetNotificationConnectionsAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                var context = store.Context;
+
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = "test"
+                });
+
+                await context.SaveChangesAsync();
+
+                Assert.NotNull(await store.GetNotificationConnectionsAsync("test", "test"));
+            });
+        }
+
+        [Fact]
+        public async Task UserHasConnectionAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                var context = store.Context;
+
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = "test1"
+                });
+
+                Assert.False(await store.UserHasConnectionAsync("test"));
+            });
+        }
+
+        [Fact]
+        public async Task GetAttendeesAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var attendees = await store.GetAttendeesAsync(conv);
+                Assert.NotNull(attendees);
+                Assert.NotNull(attendees.FirstOrDefault());
+            });
+        }
+
+        [Fact]
+        public async Task DeleteUserAsyncTest()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var user = new UserTest();
+
+                var context = store.Context;
+
+                context.Attendee.Add(new Attendee()
+                {
+                    ConversationId = conv.Id,
+                    UserId = "test"
+                });
+
+                context.Users.Add(user);
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = "test"
+                });
+
+                context.SaveChanges();
+
+                await store.DeleteUserAsync(user);
+
+                Assert.Empty(context.NotificationConnections);
+                Assert.Empty(context.Users);
+
+                Assert.NotEmpty(context.Conversations);
+            });
         }
     }
 }

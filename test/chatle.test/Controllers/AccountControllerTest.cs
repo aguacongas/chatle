@@ -68,7 +68,7 @@ namespace chatle.test.Controllers
             var userValidators = new List<IUserValidator<ChatLeUser>>();
             var validator = new Mock<IUserValidator<ChatLeUser>>();
             userValidators.Add(validator.Object);
-            var userManager = GetUserManager<ChatLeUser>(userValidators);
+            var userManager = GetUserManager(userValidators);
 
             validator.Setup(v => v.ValidateAsync(userManager, It.IsAny<ChatLeUser>()))
                .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
@@ -95,7 +95,7 @@ namespace chatle.test.Controllers
             var userValidators = new List<IUserValidator<ChatLeUser>>();
             var validator = new Mock<IUserValidator<ChatLeUser>>();
             userValidators.Add(validator.Object);
-            var userManager = GetUserManager<ChatLeUser>(userValidators);
+            var userManager = GetUserManager(userValidators);
 
             validator.Setup(v => v.ValidateAsync(userManager, It.IsAny<ChatLeUser>()))
                .Returns(Task.FromResult(IdentityResult.Failed(new IdentityError[] {

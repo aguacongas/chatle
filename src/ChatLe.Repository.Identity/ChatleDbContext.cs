@@ -68,11 +68,13 @@ namespace ChatLe.Models
                 b.HasMany(c => c.Attendees)
                     .WithOne()
                     .HasForeignKey(a => a.ConversationId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
 
                 b.HasMany(c => c.Messages)
                     .WithOne()
                     .HasForeignKey(m => m.ConversationId)
+                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

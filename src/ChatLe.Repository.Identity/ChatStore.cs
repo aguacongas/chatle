@@ -174,7 +174,9 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
+            return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 
+                && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) 
+                && x.Attendees.Any(b => b.UserId.Equals(attendee2.Id)));
         }
         /// <summary>
         /// Gets a conversation by her id
@@ -303,7 +305,7 @@ namespace ChatLe.Models
         public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
+            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType == notificationType).ToListAsync();
         }
         /// <summary>
         /// Check if a user has connection
