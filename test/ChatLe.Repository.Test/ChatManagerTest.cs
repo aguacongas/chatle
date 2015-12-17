@@ -7,9 +7,8 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.OptionsModel;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 
-namespace ChatLe.Repository.Text
+namespace ChatLe.Repository.Test
 {
     public class ChatManagerTest
     {

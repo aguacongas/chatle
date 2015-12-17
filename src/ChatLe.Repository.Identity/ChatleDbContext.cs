@@ -2,30 +2,35 @@
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Data.Entity.Infrastructure;
 
 namespace ChatLe.Models
 {
-    public class ChatLeIdentityDbContextSql : ChatLeIdentityDbContext
+    public class ChatLeIdentityDbContext : ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true");
-            base.OnConfiguring(options);
-        }
     }
-
-    public class ChatLeIdentityDbContext:ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
-    { }
     /// <summary>
     /// Database context for ChatLe user
     /// </summary>
-    public class ChatLeIdentityDbContext<TKey, TMessage, TAttendee, TConversation, TNotificationConnection> : IdentityDbContext<ChatLeUser> 
+    public class ChatLeIdentityDbContext<TKey, TMessage, TAttendee, TConversation, TNotificationConnection> : IdentityDbContext<ChatLeUser, IdentityRole, string> 
         where TKey: IEquatable<TKey>
         where TMessage : Message<TKey>
         where TAttendee : Attendee<TKey>
         where TConversation : Conversation<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
+        public ChatLeIdentityDbContext(IServiceProvider serviceProvider):base(serviceProvider)
+        { }
+
+        public ChatLeIdentityDbContext(DbContextOptions options):base(options)
+        { }
+
+        public ChatLeIdentityDbContext(IServiceProvider serviceProvider, DbContextOptions options) : base(serviceProvider, options)
+        { }
+
+        protected ChatLeIdentityDbContext()
+        { }
+
         /// <summary>
         /// Gets or sets the DbSet of messages
         /// </summary>
@@ -57,8 +62,26 @@ namespace ChatLe.Models
                 .HasMany(u => u.NotificationConnections)
                 .WithOne()
                 .HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType })
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Message<TKey>>(b =>
+            {
+                b.HasKey(m => m.Id);
+                b.HasOne(m => m.Conversation)
+                    .WithMany()
+                    .HasForeignKey(m => m.ConversationId);
+                b.ToTable("Messages");
+            });
+
+            builder.Entity<Attendee<TKey>>(b =>
+            {
+                b.HasKey(a => new { a.ConversationId, a.UserId });
+                b.HasOne(a => a.Conversation)
+                    .WithMany()
+                    .HasForeignKey(a => a.ConversationId);
+
+                b.ToTable("Attendees");
+            });
 
             builder.Entity<Conversation<TKey>>(b =>
             {
@@ -68,27 +91,14 @@ namespace ChatLe.Models
                 b.HasMany(c => c.Attendees)
                     .WithOne()
                     .HasForeignKey(a => a.ConversationId)
-                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
 
                 b.HasMany(c => c.Messages)
                     .WithOne()
                     .HasForeignKey(m => m.ConversationId)
-                    .IsRequired()
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            builder.Entity<Message<TKey>>(b =>
-            {
-                b.HasKey(m => m.Id);
-                b.ToTable("Messages");
-            });
-
-            builder.Entity<Attendee<TKey>>(b =>
-            {
-                b.HasKey(a => new { a.ConversationId, a.UserId });
-                b.ToTable("Attendees");                
-            });            
         }
     }
 }

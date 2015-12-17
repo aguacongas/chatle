@@ -142,7 +142,7 @@ namespace ChatLe.Models
         public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Users.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
         /// <summary>
         /// Update the user on the database
@@ -174,7 +174,7 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 
+            return await Conversations.Include(c=> c.Attendees).FirstOrDefaultAsync(x => x.Attendees.Count == 2 
                 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) 
                 && x.Attendees.Any(b => b.UserId.Equals(attendee2.Id)));
         }

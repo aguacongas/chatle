@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ChatLe.Repository.Text
+namespace ChatLe.Repository.Test
 {
     public class ChatStoreTest
     {
@@ -113,13 +113,13 @@ namespace ChatLe.Repository.Text
             }
         }
 
-        static async Task ExecuteTest(Func<ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>, Task> action)
+        static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
+            ServiceCollection services = GetServicesCollection<ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>>();
 
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(services.BuildServiceProvider()))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
                 await action(store);
             }
         }
@@ -154,7 +154,7 @@ namespace ChatLe.Repository.Text
         {
             await ExecuteTest(async (store) =>
             {
-                var user = new UserTest()
+                var user = new ChatLeUser()
                 {
                     Id = "test",
                     UserName = "test"
@@ -172,12 +172,12 @@ namespace ChatLe.Repository.Text
             await ExecuteTest(async (store) =>
             {
                 var context = store.Context;
-                var connected = new UserTest()
+                var connected = new ChatLeUser()
                 {
                     Id = "connected",
                     UserName = "connected"
                 };
-                context.Users.Add(connected);
+                context.Add(connected);
 
                 var nc = new NotificationConnection()
                 {
@@ -187,12 +187,12 @@ namespace ChatLe.Repository.Text
                 };
                 context.NotificationConnections.Add(nc);
 
-                var notConnected = new UserTest()
+                var notConnected = new ChatLeUser()
                 {
                     Id = "notConnected",
                     UserName = "notConnected",
                 };
-                context.Users.Add(notConnected);
+                context.Add(notConnected);
 
                 context.SaveChanges();
 
@@ -208,12 +208,12 @@ namespace ChatLe.Repository.Text
             await ExecuteTest(async (store) =>
             {
                 var context = store.Context;
-                var user = new UserTest()
+                var user = new ChatLeUser()
                 {
                     Id = "test",
                     UserName = "test",
                 };
-                context.Users.Add(user);
+                context.Add(user);
                 context.SaveChanges();
 
                 var nc = new NotificationConnection()
@@ -224,9 +224,34 @@ namespace ChatLe.Repository.Text
                 };
 
                 await store.CreateNotificationConnectionAsync(nc);
-                nc = await store.GetNotificationConnectionAsync("test", "test");
+
+                Assert.Equal(1, context.NotificationConnections.Count());
+
+                nc = await store.GetNotificationConnectionAsync("test", "test");                
                 await store.DeleteNotificationConnectionAsync(nc);
+
+                Assert.Empty(context.NotificationConnections);
+
+                var nc1 = new NotificationConnection()
+                {
+                    ConnectionId = "test",
+                    UserId = "test",
+                    NotificationType = "test"
+                };
+
+                await store.CreateNotificationConnectionAsync(nc1);
+                var nc2 = new NotificationConnection()
+                {
+                    ConnectionId = "test2",
+                    UserId = "test2",
+                    NotificationType = "test"
+                };
+
+                await store.CreateNotificationConnectionAsync(nc2);
+
+                Assert.Equal(2, context.NotificationConnections.Count());
             });
+
         }
 
         [Fact]
@@ -251,7 +276,7 @@ namespace ChatLe.Repository.Text
                     ConversationId = conv.Id,
                     UserId = "test"
                 };
-                context.Attendee.Add(attendee);
+                context.Add(attendee);
 
                 var message = new Message()
                 {
@@ -333,7 +358,7 @@ namespace ChatLe.Repository.Text
             await ExecuteTest(async store =>
             {
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetConversationAsync(null, null));
-                await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetConversationAsync(new UserTest(), null));
+                await Assert.ThrowsAsync<ArgumentNullException>(() => store.GetConversationAsync(new ChatLeUser(), null));
             });
         }
 
@@ -343,27 +368,27 @@ namespace ChatLe.Repository.Text
             await ExecuteTest(async store =>
             {
                 AddConv(store);
-                Assert.NotNull(await store.GetConversationAsync(new UserTest() { Id = "test1" }, new UserTest() { Id = "test2" }));
+                Assert.NotNull(await store.GetConversationAsync(new ChatLeUser() { Id = "test1" }, new ChatLeUser() { Id = "test2" }));
             });
         }
 
-        private static Conversation AddConv(ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection> store)
+        private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection> store)
         {
             var context = store.Context;
             var conv = new Conversation();
-            context.Conversations.Add(conv);
+            context.Add(conv);
             var attendee1 = new Attendee()
             {
                 ConversationId = conv.Id,
                 UserId = "test1"
             };
-            context.Attendee.Add(attendee1);
+            context.Add(attendee1);
             var attendee2 = new Attendee()
             {
                 ConversationId = conv.Id,
                 UserId = "test2"
             };
-            context.Attendee.Add(attendee2);
+            context.Add(attendee2);
 
             var message = new Message()
             {
@@ -478,17 +503,17 @@ namespace ChatLe.Repository.Text
             await ExecuteTest(async store =>
             {
                 var conv = AddConv(store);
-                var user = new UserTest();
+                var user = new ChatLeUser() { Id = "test" };
 
                 var context = store.Context;
 
-                context.Attendee.Add(new Attendee()
+                context.Add(new Attendee()
                 {
                     ConversationId = conv.Id,
                     UserId = "test"
                 });
 
-                context.Users.Add(user);
+                context.Add(user);
                 context.NotificationConnections.Add(new NotificationConnection()
                 {
                     ConnectionDate = DateTime.Now,

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
-namespace ChatLe.Repository.Text
+namespace ChatLe.Repository.Test
 {
     public static class TestHelpers
     {
