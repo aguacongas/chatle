@@ -35,6 +35,7 @@ namespace ChatLe
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
                 loggerFactory.AddDebug();
+                loggerFactory.MinimumLevel = LogLevel.Debug;
             }
 
             builder.AddEnvironmentVariables();

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.OptionsModel;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Repository.Text
 {
@@ -94,7 +95,7 @@ namespace ChatLe.Repository.Text
         [Fact]
         public async Task RemoveConnectionIdAsyncTest()
         {
-            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();            
+            var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             await manager.RemoveConnectionIdAsync("test", "test", "test");
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());

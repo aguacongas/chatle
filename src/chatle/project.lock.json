@@ -7,7 +7,8 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "EntityFramework.Core": "7.0.0-rc1-final"
+          "EntityFramework.Core": "7.0.0-rc1-final",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -2199,6 +2200,7 @@
         "dependencies": {
           "EntityFramework.Core": "7.0.0-rc1-final",
           "Microsoft.CSharp": "4.0.1-beta-23516",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
           "System.Collections": "4.0.11-beta-23516",
           "System.Linq": "4.0.1-beta-23516",
           "System.Runtime": "4.0.21-beta-23516",
@@ -5054,7 +5056,8 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "EntityFramework.Core": "7.0.0-rc1-final"
+          "EntityFramework.Core": "7.0.0-rc1-final",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -7247,7 +7250,8 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "EntityFramework.Core": "7.0.0-rc1-final"
+          "EntityFramework.Core": "7.0.0-rc1-final",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -9442,6 +9446,7 @@
         "dependencies": {
           "EntityFramework.Core": "7.0.0-rc1-final",
           "Microsoft.CSharp": "4.0.1-beta-23516",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
           "System.Collections": "4.0.11-beta-23516",
           "System.Linq": "4.0.1-beta-23516",
           "System.Runtime": "4.0.21-beta-23516",
@@ -12806,6 +12811,7 @@
         "dependencies": {
           "EntityFramework.Core": "7.0.0-rc1-final",
           "Microsoft.CSharp": "4.0.1-beta-23516",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
           "System.Collections": "4.0.11-beta-23516",
           "System.Linq": "4.0.1-beta-23516",
           "System.Runtime": "4.0.21-beta-23516",
@@ -17044,7 +17050,7 @@
     },
     "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
       "type": "package",
-      "sha512": "2+V/VDgZu59Thrlp+FQH38H/SmPBegMKsG0ie1ZZyHtx7kJNEozIx/p9zs0UrolX0uyYX7Ouoj3Q3Be15lqXxA==",
+      "sha512": "E7VdmGw6xO3VHWapC+pNLZmo6yncS53UY3bmb5WZm9wliJBB1A6brgzKA4fcqiLrmJFx71r0M2zEbRDphRLUNg==",
       "files": [
         "analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll",
         "analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll",
@@ -17928,7 +17934,7 @@
     "runtime.win7.System.Diagnostics.Process/4.1.0-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "hXKdXyMDMGkSwaOQOgNlQsJuROb0rs+B/nGdvEDQZLZj0J9mH2jZ1/sXOB6nfgm/quboh0/EhV8oqC/1pzmBog==",
+      "sha512": "WQ9fNSFkKk/aaKiVS9YA0b1W6CpXt60zvUY2HdmY5N9Js6h/mxhXavxCowYR9qVW95gqA42zcxb3FElWsCqqEw==",
       "files": [
         "lib/win8/_._",
         "lib/wp8/_._",
@@ -20483,7 +20489,7 @@
     "System.Reflection.TypeExtensions/4.0.1-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "Q3FiCsJ/4s2nuyhOHAFhc0Te10LzPjv6QzVcywA3oWI1msfDg583RIXQ9YifDfOuig+wg+SX0p133qV71HVfyw==",
+      "sha512": "n8m144jjCwhN/qtLih35a2sO33fLWm1U3eg51KxqAcAjJcw0nq1zWie8FZognBTPv7BXdW/G8xGbbvDGFoJwZA==",
       "files": [
         "lib/DNXCore50/de/System.Reflection.TypeExtensions.xml",
         "lib/DNXCore50/es/System.Reflection.TypeExtensions.xml",
@@ -21099,7 +21105,7 @@
     "System.Runtime.Serialization.Primitives/4.0.11-beta-23409": {
       "type": "package",
       "serviceable": true,
-      "sha512": "0JLo0iSVWtuVwNo51/ArH+WtTTriWs80roj32aBMDiFBtSMoNbBDQ5BxzqbbDjLw17mtLFHMBqIjeUVsGeRMlQ==",
+      "sha512": "AQywM01eG8EgYde/RRrJDVdHmOOI3KkgK9GEjLQqvTLsrWsamNHN/j7Pxwa3XX7klSSrfDpvTNfUl40855idVg==",
       "files": [
         "lib/dotnet/de/System.Runtime.Serialization.Primitives.xml",
         "lib/dotnet/es/System.Runtime.Serialization.Primitives.xml",

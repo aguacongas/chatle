@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +25,12 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>, new()
         where TNotificationConnection : NotificationConnection<TKey>, new()
     {
+        private readonly ILogger _logger;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="store">the store</param>
-        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store, IOptions<ChatOptions> optionsAccessor)
+        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store, IOptions<ChatOptions> optionsAccessor, ILoggerFactory loggerFactory = null)
         {
             if (store == null)
                 throw new ArgumentNullException("store");
@@ -37,6 +39,10 @@ namespace ChatLe.Models
 
             Store = store;
             Options = optionsAccessor.Value;
+            if (loggerFactory != null)
+                _logger = loggerFactory.CreateLogger("ChatLe.Models.ChatManager");
+            else
+                _logger = new FakeLogger();            
         }
         /// <summary>
         /// Gets the store
@@ -63,6 +69,8 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("connectionId");
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
+
+            _logger.LogInformation("AddConnectionIdAsync {0} {1} {2}", userName, connectionId, notificationType);
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
@@ -99,6 +107,7 @@ namespace ChatLe.Models
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
 
+            _logger.LogInformation("RemoveConnectionIdAsync {0} {1} {2}", userName, connectionId, notificationType);
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
             {

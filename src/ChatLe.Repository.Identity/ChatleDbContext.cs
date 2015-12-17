@@ -47,18 +47,18 @@ namespace ChatLe.Models
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<ChatLeUser>()
-                .HasMany(u => u.NotificationConnections)
-                .WithOne()
-                .HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType })
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.Entity<NotificationConnection<TKey>>(b =>
             {
                 b.HasKey(n => new { n.ConnectionId, n.NotificationType });
                 b.ToTable("NotificationConnections");
             });
 
+            builder.Entity<ChatLeUser>()
+                .HasMany(u => u.NotificationConnections)
+                .WithOne()
+                .HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType })
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Conversation<TKey>>(b =>
             {
