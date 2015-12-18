@@ -62,6 +62,8 @@ $(function() {
                     From: UserName,
                     Text: message
                 });
+            }).fail(function(data) {
+                location.href = "/Account?reason=error";
             }) : $.ajax("api/chat/conv", {
                 data: {
                     to: self.attendees()[0].UserId,
@@ -73,11 +75,15 @@ $(function() {
                     From: UserName,
                     Text: message
                 });
+            }).fail(function(data) {
+                location.href = "/Account?reason=error";
             });
         }, getMessages = function() {
             var self = this;
             $.getJSON("api/chat/" + this.id).done(function(data) {
                 self.messages(data);
+            }).fail(function(data) {
+                location.href = "/Account?reason=error";
             });
         }, title = "", attendees = conv.Attendees, i = 0; i < attendees.length; i++) {
             var attendee = attendees[i];
@@ -114,16 +120,20 @@ $(function() {
     }), $.connection.hub.reconnected(function() {
         console.log("Chat Hub reconnect");
     }), $.connection.hub.error(function(err) {
-        console.log("Chat Hub error");
+        console.log("Chat Hub error"), location.href = "/Account?reason=error";
     }), $.connection.hub.disconnected(function() {
-        console.log("Chat Hub disconnected");
+        console.log("Chat Hub disconnected"), location.href = "/Account?reason=disconnected";
     }), $.connection.hub.start().done(function() {
         console.log("Chat Hub started"), $.getJSON("api/users").done(function(data) {
             viewModel.users(data.Users);
+        }).fail(function(data) {
+            location.href = "/Account?reason=disconnected";
         }), $.getJSON("api/chat").done(function(data) {
             data && $.each(data, function(index, conv) {
                 viewModel.conversations.unshift(new ConversationVM(conv));
             });
+        }).fail(function(data) {
+            location.href = "/Account?reason=disconnected";
         });
     });
 });

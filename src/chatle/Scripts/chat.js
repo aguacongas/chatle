@@ -117,14 +117,18 @@ $(function () {
                 }).done(function (data) {
                     self.id = data;
                     self.messages.unshift({ From: UserName, Text: message });
-                });
+                }).fail(function (data) {
+                    location.href = "/Account?reason=error"
+                });;
             } else {
                 $.ajax('api/chat', {
                     data: { to: self.id, text: message },
                     type: "POST"
                 }).done(function () {
                     self.messages.unshift({ From: UserName, Text: message });
-                });
+                }).fail(function (data) {
+                    location.href = "/Account?reason=error"
+                });;
             }
         };
         /**
@@ -133,9 +137,11 @@ $(function () {
         var getMessages = function () {
             var self = this;
             $.getJSON('api/chat/' + this.id)
-                    .done(function (data) {
-                        self.messages(data);
-                    });
+                .done(function (data) {
+                    self.messages(data);
+                }).fail(function (data) {
+                    location.href = "/Account?reason=error"
+                });
         };
 
         var title = '';
@@ -218,13 +224,15 @@ $(function () {
     $.connection.hub.reconnected(function () {
         console.log("Chat Hub reconnect");
     });
-    // for debug only, callback on connection error
+    // callback on connection error
     $.connection.hub.error(function (err) {
         console.log("Chat Hub error");
+        location.href = "/Account?reason=error";
     });
-    // for debug only, callback on connection disconnect
+    // callback on connection disconnect
     $.connection.hub.disconnected(function () {
         console.log("Chat Hub disconnected");
+        location.href = "/Account?reason=disconnected";
     });
     // start the connection
     $.connection.hub.start()
@@ -234,7 +242,9 @@ $(function () {
             $.getJSON("api/users")
                 .done(function (data) {
                     viewModel.users(data.Users);
-            });
+                }).fail(function (data) {
+                    location.href  ="/Account?reason=disconnected"
+                });
 
             // get user conversations
             $.getJSON("api/chat")
@@ -244,7 +254,9 @@ $(function () {
                     }
                     $.each(data, function (index, conv) {
                         viewModel.conversations.unshift(new ConversationVM(conv));
+                    })
+                }).fail(function (data) {
+                    location.href = "/Account?reason=disconnected"
                 });
-            });
         });
 });

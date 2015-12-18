@@ -174,9 +174,16 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            return await Conversations.Include(c=> c.Attendees).FirstOrDefaultAsync(x => x.Attendees.Count == 2 
-                && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) 
-                && x.Attendees.Any(b => b.UserId.Equals(attendee2.Id)));
+            var convs = from c in Conversations
+                       join a1 in Attendees
+                            on c.Id equals a1.ConversationId
+                       join a2 in Attendees
+                            on c.Id equals a2.ConversationId
+                       where a1.UserId.Equals(attendee1.Id)
+                            && a2.UserId.Equals(attendee2.Id)
+                       select c;
+
+            return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
         }
         /// <summary>
         /// Gets a conversation by her id
@@ -219,9 +226,9 @@ namespace ChatLe.Models
 
             var count = q1.Count();
 
-            var q2 = q1.Skip(skip)
+            var q2 = await q1.Skip(skip)
                      .Take(pageLength)
-                     .ToList();
+                     .ToListAsync();
 
             var query = from r in q2
                         join u in Users
@@ -284,6 +291,7 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
+            Context.Database.EnsureCreated();
             NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();
             Attendees.RemoveRange(Attendees.ToArray());

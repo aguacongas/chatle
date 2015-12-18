@@ -58,28 +58,15 @@ namespace ChatLe.Models
                 b.ToTable("NotificationConnections");
             });
 
-            builder.Entity<ChatLeUser>()
-                .HasMany(u => u.NotificationConnections)
-                .WithOne()
-                .HasForeignKey(nc => new { nc.ConnectionId, nc.NotificationType })
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.Entity<Message<TKey>>(b =>
             {
                 b.HasKey(m => m.Id);
-                b.HasOne(m => m.Conversation)
-                    .WithMany()
-                    .HasForeignKey(m => m.ConversationId);
                 b.ToTable("Messages");
             });
 
             builder.Entity<Attendee<TKey>>(b =>
             {
                 b.HasKey(a => new { a.ConversationId, a.UserId });
-                b.HasOne(a => a.Conversation)
-                    .WithMany()
-                    .HasForeignKey(a => a.ConversationId);
-
                 b.ToTable("Attendees");
             });
 
@@ -87,16 +74,6 @@ namespace ChatLe.Models
             {
                 b.HasKey(c => c.Id);
                 b.ToTable("Conversations");
-
-                b.HasMany(c => c.Attendees)
-                    .WithOne()
-                    .HasForeignKey(a => a.ConversationId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                b.HasMany(c => c.Messages)
-                    .WithOne()
-                    .HasForeignKey(m => m.ConversationId)
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
         }
