@@ -172,7 +172,7 @@ namespace ChatLe.Models
             if (to == null)
                 throw new ArgumentNullException("to");
 
-            _logger.LogInformation("GetOrCreateConversationAsync from : {0}, to : {1}, initialMessage: {2}", from, to, initial);
+            _logger.LogInformation("GetOrCreateConversationAsync from : {0}, to : {1}, initialMessage: {2}", from, to, initialMessage);
 
             var attendee1 = await Store.FindUserByNameAsync(from, cancellationToken);
             var attendee2 = await Store.FindUserByNameAsync(to, cancellationToken);

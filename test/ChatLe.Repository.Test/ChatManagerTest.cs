@@ -129,7 +129,7 @@ namespace ChatLe.Repository.Test
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             var conv = await manager.GetOrCreateConversationAsync(userId1, userId2, "test");
             Assert.True(conv.Attendees.Count == 2);
-            Assert.True(conv.Messages.Count > 0);
+            Assert.True(conv.Messages.Count == 1);
             Assert.True(conv.Messages.Last().Text == "test");
         }
 
