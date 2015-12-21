@@ -29,11 +29,9 @@ $(function() {
                 }), conv && conv.messages.unshift(data);
             }
         }, joinConversation = function(data) {
-            if (data) {
-                this.conversations.remove(function(conv) {
-                    return conv.id === data.Id;
-                }), this.conversations.unshift(new ConversationVM(data));
-            }
+            data && (this.conversations.remove(function(conv) {
+                return conv.id === data.Id;
+            }), this.conversations.unshift(new ConversationVM(data)));
         }, showConversation = function(conv) {
             this.currentConv(conv);
         };
@@ -111,7 +109,7 @@ $(function() {
     }, chatHub.client.messageReceived = function(data) {
         viewModel.messageReceived(data);
     }, chatHub.client.joinConversation = function(data) {
-        viewModel.joinConversation(data);
+        console.log("join conversation " + JSON.stringify(data)), viewModel.joinConversation(data);
     }, $.connection.hub.stateChanged(function(change) {
         var oldState = null, newState = null;
         for (var state in $.signalR.connectionState) $.signalR.connectionState[state] === change.oldState && (oldState = state), 

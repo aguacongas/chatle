@@ -172,6 +172,8 @@ namespace ChatLe.Models
             if (to == null)
                 throw new ArgumentNullException("to");
 
+            _logger.LogInformation("GetOrCreateConversationAsync from : {0}, to : {1}, initialMessage: {2}", from, to, initial);
+
             var attendee1 = await Store.FindUserByNameAsync(from, cancellationToken);
             var attendee2 = await Store.FindUserByNameAsync(to, cancellationToken);
             var conv = await Store.GetConversationAsync(attendee1, attendee2, cancellationToken);
@@ -179,8 +181,8 @@ namespace ChatLe.Models
             {
                 conv = new TConversation();
                 await Store.CreateConversationAsync(conv, cancellationToken);
-                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee1.Id, cancellationToken));
-                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee2.Id, cancellationToken));
+                await AddAttendeeAsync(conv.Id, attendee1.Id, cancellationToken);
+                await AddAttendeeAsync(conv.Id, attendee2.Id, cancellationToken);
             }
 
             if (initialMessage != null)
@@ -198,12 +200,13 @@ namespace ChatLe.Models
         /// <returns>an async task</returns>
         protected virtual async Task AddMessageAsync(TConversation conv, TUser sender, string content, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("AddMessage to conversation : {0} content : {1}", conv.Id, content);
+            
             var message = new TMessage();
             message.ConversationId = conv.Id;
             message.UserId = sender.Id;
             message.Text = content;
             await Store.CreateMessageAsync(message, cancellationToken);
-            conv.Messages.Add(message);
         }
         /// <summary>
         /// Add an attendee in a conversation by ids

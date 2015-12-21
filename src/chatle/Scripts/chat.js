@@ -72,7 +72,6 @@ $(function () {
             if (!data) {
                 return;
             }
-            var exist = false;
             this.conversations.remove(function (conv) {
                 return conv.id === data.Id;
             });
@@ -202,6 +201,7 @@ $(function () {
       * @param Conv data, the conversation model
     */
     chatHub.client.joinConversation = function (data) {
+        console.log("join conversation " + JSON.stringify(data));
         viewModel.joinConversation(data);
     };
     // for debug only, callback on connection state change

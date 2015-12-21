@@ -23,17 +23,19 @@ namespace ChatLe.Controllers
         private readonly IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> _chatManager;
         private readonly IHubContext _hub;
         private readonly UserManager<ChatLeUser> _userManager;
+        private readonly ILogger<ChatController> _logger;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="chatManager">the chat repository manager</param>
         /// <param name="signalRConnectionManager">the SignalR connection manager</param>
         /// <param name="userManager">the Identity user manager</param>
-        public ChatController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager, IConnectionManager signalRConnectionManager, UserManager<ChatLeUser> userManager)
+        public ChatController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager, IConnectionManager signalRConnectionManager, UserManager<ChatLeUser> userManager, ILogger<ChatController> logger)
         {
             _chatManager = chatManager;
             _hub = signalRConnectionManager.GetHubContext<ChatHub>();
             _userManager = userManager;
+            _logger = logger;
         }
         /// <summary>
         /// Get messages in a conversation
