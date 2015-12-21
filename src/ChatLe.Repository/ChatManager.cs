@@ -181,8 +181,8 @@ namespace ChatLe.Models
             {
                 conv = new TConversation();
                 await Store.CreateConversationAsync(conv, cancellationToken);
-                await AddAttendeeAsync(conv.Id, attendee1.Id, cancellationToken);
-                await AddAttendeeAsync(conv.Id, attendee2.Id, cancellationToken);
+                await AddAttendeeAsync(conv, attendee1.Id, cancellationToken);
+                await AddAttendeeAsync(conv, attendee2.Id, cancellationToken);
             }
 
             if (initialMessage != null)
@@ -207,6 +207,9 @@ namespace ChatLe.Models
             message.UserId = sender.Id;
             message.Text = content;
             await Store.CreateMessageAsync(message, cancellationToken);
+            var messages = conv.Messages;
+            if (!messages.Any(m => m.Id.Equals(message.Id)))
+                messages.Add(message);
         }
         /// <summary>
         /// Add an attendee in a conversation by ids
@@ -215,12 +218,15 @@ namespace ChatLe.Models
         /// <param name="userId">the user id</param>
         /// <param name="cancellationToken">a cancellation token</param>
         /// <returns>an async task</returns>
-        protected virtual async Task<TAttendee> AddAttendeeAsync(TKey convId, TKey userId, CancellationToken cancellationToken)
+        protected virtual async Task<TAttendee> AddAttendeeAsync(TConversation conv, TKey userId, CancellationToken cancellationToken)
         {
             var attendee = new TAttendee();
-            attendee.ConversationId = convId;
+            attendee.ConversationId = conv.Id;
             attendee.UserId = userId;
             await Store.CreateAttendeeAsync(attendee, cancellationToken);
+            var attendees = conv.Attendees;
+            if (!attendees.Any(a => a.UserId.Equals(attendee.UserId)))
+                attendees.Add(attendee);
             return attendee;
         }
         /// <summary>
