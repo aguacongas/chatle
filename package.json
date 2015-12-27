@@ -11,6 +11,6 @@
 	"dependencies": {
 		"lodash": "3.10.1",
 		"bower": "1.7.1",
-		"gulp": "3.8.11"
+		"gulp": "3.9.0"
 	}
 }
