@@ -19,8 +19,8 @@ bld/
 [Oo]bj/
 node_modules/
 bower_components/
-wwwroot/lib/
-wwwroot/scripts/
+**/wwwroot/lib/
+**/wwwroot/scripts/
 .vs/
 
 # Roslyn cache directories
