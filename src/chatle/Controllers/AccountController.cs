@@ -4,6 +4,8 @@ using Microsoft.AspNet.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using ChatLe.Hubs;
 
 namespace ChatLe.Controllers
 {
@@ -25,7 +27,7 @@ namespace ChatLe.Controllers
         // GET: /Account/Index
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Index(string returnUrl = null)
+        public IActionResult Index(string returnUrl = null, string reason = null)
         {
             ViewBag.ReturnUrl = returnUrl;
             return View(new LoginPageViewModel());
@@ -148,16 +150,20 @@ namespace ChatLe.Controllers
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogOff()
+        public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
-
-            if (user != null && user.PasswordHash == null)
-            {
-                await ChatManager.RemoveUserAsync(user);
-            }
+			if (user != null)
+			{
+				if (user.PasswordHash == null)
+				{
+					var hub = signalRConnectionManager.GetHubContext<ChatHub>();
+					hub.Clients.All.userDisconnected(user.UserName);
+					await ChatManager.RemoveUserAsync(user);
+				}
+			}
             await SignInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
         #region Helpers

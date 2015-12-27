@@ -378,5 +378,11 @@ namespace ChatLe.Models
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
-    }
+
+		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+		}
+	}
 }

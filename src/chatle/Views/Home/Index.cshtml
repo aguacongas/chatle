@@ -8,10 +8,10 @@
         <h6>CONNECTED</h6>
         <ul data-bind="foreach: users">
             <li>
-                <!-- ko if: UserName !== Id -->
+                <!-- ko if: $parent.userName !== Id -->
                 <a href="#" data-bind="text: Id, click: function() { $parent.showMessage($data); }"></a>
                 <!-- /ko -->
-                <!-- ko if: UserName === Id -->
+                <!-- ko if: $parent.userName === Id -->
                 @Html.ActionLink(User.Identity.Name, "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
                 <!-- /ko -->
             </li>
@@ -53,6 +53,13 @@
     <script src="/signalr/js"></script>
     <script src="~/scripts/chat.js"></script>
     <script>
-        var UserName = '@User.Identity.Name';
+		$(document).ready(function () {
+			chatLe.userName = '@User.Identity.Name';
+			chatLe.chatAPI = '@Url.Action("Get", "Chat")'
+			chatLe.convAPI = '@Url.Action("CreateConversation", "Chat")'
+			chatLe.userAPI = '@Url.Action("Get", "User")'
+
+			chatLe.init(true);
+		});
     </script>
 }

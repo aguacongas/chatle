@@ -82,13 +82,12 @@ namespace ChatLe.Repository.Test
         }
 
         [Theory]
-        [InlineData (null, "test", "test")]
-        [InlineData("test", null, "test")]
-        [InlineData("test", "test", null)]
-        public async Task RemoveConnectionIdAsync_Should_ThrowArgumentNullException(string userName, string connectionId, string notificationType)
+        [InlineData (null, "test")]
+        [InlineData("test", null)]
+        public async Task RemoveConnectionIdAsync_Should_ThrowArgumentNullException(string connectionId, string notificationType)
         {
             var manager = CreateManager();
-            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(userName, connectionId, notificationType));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(connectionId, notificationType));
         }
 
         [Fact]
@@ -96,15 +95,14 @@ namespace ChatLe.Repository.Test
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-            await manager.RemoveConnectionIdAsync("test", "test", "test");
-            storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
-            await manager.RemoveConnectionIdAsync("test", "test", "test");
-            storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection());
-            await manager.RemoveConnectionIdAsync("test", "test", "test");
-            storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(true);
-            Assert.True(await manager.RemoveConnectionIdAsync("test", "test", "test"));
-            storeMock.Setup(s => s.UserHasConnectionAsync("test1")).ReturnsAsync(false);
-            Assert.False(await manager.RemoveConnectionIdAsync("test1", "test", "test"));
+			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test"));
+            storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection() { UserId = "test" });
+			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test"));
+            storeMock.Setup(s => s.FindUserByIdAsync("test", CancellationToken.None)).ReturnsAsync(new UserTest());
+			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(true);
+			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test"));
+			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(false);
+			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test"));
         }
 
         [Theory]

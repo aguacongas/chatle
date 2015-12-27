@@ -39,15 +39,14 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a Task</returns>
         Task AddConnectionIdAsync (string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
-        /// <summary>
-        /// Removes a notification connection assotiate to a user
-        /// </summary>
-        /// <param name="userName">The user name</param>
-        /// <param name="connectionId">The connection id</param>
-        /// <param name="notificationType">the type of notification</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>A Task</returns>
-        Task<bool> RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+		/// <summary>
+		/// Removes a notification connection assotiate to a user
+		/// </summary>
+		/// <param name="connectionId">The connection id</param>
+		/// <param name="notificationType">the type of notification</param>
+		/// <param name="cancellationToken">an optional cancellation token</param>
+		/// <returns>A <see cref="Task{TUser} with the disconnected user or null if the user has an other connection or no user found</returns>
+		Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Gets or creates a conversation
         /// </summary>

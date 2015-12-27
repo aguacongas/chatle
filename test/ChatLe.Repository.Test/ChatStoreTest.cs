@@ -352,7 +352,16 @@ namespace ChatLe.Repository.Test
             });
         }
 
-        [Fact]
+		[Fact]
+		public async Task FindUserByIdTest()
+		{
+			await ExecuteTest(async store =>
+			{
+				await store.FindUserByIdAsync("test");
+			});
+		}
+
+		[Fact]
         public async Task GetConversationAsync_should_throw_ArgumentNullException()
         {
             await ExecuteTest(async store =>

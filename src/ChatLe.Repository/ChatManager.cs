@@ -93,35 +93,31 @@ namespace ChatLe.Models
         /// <summary>
         /// Removes a notification connection assotiate to a user
         /// </summary>
-        /// <param name="userName">The user name</param>
         /// <param name="connectionId">The connection id</param>
         /// <param name="notificationType">the type of notification</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>A Task</returns>
-        public virtual async Task<bool> RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (userName == null)
-                throw new ArgumentNullException("userName");
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
 
-            _logger.LogInformation("RemoveConnectionIdAsync {0} {1} {2}", userName, connectionId, notificationType);
-            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
-            if (user != null)
-            {
-                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
-                if (nc != null)
-                    await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
-
-                var ret = await Store.UserHasConnectionAsync(user.Id);
-                if (!ret && user.PasswordHash == null)
-                    await Store.DeleteUserAsync(user, cancellationToken);
-                return ret;
-            }
-
-            return false;
+            var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
+			if (nc != null)
+			{
+				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
+				var user = await Store.FindUserByIdAsync(nc.UserId);
+				if (user != null)
+				{
+					var ret = await Store.UserHasConnectionAsync(user.Id);
+					if (!ret && user.PasswordHash == null)
+						await Store.DeleteUserAsync(user, cancellationToken);
+					return user;
+				}
+			}
+			return default(TUser);
         }
         /// <summary>
         /// Adds a message to a conversation
