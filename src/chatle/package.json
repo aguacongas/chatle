@@ -4,10 +4,14 @@
   "name": "chatle",
   "readme": "Olivier Lefebvre all right reserved",
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aguacongas/chatle"
-  },
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aguacongas/chatle"
+	},
+	"dependencies": {
+		"bower": "1.7.1",
+		"lodash": "3.10.1"
+	},
 	"devDependencies": {
 		"gulp": "3.8.11",
 		"gulp-concat": "2.5.2",
