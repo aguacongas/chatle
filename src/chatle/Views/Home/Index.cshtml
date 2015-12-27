@@ -48,11 +48,25 @@
 
 @section scripts
 {
-    <script src="~/lib/knockout/knockout.js"></script>
-    <script src="~/lib/signalr/jquery.signalR.js"></script>
-    <script src="/signalr/js"></script>
-    <script src="~/scripts/chat.js"></script>
-    <script>
+	<environment names="Development">
+		<script src="~/lib/knockout/dist/knockout.js"></script>
+		<script src="~/lib/signalr/jquery.signalR.js"></script>
+		<script src="~/js/chat.js"></script>
+	</environment>
+	<environment names="Staging,Production">
+		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"
+				asp-fallback-src="~/lib/knockout/dist/knockout.js"
+				asp-fallback-test="ko">
+		</script>
+		<script src="http://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.min.js"
+				asp-fallback.src="~/lib/signalr/jquery.signalR.min.js"
+				asp-fallback-test="window.jQuery && window.jQuery.connection">
+		</script>
+		<script src="~/js/chat.min.js"></script>	
+	</environment>
+	<script src="/signalr/js"></script>
+
+	<script>
 		$(document).ready(function () {
 			chatLe.userName = '@User.Identity.Name';
 			chatLe.chatAPI = '@Url.Action("Get", "Chat")'
@@ -61,5 +75,5 @@
 
 			chatLe.init(true);
 		});
-    </script>
+	</script>
 }
