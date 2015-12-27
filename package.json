@@ -1,0 +1,16 @@
+{
+	"version": "1.0.0",
+	"description": "chatle website",
+	"name": "chatle",
+	"readme": "Olivier Lefebvre all right reserved",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aguacongas/chatle"
+	},
+	"dependencies": {
+		"lodash": "3.10.1",
+		"bower": "1.7.1",
+		"gulp": "3.8.11"
+	}
+}
