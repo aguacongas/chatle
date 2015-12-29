@@ -210,7 +210,9 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
   @{
 	var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
     var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
-    projectFiles.ForEach(projectFile => OpenCoverTest(BASE_DIR, projectFile, coverageFile, Configuration));
+	Log.Info("configuration: " + Configuration);
+	Log.Info("coverageFile: " + coverageFile);
+    projectFiles.ForEach(projectFile => OpenCoverTest(projectFile, coverageFile, Configuration));
   }
 
 #build-samples target='test' if='!IsBuildV2 && Directory.Exists("samples")'
@@ -376,7 +378,7 @@ macro name='Dnx' command='string' dnxDir='string' dnvmUse='string'
 macro name="UpdateResx" resxFile='string'
     k-generate-resx
 
-macro name="OpenCoverTest" baseDir='string' projectFile='string' coverageFile='string' configuration='string'
+macro name="OpenCoverTest" projectFile='string' coverageFile='string' configuration='string'
     opencover
 
 macro name="DnxTest" projectFile='string' testParallel='bool'

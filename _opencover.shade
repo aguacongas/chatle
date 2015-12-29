@@ -8,9 +8,6 @@ default KOREBUILD_TEST_DNXCORE='${E("KOREBUILD_TEST_DNXCORE")}'
 
 opencover
     Run opencover on unittest in your project
-
-baseDir=''
-	Required. Path to the base directory
 	
 projectFile=''
     Required. Path to the test project.json to execute
@@ -27,7 +24,8 @@ configuration='Debug'
 	var sourcesFiles = Files.Include("src/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
 	var pdbLocation = "";
 
-
+	Log.Info("configuration: " + configuration);
+	
 	foreach (var sourceFile in sourcesFiles)
 	{
 		var sourceText = File.ReadAllText(sourceFile);
@@ -45,11 +43,14 @@ configuration='Debug'
 	}
 
 	pdbLocation = pdbLocation.TrimEnd((char)';');
+	Log.Info("pdbLocation: " + pdbLocation);
 
 	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine("packages"
 		, "OpenCover")
 		, "tools")
 		, "OpenCover.Console.exe");
+
+	Log.Info("openCoverLocation: " + openCoverLocation);
 
     var projectText = File.ReadAllText(projectFile);
     var project = (JsonObject)Json.Deserialize(projectText);
@@ -59,6 +60,7 @@ configuration='Debug'
     if (commands != null && commands.Keys.Contains("test"))
     {
         var projectFolder = Path.GetDirectoryName(projectFile);
+		Log.Info("projectFolder: " + projectFolder);
 		var projectPath  = Path.Combine(projectFolder, "project.json");
 		var results = Path.Combine(projectFolder, "xunit-results.xml");
 

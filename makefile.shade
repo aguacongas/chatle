@@ -2,6 +2,6 @@
 var VERSION='0.1'
 var FULL_VERSION='0.1'
 var AUTHORS='Olivier Lefebvre'
-var Configuration="Debug"
+var Configuration="Release"
 use-standard-lifecycle
 goals
