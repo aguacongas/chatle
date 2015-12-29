@@ -1,0 +1,70 @@
+use import="Json"
+use import="Environment"
+
+default NO_PARALLEL_TEST_PROJECTS='${E("NO_PARALLEL_TEST_PROJECTS")}'
+default KOREBUILD_TEST_DNXCORE='${E("KOREBUILD_TEST_DNXCORE")}'
+
+@{/*
+
+opencover
+    Run opencover on unittest in your project
+
+openCoverLocation=''
+	Required. Path to opencover.console location
+
+pdbLocation=''
+	Required. Path to pdb under cover location
+
+projectFile=''
+    Required. Path to the test project.json to execute
+
+coverageFile=''
+	Required. Path to the coverage file
+
+*/}
+
+@{
+    var projectText = File.ReadAllText(projectFile);
+    var project = (JsonObject)Json.Deserialize(projectText);
+
+    var commands = project.ValueAsJsonObject("commands");
+
+    if (commands != null && commands.Keys.Contains("test"))
+    {
+        var projectFolder = Path.Combine(Directory.GetCurrentDirectory()
+			, Path.GetDirectoryName(projectFile));
+		var projectPath  = Path.Combine(projectFolder, "project.json");
+		var results = Path.Combine(projectFolder, "xunit-results.xml");
+
+		// find dnx location
+		var runtime = E("BUILDCMD_DNX_RUNTIME");
+		if (runtime == "")
+			runtime = "clr";
+		var os = IsLinux ? "mono" : "win";
+		var architecture = E("BUILDCMD_DNX_ARCHITECTURE");
+		if (architecture == "")
+			architecture = "x86";
+		var dnxVersion = E("BUILDCMD_DNX_VERSION");
+		if (dnxVersion == "")
+			dnxVersion = "1.0.0.rc1-update1";
+
+		var dnxName= string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
+		
+		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(E("DNX_HOME")
+			, "runtimes")
+			, dnxName)
+			, "bin")
+			, "dnx.exe");
+		
+		var target = '-target:"' + dnxLocation +  '" ';
+		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p "' + projectPath + '" test -xml "' + results + '" -nologo -parallel none" ';
+		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[ChatLe*]* -[xunit*]*"';
+        
+		if (File.Exists(coverageFile))
+		{
+			args += " -mergeoutput";
+		}
+
+		Exec(openCoverLocation, args);
+    }
+}
