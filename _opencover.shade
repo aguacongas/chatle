@@ -27,12 +27,13 @@ configuration='Debug'
 	var sourcesFiles = Files.Include("src/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
 	var pdbLocation = "";
 
+
 	foreach (var sourceFile in sourcesFiles)
 	{
 		var sourceText = File.ReadAllText(sourceFile);
 		var source = (JsonObject)Json.Deserialize(sourceText);
 		var configs = source.ValueAsJsonObject("frameworks");
-		var sourceDirectory = Path.GetDirectoryName(Path.Combine(baseDir, sourceFile));
+		var sourceDirectory = Path.GetDirectoryName(sourceFile);
 
 		foreach(var framework in configs.Keys)
 		{			
@@ -45,8 +46,7 @@ configuration='Debug'
 
 	pdbLocation = pdbLocation.TrimEnd((char)';');
 
-	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(baseDir
-		, "packages")
+	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine("packages"
 		, "OpenCover")
 		, "tools")
 		, "OpenCover.Console.exe");
@@ -58,8 +58,7 @@ configuration='Debug'
 
     if (commands != null && commands.Keys.Contains("test"))
     {
-        var projectFolder = Path.Combine(baseDir
-			, Path.GetDirectoryName(projectFile));
+        var projectFolder = Path.GetDirectoryName(projectFile);
 		var projectPath  = Path.Combine(projectFolder, "project.json");
 		var results = Path.Combine(projectFolder, "xunit-results.xml");
 
