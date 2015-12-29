@@ -208,42 +208,9 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 
 #xunit-test target='test' if='Directory.Exists("test")'
   @{
-	var sourcesFiles = Files.Include("src/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
-	var pdbLocation = "";
-
-	foreach (var projectFile in sourcesFiles)
-	{
-		Log.Info("projectFile: " + projectFile);
-		var projectText = File.ReadAllText(projectFile);
-		var project = (JsonObject)Json.Deserialize(projectText);
-		var configs = project.ValueAsJsonObject("frameworks");
-		var sourceDirectory = Path.GetDirectoryName(Path.Combine(BASE_DIR, projectFile));
-		var configuration = Configuration;
-		Log.Info("configuration: " + configuration);
-
-		Log.Info("sourceDirectory: " + sourceDirectory);
-		foreach(var framework in configs.Keys)
-		{			
-			Log.Info("framework: " + framework);	
-			
-			pdbLocation += Path.Combine(Path.Combine(Path.Combine(sourceDirectory
-				, "bin")
-				, configuration)
-				, framework) + ";";
-		}
-	}
-
-	pdbLocation = pdbLocation.TrimEnd((char)';');
-
-	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(BASE_DIR
-		, "packages")
-		, "OpenCover")
-		, "tools")
-		, "OpenCover.Console.exe");
-
 	var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
     var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
-    projectFiles.ForEach(projectFile => OpenCoverTest(openCoverLocation, pdbLocation, projectFile, coverageFile));
+    projectFiles.ForEach(projectFile => OpenCoverTest(BASE_DIR, projectFile, coverageFile, Configuration));
   }
 
 #build-samples target='test' if='!IsBuildV2 && Directory.Exists("samples")'
@@ -409,7 +376,7 @@ macro name='Dnx' command='string' dnxDir='string' dnvmUse='string'
 macro name="UpdateResx" resxFile='string'
     k-generate-resx
 
-macro name="OpenCoverTest" openCoverLocation='string' pdbLocation='string' projectFile='string' coverageFile='string'
+macro name="OpenCoverTest" baseDir='string' projectFile='string' coverageFile='string' configuration='string'
     opencover
 
 macro name="DnxTest" projectFile='string' testParallel='bool'

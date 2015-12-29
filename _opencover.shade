@@ -9,21 +9,48 @@ default KOREBUILD_TEST_DNXCORE='${E("KOREBUILD_TEST_DNXCORE")}'
 opencover
     Run opencover on unittest in your project
 
-openCoverLocation=''
-	Required. Path to opencover.console location
-
-pdbLocation=''
-	Required. Path to pdb under cover location
-
+baseDir=''
+	Required. Path to the base directory
+	
 projectFile=''
     Required. Path to the test project.json to execute
 
 coverageFile=''
 	Required. Path to the coverage file
 
+configuration='Debug'
+	Optional. build configuration to use
+
 */}
 
 @{
+	var sourcesFiles = Files.Include("src/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
+	var pdbLocation = "";
+
+	foreach (var sourceFile in sourcesFiles)
+	{
+		var sourceText = File.ReadAllText(sourceFile);
+		var source = (JsonObject)Json.Deserialize(sourceText);
+		var configs = source.ValueAsJsonObject("frameworks");
+		var sourceDirectory = Path.GetDirectoryName(Path.Combine(baseDir, sourceFile));
+
+		foreach(var framework in configs.Keys)
+		{			
+			pdbLocation += Path.Combine(Path.Combine(Path.Combine(sourceDirectory
+				, "bin")
+				, configuration)
+				, framework) + ";";
+		}
+	}
+
+	pdbLocation = pdbLocation.TrimEnd((char)';');
+
+	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(baseDir
+		, "packages")
+		, "OpenCover")
+		, "tools")
+		, "OpenCover.Console.exe");
+
     var projectText = File.ReadAllText(projectFile);
     var project = (JsonObject)Json.Deserialize(projectText);
 
@@ -31,7 +58,7 @@ coverageFile=''
 
     if (commands != null && commands.Keys.Contains("test"))
     {
-        var projectFolder = Path.Combine(Directory.GetCurrentDirectory()
+        var projectFolder = Path.Combine(baseDir
 			, Path.GetDirectoryName(projectFile));
 		var projectPath  = Path.Combine(projectFolder, "project.json");
 		var results = Path.Combine(projectFolder, "xunit-results.xml");
@@ -57,7 +84,7 @@ coverageFile=''
 			, "dnx.exe");
 		
 		var target = '-target:"' + dnxLocation +  '" ';
-		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p "' + projectPath + '" test -xml "' + results + '" -nologo -parallel none" ';
+		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p ""' + projectPath + '"" test -xml ""' + results + '"" -nologo -parallel none" ';
 		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[ChatLe*]* -[xunit*]*"';
         
 		if (File.Exists(coverageFile))
