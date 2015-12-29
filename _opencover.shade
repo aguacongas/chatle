@@ -65,20 +65,39 @@ configuration='Debug'
 		var results = Path.Combine(projectFolder, "xunit-results.xml");
 
 		// find dnx location
-		var runtime = E("BUILDCMD_DNX_RUNTIME");
-		if (runtime == "")
+		var runtime = Environment.GetEnvironmentVariable("BUILDCMD_DNX_RUNTIME");
+		if (String.IsNullOrEmpty(runtime)) 
+		{
+			Log.Warn("BUILDCMD_DNX_RUNTIME environment variable not set.");
 			runtime = "clr";
-		var os = IsLinux ? "mono" : "win";
-		var architecture = E("BUILDCMD_DNX_ARCHITECTURE");
-		if (architecture == "")
-			architecture = "x86";
-		var dnxVersion = E("BUILDCMD_DNX_VERSION");
-		if (dnxVersion == "")
-			dnxVersion = "1.0.0.rc1-update1";
+		}
 
-		var dnxName= string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
-		
-		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(E("DNX_HOME")
+		var os = IsLinux ? "mono" : "win";
+		var architecture = Environment.GetEnvironmentVariable("BUILDCMD_DNX_ARCHITECTURE");
+		if (String.IsNullOrEmpty(architecture)) 
+		{
+			Log.Warn("BUILDCMD_DNX_ARCHITECTURE environment variable not set.");
+			architecture = "x86";
+		}
+		var dnxVersion = Environment.GetEnvironmentVariable("BUILDCMD_DNX_VERSION");
+		if (String.IsNullOrEmpty(dnxVersion)) 
+		{
+			Log.Warn("BUILDCMD_DNX_VERSION environment variable not set.");
+			dnxVersion = "1.0.0.rc1-update1";
+		}
+
+		var dnxName = string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
+		Log.Info("dnxName: " + dnxName);
+	
+		var dnxHome = Environment.GetEnvironmentVariable(DNX_HOME);
+		if (String.IsNullOrEmpty(dnxHome)) 
+		{
+			Log.Warn("DNX_HOME environment variable not set.");
+			Environment.Exit(-1);
+			return;
+		}
+
+		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(dnxHome
 			, "runtimes")
 			, dnxName)
 			, "bin")
