@@ -50,11 +50,6 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
   var bowerDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "bower.json")}'
   bower each='var bowerDir in bowerDirs' bowerCommand='install ${E("KOREBUILD_BOWER_INSTALL_OPTIONS")}'
 
-#run-gulp .restore-npm-modules .restore-bower-components target='initialize'
-  -// Find all dirs that contain a gulpfile.js file
-  var gulpDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "gulpfile.js")}'
-  gulp each='var gulpDir in gulpDirs'
-
 #clean-bin-folder
   rimraf rimrafDir='bin' if='Directory.Exists("bin")'
 
@@ -70,8 +65,13 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 -// Target order is important because clean-npm-modules may (re)create bin folder.
 #deep-clean .clean-npm-modules .clean-bin-folder description='Clean folders that may cause problems for `git clean`.'
 
-#repo-initialize target='initialize'
+#repo-initialize
   k-restore
+
+#run-gulp .restore-npm-modules .restore-bower-components .repo-initialize target='initialize'
+  -// Find all dirs that contain a gulpfile.js file
+  var gulpDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "gulpfile.js")}'
+  gulp each='var gulpDir in gulpDirs'
 
 #target-dir-clean target='clean'
   @{
