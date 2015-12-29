@@ -93,6 +93,7 @@ configuration='Debug'
 		if (String.IsNullOrEmpty(dnxHome)) 
 		{
 			Log.Warn("DNX_HOME environment variable not set.");
+			dnxHome = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), ".dnx");
 		}
 
 		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(dnxHome
