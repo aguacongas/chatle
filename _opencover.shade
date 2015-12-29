@@ -89,12 +89,10 @@ configuration='Debug'
 		var dnxName = string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
 		Log.Info("dnxName: " + dnxName);
 	
-		var dnxHome = Environment.GetEnvironmentVariable(DNX_HOME);
+		var dnxHome = Environment.GetEnvironmentVariable("DNX_HOME");
 		if (String.IsNullOrEmpty(dnxHome)) 
 		{
 			Log.Warn("DNX_HOME environment variable not set.");
-			Environment.Exit(-1);
-			return;
 		}
 
 		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(dnxHome
@@ -103,6 +101,8 @@ configuration='Debug'
 			, "bin")
 			, "dnx.exe");
 		
+		Log.Info("dnxLocation: " + dnxLocation);
+
 		var target = '-target:"' + dnxLocation +  '" ';
 		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p ""' + projectPath + '"" test -xml ""' + results + '"" -nologo -parallel none" ';
 		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[ChatLe*]* -[xunit*]*"';
