@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+export BUILDCMD_DNX_VERSION=1.0.0-rc1-update1
+export BUILDCMD_DNX_RUNTIME=clr
+export BUILDCMD_DNX_ARCHITECTURE=x64
+export DNX_FEED=https://www.nuget.org/api/v2
+
 if test `uname` = Darwin; then
     cachedir=~/Library/Caches/KBuild
 else
@@ -34,8 +39,8 @@ if ! type dnvm > /dev/null 2>&1; then
 fi
 
 if ! type dnx > /dev/null 2>&1 || [ -z "$SKIP_DNX_INSTALL" ]; then
-    dnvm install latest -runtime coreclr -alias default
-    dnvm install default -runtime mono -alias default
+    dnvm install $BUILDCMD_DNX_VERSION -runtime coreclr -alias core
+    dnvm install $BUILDCMD_DNX_VERSION -runtime mono -alias default
 else
     dnvm use default -runtime mono
 fi
