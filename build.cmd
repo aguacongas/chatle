@@ -30,7 +30,6 @@ IF "%BUILDCMD_KOREBUILD_VERSION%"=="" (
 )
 .nuget\NuGet.exe install Sake -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 .nuget\NuGet.exe install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-.nuget\NuGet.exe install psake -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
 .nuget\NuGet.exe install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
 .nuget\NuGet.exe install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 

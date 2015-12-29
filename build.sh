@@ -1,46 +1,43 @@
 #!/usr/bin/env bash
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-ERRORS=()
-SKIPPED=()
-
-printf "${GREEN}Start tests\n"
-
-for t in `grep -l "xunit.runner" test/*/project.json`; do
-    TEST_DIR=$(dirname $t)
-
-    _=$(grep "dnxcore50" $t)
-    rc=$?
-    if [[ $rc != 0 ]]; then
-        printf "${YELLOW}Skipping tests on project ${TEST_DIR}. Project does not support CoreCLR${NC}\n"
-        SKIPPED+=("${TEST_DIR} skipped")
-        continue
-    fi
-    
-    printf "${GREEN}Running tests on ${TEST_DIR}${NC}\n"
-
-    (cd $TEST_DIR && dnvm run default -r coreclr test $@)
-    rc=$?
-    if [[ $rc != 0 ]]; then
-        printf "${RED}Test ${TEST_DIR} failed error code ${rc}${NC}\n"
-        ERRORS+=("${TEST_DIR} failed")
-    fi
-done
-
-echo "============= TEST SUMMARY =============="
-
-printf "${YELLOW}%s${NC}\n" "${SKIPPED[@]}"
-
-if [ "${#ERRORS}" -ne "0" ]; then
-    printf "${RED}%s${NC}\n" "${ERRORS[@]}"
-    rc=1
+if test `uname` = Darwin; then
+    cachedir=~/Library/Caches/KBuild
 else
-    printf "${GREEN}All tests passed${NC}\n"
-    rc=0
+    if [ -z $XDG_DATA_HOME ]; then
+        cachedir=$HOME/.local/share
+    else
+        cachedir=$XDG_DATA_HOME;
+    fi
+fi
+mkdir -p $cachedir
+nugetVersion=latest
+cachePath=$cachedir/nuget.$nugetVersion.exe
+
+url=https://dist.nuget.org/win-x86-commandline/$nugetVersion/nuget.exe
+
+if test ! -f $cachePath; then
+    wget -O $cachePath $url 2>/dev/null || curl -o $cachePath --location $url /dev/null
 fi
 
-exit $rc
+if test ! -e .nuget; then
+    mkdir .nuget
+    cp $cachePath .nuget/nuget.exe
+fi
+
+if test ! -d packages/Sake; then
+    mono .nuget/nuget.exe install KoreBuild -ExcludeVersion -o packages -nocache -pre
+    mono .nuget/nuget.exe install Sake -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+fi
+
+if ! type dnvm > /dev/null 2>&1; then
+    source packages/KoreBuild/build/dnvm.sh
+fi
+
+if ! type dnx > /dev/null 2>&1 || [ -z "$SKIP_DNX_INSTALL" ]; then
+    dnvm install latest -runtime coreclr -alias default
+    dnvm install default -runtime mono -alias default
+else
+    dnvm use default -runtime mono
+fi
+
+mono packages/Sake/tools/Sake.exe -I packages/KoreBuild/build -f makefile.shade "$@"

@@ -23,8 +23,6 @@ configuration='Debug'
 @{
 	var sourcesFiles = Files.Include("src/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
 	var pdbLocation = "";
-
-	Log.Info("configuration: " + configuration);
 	
 	foreach (var sourceFile in sourcesFiles)
 	{
@@ -43,14 +41,11 @@ configuration='Debug'
 	}
 
 	pdbLocation = pdbLocation.TrimEnd((char)';');
-	Log.Info("pdbLocation: " + pdbLocation);
 
 	var openCoverLocation = Path.Combine(Path.Combine(Path.Combine("packages"
 		, "OpenCover")
 		, "tools")
 		, "OpenCover.Console.exe");
-
-	Log.Info("openCoverLocation: " + openCoverLocation);
 
     var projectText = File.ReadAllText(projectFile);
     var project = (JsonObject)Json.Deserialize(projectText);
@@ -87,7 +82,6 @@ configuration='Debug'
 		}
 
 		var dnxName = string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
-		Log.Info("dnxName: " + dnxName);
 	
 		var dnxHome = Environment.GetEnvironmentVariable("DNX_HOME");
 		if (String.IsNullOrEmpty(dnxHome)) 
@@ -102,8 +96,6 @@ configuration='Debug'
 			, "bin")
 			, "dnx.exe");
 		
-		Log.Info("dnxLocation: " + dnxLocation);
-
 		var target = '-target:"' + dnxLocation +  '" ';
 		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p ""' + projectPath + '"" test -xml ""' + results + '"" -nologo -parallel none" ';
 		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[ChatLe*]* -[xunit*]*"';

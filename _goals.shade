@@ -208,11 +208,23 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 
 #xunit-test target='test' if='Directory.Exists("test")'
   @{
-	var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
-    var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
-	Log.Info("configuration: " + Configuration);
-	Log.Info("coverageFile: " + coverageFile);
-    projectFiles.ForEach(projectFile => OpenCoverTest(projectFile, coverageFile, Configuration));
+		var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
+		if (!IsLinux)
+		{
+			var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
+			projectFiles.ForEach(projectFile => OpenCoverTest(projectFile, coverageFile, Configuration));
+		}
+		else
+		{
+			if (ShouldRunInParallel)
+			{
+				Parallel.ForEach(projectFiles, projectFile => DnxTest(projectFile, testParallel: true));
+			}
+			else
+			{
+				projectFiles.ForEach(projectFile => DnxTest(projectFile, testParallel: false));
+			}
+		}
   }
 
 #build-samples target='test' if='!IsBuildV2 && Directory.Exists("samples")'
