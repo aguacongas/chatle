@@ -267,6 +267,29 @@ namespace chatle.test.Controllers
 		}
 
 		[Fact]
+		public void SendMessageTest_NoConversation()
+		{
+			ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =>
+			{
+				var mockHttpContext = new Mock<HttpContext>();
+				var mockClaims = new Mock<ClaimsPrincipal>();
+				var mockIndentity = new Mock<IIdentity>();
+				mockIndentity.SetupGet(i => i.Name).Returns("test");
+				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
+				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
+				controller.ActionContext.HttpContext = mockHttpContext.Object;
+
+				mockChatManager.Setup(c => c.AddMessageAsync(It.IsAny<string>()
+						, It.IsAny<string>()
+						, It.IsAny<Message>()
+						, It.IsAny<CancellationToken>()))
+					.ReturnsAsync(null);
+
+				await controller.SendMessage("test1", "test");
+			});
+		}
+
+		[Fact]
 		public void CreateConversationTest()
 		{
 			ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =>

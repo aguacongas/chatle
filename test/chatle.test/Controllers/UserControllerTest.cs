@@ -1,5 +1,8 @@
 ﻿using ChatLe.Controllers;
 using ChatLe.Models;
+using Moq;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,14 +13,18 @@ namespace Chatle.test.Controllers
         [Fact]
         public async Task GetUsersTest()
         {
-            var provider = TestUtils.GetServiceProvider();
-            var manager = provider.GetService(typeof(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>)) as IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>;
-            
-            using (var controller = new UserController(manager))
+			var mockManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+			mockManager.Setup(m => m.GetUsersConnectedAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Page<ChatLeUser>(new List<ChatLeUser>()
+			{
+				new ChatLeUser()
+			}, 0, 1));
+
+
+			using (var controller = new UserController(mockManager.Object))
             {
                 var users = await controller.Get();
 				Assert.NotNull(users);
-				Assert.Empty(users.Users);
+				Assert.NotEmpty(users.Users);
 				Assert.Equal(1, users.PageCount);
 				Assert.Equal(0, users.PageIndex);
             }                

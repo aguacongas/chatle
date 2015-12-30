@@ -143,8 +143,6 @@ namespace ChatLe.Controllers
         {
             var userName = HttpContext.User.Identity.Name;
             var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
-            if (conversation == null)
-                return null;
 
             var users = new List<ChatLeUser>(conversation.Attendees.Count);
             var attendees = new List<AttendeeViewModel>(conversation.Attendees.Count);
