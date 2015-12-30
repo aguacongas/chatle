@@ -13,6 +13,8 @@ namespace ChatLe.Controllers
             if (_logger == null)
                 _logger = factory.CreateLogger("Unhandled Error");
         }
+
+
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)

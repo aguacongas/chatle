@@ -1,5 +1,6 @@
 ﻿using ChatLe.ViewModels;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,7 +15,7 @@ namespace Chatle.test
             services.AddMvc();
             services.AddEntityFramework()
                 .AddInMemoryDatabase()
-                .AddDbContext<ChatLeIdentityDbContext>();
+                .AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase());
             services.AddInstance<ILoggerFactory>(new LoggerFactory());
             services.AddIdentity<ChatLeUser, IdentityRole>();
             services.AddChatLe();
