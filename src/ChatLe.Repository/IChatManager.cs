@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
     /// <summary>
     /// Interface defining chat manager

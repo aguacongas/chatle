@@ -1,6 +1,7 @@
 ﻿using Chatle.test.Controllers;
 using ChatLe.Controllers;
 using ChatLe.Hubs;
+using ChatLe.Models;
 using ChatLe.ViewModels;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Identity;
@@ -19,7 +20,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace chatle.test.Controllers
@@ -298,9 +298,9 @@ namespace chatle.test.Controllers
 
 				mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
 				var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
-				dynamic all = new ExpandoObject();
-				all.joinConversation = new Action<ConversationViewModel>(m => { });
-				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
+				dynamic group = new ExpandoObject();
+				group.joinConversation = new Action<ConversationViewModel>(m => { });
+				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)group);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
 				var result = await controller.CreateConversation("test1", "test");

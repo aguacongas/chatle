@@ -6,6 +6,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using ChatLe.Hubs;
+using ChatLe.Models;
 
 namespace ChatLe.Controllers
 {
@@ -176,7 +177,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.FindByIdAsync(User.GetUserId());
+            return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         public enum ManageMessageId

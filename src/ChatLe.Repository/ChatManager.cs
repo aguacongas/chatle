@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {    
     /// <summary>
     /// Manage chat repository

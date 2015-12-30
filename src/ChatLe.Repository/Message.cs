@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
     public class Message : Message<string>
     {

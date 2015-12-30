@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
     /// <summary>
     /// Default <see cref="ChatManager<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>"/>

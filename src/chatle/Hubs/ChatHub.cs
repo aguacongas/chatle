@@ -2,7 +2,7 @@
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using System;
-using ChatLe.ViewModels;
+using ChatLe.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Hubs

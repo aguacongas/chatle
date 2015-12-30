@@ -1,5 +1,5 @@
 ﻿using ChatLe.Controllers;
-using ChatLe.ViewModels;
+using ChatLe.Models;
 using System.Threading.Tasks;
 using Xunit;
 

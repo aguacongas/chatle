@@ -1,4 +1,4 @@
-﻿using ChatLe.ViewModels;
+﻿using ChatLe.Models;
 using Moq;
 using System;
 using System.Threading.Tasks;

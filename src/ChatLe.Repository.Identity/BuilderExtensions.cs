@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
     public static class BuilderExtensions
     {

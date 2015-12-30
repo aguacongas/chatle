@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatLe.Models;
+using System;
 using System.Collections.Generic;
 
 namespace ChatLe.ViewModels

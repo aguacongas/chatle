@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
     internal class FakeLogger : ILogger
     {
