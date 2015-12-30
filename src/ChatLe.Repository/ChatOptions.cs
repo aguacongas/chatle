@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     public class ChatOptions
     {

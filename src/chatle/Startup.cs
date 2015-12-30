@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using ChatLe.Models;
+using ChatLe.ViewModels;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity.EntityFramework;

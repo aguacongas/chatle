@@ -1,10 +1,10 @@
-﻿using ChatLe.Models;
+﻿using ChatLe.ViewModels;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace chatle.test
+namespace Chatle.test
 {
     public class TestUtils
     {

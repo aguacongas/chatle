@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     public class Page<T> :IEnumerable<T>
     {

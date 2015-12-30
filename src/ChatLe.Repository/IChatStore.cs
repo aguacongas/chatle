@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     /// <summary>
     /// Chat store interface

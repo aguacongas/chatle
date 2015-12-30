@@ -1,10 +1,7 @@
-﻿using ChatLe.Models;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
-namespace chatle.Models
+namespace ChatLe.ViewModels
 {
     /// <summary>
     /// View model for conversation

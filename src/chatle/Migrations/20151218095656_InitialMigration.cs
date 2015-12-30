@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Metadata;
 
-namespace chatle.Migrations
+namespace Chatle.Migrations
 {
     public partial class InitialMigration : Migration
     {

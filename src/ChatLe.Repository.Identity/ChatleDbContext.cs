@@ -4,7 +4,7 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Infrastructure;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     public class ChatLeIdentityDbContext : ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
     {

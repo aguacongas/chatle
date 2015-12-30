@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     /// <summary>
     /// Chat store for <see cref="ChatLeUser"/>

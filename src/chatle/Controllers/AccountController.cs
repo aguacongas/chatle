@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ChatLe.Models;
+using ChatLe.ViewModels;
 using Microsoft.AspNet.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNet.Mvc;

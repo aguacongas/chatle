@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
-using ChatLe.Models;
+using ChatLe.ViewModels;
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNet.Builder;

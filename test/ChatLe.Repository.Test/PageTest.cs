@@ -1,4 +1,4 @@
-﻿using ChatLe.Models;
+﻿using ChatLe.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;

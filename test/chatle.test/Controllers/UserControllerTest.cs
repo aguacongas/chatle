@@ -1,9 +1,9 @@
 ﻿using ChatLe.Controllers;
-using ChatLe.Models;
+using ChatLe.ViewModels;
 using System;
 using Xunit;
 
-namespace chatle.test.Controllers
+namespace Chatle.test.Controllers
 {
     public class UserControllerTest
     {

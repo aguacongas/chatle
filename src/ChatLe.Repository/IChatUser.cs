@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     public interface IChatUser<TKey> where TKey : IEquatable<TKey>
     {

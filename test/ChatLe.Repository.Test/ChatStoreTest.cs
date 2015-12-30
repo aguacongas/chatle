@@ -1,4 +1,4 @@
-﻿using ChatLe.Models;
+﻿using ChatLe.ViewModels;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using System;

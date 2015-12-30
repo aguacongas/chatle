@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity.EntityFramework;
 
-namespace ChatLe.Models
+namespace ChatLe.ViewModels
 {
     public class ChatLeUser : IdentityUser, IChatUser<string>
     {
