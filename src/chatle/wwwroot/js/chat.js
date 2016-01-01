@@ -1,4 +1,3 @@
-var chatLe = chatLe || {};
 /**
   * @desc chat management class
   * @author Olivier Lefebvre
@@ -6,7 +5,7 @@ var chatLe = chatLe || {};
 (function () {
 	"use strict";
 
-	chatLe = function () {
+	var chatLe = function () {
 		// settings
 		var settings = {
 			userName: null,
@@ -293,5 +292,5 @@ var chatLe = chatLe || {};
 		return settings;
 	};
 
+	window.chatLe = chatLe();
 })();
-chatLe = chatLe();

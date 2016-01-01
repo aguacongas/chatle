@@ -3,6 +3,7 @@
 		{ "Path": "../../src/chatle/wwwroot/lib/jquery/dist/jquery.js" },
 		{ "Path": "../../src/chatle/wwwroot/lib/signalr/jquery.signalR.js" },
 		{ "Path": "../../src/chatle/wwwroot/lib/knockout/dist/knockout.js" },
+		{ "Path": "wwwroot\\lib\\jasmine-ajax\\lib\\mock-ajax.js" },
 		{ "Path": "../../src/chatle/wwwroot/js/chat.js" }
 	],
 	"CodeCoverageIncludes": [ "*\\chat.js" ]

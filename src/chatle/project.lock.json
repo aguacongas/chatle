@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -14,7 +14,7 @@
           "System.Runtime"
         ]
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -2190,7 +2190,7 @@
       }
     },
     "DNXCore,Version=v5.0": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -2203,7 +2203,7 @@
           "System.Threading": "4.0.11-beta-23516"
         }
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -5044,7 +5044,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -5055,7 +5055,7 @@
           "System.Runtime"
         ]
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -7234,7 +7234,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -7245,7 +7245,7 @@
           "System.Runtime"
         ]
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -9424,7 +9424,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x86": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -9437,7 +9437,7 @@
           "System.Threading": "4.0.11-beta-23516"
         }
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -12785,7 +12785,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x64": {
-      "ChatLe.Repository/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -12798,7 +12798,7 @@
           "System.Threading": "4.0.11-beta-23516"
         }
       },
-      "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+      "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
@@ -16147,11 +16147,11 @@
     }
   },
   "libraries": {
-    "ChatLe.Repository/1.0.0-rc1-151230213835": {
+    "ChatLe.Repository/1.0.0-rc1-151231102714": {
       "type": "project",
       "path": "../ChatLe.Repository/project.json"
     },
-    "ChatLe.Repository.Identity/1.0.0-rc1-151230213835": {
+    "ChatLe.Repository.Identity/1.0.0-rc1-151231102714": {
       "type": "project",
       "path": "../ChatLe.Repository.Identity/project.json"
     },
