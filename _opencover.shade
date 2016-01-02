@@ -98,7 +98,7 @@ configuration='Debug'
 		
 		var target = '-target:"' + dnxLocation +  '" ';
 		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p ""' + projectPath + '"" test -xml ""' + results + '"" -nologo -parallel none" ';
-		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*"';
+		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
         
 		if (File.Exists(coverageFile))
 		{

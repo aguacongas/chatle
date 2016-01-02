@@ -208,25 +208,30 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 
 #xunit-test target='test' if='Directory.Exists("test")'
   @{
-		var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
-		if (!IsLinux)
+	var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
+	if (!IsLinux)
+	{
+		var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
+		projectFiles.ForEach(projectFile => OpenCoverTest(projectFile, coverageFile, Configuration));
+	}
+	else
+	{
+		if (ShouldRunInParallel)
 		{
-			var coverageFile = Path.Combine(TARGET_DIR, "coverage.xml");
-			projectFiles.ForEach(projectFile => OpenCoverTest(projectFile, coverageFile, Configuration));
+			Parallel.ForEach(projectFiles, projectFile => DnxTest(projectFile, testParallel: true));
 		}
 		else
 		{
-			if (ShouldRunInParallel)
-			{
-				Parallel.ForEach(projectFiles, projectFile => DnxTest(projectFile, testParallel: true));
-			}
-			else
-			{
-				projectFiles.ForEach(projectFile => DnxTest(projectFile, testParallel: false));
-			}
+			projectFiles.ForEach(projectFile => DnxTest(projectFile, testParallel: false));
 		}
+	}
   }
 
+#chutzpah-test target='test' if='Directory.Exists("test")'
+  @{
+	var projectFiles = Files.Include("test/**/chutzpah.json").Exclude("**/bin/*/app/chutzpah.json").ToList();
+	Parallel.ForEach(projectFiles, projectFile => ChutzpahTest(projectFile));
+  }
 #build-samples target='test' if='!IsBuildV2 && Directory.Exists("samples")'
   @{
     var projectFiles = Files.Include("samples/**/project.json").ToList();
@@ -389,6 +394,9 @@ macro name='Dnx' command='string' dnxDir='string' dnvmUse='string'
 
 macro name="UpdateResx" resxFile='string'
     k-generate-resx
+
+macro name="ChutzpahTest" projectFile='string'
+    chutzpah
 
 macro name="OpenCoverTest" projectFile='string' coverageFile='string' configuration='string'
     opencover
