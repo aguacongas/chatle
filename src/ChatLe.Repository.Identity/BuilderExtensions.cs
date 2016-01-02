@@ -41,7 +41,7 @@ namespace ChatLe.Models
 
         public static IApplicationBuilder UseChatLe(this IApplicationBuilder app)
         {
-            var store = app.ApplicationServices.GetRequiredService<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            var store = app.ApplicationServices.GetRequiredService<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();            
             store.Init();
             return app;
         }

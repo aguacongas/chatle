@@ -142,7 +142,7 @@ namespace ChatLe.Models
         public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Users.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
         /// <summary>
         /// Update the user on the database
@@ -174,7 +174,16 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            return await Conversations.FirstOrDefaultAsync(x => x.Attendees.Count == 2 && x.Attendees.Any(a => a.UserId.Equals(attendee1.Id)) && x.Attendees.Any(b => b.UserId.Equals(attendee2.UserName)));
+            var convs = from c in Conversations
+                       join a1 in Attendees
+                            on c.Id equals a1.ConversationId
+                       join a2 in Attendees
+                            on c.Id equals a2.ConversationId
+                       where a1.UserId.Equals(attendee1.Id)
+                            && a2.UserId.Equals(attendee2.Id)
+                       select c;
+
+            return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
         }
         /// <summary>
         /// Gets a conversation by her id
@@ -217,9 +226,9 @@ namespace ChatLe.Models
 
             var count = q1.Count();
 
-            var q2 = q1.Skip(skip)
+            var q2 = await q1.Skip(skip)
                      .Take(pageLength)
-                     .ToList();
+                     .ToListAsync();
 
             var query = from r in q2
                         join u in Users
@@ -282,6 +291,7 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
+            Context.Database.EnsureCreated();
             NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();
             Attendees.RemoveRange(Attendees.ToArray());
@@ -303,7 +313,7 @@ namespace ChatLe.Models
         public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && (notificationType == null || n.NotificationType == notificationType)).ToListAsync();
+            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType == notificationType).ToListAsync();
         }
         /// <summary>
         /// Check if a user has connection
@@ -368,5 +378,11 @@ namespace ChatLe.Models
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
-    }
+
+		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+		}
+	}
 }

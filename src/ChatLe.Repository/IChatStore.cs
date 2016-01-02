@@ -29,13 +29,20 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TUser}"/></returns>
         Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken));
-        /// <summary>
-        /// Create a message on the database
-        /// </summary>
-        /// <param name="message">The message to create</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task"/></returns>
-        Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken));
+		/// <summary>
+		/// Find a user by her Id
+		/// </summary>
+		/// <param name="id">the user id</param>
+		/// <param name="cancellationToken">an optional cancellation token</param>
+		/// <returns>a <see cref="Task{TUser}"/></returns>
+		Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken));
+		/// <summary>
+		/// Create a message on the database
+		/// </summary>
+		/// <param name="message">The message to create</param>
+		/// <param name="cancellationToken">an optional cancellation token</param>
+		/// <returns>a <see cref="Task"/></returns>
+		Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken));
         /// <summary>
         /// Create an attendee on the database
         /// </summary>

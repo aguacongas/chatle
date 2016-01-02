@@ -1,5 +1,5 @@
-﻿using chatle.Models;
-using ChatLe.Models;
+﻿using ChatLe.Models;
+using ChatLe.ViewModels;
 using Microsoft.AspNet.Mvc;
 using System.Collections.Generic;
 using System.Linq;

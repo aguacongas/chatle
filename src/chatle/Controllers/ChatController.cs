@@ -8,7 +8,7 @@ using Microsoft.AspNet.SignalR;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using chatle.Models;
+using ChatLe.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -143,8 +143,6 @@ namespace ChatLe.Controllers
         {
             var userName = HttpContext.User.Identity.Name;
             var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
-            if (conversation == null)
-                return null;
 
             var users = new List<ChatLeUser>(conversation.Attendees.Count);
             var attendees = new List<AttendeeViewModel>(conversation.Attendees.Count);

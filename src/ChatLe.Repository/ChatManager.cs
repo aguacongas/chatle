@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +25,12 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>, new()
         where TNotificationConnection : NotificationConnection<TKey>, new()
     {
+        private readonly ILogger _logger;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="store">the store</param>
-        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store, IOptions<ChatOptions> optionsAccessor)
+        public ChatManager(IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> store, IOptions<ChatOptions> optionsAccessor, ILoggerFactory loggerFactory = null)
         {
             if (store == null)
                 throw new ArgumentNullException("store");
@@ -37,6 +39,10 @@ namespace ChatLe.Models
 
             Store = store;
             Options = optionsAccessor.Value;
+            if (loggerFactory != null)
+                _logger = loggerFactory.CreateLogger("ChatLe.Models.ChatManager");
+            else
+                _logger = new FakeLogger();            
         }
         /// <summary>
         /// Gets the store
@@ -61,6 +67,10 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("userName");
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
+            if (notificationType == null)
+                throw new ArgumentNullException("notificationType");
+
+            _logger.LogInformation("AddConnectionIdAsync {0} {1} {2}", userName, connectionId, notificationType);
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
             if (user != null)
@@ -83,32 +93,31 @@ namespace ChatLe.Models
         /// <summary>
         /// Removes a notification connection assotiate to a user
         /// </summary>
-        /// <param name="userName">The user name</param>
         /// <param name="connectionId">The connection id</param>
         /// <param name="notificationType">the type of notification</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>A Task</returns>
-        public virtual async Task<bool> RemoveConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (userName == null)
-                throw new ArgumentNullException("userName");
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
+            if (notificationType == null)
+                throw new ArgumentNullException("notificationType");
 
-            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
-            if (user != null)
-            {
-                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
-                if (nc != null)
-                    await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
-
-                var ret = await Store.UserHasConnectionAsync(user.Id);
-                if (!ret && user.PasswordHash == null)
-                    await Store.DeleteUserAsync(user, cancellationToken);
-                return ret;
-            }
-
-            return false;
+            var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
+			if (nc != null)
+			{
+				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
+				var user = await Store.FindUserByIdAsync(nc.UserId);
+				if (user != null)
+				{
+					var ret = await Store.UserHasConnectionAsync(user.Id);
+					if (!ret && user.PasswordHash == null)
+						await Store.DeleteUserAsync(user, cancellationToken);
+					return user;
+				}
+			}
+			return default(TUser);
         }
         /// <summary>
         /// Adds a message to a conversation
@@ -159,6 +168,8 @@ namespace ChatLe.Models
             if (to == null)
                 throw new ArgumentNullException("to");
 
+            _logger.LogInformation("GetOrCreateConversationAsync from : {0}, to : {1}, initialMessage: {2}", from, to, initialMessage);
+
             var attendee1 = await Store.FindUserByNameAsync(from, cancellationToken);
             var attendee2 = await Store.FindUserByNameAsync(to, cancellationToken);
             var conv = await Store.GetConversationAsync(attendee1, attendee2, cancellationToken);
@@ -166,8 +177,8 @@ namespace ChatLe.Models
             {
                 conv = new TConversation();
                 await Store.CreateConversationAsync(conv, cancellationToken);
-                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee1.Id, cancellationToken));
-                conv.Attendees.Add(await AddAttendeeAsync(conv.Id, attendee2.Id, cancellationToken));
+                await AddAttendeeAsync(conv, attendee1.Id, cancellationToken);
+                await AddAttendeeAsync(conv, attendee2.Id, cancellationToken);
             }
 
             if (initialMessage != null)
@@ -185,12 +196,16 @@ namespace ChatLe.Models
         /// <returns>an async task</returns>
         protected virtual async Task AddMessageAsync(TConversation conv, TUser sender, string content, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("AddMessage to conversation : {0} content : {1}", conv.Id, content);
+            
             var message = new TMessage();
             message.ConversationId = conv.Id;
             message.UserId = sender.Id;
             message.Text = content;
             await Store.CreateMessageAsync(message, cancellationToken);
-            conv.Messages.Add(message);
+            var messages = conv.Messages;
+            if (!messages.Any(m => m.Id.Equals(message.Id)))
+                messages.Add(message);
         }
         /// <summary>
         /// Add an attendee in a conversation by ids
@@ -199,12 +214,15 @@ namespace ChatLe.Models
         /// <param name="userId">the user id</param>
         /// <param name="cancellationToken">a cancellation token</param>
         /// <returns>an async task</returns>
-        protected virtual async Task<TAttendee> AddAttendeeAsync(TKey convId, TKey userId, CancellationToken cancellationToken)
+        protected virtual async Task<TAttendee> AddAttendeeAsync(TConversation conv, TKey userId, CancellationToken cancellationToken)
         {
             var attendee = new TAttendee();
-            attendee.ConversationId = convId;
+            attendee.ConversationId = conv.Id;
             attendee.UserId = userId;
             await Store.CreateAttendeeAsync(attendee, cancellationToken);
+            var attendees = conv.Attendees;
+            if (!attendees.Any(a => a.UserId.Equals(attendee.UserId)))
+                attendees.Add(attendee);
             return attendee;
         }
         /// <summary>
@@ -244,7 +262,11 @@ namespace ChatLe.Models
             // TODO: check if it's necessary when EF7 will be release
             foreach (var conv in conversations)
             {
-                await Store.GetAttendeesAsync(conv, cancellationToken);
+                var attendees = await Store.GetAttendeesAsync(conv, cancellationToken);
+                foreach (var attendee in attendees)
+                    if (!conv.Attendees.Any(a => a.UserId.Equals(attendee.UserId)))
+                        conv.Attendees.Add(attendee);
+
                 var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
                 foreach (var message in messages)
                     if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))

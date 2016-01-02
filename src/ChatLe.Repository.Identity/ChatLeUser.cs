@@ -10,6 +10,7 @@ namespace ChatLe.Models
         {
             Id = Guid.NewGuid().ToString("N");
         }
+
         public ChatLeUser(string userName) :this()
         {
             UserName = userName;

@@ -17,5 +17,7 @@ namespace ChatLe.Models
         public virtual TKey UserId { get; set; }
         public virtual string Text { get; set; }
         public virtual DateTime Date { get; set; }
+
+        public virtual Conversation<TKey> Conversation { get; set; }
     }
 }

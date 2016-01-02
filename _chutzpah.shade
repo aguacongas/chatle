@@ -1,0 +1,22 @@
+@{/*
+
+chutzpah
+    Run opencover on unittest in your project
+	
+projectFile=''
+    Required. Path to the test chutzpah.json to execute
+
+*/}
+
+@{
+	var chutzpahLocation = Path.Combine(Path.Combine(Path.Combine("packages"
+		, "Chutzpah")
+		, "tools")
+		, "chutzpah.console.exe");
+
+	var projectFolder = Path.GetDirectoryName(projectFile);
+
+	var args = projectFile + ' /nologo /silent /coverage /coveragehtml artifacts/js-coverage.html /junit ' + Path.Combine(projectFolder, "chutzpah-result.xml");
+
+	Exec(chutzpahLocation, args);
+}

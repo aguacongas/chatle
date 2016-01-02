@@ -1,28 +1,13 @@
 {
-    "name": "chatle",
-    "private": true,
-    "dependencies": {
-        "bootstrap": "~3.0.0",
-        "jquery": "~1.10.2",
-        "jquery-validation": "~1.11.1",
-        "jquery-validation-unobtrusive": "~3.2.2",
-        "knockout": "~3.2.0",
-        "signalr": "~2.1.2"
-    },
-    "exportsOverride": {
-        "bootstrap": {
-            "js": "dist/js/*.*",
-            "css": "dist/css/*.*",
-            "fonts": "dist/fonts/*.*"
-        },
-        "jquery": {
-            "js": "jquery.{js,min.js,min.map}"
-        },
-        "jquery-validation": {
-            "": "jquery.validate.js"
-        },
-        "jquery-validation-unobtrusive": {
-            "": "jquery.validate.unobtrusive.{js,min.js}"
-        }
-    }
+	"name": "ASP.NET",
+	"private": true,
+	"dependencies": {
+		"bootstrap": "3.3.5",
+		"jquery": "2.1.4",
+		"jquery-validation": "1.14.0",
+		"jquery-validation-unobtrusive": "3.2.4",
+		"knockout": "3.4.0",
+		"signalr": "2.2.0"
+	},
+	"ignore": ""
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
-namespace ChatLe.Repository.Text
+namespace ChatLe.Repository.Test
 {
     public static class TestHelpers
     {
@@ -84,8 +84,15 @@ namespace ChatLe.Repository.Text
                 b.HasKey(c => c.Id);
                 b.ToTable("Conversations");
 
-                b.HasMany(c => c.Attendees).WithOne().HasForeignKey(a => a.ConversationId);
-                b.HasMany(c => c.Messages).WithOne().HasForeignKey(m => m.ConversationId);                
+                b.HasMany(c => c.Attendees)
+                    .WithOne()
+                    .HasForeignKey(a => a.ConversationId)
+                    .IsRequired();
+
+                b.HasMany(c => c.Messages)
+                    .WithOne()
+                    .HasForeignKey(m => m.ConversationId)
+                    .IsRequired();                
             });
 
             builder.Entity<NotificationConnection<TKey>>(b =>
