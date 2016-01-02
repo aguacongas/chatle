@@ -1,6 +1,6 @@
 {
-  "name": "ASP.NET",
-  "private": true,
+	"name": "ASP.NET",
+	"private": true,
 	"dependencies": {
 		"bootstrap": "3.3.5",
 		"jquery": "2.1.4",
@@ -8,5 +8,6 @@
 		"jquery-validation-unobtrusive": "3.2.4",
 		"knockout": "3.4.0",
 		"signalr": "2.2.0"
-	}
+	},
+	"ignore": ""
 }
