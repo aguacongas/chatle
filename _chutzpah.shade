@@ -16,7 +16,7 @@ projectFile=''
 
 	var projectFolder = Path.GetDirectoryName(projectFile);
 
-	var args = projectFile + ' /nologo /silent /coverable /junit ' + Path.Combine(projectFolder, "chutzpah-result.xml");
+	var args = projectFile + ' /nologo /silent /coverage /coveragehtml artifacts/js-coverage.html /junit ' + Path.Combine(projectFolder, "chutzpah-result.xml");
 
 	Exec(chutzpahLocation, args);
 }
