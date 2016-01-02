@@ -14,6 +14,10 @@ projectFile=''
 		, "tools")
 		, "chutzpah.console.exe");
 
+	if(IsLinux)
+    {
+		chutzpahLocation = 'mono ' + chutzpahLocation;
+	}  
 	var projectFolder = Path.GetDirectoryName(projectFile);
 
 	var args = projectFile + ' /failOnError /nologo /silent /coverable /nunit2 ' + Path.Combine(projectFolder, "chutzpah-result.xml");

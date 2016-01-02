@@ -227,7 +227,7 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 	}
   }
 
-#chutzpah-test target='test' if='Directory.Exists("test") && !IsLinux'
+#chutzpah-test target='test' if='Directory.Exists("test")'
   @{
 	var projectFiles = Files.Include("test/**/chutzpah.json").Exclude("**/bin/*/app/chutzpah.json").ToList();
 	Parallel.ForEach(projectFiles, projectFile => ChutzpahTest(projectFile));
