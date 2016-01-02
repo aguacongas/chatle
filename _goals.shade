@@ -68,7 +68,7 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
   var bowerDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "bower.json")}'
   bower each='var bowerDir in bowerDirs' bowerCommand='install ${E("KOREBUILD_BOWER_INSTALL_OPTIONS")}'
 
-#run-gulp .restore-npm-modules .repo-initialize .restore-bower-components  target='initialize'
+#run-gulp .repo-initialize .restore-npm-modules .restore-bower-components  target='initialize'
   -// Find all dirs that contain a gulpfile.js file
   var gulpDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "gulpfile.js")}'
   gulp each='var gulpDir in gulpDirs'

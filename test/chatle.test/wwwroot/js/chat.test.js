@@ -118,9 +118,6 @@
 
 		describe("on started", function () {
 
-			chatLe.userAPI = "/userAPI";
-			chatLe.chatAPI = "/chatAPI";
-
 			var users = {
 				Users: [
 					"test"
@@ -134,6 +131,10 @@
 			}];
 
 			beforeEach(function () {
+
+				chatLe.userAPI = "/userAPI";
+				chatLe.chatAPI = "/chatAPI";
+
 				jasmine.Ajax.install();
 
 				spyOn(currenVM, 'users').and.callThrough();
