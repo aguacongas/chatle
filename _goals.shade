@@ -45,11 +45,6 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
   var npmDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "package.json")}'
   npm npmCommand='install ${E("KOREBUILD_NPM_INSTALL_OPTIONS")}' each='var npmDir in npmDirs'
 
-#restore-bower-components
-  -// Find all dirs that contain a bower.json file
-  var bowerDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "bower.json")}'
-  bower each='var bowerDir in bowerDirs' bowerCommand='install ${E("KOREBUILD_BOWER_INSTALL_OPTIONS")}'
-
 #clean-bin-folder
   rimraf rimrafDir='bin' if='Directory.Exists("bin")'
 
@@ -67,6 +62,11 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 
 #repo-initialize
   k-restore
+
+#restore-bower-components
+  -// Find all dirs that contain a bower.json file
+  var bowerDirs = '${GetDirectoriesContaining(Directory.GetCurrentDirectory(), "bower.json")}'
+  bower each='var bowerDir in bowerDirs' bowerCommand='install ${E("KOREBUILD_BOWER_INSTALL_OPTIONS")}'
 
 #run-gulp .restore-npm-modules .restore-bower-components .repo-initialize target='initialize'
   -// Find all dirs that contain a gulpfile.js file
