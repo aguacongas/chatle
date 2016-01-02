@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="us-ascii"?>
+<test-results name="Chutzpah Test Results" total="21" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2016-01-02" time="15:46:03">
+  <test-suite type="JavaScript" name="c:\users\olivierlefebvre\source\repos\chatle\test\chatle.test\wwwroot\js\chat.test.js" success="21" time="0.057" executed="True" asserts="0" result="Success">
+    <results>
+      <test-suite type="JavaScript" name="chat test suite" success="6" time="0.004" executed="True" asserts="0" result="Success">
+        <results>
+          <test-case name="chatLe must be defined" description="chat test suite:chatLe must be defined" success="True" time="0.003" executed="True" asserts="0" result="Success" />
+          <test-case name="chatLe.userName must be defined" description="chat test suite:chatLe.userName must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="chatLe.chatAPI must be defined" description="chat test suite:chatLe.chatAPI must be defined" success="True" time="0.001" executed="True" asserts="0" result="Success" />
+          <test-case name="chatLe.chatAPI must be defined" description="chat test suite:chatLe.chatAPI must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="chatLe.userAPI must be defined" description="chat test suite:chatLe.userAPI must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="chatLe.init must be defined" description="chat test suite:chatLe.init must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+        </results>
+      </test-suite>
+      <test-suite type="JavaScript" name="chat test suite start chat" success="9" time="0.025" executed="True" asserts="0" result="Success">
+        <results>
+          <test-case name="chatLe.init must called" description="chat test suite start chat:chatLe.init must called" success="True" time="0.003" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.chat.client.userConnected must be defined" description="chat test suite start chat:$.connection.chat.client.userConnected must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.chat.client.messageReceived must be defined" description="chat test suite start chat:$.connection.chat.client.messageReceived must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.chat.client.joinConversation must be defined" description="chat test suite start chat:$.connection.chat.client.joinConversation must be defined" success="True" time="0.001" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.hub.stateChanged must have been called in debug mode" description="chat test suite start chat:$.connection.hub.stateChanged must have been called in debug mode" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.hub.reconnected must have been called  in debug mode" description="chat test suite start chat:$.connection.hub.reconnected must have been called  in debug mode" success="True" time="0.001" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.hub.error must have been called" description="chat test suite start chat:$.connection.hub.error must have been called" success="True" time="0.02" executed="True" asserts="0" result="Success" />
+          <test-case name="$.connection.hub.disconnected must have been called" description="chat test suite start chat:$.connection.hub.disconnected must have been called" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="start call back must be defined" description="chat test suite start chat:start call back must be defined" success="True" time="0" executed="True" asserts="0" result="Success" />
+        </results>
+      </test-suite>
+      <test-suite type="JavaScript" name="chat test suite start chat on started" success="2" time="0.013" executed="True" asserts="0" result="Success">
+        <results>
+          <test-case name="on started must set the users observable array" description="chat test suite start chat on started:on started must set the users observable array" success="True" time="0.011" executed="True" asserts="0" result="Success" />
+          <test-case name="on started must set the conversations observable array" description="chat test suite start chat on started:on started must set the conversations observable array" success="True" time="0.002" executed="True" asserts="0" result="Success" />
+        </results>
+      </test-suite>
+      <test-suite type="JavaScript" name="chat test suite start chat logout on error" success="2" time="0.004" executed="True" asserts="0" result="Success">
+        <results>
+          <test-case name="on started must call logout on get users failed" description="chat test suite start chat logout on error:on started must call logout on get users failed" success="True" time="0.002" executed="True" asserts="0" result="Success" />
+          <test-case name="on started must call logout on get conversation failed" description="chat test suite start chat logout on error:on started must call logout on get conversation failed" success="True" time="0.002" executed="True" asserts="0" result="Success" />
+        </results>
+      </test-suite>
+      <test-suite type="JavaScript" name="chat test suite start chat on signalR event" success="2" time="0" executed="True" asserts="0" result="Success">
+        <results>
+          <test-case name="on hub disconnected must call logout" description="chat test suite start chat on signalR event:on hub disconnected must call logout" success="True" time="0" executed="True" asserts="0" result="Success" />
+          <test-case name="on hub error must call logout" description="chat test suite start chat on signalR event:on hub error must call logout" success="True" time="0" executed="True" asserts="0" result="Success" />
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

@@ -20,7 +20,7 @@ projectFile=''
 	}  
 	var projectFolder = Path.GetDirectoryName(projectFile);
 
-	var args = projectFile + ' /failOnError /nologo /silent /coverable /nunit2 ' + Path.Combine(projectFolder, "chutzpah-result.xml");
+	var args = projectFile + ' /nologo /silent /coverable /junit ' + Path.Combine(projectFolder, "chutzpah-result.xml");
 
 	Exec(chutzpahLocation, args);
 }
