@@ -33,7 +33,8 @@ IF "%BUILDCMD_KOREBUILD_VERSION%"=="" (
 .nuget\NuGet.exe install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
 .nuget\NuGet.exe install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 .nuget\NuGet.exe install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-
+.nuget\NuGet.exe install Selenium.WebDriver.ChromeDriver -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+.nuget\NuGet.exe install Selenium.WebDriver.IEDriver -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 :getdnx
     CALL packages\KoreBuild\build\dnvm install %BUILDCMD_DNX_VERSION% -a %BUILDCMD_DNX_ARCHITECTURE% -r coreclr -Alias core
     CALL packages\KoreBuild\build\dnvm install %BUILDCMD_DNX_VERSION% -a %BUILDCMD_DNX_ARCHITECTURE% -r clr -Alias default -p
