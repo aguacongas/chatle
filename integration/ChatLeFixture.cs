@@ -16,7 +16,7 @@ namespace IntegrationTest
 		{
 			var processStartInfo = new ProcessStartInfo()
 			{
-				Arguments = "-p ../../src/chatle web",
+				Arguments = "-p " + TestUtils.GetPathPrefix() + "src/chatle web",
 				CreateNoWindow = true,
 				FileName = "dnx",
 				RedirectStandardOutput = true,
@@ -31,7 +31,7 @@ namespace IntegrationTest
 				var data = args.Data;
 				if (data == null)
 					return;
-				Debug.WriteLine(data);
+				Trace.WriteLine(data);
 				Console.WriteLine(data);
 				if (data.StartsWith("Application started."))
 					ready = true;
@@ -43,7 +43,7 @@ namespace IntegrationTest
 				if (data == null)
 					return;
 
-				Debug.WriteLine(data);
+				Trace.WriteLine(data);
 				Console.WriteLine(data);
 				ready = true;
 			};

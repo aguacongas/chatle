@@ -4,6 +4,7 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -15,14 +16,15 @@ namespace IntegrationTest
     {
 		public IWebDriver GetDriver(string browser)
 		{
+			var path = TestUtils.GetPathPrefix();
 			switch(browser)
 			{
 				case "ie":
-					return new InternetExplorerDriver("../../packages/Selenium.WebDriver.IEDriver/driver");
+					return new InternetExplorerDriver(Path.Combine(path, "packages/Selenium.WebDriver.IEDriver/driver"));
 				case "firefox":
 					return new FirefoxDriver(new FirefoxBinary(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe"), new FirefoxProfile());
 				case "chrome":
-					return new ChromeDriver("../../packages/Selenium.WebDriver.ChromeDriver/driver");
+					return new ChromeDriver(Path.Combine(path, "packages/Selenium.WebDriver.ChromeDriver/driver"));
 			}
 
 			throw new ArgumentOutOfRangeException("unknow browser");
@@ -37,7 +39,7 @@ namespace IntegrationTest
 			using (var driver = GetDriver(browser))
 			{
 				driver.Navigate().GoToUrl("http://localhost:5000");
-				Assert.Equal(driver.Url, "http://localhost:5000/Account");
+				Assert.Equal("http://localhost:5000/Account", driver.Url);
 			}
 		}
 
@@ -58,7 +60,7 @@ namespace IntegrationTest
 						var inputUserName = form.FindElement(By.Id("UserName"));
 						inputUserName.SendKeys("test" + browser);
 						form.Submit();
-						Assert.Equal(driver.Url, "http://localhost:5000/");
+						Assert.Equal("http://localhost:5000/", driver.Url);
 					}
 				}
 			}

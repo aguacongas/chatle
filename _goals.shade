@@ -206,6 +206,7 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
   kpm-publish sourcePackagesDir='${BUILD_DIR}' targetPackagesDir='${E("PACKAGES_PUBLISH_DIR")}'
   nuget-resilient-publish sourcePackagesDir='${BUILD_DIR}' nugetFeed='${E("NUGET_PUBLISH_FEED")}' if='!string.IsNullOrEmpty(E("NUGET_PUBLISH_FEED"))'
 
+
 #xunit-test target='test' if='Directory.Exists("test")'
   @{
 	var projectFiles = Files.Include("test/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
@@ -232,6 +233,13 @@ default NUGET_FEED = 'https://api.nuget.org/v3/index.json'
 	var projectFiles = Files.Include("test/**/chutzpah.json").Exclude("**/bin/*/app/chutzpah.json").ToList();
 	Parallel.ForEach(projectFiles, projectFile => ChutzpahTest(projectFile));
   }
+
+#integration-test target='test' if='Directory.Exists("integration") && !IsLinux'
+  @{
+	var projectFiles = Files.Include("integration/**/project.json").Exclude("**/bin/*/app/project.json").ToList();
+	projectFiles.ForEach(projectFile => DnxTest(projectFile, testParallel: false));
+  }
+
 #build-samples target='test' if='!IsBuildV2 && Directory.Exists("samples")'
   @{
     var projectFiles = Files.Include("samples/**/project.json").ToList();
