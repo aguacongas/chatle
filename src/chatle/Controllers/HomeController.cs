@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using ChatLe.ViewModels;
-using Microsoft.AspNet.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.SignalR.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
 using ChatLe.Models;
 

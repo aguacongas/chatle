@@ -1,7 +1,7 @@
 ﻿using ChatLe;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Hosting.Builder;
-using Microsoft.AspNet.Http.Features;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;

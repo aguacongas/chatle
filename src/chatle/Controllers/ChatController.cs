@@ -1,13 +1,13 @@
 ﻿using ChatLe.Hubs;
 using ChatLe.Models;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.SignalR.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using ChatLe.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860

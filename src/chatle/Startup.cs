@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using ChatLe.Models;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
