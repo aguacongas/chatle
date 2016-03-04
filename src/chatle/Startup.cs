@@ -4,7 +4,7 @@ using ChatLe.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +35,6 @@ namespace ChatLe
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
                 loggerFactory.AddDebug();
-                loggerFactory.MinimumLevel = LogLevel.Debug;
             }
 
             builder.AddEnvironmentVariables();
@@ -76,7 +75,7 @@ namespace ChatLe
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
 
-            services.AddChatLe(Configuration);
+            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]));
 
         }
 

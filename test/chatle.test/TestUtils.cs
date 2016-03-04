@@ -1,6 +1,6 @@
 ﻿using ChatLe.Models;
-using Microsoft.AspNetCore.Identity.EntityFramework;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,7 +16,7 @@ namespace Chatle.test
 			services.AddEntityFramework()
 				.AddInMemoryDatabase()
 				.AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase());
-			services.AddInstance<ILoggerFactory>(new LoggerFactory());
+			services.AddTransient<ILoggerFactory, LoggerFactory>();
 			services.AddIdentity<ChatLeUser, IdentityRole>();
 			services.AddChatLe();
 			return services.BuildServiceProvider();

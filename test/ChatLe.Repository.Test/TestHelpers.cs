@@ -1,5 +1,5 @@
 ﻿using ChatLe.Models;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,7 +15,7 @@ namespace ChatLe.Repository.Test
             services.AddEntityFramework()
                 .AddInMemoryDatabase()
                 .AddDbContext<T>(options => options.UseInMemoryDatabase());
-            services.AddInstance<ILoggerFactory>(new LoggerFactory());
+            services.AddTransient<ILoggerFactory, LoggerFactory>();
 
             return services;
         }

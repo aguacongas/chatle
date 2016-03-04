@@ -6,8 +6,9 @@ using Moq;
 using Xunit;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using System.Threading;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
@@ -47,8 +48,7 @@ namespace Chatle.test.Controllers
 			var userManager = new UserManager<TUser>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
 				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}
@@ -279,7 +279,7 @@ namespace Chatle.test.Controllers
 				controller.Url = new Mock<IUrlHelper>().Object;
 				var mockHttpContext = new Mock<HttpContext>();
 				mockHttpContext.SetupGet(h => h.User).Returns(new Mock<ClaimsPrincipal>().Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 				var result = await controller.Manage(manageViewModel);
 				Assert.IsType<RedirectToActionResult>(result);
 
@@ -321,7 +321,7 @@ namespace Chatle.test.Controllers
 				var claimsMock = new Mock<ClaimsPrincipal>();
 				claimsMock.Setup(c => c.FindFirst(It.IsAny<string>())).Returns(new Claim("test", "test"));
 				mockHttpContext.SetupGet(h => h.User).Returns(claimsMock.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 				var result = await controller.LogOff(mockConnectionManager.Object);
 				Assert.IsType<RedirectToActionResult>(result);
 

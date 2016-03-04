@@ -19,14 +19,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public void AddChatLe_with_IConfiguration()
-        {
-            var serviceCollectionMock = new Mock<IServiceCollection>();
-            var services = serviceCollectionMock.Object;
-            services.AddChatLe(config: new Mock<IConfiguration>().Object);
-        }
-
-        [Fact]
         public void AddChatLe_with_configure_action()
         {
             var serviceCollectionMock = new Mock<IServiceCollection>();

@@ -1,5 +1,5 @@
 ﻿using ChatLe.Models;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;

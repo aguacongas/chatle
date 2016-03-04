@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.OptionsModel;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

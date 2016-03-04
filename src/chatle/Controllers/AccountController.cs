@@ -177,7 +177,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return await UserManager.GetUserAsync(HttpContext.User);
         }
 
         public enum ManageMessageId

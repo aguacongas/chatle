@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
 using System.Threading;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 
 namespace ChatLe.Repository.Test
