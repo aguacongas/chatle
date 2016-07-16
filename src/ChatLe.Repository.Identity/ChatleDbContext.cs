@@ -18,13 +18,7 @@ namespace ChatLe.Models
         where TConversation : Conversation<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
-        public ChatLeIdentityDbContext(IServiceProvider serviceProvider):base(serviceProvider)
-        { }
-
         public ChatLeIdentityDbContext(DbContextOptions options):base(options)
-        { }
-
-        public ChatLeIdentityDbContext(IServiceProvider serviceProvider, DbContextOptions options) : base(serviceProvider, options)
         { }
 
         protected ChatLeIdentityDbContext()
