@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Hubs;
 using Microsoft.AspNetCore.SignalR.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -57,11 +58,14 @@ namespace chatle.test.Controllers
 			options.Setup(o => o.Value).Returns(idOptions);
 			var pwdValidators = new List<PasswordValidator<TUser>>();
 			pwdValidators.Add(new PasswordValidator<TUser>());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
 			var userManager = new Mock<UserManager<TUser>>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
-				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}

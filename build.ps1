@@ -69,7 +69,7 @@ if (!(Test-Path $buildFolder)) {
 # We still nuget because dotnet doesn't have support for pushing packages
 Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v3.5.0-beta2/NuGet.exe" -OutFile "$buildFolder/nuget.exe"
 
-&"$buildFolder\NuGet.exe" install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+&"$buildFolder\NuGet.exe" install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Version 4.6.166 -Out packages
 &"$buildFolder\NuGet.exe" install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
 &"$buildFolder\NuGet.exe" install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 &"$buildFolder\NuGet.exe" install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages

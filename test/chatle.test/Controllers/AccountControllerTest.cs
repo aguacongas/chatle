@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Hubs;
 using System.Dynamic;
 using ChatLe.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Chatle.test.Controllers
 {
@@ -62,11 +63,14 @@ namespace Chatle.test.Controllers
 			options.Setup(o => o.Value).Returns(idOptions);
 			var pwdValidators = new List<PasswordValidator<TUser>>();
 			pwdValidators.Add(new PasswordValidator<TUser>());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
 			var userManager = new Mock<UserManager<TUser>>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
-				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}

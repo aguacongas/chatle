@@ -26,3 +26,4 @@
 /bin
 /src/ChatLe.Repository.Identity/obj
 *.xml
+/_Chutzpah.coverage.html
