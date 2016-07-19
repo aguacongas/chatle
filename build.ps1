@@ -1,5 +1,7 @@
 $ErrorActionPreference = "Stop"
 
+Write-Host "Powershell version: " $PSVersionTable.PSVersion
+
 function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $retries) 
 {
     while($true)
