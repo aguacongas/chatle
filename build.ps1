@@ -65,10 +65,10 @@ if (!(Test-Path $buildFolder)) {
 }
 
 
-& $buildFolder\NuGet.exe install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-& $buildFolder\NuGet.exe install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
-& $buildFolder\NuGet.exe install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-& $buildFolder\NuGet.exe install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+&"$buildFolder\NuGet.exe" install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+&"$buildFolder\NuGet.exe" install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
+&"$buildFolder\NuGet.exe" install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+&"$buildFolder\NuGet.exe" install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 
 
 &"$buildFile" $args

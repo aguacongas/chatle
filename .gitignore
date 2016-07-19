@@ -25,3 +25,4 @@
 /src/chatle/node_modules
 /bin
 /src/ChatLe.Repository.Identity/obj
+*.xml
