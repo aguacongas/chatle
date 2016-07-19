@@ -181,7 +181,7 @@ namespace Chatle.test.Controllers
 			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
 			var signinManager = MockSigninManager<ChatLeUser>(userManager);
-			signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(SignInResult.Success));
+			signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Success));
 			var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
 			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
@@ -198,7 +198,7 @@ namespace Chatle.test.Controllers
 				var result = await controller.Login(loginViewModel, null);
 				Assert.IsType<RedirectToActionResult>(result);
 
-				signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(SignInResult.Failed));
+				signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Failed));
 
 				result = await controller.Login(loginViewModel);
 

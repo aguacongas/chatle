@@ -13,9 +13,7 @@ namespace Chatle.test
 		{
 			var services = new ServiceCollection();
 			services.AddMvc();
-			services.AddEntityFramework()
-				.AddInMemoryDatabase()
-				.AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase());
+			services.AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase());
 			services.AddTransient<ILoggerFactory, LoggerFactory>();
 			services.AddIdentity<ChatLeUser, IdentityRole>();
 			services.AddChatLe();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using ChatLe.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
+using System.IO;
 
 namespace ChatLe
 {
@@ -81,28 +80,9 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework();
-
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
-            switch (dbEngine)
-            {
-                case DBEngine.InMemory:
-                    builder.AddInMemoryDatabase();
-                    break;
-                //case DBEngine.SQLite:
-                //    builder.AddSQLite();
-                //    break;
-                case DBEngine.SqlServer:
-                    builder.AddSqlServer();
-                    break;
-                //case DBEngine.Redis:
-                //    //builder.AddRedis();
-                //    break;
-                default:
-                    throw new InvalidOperationException("Database engine unsupported");
-            }
 
-            builder.AddDbContext<ChatLeIdentityDbContext>(options =>
+            services.AddDbContext<ChatLeIdentityDbContext>(options =>
             {
                 switch (dbEngine)
                 {
@@ -165,5 +145,17 @@ namespace ChatLe
                 app.UseExceptionHandler("/Home/Error");
             }            
         }
-    }
+
+		public static void Main(string[] args)
+		{
+			var host = new WebHostBuilder()
+				.UseKestrel()
+				.UseContentRoot(Directory.GetCurrentDirectory())
+				.UseIISIntegration()
+				.UseStartup<Startup>()
+				.Build();
+
+			host.Run();
+		}
+	}
 }

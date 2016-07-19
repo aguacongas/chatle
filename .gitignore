@@ -3,3 +3,25 @@
 ################################################################################
 
 /.build
+/.vs
+/artifacts
+/integration/bin
+/integration/obj
+/packages
+/src/chatle/bin
+/src/chatle/obj
+/src/chatle/wwwroot
+/src/ChatLe.Repository/bin
+/src/ChatLe.Repository/obj
+/src/ChatLe.Repository.Identity/bin
+/test/ChatLe.Repository.Test/bin
+/test/ChatLe.Repository.Test/obj
+/test/chatle.test/bin
+/test/chatle.test/obj
+/test/chatle.test/wwwroot
+*.lock.json
+*.user
+/test/chatle.test/chutzpah-result.xml
+/src/chatle/node_modules
+/bin
+/src/ChatLe.Repository.Identity/obj

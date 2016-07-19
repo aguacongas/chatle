@@ -1,3 +1,33 @@
+$ErrorActionPreference = "Stop"
+
+function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $retries) 
+{
+    while($true)
+    {
+        try
+        {
+            Invoke-WebRequest $url -OutFile $downloadLocation
+            break
+        }
+        catch
+        {
+            $exceptionMessage = $_.Exception.Message
+            Write-Host "Failed to download '$url': $exceptionMessage"
+            if ($retries -gt 0) {
+                $retries--
+                Write-Host "Waiting 10 seconds before retrying. Retries left: $retries"
+                Start-Sleep -Seconds 10
+
+            }
+            else 
+            {
+                $exception = $_.Exception
+                throw $exception
+            }
+        }
+    }
+}
+
 cd $PSScriptRoot
 
 $repoFolder = $PSScriptRoot
@@ -20,7 +50,8 @@ if (!(Test-Path $buildFolder)) {
 
     $localZipFile="$tempFolder\korebuild.zip"
     
-    Invoke-WebRequest $koreBuildZip -OutFile $localZipFile
+    DownloadWithRetry -url $koreBuildZip -downloadLocation $localZipFile -retries 6
+
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory($localZipFile, $tempFolder)
     
@@ -32,5 +63,12 @@ if (!(Test-Path $buildFolder)) {
         Remove-Item -Recurse -Force $tempFolder
     }
 }
+
+
+& $buildFolder\NuGet.exe install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+& $buildFolder\NuGet.exe install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
+& $buildFolder\NuGet.exe install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+& $buildFolder\NuGet.exe install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+
 
 &"$buildFile" $args
