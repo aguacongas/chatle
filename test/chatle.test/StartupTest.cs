@@ -13,12 +13,13 @@ namespace chatle.test
     public class StartupTest
     {
 		
-		[Fact(Skip ="Disable for the moment")]
+		[Fact]
 		public void ConfigureTest()
 		{
 			var mockHostingEnvironment = new Mock<IHostingEnvironment>();
-			mockHostingEnvironment.SetupGet(h => h.EnvironmentName).Returns("Test");
+			mockHostingEnvironment.SetupGet(h => h.EnvironmentName).Returns("Development");
 			mockHostingEnvironment.SetupGet(h => h.ContentRootPath).Returns(Directory.GetCurrentDirectory());
+			mockHostingEnvironment.SetupGet(h => h.WebRootPath).Returns(Path.Combine(Directory.GetCurrentDirectory(), "wwwroo"));
 			var startup = new Startup(mockHostingEnvironment.Object, new Mock<ILoggerFactory>().Object);
 			var serviceCollection = new ServiceCollection();
 			startup.ConfigureServices(serviceCollection);

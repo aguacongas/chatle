@@ -11,7 +11,7 @@ namespace ChatLe.Repository.Test
     public class ChatStoreTest
     {
         [Fact]
-        public void Construtor1Test()
+        public void ConstrutorTest()
         {
             using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
@@ -19,25 +19,6 @@ namespace ChatLe.Repository.Test
             }
         }
 
-
-        [Fact]
-        public void Constructor2Test()
-        {
-
-            using (var context = new DbContext(new DbContextOptionsBuilder().Options))
-            {
-                var store = new ChatStore<ChatLeUser>(context);
-            }
-        }
-
-        [Fact]
-        public void Constructor3Test()
-        {
-            using (var context = new ChatLeIdentityDbContext())
-            {
-                var store = new ChatStore(context);
-            }
-        }
 
         [Fact]
         public void Construtor_should_throw_argumentNullException()

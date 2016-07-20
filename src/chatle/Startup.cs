@@ -26,6 +26,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -137,7 +138,8 @@ namespace ChatLe
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-            }
+				app.UseDatabaseErrorPage();
+			}
             else
             {
                 // Add Error handling middleware which catches all application specific errors and

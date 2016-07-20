@@ -7,7 +7,12 @@ namespace ChatLe.Models
 {
     public class ChatLeIdentityDbContext : ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
     {
-    }
+		public ChatLeIdentityDbContext(DbContextOptions options) : base(options)
+		{ }
+
+		protected ChatLeIdentityDbContext()
+		{ }
+	}
     /// <summary>
     /// Database context for ChatLe user
     /// </summary>
