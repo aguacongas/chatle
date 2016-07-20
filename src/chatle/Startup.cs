@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Threading;
 using ChatLe.Models;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
+using System.IO;
 
 namespace ChatLe
 {
@@ -27,6 +26,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -35,7 +35,6 @@ namespace ChatLe
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
                 loggerFactory.AddDebug();
-                loggerFactory.MinimumLevel = LogLevel.Debug;
             }
 
             builder.AddEnvironmentVariables();
@@ -76,34 +75,15 @@ namespace ChatLe
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
 
-            services.AddChatLe(Configuration);
+            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]));
 
         }
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var builder = services.AddEntityFramework();
-
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
-            switch (dbEngine)
-            {
-                case DBEngine.InMemory:
-                    builder.AddInMemoryDatabase();
-                    break;
-                //case DBEngine.SQLite:
-                //    builder.AddSQLite();
-                //    break;
-                case DBEngine.SqlServer:
-                    builder.AddSqlServer();
-                    break;
-                //case DBEngine.Redis:
-                //    //builder.AddRedis();
-                //    break;
-                default:
-                    throw new InvalidOperationException("Database engine unsupported");
-            }
 
-            builder.AddDbContext<ChatLeIdentityDbContext>(options =>
+            services.AddDbContext<ChatLeIdentityDbContext>(options =>
             {
                 switch (dbEngine)
                 {
@@ -158,7 +138,8 @@ namespace ChatLe
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-            }
+				app.UseDatabaseErrorPage();
+			}
             else
             {
                 // Add Error handling middleware which catches all application specific errors and
@@ -166,5 +147,17 @@ namespace ChatLe
                 app.UseExceptionHandler("/Home/Error");
             }            
         }
-    }
+
+		public static void Main(string[] args)
+		{
+			var host = new WebHostBuilder()
+				.UseKestrel()
+				.UseContentRoot(Directory.GetCurrentDirectory())
+				.UseIISIntegration()
+				.UseStartup<Startup>()
+				.Build();
+
+			host.Run();
+		}
+	}
 }

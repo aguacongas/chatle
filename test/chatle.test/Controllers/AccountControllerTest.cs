@@ -1,25 +1,27 @@
 ﻿using ChatLe.Controllers;
 using ChatLe.Models;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using System;
 using Moq;
 using Xunit;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Threading;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
-using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using Microsoft.AspNet.SignalR.Infrastructure;
+using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Hubs;
 using System.Dynamic;
 using ChatLe.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Chatle.test.Controllers
 {
@@ -47,8 +49,7 @@ namespace Chatle.test.Controllers
 			var userManager = new UserManager<TUser>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
 				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}
@@ -62,11 +63,14 @@ namespace Chatle.test.Controllers
 			options.Setup(o => o.Value).Returns(idOptions);
 			var pwdValidators = new List<PasswordValidator<TUser>>();
 			pwdValidators.Add(new PasswordValidator<TUser>());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
 			var userManager = new Mock<UserManager<TUser>>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
-				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}
@@ -181,7 +185,7 @@ namespace Chatle.test.Controllers
 			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
 			var signinManager = MockSigninManager<ChatLeUser>(userManager);
-			signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(SignInResult.Success));
+			signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Success));
 			var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
 			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
@@ -198,7 +202,7 @@ namespace Chatle.test.Controllers
 				var result = await controller.Login(loginViewModel, null);
 				Assert.IsType<RedirectToActionResult>(result);
 
-				signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(SignInResult.Failed));
+				signinManager.Setup(m => m.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Failed));
 
 				result = await controller.Login(loginViewModel);
 
@@ -279,7 +283,7 @@ namespace Chatle.test.Controllers
 				controller.Url = new Mock<IUrlHelper>().Object;
 				var mockHttpContext = new Mock<HttpContext>();
 				mockHttpContext.SetupGet(h => h.User).Returns(new Mock<ClaimsPrincipal>().Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 				var result = await controller.Manage(manageViewModel);
 				Assert.IsType<RedirectToActionResult>(result);
 
@@ -321,7 +325,7 @@ namespace Chatle.test.Controllers
 				var claimsMock = new Mock<ClaimsPrincipal>();
 				claimsMock.Setup(c => c.FindFirst(It.IsAny<string>())).Returns(new Claim("test", "test"));
 				mockHttpContext.SetupGet(h => h.User).Returns(claimsMock.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 				var result = await controller.LogOff(mockConnectionManager.Object);
 				Assert.IsType<RedirectToActionResult>(result);
 

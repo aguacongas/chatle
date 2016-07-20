@@ -4,7 +4,7 @@ using Xunit;
 using ChatLe.Models;
 using System;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNet.Builder;
+using Microsoft.AspNetCore.Builder;
 
 namespace ChatLe.Repository.Test
 {
@@ -16,14 +16,6 @@ namespace ChatLe.Repository.Test
             var serviceCollectionMock = new Mock<IServiceCollection>();
             var services = serviceCollectionMock.Object;
             services.ConfigureChatLe((options) => { });
-        }
-
-        [Fact]
-        public void AddChatLe_with_IConfiguration()
-        {
-            var serviceCollectionMock = new Mock<IServiceCollection>();
-            var services = serviceCollectionMock.Object;
-            services.AddChatLe(config: new Mock<IConfiguration>().Object);
         }
 
         [Fact]

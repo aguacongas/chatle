@@ -1,5 +1,5 @@
 ﻿using ChatLe.Models;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,20 +7,6 @@ using System.Collections.Generic;
 
 namespace ChatLe.Repository.Test
 {
-    public static class TestHelpers
-    {
-        public static ServiceCollection GetServicesCollection<T>() where T :DbContext
-        {
-            var services = new ServiceCollection();
-            services.AddEntityFramework()
-                .AddInMemoryDatabase()
-                .AddDbContext<T>(options => options.UseInMemoryDatabase());
-            services.AddInstance<ILoggerFactory>(new LoggerFactory());
-
-            return services;
-        }
-    }
-
     public class UserTest: UserTest<string>
     {
         public UserTest()
@@ -43,7 +29,7 @@ namespace ChatLe.Repository.Test
 
     public class ChatDbContext:ChatDbContext<string, UserTest, Message, Attendee, Conversation, NotificationConnection>
     {
-        public ChatDbContext(IServiceProvider provider) : base(provider) { }
+        public ChatDbContext(DbContextOptions options) : base(options) { }
     }
 
     public class ChatDbContext<TKey, TUser, TMessage, TAttendee, TConversation, TNotificationConnection> : DbContext 
@@ -54,13 +40,18 @@ namespace ChatLe.Repository.Test
         where TConversation : Conversation<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
-        public ChatDbContext(IServiceProvider provider) : base(provider) { }
+        public ChatDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<TUser> Users { get; set; }
         public DbSet<TMessage> Messages { get; set; }
         public DbSet<TAttendee> Attendee { get; set; }
         public DbSet<TConversation> Conversations { get; set; }
         public DbSet<TNotificationConnection> NotificationConnections { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseInMemoryDatabase();
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

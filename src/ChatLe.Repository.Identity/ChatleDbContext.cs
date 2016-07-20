@@ -1,14 +1,18 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Infrastructure;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ChatLe.Models
 {
     public class ChatLeIdentityDbContext : ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>
     {
-    }
+		public ChatLeIdentityDbContext(DbContextOptions options) : base(options)
+		{ }
+
+		protected ChatLeIdentityDbContext()
+		{ }
+	}
     /// <summary>
     /// Database context for ChatLe user
     /// </summary>
@@ -19,13 +23,7 @@ namespace ChatLe.Models
         where TConversation : Conversation<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
-        public ChatLeIdentityDbContext(IServiceProvider serviceProvider):base(serviceProvider)
-        { }
-
         public ChatLeIdentityDbContext(DbContextOptions options):base(options)
-        { }
-
-        public ChatLeIdentityDbContext(IServiceProvider serviceProvider, DbContextOptions options) : base(serviceProvider, options)
         { }
 
         protected ChatLeIdentityDbContext()

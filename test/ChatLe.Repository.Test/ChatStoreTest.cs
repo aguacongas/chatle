@@ -1,5 +1,5 @@
 ﻿using ChatLe.Models;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -11,42 +11,14 @@ namespace ChatLe.Repository.Test
     public class ChatStoreTest
     {
         [Fact]
-        public void Construtor1Test()
+        public void ConstrutorTest()
         {
-            ServiceCollection services = GetServicesCollection<DbContext>();
-
-            using (var context = new DbContext(services.BuildServiceProvider()))
+            using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
                 var store = new ChatStore<UserTest>(context);
             }
         }
 
-        private static ServiceCollection GetServicesCollection<T>() where T : DbContext
-        {
-            return TestHelpers.GetServicesCollection<T>();
-        }
-
-        [Fact]
-        public void Constructor2Test()
-        {
-            ServiceCollection services = GetServicesCollection<DbContext>();
-
-            using (var context = new DbContext(services.BuildServiceProvider()))
-            {
-                var store = new ChatStore<ChatLeUser>(context);
-            }
-        }
-
-        [Fact]
-        public void Constructor3Test()
-        {
-            ServiceCollection services = GetServicesCollection<DbContext>();
-
-            using (var context = new ChatLeIdentityDbContext())
-            {
-                var store = new ChatStore(context);
-            }
-        }
 
         [Fact]
         public void Construtor_should_throw_argumentNullException()
@@ -56,15 +28,33 @@ namespace ChatLe.Repository.Test
 
         class FakeContextTest : DbContext
         {
-            public FakeContextTest(IServiceProvider provider) : base(provider) { }
+            public FakeContextTest(DbContextOptions options) : base(options) { }
+            
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                optionsBuilder.UseInMemoryDatabase();
+            }
+
+            public DbSet<UserTest> Users { get; set; }
+            public DbSet<Message> Messages { get; set; }
+            public DbSet<Attendee> Attendee { get; set; }
+            public DbSet<Conversation> Conversations { get; set; }
+            public DbSet<NotificationConnection> NotificationConnections { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<Attendee<string>>()
+                    .HasKey(a => new { a.ConversationId, a.UserId });
+                
+                modelBuilder.Entity<NotificationConnection<string>>()
+                    .HasKey(nc => new { nc.ConnectionId, nc.UserId, nc.NotificationType });
+            }
         }
 
         [Fact]
         public void ConversationsPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection<FakeContextTest>();
-
-            using (var context = new FakeContextTest(services.BuildServiceProvider()))
+            using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var conversations = store.Conversations;
@@ -76,9 +66,7 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void MessagesPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection<FakeContextTest>();
-
-            using (var context = new FakeContextTest(services.BuildServiceProvider()))
+            using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var messages = store.Messages;
@@ -90,9 +78,7 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void UsersPropertyTest()
         {
-            ServiceCollection services = GetServicesCollection<FakeContextTest>();
-
-            using (var context = new FakeContextTest(services.BuildServiceProvider()))
+            using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
                 var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
                 var users = store.Users;
@@ -104,9 +90,7 @@ namespace ChatLe.Repository.Test
         [Fact]
         public async Task CreateMessageAsync_should_throw_ArgumentNullException()
         {
-            ServiceCollection services = GetServicesCollection<ChatDbContext>();
-
-            using (var context = new ChatDbContext(services.BuildServiceProvider()))
+            using (var context = new ChatDbContext(new DbContextOptionsBuilder().Options))
             {
                 var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
@@ -114,10 +98,11 @@ namespace ChatLe.Repository.Test
         }
 
         static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
-        {
-            ServiceCollection services = GetServicesCollection<ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>>();
-
-            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(services.BuildServiceProvider()))
+        {  
+            var builder = new DbContextOptionsBuilder();
+            builder.UseInMemoryDatabase();            
+                      
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {
                 var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
                 await action(store);
@@ -468,8 +453,6 @@ namespace ChatLe.Repository.Test
                     NotificationType = "test",
                     UserId = "test"
                 });
-
-                await context.SaveChangesAsync();
 
                 Assert.NotNull(await store.GetNotificationConnectionsAsync("test", "test"));
             });
