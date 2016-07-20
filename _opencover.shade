@@ -50,61 +50,21 @@ configuration='Debug'
     var projectText = File.ReadAllText(projectFile);
     var project = (JsonObject)Json.Deserialize(projectText);
 
-    var commands = project.ValueAsJsonObject("commands");
+	var projectFolder = Path.GetDirectoryName(projectFile);
+	Log.Info("projectFolder: " + projectFolder);
+	var projectPath  = Path.Combine(projectFolder, "project.json");
+	var results = Path.Combine(projectFolder, "xunit-results.xml");
 
-    if (commands != null && commands.Keys.Contains("test"))
-    {
-        var projectFolder = Path.GetDirectoryName(projectFile);
-		Log.Info("projectFolder: " + projectFolder);
-		var projectPath  = Path.Combine(projectFolder, "project.json");
-		var results = Path.Combine(projectFolder, "xunit-results.xml");
-
-		// find dnx location
-		var runtime = Environment.GetEnvironmentVariable("BUILDCMD_DNX_RUNTIME");
-		if (String.IsNullOrEmpty(runtime)) 
-		{
-			Log.Warn("BUILDCMD_DNX_RUNTIME environment variable not set.");
-			runtime = "clr";
-		}
-
-		var os = IsLinux ? "mono" : "win";
-		var architecture = Environment.GetEnvironmentVariable("BUILDCMD_DNX_ARCHITECTURE");
-		if (String.IsNullOrEmpty(architecture)) 
-		{
-			Log.Warn("BUILDCMD_DNX_ARCHITECTURE environment variable not set.");
-			architecture = "x86";
-		}
-		var dnxVersion = Environment.GetEnvironmentVariable("BUILDCMD_DNX_VERSION");
-		if (String.IsNullOrEmpty(dnxVersion)) 
-		{
-			Log.Warn("BUILDCMD_DNX_VERSION environment variable not set.");
-			dnxVersion = "1.0.0.rc1-update1";
-		}
-
-		var dnxName = string.Format("dnx-{0}-{1}-{2}.{3}", runtime, os, architecture, dnxVersion);
+	var dnxLocation = @"C:\Program Files\dotnet\dotnet.exe";
 	
-		var dnxHome = Environment.GetEnvironmentVariable("DNX_HOME");
-		if (String.IsNullOrEmpty(dnxHome)) 
-		{
-			Log.Warn("DNX_HOME environment variable not set.");
-			dnxHome = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), ".dnx");
-		}
+	var target = '-target:"' + dnxLocation +  '" ';
+	var targetArgs = '-targetargs:" test ""' + projectFile + '"" -xml ""' + results + '"" -nologo -parallel none" ';
+	var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
+	
+	if (File.Exists(coverageFile))
+	{
+		args += " -mergeoutput";
+	}
 
-		var dnxLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine(dnxHome
-			, "runtimes")
-			, dnxName)
-			, "bin")
-			, "dnx.exe");
-		
-		var target = '-target:"' + dnxLocation +  '" ';
-		var targetArgs = '-targetargs:"--lib ""' +  pdbLocation + '"" -p ""' + projectPath + '"" test -xml ""' + results + '"" -nologo -parallel none" ';
-		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
-        
-		if (File.Exists(coverageFile))
-		{
-			args += " -mergeoutput";
-		}
-
-		Exec(openCoverLocation, args);
-    }
+	Exec(openCoverLocation, args);
 }

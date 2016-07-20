@@ -1,6 +1,6 @@
 ﻿using ChatLe.Models;
 using ChatLe.ViewModels;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

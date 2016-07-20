@@ -1,10 +1,11 @@
 ﻿using ChatLe.Controllers;
-using Microsoft.AspNet.Diagnostics;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -30,7 +31,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.IsAuthenticated).Returns(true);
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				var result = controller.Index();
 				Assert.IsType<ViewResult>(result);
@@ -81,7 +82,7 @@ namespace chatle.test.Controllers
 				var mockHttpContext = new Mock<HttpContext>();
 				var mockFeatures = new Mock<IFeatureCollection>();
 				mockHttpContext.SetupGet(h => h.Features).Returns(mockFeatures.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				var result = controller.Error();
 				Assert.IsType<ViewResult>(result);

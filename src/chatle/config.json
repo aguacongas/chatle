@@ -1,26 +1,26 @@
 ﻿{
-  "ChatConfig": {
-    "UserPerPage": 25
-  },
-  "DatabaseEngine": "InMemory",
-  "CreateDatabase": "false",
-  "Data": {
-    "DefaultConnection": {
-      "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true"
-    },
-    "Redis": {
-      "Hostname": "127.0.0.1"
-    }
-  },
-  "Identity": {
-    "Password": {
-      "RequireDigit": "false",
-      "RequireLowercase": "false",
-      "RequireUppercase": "false",
-      "RequireNonLetterOrDigit": "false"
-    }
-  },
-  "RemoveResponseHeader": {
-    "Values": "Server, ETag"
-  }
+	"ChatConfig": {
+		"UserPerPage": 25
+	},
+	"DatabaseEngine": "SqlServer",
+	"CreateDatabase": "false",
+	"Data": {
+		"DefaultConnection": {
+			"ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true"
+		},
+		"Redis": {
+			"Hostname": "127.0.0.1"
+		}
+	},
+	"Identity": {
+		"Password": {
+			"RequireDigit": "false",
+			"RequireLowercase": "false",
+			"RequireUppercase": "false",
+			"RequireNonLetterOrDigit": "false"
+		}
+	},
+	"RemoveResponseHeader": {
+		"Values": "Server, ETag"
+	}
 }

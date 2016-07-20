@@ -3,15 +3,17 @@ using ChatLe.Controllers;
 using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc.ModelBinding;
-using Microsoft.AspNet.Mvc.ViewFeatures;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
-using Microsoft.AspNet.SignalR.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Hubs;
+using Microsoft.AspNetCore.SignalR.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -56,11 +58,14 @@ namespace chatle.test.Controllers
 			options.Setup(o => o.Value).Returns(idOptions);
 			var pwdValidators = new List<PasswordValidator<TUser>>();
 			pwdValidators.Add(new PasswordValidator<TUser>());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
 			var userManager = new Mock<UserManager<TUser>>(store.Object, options.Object, new PasswordHasher<TUser>(),
 				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
-				new IdentityErrorDescriber(), null,
-				new Mock<ILogger<UserManager<TUser>>>().Object,
-				null);
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock<ILogger<UserManager<TUser>>>().Object);
 
 			return userManager;
 		}
@@ -120,7 +125,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetConversationsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
 					.ReturnsAsync(new List<Conversation>()
@@ -162,7 +167,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetConversationsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
 					.ReturnsAsync(new List<Conversation>()
@@ -199,7 +204,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetConversationsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
 					.ReturnsAsync(new List<Conversation>()
@@ -241,7 +246,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.AddMessageAsync(It.IsAny<string>()
 						, It.IsAny<string>()
@@ -277,7 +282,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.AddMessageAsync(It.IsAny<string>()
 						, It.IsAny<string>()
@@ -300,7 +305,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetOrCreateConversationAsync(It.IsAny<string>()
 						, It.IsAny<string>()
@@ -343,7 +348,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetOrCreateConversationAsync(It.IsAny<string>()
 						, It.IsAny<string>()
@@ -381,7 +386,7 @@ namespace chatle.test.Controllers
 				mockIndentity.SetupGet(i => i.Name).Returns("test");
 				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				controller.ActionContext.HttpContext = mockHttpContext.Object;
+				controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
 				mockChatManager.Setup(c => c.GetOrCreateConversationAsync(It.IsAny<string>()
 						, It.IsAny<string>()

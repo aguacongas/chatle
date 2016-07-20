@@ -1,8 +1,8 @@
 ﻿using ChatLe.Hubs;
 using ChatLe.Models;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Hubs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
