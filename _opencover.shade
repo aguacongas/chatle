@@ -58,7 +58,7 @@ configuration='Debug'
 	var dnxLocation = @"C:\Program Files\dotnet\dotnet.exe";
 	
 	var target = '-target:"' + dnxLocation +  '" ';
-	var targetArgs = '-targetargs:" test ""' + projectFile + '"" -xml ""' + results + '"" -nologo -parallel none" ';
+	var targetArgs = '-targetargs:" test ""' + projectFile + '"" -f net451 -xml ""' + results + '"" -nologo -parallel none" ';
 	var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
 	
 	if (File.Exists(coverageFile))
