@@ -29,3 +29,6 @@
 /_Chutzpah.coverage.html
 /src/ChatLe.Repository.Identity.SqlServer/bin/Debug
 /src/ChatLe.Repository.Identity.SqlServer/obj/Debug
+/src/ChatLe.Repository.Identity.SqlServer/bin/Release
+/src/ChatLe.Repository.Identity.SqlServer/obj/Release/net451
+/build.txt
