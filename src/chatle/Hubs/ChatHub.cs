@@ -51,7 +51,7 @@ namespace ChatLe.Hubs
 			Logger.LogInformation("OnConnected " + name);
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			await Groups.Add(this.Context.ConnectionId, name);
-			Clients.Others.userConnected(new { Id = name });
+			Clients.Others.userConnected(new { id = name });
 			await base.OnConnected();
 		}
 		/// <summary>
@@ -65,7 +65,7 @@ namespace ChatLe.Hubs
 			Logger.LogInformation("OnReconnected " + name);
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			await Groups.Add(this.Context.ConnectionId, name);
-			Clients.Others.userConnected(new { Id = name });
+			Clients.Others.userConnected(new { id = name });
 			await base.OnReconnected();
 		}
 		/// <summary>

@@ -8,10 +8,10 @@
         <h6>CONNECTED</h6>
         <ul data-bind="foreach: users">
             <li>
-                <!-- ko if: $parent.userName !== Id -->
-                <a href="#" data-bind="text: Id, click: function() { $parent.showMessage($data); }"></a>
+                <!-- ko if: $parent.userName !== id -->
+                <a href="#" data-bind="text: id, click: function() { $parent.showMessage($data); }"></a>
                 <!-- /ko -->
-                <!-- ko if: $parent.userName === Id -->
+                <!-- ko if: $parent.userName === id -->
                 @Html.ActionLink(User.Identity.Name, "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
                 <!-- /ko -->
             </li>
@@ -26,8 +26,8 @@
         </form>
         <ul data-bind="foreach: messages">
             <li>
-                <small data-bind="text: From"></small><br />
-                <span data-bind="text: Text"></span>
+                <small data-bind="text: from"></small><br />
+                <span data-bind="text: text"></span>
             </li>
         </ul>
         <!-- /ko -->
@@ -40,7 +40,7 @@
         <ul data-bind="foreach: conversations">
             <li>
                 <a href="#" data-bind="text: title, click: function() { $parent.showConversation($data); }"></a><br />
-                <span data-bind="text: messages() && messages()[0] ? messages()[0].Text: null"></span>
+                <span data-bind="text: messages() && messages()[0] ? messages()[0].text: null"></span>
             </li>
         </ul>
     </div>

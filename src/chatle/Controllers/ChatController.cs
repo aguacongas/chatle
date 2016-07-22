@@ -128,7 +128,7 @@ namespace ChatLe.Controllers
             {
                 var user = await _userManager.FindByIdAsync(attendee.UserId);
                 if (user != null && user.UserName != userName)
-                    _hub.Clients.Group(user.UserName).messageReceived(new MessageViewModel() { ConversationId = to, Date = message.Date, From = HttpContext.User.Identity.Name, Text = text });
+                    _hub.Clients.Group(user.UserName).messageReceived(new { conversationId = to, date = message.Date, from = HttpContext.User.Identity.Name, text = text });
             }            
         }
 
@@ -167,7 +167,8 @@ namespace ChatLe.Controllers
                 }
                 messages.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
             }
-            _hub.Clients.Group(to).joinConversation(new ConversationViewModel(){ Id = conversation.Id, Attendees = attendees, Messages = messages });
+
+            _hub.Clients.Group(to).joinConversation(new { id = conversation.Id, attendees = attendees.Select(a => new { userId = a.UserId }), messages = messages.Select(m => new { date = m.Date, from = m.From, text = m.Text }) });
             
             return conversation.Id;
         }
