@@ -6,7 +6,7 @@ Travis build status: [![Build Status](https://travis-ci.org/aguacongas/chatle.sv
 
 Latest version on myget: [![version](https://img.shields.io/myget/chatle/v/ChatLe.Repository.svg?style=flat)](https://www.myget.org/F/chatle/)
 
-Code coverage: [![Coverage Status](https://coveralls.io/repos/aguacongas/chatle/badge.svg?branch=dev&service=github)](https://coveralls.io/github/aguacongas/chatle?branch=dev)
+Code coverage: [![Coverage Status](https://coveralls.io/repos/aguacongas/chatle/badge.svg?branch=dev&service=github)](https://coveralls.io/github/aguacongas/chatle?branch=develop)
 
 chatle is projects samples for 
 
