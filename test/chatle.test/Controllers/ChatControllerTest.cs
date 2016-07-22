@@ -263,7 +263,7 @@ namespace chatle.test.Controllers
 				mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
 				var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
 				dynamic all = new ExpandoObject();
-				all.messageReceived = new Action<MessageViewModel>(m => { });
+				all.messageReceived = new Action<object>(m => { });
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
@@ -327,7 +327,7 @@ namespace chatle.test.Controllers
 				mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
 				var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
 				dynamic group = new ExpandoObject();
-				group.joinConversation = new Action<ConversationViewModel>(m => { });
+				group.joinConversation = new Action<object>(m => { });
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)group);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
@@ -411,7 +411,7 @@ namespace chatle.test.Controllers
 
 				var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
 				dynamic all = new ExpandoObject();
-				all.joinConversation = new Action<ConversationViewModel>(m => { });
+				all.joinConversation = new Action<object>(m => { });
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
