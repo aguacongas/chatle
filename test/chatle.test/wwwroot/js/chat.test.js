@@ -119,15 +119,15 @@
 		describe("on started", function () {
 
 			var users = {
-				Users: [
+				users: [
 					"test"
 				]
 			};
 
 			var conversations = [{
-				Id: 'test',
-				Attendees: ['test1', 'test'],
-				Messages: ['test']
+				id: 'test',
+				attendees: ['test1', 'test'],
+				messages: ['test']
 			}];
 
 			beforeEach(function () {
@@ -166,7 +166,7 @@
 			});
 
 			it("on started must set the users observable array", function () {
-				expect(currenVM.users).toHaveBeenCalledWith(users.Users);
+				expect(currenVM.users).toHaveBeenCalledWith(users.users);
 			});
 
 			it("on started must set the conversations observable array", function () {
