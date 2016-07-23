@@ -2,7 +2,7 @@
 	"ChatConfig": {
 		"UserPerPage": 25
 	},
-	"DatabaseEngine": "SqlServer",
+	"DatabaseEngine": "InMemory",
 	"CreateDatabase": "false",
 	"Data": {
 		"DefaultConnection": {
