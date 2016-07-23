@@ -15,3 +15,8 @@ bower_components
 bin
 obj
 node_modules
+/test/chatle.test/wwwroot/css
+/test/chatle.test/wwwroot/js/chat.min.js
+/test/chatle.test/wwwroot/lib
+/src/chatle/wwwroot/css
+/src/chatle/wwwroot/js/chat.min.js
