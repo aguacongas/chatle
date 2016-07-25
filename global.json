@@ -5,7 +5,7 @@
 		"integration"
 	],
 	"sdk": {
-		"version": "1.0.0-*",
+		"version": "1.0.0-preview3-003213",
 		"architecture": "x64"
 	}
 }
