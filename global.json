@@ -4,8 +4,8 @@
 		"test",
 		"integration"
 	],
-	"sdk": {
-		"version": "1.0.0-preview3-003213",
-		"architecture": "x64"
-	}
+  "sdk": {
+    "version": "1.0.0-preview3-003206",
+    "architecture": "x64"
+  }
 }
