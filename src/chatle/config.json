@@ -2,11 +2,11 @@
 	"ChatConfig": {
 		"UserPerPage": 25
 	},
-	"DatabaseEngine": "InMemory",
+	"DatabaseEngine": "SQLite",
 	"CreateDatabase": "false",
 	"Data": {
 		"DefaultConnection": {
-			"ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=chatle;Trusted_Connection=True;MultipleActiveResultSets=true"
+			"ConnectionString": "Filename=./ChatLeDbContext.db"
 		},
 		"Redis": {
 			"Hostname": "127.0.0.1"

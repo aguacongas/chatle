@@ -84,7 +84,7 @@ namespace ChatLe
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
 
             services.AddDbContext<ChatLeIdentityDbContext>(options =>
-            {
+            {                
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
@@ -93,9 +93,9 @@ namespace ChatLe
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
                         break;
-                    //case DBEngine.SQLite:
-                    //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
-                    //    break;
+                    case DBEngine.SQLite:
+                        options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"]);
+                        break;
                     //case DBEngine.Redis:
                     //    int port;
                     //    int database;
@@ -130,6 +130,7 @@ namespace ChatLe
                 })
                 .UseSignalR()
                 .UseChatLe();
+
         }
 
         protected virtual void ConfigureErrors(IApplicationBuilder app)
