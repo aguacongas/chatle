@@ -7,12 +7,7 @@ use import="Environment"
 
 gitversion
     Run GitVersion
-	
-buildServer=false
-    True if running on buildServer, otherwise false
 */}
-
-default buildServer = false
 
 @{
     var workingdir = Directory.GetCurrentDirectory();
@@ -22,7 +17,7 @@ default buildServer = false
 		, "tools")
 		, "GitVersion.exe");
 
-    var args = buildServer ? "/output buildServer /updateassemblyinfo true" : "/updateassemblyinfo true";
+    var args = "/output buildServer /updateassemblyinfo true";
 
     var processStartInfo = new ProcessStartInfo {
         UseShellExecute = false,
@@ -89,6 +84,7 @@ default buildServer = false
 
         process.OutputDataReceived += (sender, eventArgs) =>
         {
+            Log.Info(eventArgs.Data);
             builder.Append(eventArgs.Data);
         };
 

@@ -21,7 +21,7 @@ default TEST_PROJECT_GLOB = "test/*/project.json"
 default SAMPLES_PROJECT_GLOB = "samples/*/project.json"
 
 @{
-  GitVersion(false);
+  GitVersion();
 
   if (string.IsNullOrEmpty(E("DOTNET_BUILD_VERSION")))
   {
@@ -464,5 +464,5 @@ macro name="ChutzpahTest" projectFile='string'
 macro name="OpenCoverTest" projectFile='string' coverageFile='string' configuration='string'
     opencover
 
-macro name="GitVersion" buildServer='bool'
+macro name="GitVersion"
     gitversion
