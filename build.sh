@@ -43,7 +43,9 @@ if test ! -d $buildFolder; then
     fi
 fi
 
-nuget="mono $buildFolder/nuget.exe"
+toolsProject="project.json"
+mv "$toolsProject.norestore" "$toolsProject"
+dotnet restore "$toolsProject" --packages "packages" -v Minimal
+mv "$toolsProject" "$toolsProject.norestore"
 
-$nuget install GitVersion.CommandLine -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 $buildFile -r $repoFolder "$@"

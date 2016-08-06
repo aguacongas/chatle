@@ -12,8 +12,9 @@ gitversion
 @{
     var workingdir = Directory.GetCurrentDirectory();
 
-	var gitVersionLocation = Path.Combine(Path.Combine(Path.Combine("packages"
+	var gitVersionLocation = Path.Combine(Path.Combine(Path.Combine(Path.Combine("packages"
 		, "GitVersion.CommandLine")
+        , "3.6.2")
 		, "tools")
 		, "GitVersion.exe");
 
