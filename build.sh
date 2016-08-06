@@ -43,4 +43,7 @@ if test ! -d $buildFolder; then
     fi
 fi
 
+nuget="mono $buildFolder/nuget.exe"
+
+$nuget install GitVersion.CommandLine -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 $buildFile -r $repoFolder "$@"

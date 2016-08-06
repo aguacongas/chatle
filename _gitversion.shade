@@ -1,0 +1,105 @@
+use namespace="System.Diagnostics"
+use namespace="System.IO"
+use namespace="System.Text"
+use import="Environment"
+
+@{/*
+
+gitversion
+    Run GitVersion
+	
+buildServer=false
+    True if running on buildServer, otherwise false
+*/}
+
+default buildServer = false
+
+@{
+    var workingdir = Directory.GetCurrentDirectory();
+
+	var gitVersionLocation = Path.Combine(Path.Combine(Path.Combine("packages"
+		, "GitVersion.CommandLine")
+		, "tools")
+		, "GitVersion.exe");
+
+    var args = buildServer ? "/output buildServer /updateassemblyinfo true" : "/updateassemblyinfo true";
+
+    var processStartInfo = new ProcessStartInfo {
+        UseShellExecute = false,
+        WorkingDirectory = workingdir,
+        FileName = IsLinux ? "mono" : gitVersionLocation,
+        Arguments = IsLinux ? gitVersionLocation + " " + args : args
+    };
+
+    processStartInfo.RedirectStandardError = true;
+    processStartInfo.RedirectStandardOutput = true;
+
+    using (var process = Process.Start(processStartInfo))
+    {
+        process.EnableRaisingEvents = true;
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
+        process.ErrorDataReceived += (sender, eventArgs) =>
+        {
+            if (!string.IsNullOrWhiteSpace(eventArgs.Data))
+            {
+                Log.Error(eventArgs.Data);
+            }
+        };
+
+        process.OutputDataReceived += (sender, eventArgs) =>
+        {
+            Log.Info(eventArgs.Data);
+        };
+
+        process.WaitForExit();
+        if (process.ExitCode != 0)
+        {
+            throw new Exception("Exit code " + process.ExitCode + " from GitVersion");
+        }
+    }
+
+    args = "";
+    processStartInfo = new ProcessStartInfo {
+        UseShellExecute = false,
+        WorkingDirectory = workingdir,
+        FileName = IsLinux ? "mono" : gitVersionLocation,
+        Arguments = IsLinux ? gitVersionLocation + " " + args : args
+    };
+
+    processStartInfo.RedirectStandardError = true;
+    processStartInfo.RedirectStandardOutput = true;
+
+    using (var process = Process.Start(processStartInfo))
+    {
+        process.EnableRaisingEvents = true;
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
+        process.ErrorDataReceived += (sender, eventArgs) =>
+        {
+            if (!string.IsNullOrWhiteSpace(eventArgs.Data))
+            {
+                Log.Error(eventArgs.Data);
+            }
+        };
+
+        var builder = new StringBuilder();
+
+        process.OutputDataReceived += (sender, eventArgs) =>
+        {
+            builder.Append(eventArgs.Data);
+        };
+
+        process.WaitForExit();
+        if (process.ExitCode != 0)
+        {
+            throw new Exception("Exit code " + process.ExitCode + " from GitVersion");
+        }
+
+        var json = Json.Deserialize(builder.ToString()) as JsonObject;
+        E("KOREBUILD_BUILD_NUMBER", json.ValueAsString("PreReleaseLabel").Value + json.ValueAsInt("PreReleaseNumber").ToString("D4"));            
+        BuildQuality = "";
+    }
+}
