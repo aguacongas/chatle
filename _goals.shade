@@ -21,8 +21,11 @@ default TEST_PROJECT_GLOB = "test/*/project.json"
 default SAMPLES_PROJECT_GLOB = "samples/*/project.json"
 
 @{
-  GitVersion();
-
+  if(!IsTravisCi)
+  {
+    GitVersion();
+  }
+  
   if (string.IsNullOrEmpty(E("DOTNET_BUILD_VERSION")))
   {
     E("DOTNET_BUILD_VERSION", BuildNumber);
