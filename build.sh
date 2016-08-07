@@ -120,7 +120,7 @@ makeFile="makefile.shade"
 
 export KOREBUILD_FOLDER="$koreBuildFolder"
 
-cd $buildFolder
+cd $repoFolder
 
 toolsProject="project.json"
 mv "$toolsProject.norestore" "$toolsProject"
