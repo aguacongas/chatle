@@ -7,7 +7,8 @@ if [ ! -z $KOREBUILD_ZIP ]; then
     koreBuildZip=$KOREBUILD_ZIP
 fi
 
-buildFolder=".build"
+buildFolder="$repoFolder/.build"
+echo "buildfolder is : $buildFolder"
 
 if test ! -d $buildFolder; then
     echo "Downloading KoreBuild from $koreBuildZip"
@@ -34,15 +35,11 @@ if test ! -d $buildFolder; then
     mkdir $buildFolder
     cp -r $tempFolder/**/build/** $buildFolder
     
-    chmod +x $buildFile
-    
     # Cleanup
     if test ! -d $tempFolder; then
         rm -rf $tempFolder  
     fi
 fi
-
-cd buildFolder
 
 #!/usr/bin/env bash
 
@@ -50,7 +47,6 @@ echo "Building $repoFolder"
 
 # Make the path relative to the repo root because Sake/Spark doesn't support full paths
 koreBuildFolder=$buildFolder
-koreBuildFolder="${koreBuildFolder#/}"
 
 if test `uname` = Darwin; then
     versionFileName="cli.version.darwin"
@@ -123,6 +119,8 @@ fi
 makeFile="makefile.shade"
 
 export KOREBUILD_FOLDER="$koreBuildFolder"
+
+cd $buildFolder
 
 toolsProject="project.json"
 mv "$toolsProject.norestore" "$toolsProject"
