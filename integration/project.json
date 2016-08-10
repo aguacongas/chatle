@@ -3,8 +3,8 @@
 	"description": "IntegrationTest Class Library",
 	"authors": [ "olefebvre" ],
 	"dependencies": {
-		"dotnet-test-xunit": "1.0.0-rc3-000000-02",
-		"xunit": "2.1.0",
+		"dotnet-test-xunit": "2.2.0-*",
+		"xunit": "2.2.0-*",
 		"Selenium.Support": "2.53.1",
 		"Selenium.WebDriver": "2.53.1"
 	},
