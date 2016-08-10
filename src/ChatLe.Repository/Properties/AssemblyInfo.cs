@@ -22,5 +22,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("ea0c8d36-c7ed-4800-a392-49597fc31929")]
 
 [assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyInformationalVersion("1.1.0-disable-gitversion-travis.1+38.Branch.feature/disable-gitversion-travis.Sha.8ce9bac287e514c0e5c9190a7a3e3af7ec4bf685")]
+[assembly: AssemblyInformationalVersion("1.1.0-unstable.41+Branch.develop.Sha.f6a5c32b374082ee573440bca03095579cbd6c45")]
 [assembly: AssemblyFileVersion("1.1.0.0")]
