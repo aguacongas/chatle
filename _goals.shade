@@ -23,7 +23,7 @@ default SAMPLES_PROJECT_GLOB = "samples/*/project.json"
 @{
   if (!IsTravisCi)
   {
-    if (IsTeamCity)
+    if (IsTeamCity || !string.IsNullOrEmpty(E("APPVEYOR")))
     {
       GitVersion("true");
     }
