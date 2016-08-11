@@ -22,3 +22,5 @@ node_modules
 /src/chatle/wwwroot/css
 /src/chatle/wwwroot/lib
 /src/chatle/wwwroot/js/chat.min.js
+/src/chatle/typings
+npm-debug.log

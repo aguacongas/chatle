@@ -6,7 +6,8 @@ var gulp = require("gulp"),
         concat = require("gulp-concat"),
         cssmin = require("gulp-cssmin"),
         uglify = require("gulp-uglify"),
-		copy= require("gulp-copy");
+		copy= require("gulp-copy"),
+		rename = require("gulp-rename");
 
 var paths = {
 	webroot: "./wwwroot/"
@@ -18,6 +19,8 @@ paths.css = paths.webroot + "css/**/*.css";
 paths.minCss = paths.webroot + "css/**/*.min.css";
 paths.concatJsDest = paths.webroot + "js/chat.min.js";
 paths.concatCssDest = paths.webroot + "css/site.min.css";
+paths.angular = "node_modules/@angular/**/bundles/*.js"
+paths.lib = paths.webroot + "lib/";
 
 gulp.task("clean:js", function (cb) {
 	rimraf(paths.concatJsDest, cb);
@@ -41,6 +44,12 @@ gulp.task("min:css", function () {
 			.pipe(concat(paths.concatCssDest))
 			.pipe(cssmin())
 			.pipe(gulp.dest("."));
+});
+
+gulp.task("angular", function () {
+	return gulp.src(paths.angular)
+			.pipe(rename({ dirname: '' }))
+			.pipe(gulp.dest(paths.lib + "angular"))
 });
 
 gulp.task("min", ["min:js", "min:css"]);
