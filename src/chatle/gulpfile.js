@@ -8,6 +8,7 @@ var gulp = require("gulp"),
         uglify = require("gulp-uglify"),
 		copy= require("gulp-copy"),
 		rename = require("gulp-rename"),
+		watch = require("gulp-watch"),
 		tsc = require("gulp-tsc");
 
 var paths = {
@@ -67,6 +68,16 @@ gulp.task("angular", function () {
 				{ base: "." })
 			.pipe(rename({ dirname: '' }))
 			.pipe(gulp.dest(paths.lib + "angular"));
+});
+
+
+gulp.task("watch", function() {
+	var source = "app/**/*.js";
+	var dest = paths.webroot + "app";
+	return gulp.src(source)
+			.pipe(gulp.dest(dest))
+			.pipe(watch(source))
+			.pipe(gulp.dest(dest))
 });
 
 gulp.task("min", ["min:js", "min:css"]);
