@@ -52,6 +52,20 @@
 		<script src="~/lib/knockout/dist/knockout.js"></script>
 		<script src="~/lib/signalr/jquery.signalR.js"></script>
 		<script src="~/js/chat.js"></script>
+
+        <script src="~/lib/angular/common.umd.js"></script>
+        <script src="~/lib/angular/compile.umd.js"></script>
+        <script src="~/lib/angular/core.umd.js"></script>
+        <script src="~/lib/angular/forms.umd.js"></script>
+        <script src="~/lib/angular/http.umd.js"></script>
+        <script src="~/lib/angular/platform-browser-dynamic.umd.js"></script>
+        <script src="~/lib/angular/platform-browser.umd.js"></script>
+        <script src="~/lib/angular/router-deprecated.umd.js"></script>
+        <script src="~/lib/angular/router.umd.js"></script>
+        <script src="~/lib/angular/upgrade.umd.js"></script>
+        <script src="~/lib/angular/shim.js"></script>
+        <script src="~/lib/angular/Reflect.js"></script>
+        <script src="~/lib/angular/system.src.js"></script>        
 	</environment>
 	<environment names="Staging,Production">
 		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"
@@ -63,8 +77,27 @@
 				asp-fallback-test="window.jQuery && window.jQuery.connection">
 		</script>
 		<script src="~/js/chat.min.js"></script>	
+
+        <script src="~/lib/angular/common.umd.min.js"></script>
+        <script src="~/lib/angular/compile.umd.min.js"></script>
+        <script src="~/lib/angular/core.umd.min.js"></script>
+        <script src="~/lib/angular/forms.umd.min.js"></script>
+        <script src="~/lib/angular/http.umd.min.js"></script>
+        <script src="~/lib/angular/platform-browser-dynamic.umd.min.js"></script>
+        <script src="~/lib/angular/platform-browser.umd.min.js"></script>
+        <script src="~/lib/angular/router-deprecated.umd.min.js"></script>
+        <script src="~/lib/angular/router.umd.min.js"></script>
+        <script src="~/lib/angular/upgrade.umd.min.js"></script>
+        <script src="~/lib/angular/shim.min.js"></script>
+        <script src="~/lib/angular/Reflect.js"></script>
+        <script src="~/lib/angular/system.js"></script>
 	</environment>
+    
 	<script src="/signalr/js"></script>
+    <script src="~/js/systemjs.config.js"></script>
+    <script>
+      System.import('app').catch(function(err){ console.error(err); });
+    </script>
 
 	<script>
 		$(document).ready(function () {
