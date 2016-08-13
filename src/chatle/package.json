@@ -9,8 +9,6 @@
 		"url": "https://github.com/aguacongas/chatle"
 	},
 	"dependencies": {
-		"bower": "1.7.1",
-		"lodash": "3.10.1",
 
 		"@angular/common": "2.0.0-rc.5",
 		"@angular/compiler": "2.0.0-rc.5",

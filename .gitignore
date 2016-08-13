@@ -15,12 +15,13 @@ bower_components
 bin
 obj
 node_modules
-/test/chatle.test/wwwroot/css
+/test/chatle.test/wwwroot/css/site.min.js
 /test/chatle.test/wwwroot/lib
 /test/chatle.test/wwwroot/js/chat.min.js
 /test/chatle.test/wwwroot/lib
-/src/chatle/wwwroot/css
+/src/chatle/wwwroot/css/site.min.js
 /src/chatle/wwwroot/lib
 /src/chatle/wwwroot/js/chat.min.js
 /src/chatle/typings
 npm-debug.log
+npm-shrinkwrap.json
