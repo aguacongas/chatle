@@ -37,19 +37,18 @@
 		"gulp-rename": "1.2.2",
 		"gulp-tsc": "1.2.0",
 		"gulp-watch": "4.3.9",
-		"rimraf": "2.2.8",
+		"gulp-rimraf": "0.2.0",
 		"concurrently": "^2.0.0",
     	"typescript": "^1.8.10",
 	    "typings":"^1.0.4"
 	},
 	"scripts": {
-		"start": "tsc && concurrently \"npm run watch\" \"npm run tsc:w\" \"dotnet run\"",
+		"start": "concurrently \"npm run watch\" \"npm run tsc:w\" \"dotnet run\"",
 		"postinstall": "typings install",
 		"tsc": "tsc",
 		"tsc:w": "tsc -w",
 		"typings": "typings",
 		"gulp": "gulp",
-		"gulp:a": "gulp angular",
 		"watch": "gulp watch"
 	}
 }

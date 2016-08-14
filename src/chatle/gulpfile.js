@@ -2,7 +2,7 @@
 "use strict";
 
 var gulp = require("gulp"),
-        rimraf = require("rimraf"),
+        rimraf = require("gulp-rimraf"),
         concat = require("gulp-concat"),
         cssmin = require("gulp-cssmin"),
         uglify = require("gulp-uglify"),
@@ -33,8 +33,12 @@ paths.reflectjs = paths.node_modules + "reflect-metadata/Reflect*.js";
 paths.systemjs = paths.node_modules + "systemjs/dist/system.*.js";
 paths.rxjs = paths.node_modules + "rxjs/bundles/*.js";
 
-gulp.task("clean:js", function (cb) {
-	rimraf(paths.concatJsDest, cb);
+paths.app = "app/**/*.js";
+paths.appDest = paths.webroot + "js/app/app.min.js";
+
+gulp.task("clean:js", function () {
+	return gulp.src([ paths.concatJsDest, paths.appDest ], { read: false })
+			.pipe(rimraf());
 });
 
 gulp.task("clean:css", function (cb) {
@@ -72,14 +76,21 @@ gulp.task("angular", function () {
 
 
 gulp.task("watch", function() {
-	var source = "app/**/*.js";
-	var dest = paths.webroot + "app";
+	var source = "app/**/*.js*";
+	var dest = paths.webroot + "js/app";
 	return gulp.src(source)
 			.pipe(gulp.dest(dest))
 			.pipe(watch(source))
 			.pipe(gulp.dest(dest))
 });
 
-gulp.task("min", ["min:js", "min:css"]);
+gulp.task("min:app", function() {
+	return gulp.src(paths.app)
+			.pipe(concat(paths.appDest))
+			.pipe(uglify())
+			.pipe(gulp.dest("."));
+});
+
+gulp.task("min", ["min:js", "min:css", "min:app"]);
 
 gulp.task("default", ["clean", "min", "angular"]);
