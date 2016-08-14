@@ -24,7 +24,7 @@ node_modules
 /src/chatle/wwwroot/lib
 /src/chatle/wwwroot/js/chat.min.js
 /src/chatle/wwwroot/js/app
-/src/chatle/app/*.js*
+/src/chatle/app/**/*.js*
 /src/chatle/typings
 npm-debug.log
 npm-shrinkwrap.json

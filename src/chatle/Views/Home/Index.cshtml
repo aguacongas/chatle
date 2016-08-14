@@ -65,7 +65,9 @@
         <script src="~/lib/angular/upgrade.umd.js"></script>
         <script src="~/lib/angular/shim.js"></script>
         <script src="~/lib/angular/Reflect.js"></script>
-        <script src="~/lib/angular/system.src.js"></script>        
+        <script src="~/lib/angular/system.src.js"></script>
+
+        <script asp-src-include="~/js/app/**/*.js" asp-src-exclude="~/js/app/app.min.js"></script>
 	</environment>
 	<environment names="Staging,Production">
 		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"
@@ -91,6 +93,8 @@
         <script src="~/lib/angular/shim.min.js"></script>
         <script src="~/lib/angular/Reflect.js"></script>
         <script src="~/lib/angular/system.js"></script>
+
+        <script src="~/js/app/app.min.js"></script>
 	</environment>
     
 	<script src="/signalr/js"></script>
