@@ -30,8 +30,8 @@ paths.angularWebApi = paths.node_modules + "angular2-in-memory-web-api/*.js"
 paths.corejs = paths.node_modules + "core-js/client/shim*.js";
 paths.zonejs = paths.node_modules + "zone.js/dist/zone*.js";
 paths.reflectjs = paths.node_modules + "reflect-metadata/Reflect*.js";
-paths.systemjs = paths.node_modules + "systemjs/dist/system.*.js";
-paths.rxjs = paths.node_modules + "rxjs/bundles/*.js";
+paths.systemjs = paths.node_modules + "systemjs/dist/system*.js";
+paths.rxjs = paths.node_modules + "rxjs/**/*.js";
 
 paths.app = "app/**/*.js";
 paths.appDest = paths.webroot + "js/app/app.min.js";
@@ -61,18 +61,55 @@ gulp.task("min:css", function () {
 			.pipe(gulp.dest("."));
 });
 
-gulp.task("angular", function () {
-	return gulp.src([
-				paths.angular,
-				paths.angularWebApi,
-				paths.corejs, 
-				paths.zonejs, 
-				paths.reflectjs,
-				paths.rxjs ],
-				{ base: "." })
-			.pipe(rename({ dirname: '' }))
-			.pipe(gulp.dest(paths.lib + "angular"));
+gulp.task("copy:angular", function () {
+	return gulp.src(paths.angular,
+				{ base: paths.node_modules + "@angular/" })
+			.pipe(gulp.dest(paths.lib + "angular/"));
 });
+
+gulp.task("copy:angularWebApi", function () {
+	return gulp.src(paths.angularWebApi,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:corejs", function () {
+	return gulp.src(paths.corejs,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:zonejs", function () {
+	return gulp.src(paths.zonejs,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:reflectjs", function () {
+	return gulp.src(paths.reflectjs,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:systemjs", function () {
+	return gulp.src(paths.systemjs,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:rxjs", function () {
+	return gulp.src(paths.rxjs,
+				{ base: paths.node_modules })
+			.pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("dependencies", [ "copy:angular", 
+					"copy:angularWebApi", 
+					"copy:corejs", 
+					"copy:zonejs",
+					"copy:reflectjs",
+					"copy:systemjs",
+					"copy:rxjs" ]);
 
 
 gulp.task("watch", function() {
@@ -93,4 +130,4 @@ gulp.task("min:app", function() {
 
 gulp.task("min", ["min:js", "min:css", "min:app"]);
 
-gulp.task("default", ["clean", "min", "angular"]);
+gulp.task("default", ["clean", "min", "dependencies"]);

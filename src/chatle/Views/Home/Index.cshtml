@@ -45,6 +45,7 @@
         </ul>
     </div>
 </div>
+<chatle/>
 
 @section scripts
 {
@@ -53,20 +54,11 @@
 		<script src="~/lib/signalr/jquery.signalR.js"></script>
 		<script src="~/js/chat.js"></script>
 
-        <script src="~/lib/angular/common.umd.js"></script>
-        <script src="~/lib/angular/compile.umd.js"></script>
-        <script src="~/lib/angular/core.umd.js"></script>
-        <script src="~/lib/angular/forms.umd.js"></script>
-        <script src="~/lib/angular/http.umd.js"></script>
-        <script src="~/lib/angular/platform-browser-dynamic.umd.js"></script>
-        <script src="~/lib/angular/platform-browser.umd.js"></script>
-        <script src="~/lib/angular/router-deprecated.umd.js"></script>
-        <script src="~/lib/angular/router.umd.js"></script>
-        <script src="~/lib/angular/upgrade.umd.js"></script>
-        <script src="~/lib/angular/shim.js"></script>
-        <script src="~/lib/angular/Reflect.js"></script>
-        <script src="~/lib/angular/system.src.js"></script>
-
+        <script src="~/lib/core-js/client/shim.js"></script>
+        <script src="~/lib/reflect-metadata/Reflect.js"></script>
+        <script src="~/lib/systemjs/dist/system.src.js"></script>
+        <script src="~/lib/zone.js/dist/zone.js"></script>
+        
         <script asp-src-include="~/js/app/**/*.js" asp-src-exclude="~/js/app/app.min.js"></script>
 	</environment>
 	<environment names="Staging,Production">
@@ -78,21 +70,13 @@
 				asp-fallback.src="~/lib/signalr/jquery.signalR.min.js"
 				asp-fallback-test="window.jQuery && window.jQuery.connection">
 		</script>
-		<script src="~/js/chat.min.js"></script>	
 
-        <script src="~/lib/angular/common.umd.min.js"></script>
-        <script src="~/lib/angular/compile.umd.min.js"></script>
-        <script src="~/lib/angular/core.umd.min.js"></script>
-        <script src="~/lib/angular/forms.umd.min.js"></script>
-        <script src="~/lib/angular/http.umd.min.js"></script>
-        <script src="~/lib/angular/platform-browser-dynamic.umd.min.js"></script>
-        <script src="~/lib/angular/platform-browser.umd.min.js"></script>
-        <script src="~/lib/angular/router-deprecated.umd.min.js"></script>
-        <script src="~/lib/angular/router.umd.min.js"></script>
-        <script src="~/lib/angular/upgrade.umd.min.js"></script>
-        <script src="~/lib/angular/shim.min.js"></script>
-        <script src="~/lib/angular/Reflect.js"></script>
-        <script src="~/lib/angular/system.js"></script>
+		<script src="~/js/chat.min.js"></script>	
+        <script src="~/lib/reflect-metadata/Reflect.js"></script>
+        <script src="~/lib/systemjs/dist/system.js"></script>
+        <script src="~/lib/zone.js/dist/zone.min.js"></script>
+
+        <script src="~/lib/core-js/client/shim.min.js"></script>
 
         <script src="~/js/app/app.min.js"></script>
 	</environment>

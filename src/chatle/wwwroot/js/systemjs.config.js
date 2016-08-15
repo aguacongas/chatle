@@ -7,8 +7,8 @@
   var map = {
     'app':                        'js/app', // 'dist',
     '@angular':                   'lib/angular',
-    'angular2-in-memory-web-api': 'lib/angular',
-    'rxjs':                       'lib/angular'
+    'angular2-in-memory-web-api': 'lib/angular2-in-memory-web-api',
+    'rxjs':                       'lib/rxjs'
   };
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
@@ -31,7 +31,7 @@
   
   // Bundled (~40 requests):
   function packUmd(pkgName) {
-    packages['@angular/'+pkgName] = { main: pkgName + '.umd.js', defaultExtension: 'js' };
+    packages['@angular/'+pkgName] = { main: '/bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
   }
   // Add package entries for angular packages
   ngPackageNames.forEach(packUmd);
