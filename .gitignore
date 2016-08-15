@@ -28,3 +28,4 @@ node_modules
 /src/chatle/typings
 npm-debug.log
 npm-shrinkwrap.json
+*.ngfactory.ts

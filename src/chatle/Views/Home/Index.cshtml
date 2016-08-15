@@ -45,7 +45,7 @@
         </ul>
     </div>
 </div>
-<chatle/>
+<chatle>Loading...</chatle>
 
 @section scripts
 {
@@ -59,7 +59,7 @@
         <script src="~/lib/systemjs/dist/system.src.js"></script>
         <script src="~/lib/zone.js/dist/zone.js"></script>
         
-        <script asp-src-include="~/js/app/**/*.js" asp-src-exclude="~/js/app/app.min.js"></script>
+        <script asp-src-include="~/js/app/**/*.js" asp-src-exclude="~/js/app/*.min.js"></script>
 	</environment>
 	<environment names="Staging,Production">
 		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"
@@ -78,7 +78,7 @@
 
         <script src="~/lib/core-js/client/shim.min.js"></script>
 
-        <script src="~/js/app/app.min.js"></script>
+        <script asp-src-include="~/js/app/**/*.min.js"></script>
 	</environment>
     
 	<script src="/signalr/js"></script>

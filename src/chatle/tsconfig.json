@@ -8,5 +8,9 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false
-  }
+  },
+  "angularCompilerOptions": {
+   "genDir": ".",
+   "debug": true
+ }
 }

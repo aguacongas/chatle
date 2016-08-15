@@ -39,8 +39,9 @@
 		"gulp-watch": "4.3.9",
 		"gulp-rimraf": "0.2.0",
 		"concurrently": "^2.0.0",
-    	"typescript": "^1.8.10",
-	    "typings":"^1.0.4"
+    	"typescript": "^1.9.0-dev",
+	    "typings":"^1.0.4",
+		"@angular/compiler-cli" :"^0.5.0"
 	},
 	"scripts": {
 		"start": "concurrently \"npm run watch\" \"npm run tsc:w\" \"dotnet run\"",
@@ -49,6 +50,7 @@
 		"tsc:w": "tsc -w",
 		"typings": "typings",
 		"gulp": "gulp",
-		"watch": "gulp watch"
+		"watch": "gulp watch",
+		"ngc": "ngc"
 	}
 }

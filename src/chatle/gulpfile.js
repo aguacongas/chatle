@@ -34,11 +34,10 @@ paths.systemjs = paths.node_modules + "systemjs/dist/system*.js";
 paths.rxjs = paths.node_modules + "rxjs/**/*.js";
 
 paths.app = "app/**/*.js";
-paths.appDest = paths.webroot + "js/app/app.min.js";
+paths.appDest = paths.webroot + "js/app";
 
-gulp.task("clean:js", function () {
-	return gulp.src([ paths.concatJsDest, paths.appDest ], { read: false })
-			.pipe(rimraf());
+gulp.task("clean:js", function (cb) {
+	return rimraf(paths.concatJsDest, cb);
 });
 
 gulp.task("clean:css", function (cb) {
@@ -103,29 +102,32 @@ gulp.task("copy:rxjs", function () {
 			.pipe(gulp.dest(paths.lib));
 });
 
+gulp.task("copy:app", function () {
+	return gulp.src(paths.app + "*")
+			.pipe(gulp.dest(paths.appDest));
+});
+
 gulp.task("dependencies", [ "copy:angular", 
 					"copy:angularWebApi", 
 					"copy:corejs", 
 					"copy:zonejs",
 					"copy:reflectjs",
 					"copy:systemjs",
-					"copy:rxjs" ]);
-
+					"copy:rxjs",
+					"copy:app" ]);
 
 gulp.task("watch", function() {
-	var source = "app/**/*.js*";
-	var dest = paths.webroot + "js/app";
-	return gulp.src(source)
-			.pipe(gulp.dest(dest))
-			.pipe(watch(source))
-			.pipe(gulp.dest(dest))
+	return watch(paths.app + "*")
+			.pipe(gulp.dest(paths.appDest))
 });
 
 gulp.task("min:app", function() {
 	return gulp.src(paths.app)
-			.pipe(concat(paths.appDest))
 			.pipe(uglify())
-			.pipe(gulp.dest("."));
+			.pipe(rename({
+      			suffix: '.min'
+    		}))
+			.pipe(gulp.dest(paths.appDest));
 });
 
 gulp.task("min", ["min:js", "min:css", "min:app"]);
