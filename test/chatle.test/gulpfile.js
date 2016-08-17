@@ -16,13 +16,6 @@ var paths = {
 	node_modules:"./node_modules/"
 };
 
-paths.js = paths.webroot + "js/**/*.js";
-paths.minJs = paths.webroot + "js/**/*.min.js";
-paths.css = paths.webroot + "css/**/*.css";
-paths.minCss = paths.webroot + "css/**/*.min.css";
-paths.concatJsDest = paths.webroot + "js/chat.min.js";
-paths.concatCssDest = paths.webroot + "css/site.min.css";
-
 paths.lib = paths.webroot + "lib/";
 
 paths.angular = paths.node_modules + "@angular/**/bundles/*.js"
@@ -33,32 +26,11 @@ paths.reflectjs = paths.node_modules + "reflect-metadata/Reflect*.js";
 paths.systemjs = paths.node_modules + "systemjs/dist/system*.js";
 paths.rxjs = paths.node_modules + "rxjs/**/*.js";
 
-paths.app = "app/**/*.js";
-paths.appDest = paths.webroot + "js/app";
+paths.test = "app.test/**/*.js";
+paths.testDest = paths.webroot + "js/test";
 
-gulp.task("clean:js", function (cb) {
-	return rimraf(paths.concatJsDest, cb);
-});
-
-gulp.task("clean:css", function (cb) {
-	rimraf(paths.concatCssDest, cb);
-});
-
-gulp.task("clean", ["clean:js", "clean:css"]);
-
-gulp.task("min:js", function () {
-	return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
-			.pipe(concat(paths.concatJsDest))
-			.pipe(uglify())
-			.pipe(gulp.dest("."));
-});
-
-gulp.task("min:css", function () {
-	return gulp.src([paths.css, "!" + paths.minCss])
-			.pipe(concat(paths.concatCssDest))
-			.pipe(cssmin())
-			.pipe(gulp.dest("."));
-});
+paths.app = "../../src/chatle/app/**/*.ts";
+paths.appDest = "app";
 
 gulp.task("copy:angular", function () {
 	return gulp.src(paths.angular,
@@ -102,6 +74,11 @@ gulp.task("copy:rxjs", function () {
 			.pipe(gulp.dest(paths.lib));
 });
 
+gulp.task("copy:test", function () {
+	return gulp.src(paths.test + "*")
+			.pipe(gulp.dest(paths.testDest));
+});
+
 gulp.task("copy:app", function () {
 	return gulp.src(paths.app + "*")
 			.pipe(gulp.dest(paths.appDest));
@@ -114,22 +91,11 @@ gulp.task("dependencies", [ "copy:angular",
 					"copy:reflectjs",
 					"copy:systemjs",
 					"copy:rxjs",
-					"copy:app" ]);
+					"copy:test" ]);
 
 gulp.task("watch", function() {
-	return watch(paths.app + "*")
-			.pipe(gulp.dest(paths.appDest))
+	return watch(paths.test + "*")
+			.pipe(gulp.dest(paths.testDest))
 });
 
-gulp.task("min:app", function() {
-	return gulp.src(paths.app)
-			.pipe(uglify())
-			.pipe(rename({
-      			suffix: '.min'
-    		}))
-			.pipe(gulp.dest(paths.appDest));
-});
-
-gulp.task("min", ["min:js", "min:css", "min:app"]);
-
-gulp.task("default", ["clean", "min", "dependencies"]);
+gulp.task("default", ["copy:app", "dependencies"]);

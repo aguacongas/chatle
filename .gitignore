@@ -15,6 +15,7 @@ bower_components
 bin
 obj
 node_modules
+/test/chatle.test/app.test/**/*.js*
 /test/chatle.test/wwwroot/css/site.min.js
 /test/chatle.test/wwwroot/lib
 /test/chatle.test/wwwroot/js/chat.min.js
@@ -25,7 +26,6 @@ node_modules
 /src/chatle/wwwroot/js/chat.min.js
 /src/chatle/wwwroot/js/app
 /src/chatle/app/**/*.js*
-/src/chatle/typings
 npm-debug.log
 npm-shrinkwrap.json
 *.ngfactory.ts
