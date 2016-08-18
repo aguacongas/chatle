@@ -32,10 +32,10 @@ paths.zonejs = paths.node_modules + "zone.js/dist/zone*.js";
 paths.reflectjs = paths.node_modules + "reflect-metadata/Reflect*.js";
 paths.systemjs = paths.node_modules + "systemjs/dist/system*.js";
 paths.rxjs = paths.node_modules + "rxjs/**/*.js";
+paths.jasminejs = paths.node_modules + "jasmine-core/lib/jasmine-core/*.*";
 
 paths.app = "app/**/*.js";
 paths.appDest = paths.webroot + "js/app";
-
 gulp.task("clean:js", function (cb) {
 	return rimraf(paths.concatJsDest, cb);
 });
@@ -61,6 +61,7 @@ gulp.task("min:css", function () {
 });
 
 gulp.task("copy:angular", function () {
+
 	return gulp.src(paths.angular,
 				{ base: paths.node_modules + "@angular/" })
 			.pipe(gulp.dest(paths.lib + "angular/"));
@@ -107,6 +108,12 @@ gulp.task("copy:app", function () {
 			.pipe(gulp.dest(paths.appDest));
 });
 
+gulp.task("copy:jasmine", function () {
+	return gulp.src(paths.jasminejs,
+				{ base: paths.node_modules + "jasmine-core/lib" })
+			.pipe(gulp.dest(paths.lib));
+});
+
 gulp.task("dependencies", [ "copy:angular", 
 					"copy:angularWebApi", 
 					"copy:corejs", 
@@ -114,6 +121,7 @@ gulp.task("dependencies", [ "copy:angular",
 					"copy:reflectjs",
 					"copy:systemjs",
 					"copy:rxjs",
+					"copy:jasmine",
 					"copy:app" ]);
 
 gulp.task("watch", function() {

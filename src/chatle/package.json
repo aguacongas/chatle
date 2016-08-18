@@ -39,6 +39,7 @@
     "gulp-tsc": "1.2.0",
     "gulp-uglify": "1.2.0",
     "gulp-watch": "4.3.9",
+    "jasmine-core": "2.4.1",
     "typescript": "^1.9.0-dev",
     "typings": "^1.0.4"
   },
