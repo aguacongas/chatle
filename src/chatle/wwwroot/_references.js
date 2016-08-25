@@ -7,6 +7,7 @@
 /// <reference path="../app/main.js" />
 /// <reference path="../gulpfile.js" />
 /// <reference path="js/app/app.component.js" />
+/// <reference path="js/app/app.component.spec.js" />
 /// <reference path="js/app/app.module.js" />
 /// <reference path="js/app/contacts/contact.component.js" />
 /// <reference path="js/app/contacts/contacts.component.js" />
