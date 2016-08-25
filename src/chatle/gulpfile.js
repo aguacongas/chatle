@@ -30,7 +30,7 @@ paths.angularWebApi = paths.node_modules + "angular2-in-memory-web-api/*.js"
 paths.corejs = paths.node_modules + "core-js/client/shim*.js";
 paths.zonejs = paths.node_modules + "zone.js/dist/zone*.js";
 paths.reflectjs = paths.node_modules + "reflect-metadata/Reflect*.js";
-paths.systemjs = paths.node_modules + "systemjs/dist/system*.js";
+paths.systemjs = paths.node_modules + "systemjs/dist/*.js";
 paths.rxjs = paths.node_modules + "rxjs/**/*.js";
 paths.jasminejs = paths.node_modules + "jasmine-core/lib/jasmine-core/*.*";
 

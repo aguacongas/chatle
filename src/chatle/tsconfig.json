@@ -9,8 +9,9 @@
     "removeComments": false,
     "noImplicitAny": false
   },
+  "compileOnSave": true,
   "angularCompilerOptions": {
-   "genDir": ".",
-   "debug": true
- }
+    "genDir": ".",
+    "debug": true
+  }
 }
