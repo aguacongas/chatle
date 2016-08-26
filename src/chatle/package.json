@@ -28,7 +28,6 @@
     "angular2-in-memory-web-api": "0.0.15"
   },
   "devDependencies": {
-    "codelyzer": "0.0.28",
     "concurrently": "^2.0.0",
     "gulp": ">=3.9.1",
     "gulp-concat": ">=2.5.2",
@@ -41,7 +40,8 @@
     "gulp-watch": ">=4.3.9",
     "jasmine-core": "2.4.1",
     "tslint": "^3.15.1",
-    "typescript": "^1.8.10"
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
   },
   "scripts": {
     "start": "concurrently \"npm run watch\" \"npm run tsc:w\" \"dotnet run\"",
