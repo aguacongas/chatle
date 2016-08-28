@@ -111,10 +111,47 @@ export class ChatService {
         // start the connection
         $.connection.hub.start()
             .done(response => this.connectionStateSubject.next(ConnectionState.Connected))
-            .fail(response => this.connectionStateSubject.error(ConnectionState.Error));
+            .fail(error => this.connectionStateSubject.error(error));
 
         return this.connectionState;
     };
+
+    createConversation(to: User, message: Message): Observable<Conversation> {
+        let conversationSubjet = new Subject<Conversation>();
+
+        this.http.post(this.settings.convAPI, {
+            to: to.id,
+            message: message
+        }).toPromise()
+        .then(response => {
+            let conversation = new Conversation();
+            let data = response.json();
+            conversation.id = data.id;
+            conversation.messages.unshift(message);
+            conversation.attendees.unshift(to);
+            conversationSubjet.next(conversation);
+        })
+        .catch(error => {
+            conversationSubjet.error(error);
+        });
+
+        return conversationSubjet.asObservable();
+    } 
+
+    sendMessage(message: Message): Observable<Message> {
+        let messageSubject = new Subject<Message>();
+
+        this.http.post(this.settings.chatAPI, message)
+        .toPromise()
+        .then(response => {
+            messageSubject.next(message);
+        })
+        .catch(error => {
+            messageSubject.error(error);
+        });
+
+        return  messageSubject.asObservable();
+    }
     
     private onReconnected() {
         this.connectionStateSubject.next(ConnectionState.Connected);
