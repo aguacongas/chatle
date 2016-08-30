@@ -2,8 +2,8 @@
 
 @Injectable()
 export class Settings {
-    userName: string;
-    userAPI: string;
-    convAPI: string;
-    chatAPI: string;
+    userName = 'test';
+    userAPI =  '/api/users';
+    convAPI = '/api/chat/conv';
+    chatAPI =  '/api/chat';
 }

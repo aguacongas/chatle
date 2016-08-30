@@ -34,19 +34,21 @@ export enum ConnectionState {
 @Injectable()
 export class ChatService {
 
+    currentState = ConnectionState.Disconnected;
     connectionState: Observable<ConnectionState>;
     userConnected: Observable<User>;
     userDiscconnected: Observable<string>;
     messageReceived: Observable<Message>;
     joinConversation: Observable<Conversation>;
     
-    private connectionStateSubject: Subject<ConnectionState>;
-    private userConnectedSubject: Subject<User>;
-    private userDisconnectedSubject: Subject<string>;
-    private messageReceivedSubject: Subject<Message>;
-    private joinConversationSubject: Subject<Conversation>;
-    
-    constructor(private settings: Settings, private http: Http) {
+    private connectionStateSubject = new Subject<ConnectionState>();
+    private userConnectedSubject = new Subject<User>();
+    private userDisconnectedSubject = new Subject<string>();
+    private messageReceivedSubject = new Subject<Message>();
+    private joinConversationSubject = new Subject<Conversation>();
+    private settings = new Settings();
+
+    constructor(private http: Http) {
         this.connectionState = this.connectionStateSubject.asObservable();
         this.messageReceived = this.messageReceivedSubject.asObservable();
         this.userConnected = this.userConnectedSubject.asObservable();
@@ -107,10 +109,10 @@ export class ChatService {
         $.connection.hub.error(this.onError);
         // callback on connection disconnect
         $.connection.hub.disconnected(this.onDisconnected);
-
+    
         // start the connection
         $.connection.hub.start()
-            .done(response => this.connectionStateSubject.next(ConnectionState.Connected))
+            .done(response => this.setConnectionState(ConnectionState.Connected))
             .fail(error => this.connectionStateSubject.error(error));
 
         return this.connectionState;
@@ -123,17 +125,17 @@ export class ChatService {
             to: to.id,
             message: message
         }).toPromise()
-        .then(response => {
-            let conversation = new Conversation();
-            let data = response.json();
-            conversation.id = data.id;
-            conversation.messages.unshift(message);
-            conversation.attendees.unshift(to);
-            conversationSubjet.next(conversation);
-        })
-        .catch(error => {
-            conversationSubjet.error(error);
-        });
+            .then(response => {
+                let conversation = new Conversation();
+                let data = response.json();
+                conversation.id = data.id;
+                conversation.messages.unshift(message);
+                conversation.attendees.unshift(to);
+                conversationSubjet.next(conversation);
+            })
+            .catch(error => {
+                conversationSubjet.error(error);
+            });
 
         return conversationSubjet.asObservable();
     } 
@@ -142,27 +144,64 @@ export class ChatService {
         let messageSubject = new Subject<Message>();
 
         this.http.post(this.settings.chatAPI, message)
-        .toPromise()
-        .then(response => {
-            messageSubject.next(message);
-        })
-        .catch(error => {
-            messageSubject.error(error);
-        });
+            .toPromise()
+            .then(response => {
+                messageSubject.next(message);
+            })
+            .catch(error => {
+                messageSubject.error(error);
+            });
 
         return  messageSubject.asObservable();
     }
     
+    getUsers(): Observable<User[]> {
+        let subject = new Subject<User[]>();
+
+        this.http.get(this.settings.userAPI)
+            .toPromise()
+            .then(response => {
+                var data = response.json();
+                if (data && data.users) {
+                    subject.next(data.users as User[]);
+                }
+            })
+            .catch(error => subject.error(error));
+        
+        return subject.asObservable();
+    }
+
+    getConversations(): Observable<Conversation[]> {
+        let subject = new Subject<Conversation[]>();
+
+        this.http.get(this.settings.chatAPI)
+            .toPromise()
+            .then(response => {
+                var data = response.json();
+                if (data) {
+                    subject.next(data as Conversation[]);
+                }
+            })
+            .catch(error => subject.error(error));
+        
+        return subject.asObservable();
+    }
+
+    private setConnectionState(connectionState: ConnectionState) {
+        this.currentState = connectionState;
+        this.connectionStateSubject.next(connectionState);
+    }
+
     private onReconnected() {
-        this.connectionStateSubject.next(ConnectionState.Connected);
+        this.setConnectionState(ConnectionState.Connected);
     }
 
     private onDisconnected() {
-        this.connectionStateSubject.next(ConnectionState.Disconnected);
+        this.setConnectionState(ConnectionState.Disconnected);
     }
 
     private onError() {
-        this.connectionStateSubject.error(ConnectionState.Error);
+        this.setConnectionState(ConnectionState.Error);
     }
 
     private onUserConnected(user: User) {
@@ -182,5 +221,4 @@ export class ChatService {
     private onJoinConversation(conversation: Conversation) {
         this.joinConversationSubject.next(conversation);
     }
-
 }
