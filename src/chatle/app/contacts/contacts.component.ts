@@ -10,8 +10,7 @@ import { User } from '../shared/user'
       <li *ngFor="let user of users">
         <span>{{user.id}}</span> {{user.name}}
       </li>
-    </ul>`,
-  providers: [ChatService]
+    </ul>`
 })
 export class ContactsComponent implements OnInit 
 {
@@ -21,24 +20,24 @@ export class ContactsComponent implements OnInit
   constructor(private service: ChatService) { }
 
   ngOnInit() {
-    if (this.service.currentState == ConnectionState.Connected) {
+    this.service.connectionState
+      .subscribe(
+        connectionState => {
+          if (connectionState === ConnectionState.Connected) {
+            this.getUsers();
+          }
+        },
+        error => this.error = error);
+
+    if (this.service.currentState === ConnectionState.Connected) {
       this.getUsers();
     }
-
-    this.service.connectionState
-      .toPromise()
-      .then(connectionState => {
-        if (connectionState === ConnectionState.Connected) {
-          this.getUsers();
-        }
-      })
-      .catch(error => this.error = error);
   }
   
   private getUsers() {
     this.service.getUsers()
-      .toPromise()
-      .then(users => this.users = users)
-      .catch(error => this.error = error);
+      .subscribe(
+        users => this.users = users,
+        error => this.error = error);
   }
 }

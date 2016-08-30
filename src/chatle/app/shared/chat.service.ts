@@ -188,6 +188,7 @@ export class ChatService {
     }
 
     private setConnectionState(connectionState: ConnectionState) {
+        console.log('connection state changed to: ' + connectionState);
         this.currentState = connectionState;
         this.connectionStateSubject.next(connectionState);
     }
@@ -201,7 +202,7 @@ export class ChatService {
     }
 
     private onError() {
-        this.setConnectionState(ConnectionState.Error);
+        this.connectionStateSubject.error("SignalR transport on error");
     }
 
     private onUserConnected(user: User) {
