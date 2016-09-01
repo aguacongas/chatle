@@ -19,10 +19,10 @@ interface ChatProxy {
 }
 
 interface ChatClient {
-    userConnected(user: User): void;
-    userDisconnected(id: string): void;
-    messageReceived(message: Message): void;
-    joinConversation(conversation: Conversation): void;
+    userConnected: (user: User) => void;
+    userDisconnected: (id: string) => void;
+    messageReceived: (message: Message) => void;
+    joinConversation: (conversation: Conversation) => void;
 }
 
 export enum ConnectionState {  
@@ -66,27 +66,27 @@ export class ChatService {
           * @desc callback when a new user connect to the chat
           * @param User user, the connected user
         */
-        chatHub.client.userConnected = this.onUserConnected;
+        chatHub.client.userConnected = user => this.onUserConnected(user);
         /**
           * @desc callback when a new user disconnect the chat
           * @param id, the disconnected user id
         */
-        chatHub.client.userDisconnected = this.onUserDisconnected;
+        chatHub.client.userDisconnected = id => this.onUserDisconnected(id);
         /**
           * @desc callback when a message is received
           * @param String to, the conversation id
           * @param Message data, the message
         */
-        chatHub.client.messageReceived = this.onMessageReceived;
+        chatHub.client.messageReceived = message => this.onMessageReceived(message);
         /**
           * @desc callback when a new conversation is create on server
           * @param Conv data, the conversation model
         */
-        chatHub.client.joinConversation = this.onJoinConversation
+        chatHub.client.joinConversation = conversation => this.onJoinConversation(conversation);
 
         if (debug) {
             // for debug only, callback on connection state change
-            $.connection.hub.stateChanged(function (change) {
+            $.connection.hub.stateChanged(change => {
                 let oldState: string,
                     newState: string;
 
@@ -100,14 +100,15 @@ export class ChatService {
                 }
 
                 console.log("Chat Hub state changed from " + oldState + " to " + newState);
-            });
-            // for debug only, callback on connection reconnect
-            $.connection.hub.reconnected(this.onReconnected);
+            });                        
         }
+
+        // callback on connection reconnect
+        $.connection.hub.reconnected(() => this.onReconnected());
         // callback on connection error
-        $.connection.hub.error(this.onError);
+        $.connection.hub.error(error => this.onError(error) );
         // callback on connection disconnect
-        $.connection.hub.disconnected(this.onDisconnected);
+        $.connection.hub.disconnected(() => this.onDisconnected());
     
         // start the connection
         $.connection.hub.start()
@@ -191,7 +192,7 @@ export class ChatService {
         this.currentState = connectionState;
         this.connectionStateSubject.next(connectionState);
     }
-
+        
     private onReconnected() {
         this.setConnectionState(ConnectionState.Connected);
     }
@@ -200,8 +201,8 @@ export class ChatService {
         this.setConnectionState(ConnectionState.Disconnected);
     }
 
-    private onError() {
-        this.connectionStateSubject.error("SignalR transport on error");
+    private onError(error: any) {
+        this.connectionStateSubject.error(error);
     }
 
     private onUserConnected(user: User) {
