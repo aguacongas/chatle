@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ChatService, ConnectionState} from './shared/chat.service'
+import { ChatService, ConnectionState } from './shared/chat.service'
+import { Settings } from './shared/settings'
 
 @Component({
   selector: 'chatle',

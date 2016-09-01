@@ -11,18 +11,20 @@ import { Message } from './message';
 import { Conversation } from './conversation';
 
 describe('ChatService', () => {
+    TestBed.resetTestEnvironment();
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpModule],
             providers: [
-                { provide: XHRBackend, useClass: MockBackend }
+                { provide: XHRBackend, useClass: MockBackend },
+                { provide: Settings, useClass: Settings }
             ]
         });
     });
 
-    it("start should return connectionState observable", inject([Settings, Http], (settings: Settings, http: Http) => {
-        let service = new ChatService(settings, http);
+    it("start should return connectionState observable", inject([Http, Settings], (http: Http, settings: Settings) => {
+        let service = new ChatService(http, settings);
         let connectionState: ConnectionState;
 
         service.start(true)

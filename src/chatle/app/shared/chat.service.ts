@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+﻿import { Injectable, Inject } from '@angular/core';
 import { Http } from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
@@ -46,9 +46,8 @@ export class ChatService {
     private userDisconnectedSubject = new Subject<string>();
     private messageReceivedSubject = new Subject<Message>();
     private joinConversationSubject = new Subject<Conversation>();
-    private settings = new Settings();
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private settings: Settings) {
         this.connectionState = this.connectionStateSubject.asObservable();
         this.messageReceived = this.messageReceivedSubject.asObservable();
         this.userConnected = this.userConnectedSubject.asObservable();

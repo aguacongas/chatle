@@ -80,13 +80,12 @@
     </script>
 
 	<script>
-		$(document).ready(function () {
-			chatLe.userName = '@User.Identity.Name';
-			chatLe.chatAPI = '@Url.Action("Get", "Chat")'
-			chatLe.convAPI = '@Url.Action("CreateConversation", "Chat")'
-			chatLe.userAPI = '@Url.Action("Get", "User")'
-
-			chatLe.init(true);
-		});
+        window['chatleSetting'] = {
+            userName: '@User.Identity.Name',
+            chatAPI: '@Url.Action("Get", "Chat")',
+            convAPI: '@Url.Action("CreateConversation", "Chat")',
+            userAPI: '@Url.Action("Get", "User")',
+            debug: true
+        };
 	</script>
 }

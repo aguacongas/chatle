@@ -1,8 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+
+import { User } from '../shared/user';
 
 @Component({
   selector: 'contact',
-  template: '<h1>Contact</h1>'
+  templateUrl: 'contact.html'
 })
 
-export class ContactComponent { }
+export class ContactComponent {
+    @Input()
+    user: User;
+
+    onClick() {
+
+    }
+}

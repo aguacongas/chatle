@@ -5,10 +5,10 @@ import { User } from '../shared/user'
 
 @Component({
   selector: 'contacts',
-  template: `<h1>Contacts</h1>
+  template: `<h6>CONNECTED</h6>
     <ul>
       <li *ngFor="let user of users">
-        <span>{{user.id}}</span> {{user.name}}
+        <contact [user]="user"></contact>
       </li>
     </ul>`
 })
