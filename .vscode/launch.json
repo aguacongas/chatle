@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/bin/Debug/netcoreapp1.0/chatle.dll",
+            "program": "${workspaceRoot}/src/chatle/bin/Debug/netcoreapp1.0//osx.10.11-x64//chatle.dll",
             "args": [],
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceRoot}/src/chatle",
             "stopAtEntry": false,
             "externalConsole": false
         },
@@ -17,9 +17,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/bin/Debug/netcoreapp1.0/chatle.dll",
+            "program": "${workspaceRoot}/src/chatle/bin/Debug/netcoreapp1.0//osx.10.11-x64//chatle.dll",
             "args": [],
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceRoot}/src/chatle",
             "stopAtEntry": false,
             "launchBrowser": {
                 "enabled": true,
