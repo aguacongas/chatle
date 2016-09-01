@@ -124,18 +124,16 @@ export class ChatService {
         this.http.post(this.settings.convAPI, {
             to: to.id,
             message: message
-        }).toPromise()
-            .then(response => {
+        }).subscribe(
+            response => {
                 let conversation = new Conversation();
                 let data = response.json();
                 conversation.id = data.id;
                 conversation.messages.unshift(message);
                 conversation.attendees.unshift(to);
                 conversationSubjet.next(conversation);
-            })
-            .catch(error => {
-                conversationSubjet.error(error);
-            });
+            },
+            error => conversationSubjet.error(error));
 
         return conversationSubjet.asObservable();
     } 
@@ -144,13 +142,9 @@ export class ChatService {
         let messageSubject = new Subject<Message>();
 
         this.http.post(this.settings.chatAPI, message)
-            .toPromise()
-            .then(response => {
-                messageSubject.next(message);
-            })
-            .catch(error => {
-                messageSubject.error(error);
-            });
+            .subscribe(
+                response => messageSubject.next(message),
+                error => messageSubject.error(error));
 
         return  messageSubject.asObservable();
     }
@@ -159,14 +153,14 @@ export class ChatService {
         let subject = new Subject<User[]>();
 
         this.http.get(this.settings.userAPI)
-            .toPromise()
-            .then(response => {
-                var data = response.json();
-                if (data && data.users) {
-                    subject.next(data.users as User[]);
-                }
-            })
-            .catch(error => subject.error(error));
+            .subscribe(
+                response => {
+                    var data = response.json();
+                    if (data && data.users) {
+                        subject.next(data.users as User[]);
+                    }
+                },
+                error => subject.error(error));
         
         return subject.asObservable();
     }
@@ -175,14 +169,14 @@ export class ChatService {
         let subject = new Subject<Conversation[]>();
 
         this.http.get(this.settings.chatAPI)
-            .toPromise()
-            .then(response => {
-                var data = response.json();
-                if (data) {
-                    subject.next(data as Conversation[]);
-                }
-            })
-            .catch(error => subject.error(error));
+            .subscribe(
+                response => {
+                    var data = response.json();
+                    if (data) {
+                        subject.next(data as Conversation[]);
+                    }
+                },
+                error => subject.error(error));
         
         return subject.asObservable();
     }
