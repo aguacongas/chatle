@@ -75,10 +75,7 @@
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": "1.0.0-preview2-final",
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
-  },
-	"scripts": {
-		"precompile": ["npm run ngc -p .", "npm run gulp"]
-	},
+  },	
 	"publishOptions": {
 		"include": [
 			"web.config",

@@ -5,9 +5,7 @@ import { Settings } from './shared/settings'
 
 @Component({
   selector: 'chatle',
-  template: `<h1>chatle main Component</h1>
-    <contacts></contacts>
-  `,
+  templateUrl: '/app/app.component.html',
   providers: [ChatService]
 })
 export class AppComponent implements OnInit{

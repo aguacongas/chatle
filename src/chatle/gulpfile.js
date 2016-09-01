@@ -6,14 +6,14 @@ var gulp = require("gulp"),
         concat = require("gulp-concat"),
         cssmin = require("gulp-cssmin"),
         uglify = require("gulp-uglify"),
-		copy= require("gulp-copy"),
+		copy = require("gulp-copy"),
 		rename = require("gulp-rename"),
 		watch = require("gulp-watch"),
 		tsc = require("gulp-tsc");
 
 var paths = {
-	webroot: "./wwwroot/",
-	node_modules:"./node_modules/"
+    webroot: "./wwwroot/",
+    node_modules: "./node_modules/"
 };
 
 paths.js = paths.webroot + "js/**/*.js";
@@ -37,26 +37,26 @@ paths.jasminejs = paths.node_modules + "jasmine-core/lib/jasmine-core/*.*";
 paths.app = "app/**/*.js";
 paths.appTemplates = "app/**/*.html"
 paths.appmaps = "app/**/*.map"
-paths.appDest = paths.webroot + "js/app";
+paths.appDest = paths.webroot + "app";
 gulp.task("clean:js", function (cb) {
-	return rimraf(paths.concatJsDest, cb);
+    return rimraf(paths.concatJsDest, cb);
 });
 
 gulp.task("clean:css", function (cb) {
-	rimraf(paths.concatCssDest, cb);
+    rimraf(paths.concatCssDest, cb);
 });
 
 gulp.task("clean", ["clean:js", "clean:css"]);
 
 gulp.task("min:js", function () {
-	return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
+    return gulp.src([paths.js, "!" + paths.minJs], { base: "." })
 			.pipe(concat(paths.concatJsDest))
 			.pipe(uglify())
 			.pipe(gulp.dest("."));
 });
 
 gulp.task("min:css", function () {
-	return gulp.src([paths.css, "!" + paths.minCss])
+    return gulp.src([paths.css, "!" + paths.minCss])
 			.pipe(concat(paths.concatCssDest))
 			.pipe(cssmin())
 			.pipe(gulp.dest("."));
@@ -64,43 +64,43 @@ gulp.task("min:css", function () {
 
 gulp.task("copy:angular", function () {
 
-	return gulp.src(paths.angular,
+    return gulp.src(paths.angular,
 				{ base: paths.node_modules + "@angular/" })
 			.pipe(gulp.dest(paths.lib + "angular/"));
 });
 
 gulp.task("copy:angularWebApi", function () {
-	return gulp.src(paths.angularWebApi,
+    return gulp.src(paths.angularWebApi,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
 
 gulp.task("copy:corejs", function () {
-	return gulp.src(paths.corejs,
+    return gulp.src(paths.corejs,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
 
 gulp.task("copy:zonejs", function () {
-	return gulp.src(paths.zonejs,
+    return gulp.src(paths.zonejs,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
 
 gulp.task("copy:reflectjs", function () {
-	return gulp.src(paths.reflectjs,
+    return gulp.src(paths.reflectjs,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
 
 gulp.task("copy:systemjs", function () {
-	return gulp.src(paths.systemjs,
+    return gulp.src(paths.systemjs,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
 
 gulp.task("copy:rxjs", function () {
-	return gulp.src(paths.rxjs,
+    return gulp.src(paths.rxjs,
 				{ base: paths.node_modules })
 			.pipe(gulp.dest(paths.lib));
 });
@@ -111,32 +111,32 @@ gulp.task("copy:app", function () {
 });
 
 gulp.task("copy:jasmine", function () {
-	return gulp.src(paths.jasminejs,
+    return gulp.src(paths.jasminejs,
 				{ base: paths.node_modules + "jasmine-core/lib" })
 			.pipe(gulp.dest(paths.lib));
 });
 
-gulp.task("dependencies", [ "copy:angular", 
-					"copy:angularWebApi", 
-					"copy:corejs", 
+gulp.task("dependencies", ["copy:angular",
+					"copy:angularWebApi",
+					"copy:corejs",
 					"copy:zonejs",
 					"copy:reflectjs",
 					"copy:systemjs",
 					"copy:rxjs",
 					"copy:jasmine",
-					"copy:app" ]);
+					"copy:app"]);
 
-gulp.task("watch", function() {
-	return watch(paths.app)
+gulp.task("watch", function () {
+    return watch(paths.app)
 			.pipe(gulp.dest(paths.appDest))
 });
 
-gulp.task("min:app", function() {
-	return gulp.src(paths.app)
+gulp.task("min:app", function () {
+    return gulp.src(paths.app)
 			.pipe(uglify())
 			.pipe(rename({
-      			suffix: '.min'
-    		}))
+			    suffix: '.min'
+			}))
 			.pipe(gulp.dest(paths.appDest));
 });
 
