@@ -40,13 +40,14 @@ export class ChatService {
     userDiscconnected: Observable<string>;
     messageReceived: Observable<Message>;
     joinConversation: Observable<Conversation>;    
-    
+    openConversation: Observable<Conversation>;
+
     private connectionStateSubject = new Subject<ConnectionState>();
     private userConnectedSubject = new Subject<User>();
     private userDisconnectedSubject = new Subject<string>();
     private messageReceivedSubject = new Subject<Message>();
     private joinConversationSubject = new Subject<Conversation>();
-    private openConversationSubject = new Subject<User>();
+    private openConversationSubject = new Subject<Conversation>();
 
     constructor(private http: Http, private settings: Settings) {
         this.connectionState = this.connectionStateSubject.asObservable();
@@ -54,6 +55,7 @@ export class ChatService {
         this.userConnected = this.userConnectedSubject.asObservable();
         this.userDiscconnected = this.userDisconnectedSubject.asObservable();
         this.joinConversation = this.joinConversationSubject.asObservable();
+        this.openConversation = this.openConversationSubject.asObservable();
     }
     
     start(debug: boolean):Observable<ConnectionState> {
@@ -119,21 +121,49 @@ export class ChatService {
         return this.connectionState;
     }
 
-    showConversation(user: User) {
+    openUserConversation(user: User) {
         if (!user.conversation) {
-            user.conversation = new Conversation();
-        }
+            let conversation = new Conversation();
+            conversation.attendees.push(user);
 
-        this.onJoinConversation(user.conversation);
+            this.openConversationSubject.next(conversation);
+        } else {
+            this.openConversationSubject.next(user.conversation);
+        }        
     }
 
-    sendMessage(conversation: Conversation, message: Message): Observable<Message> {
+    showConversation(conversation: Conversation) {
+        this.openConversationSubject.next(conversation);        
+    }
+
+    sendMessage(conversation: Conversation, message: string): Observable<Message> {
         let messageSubject = new Subject<Message>();
 
-        this.http.post(this.settings.chatAPI, message)
-            .subscribe(
-                response => messageSubject.next(message),
-                error => messageSubject.error(error));
+        let m = new Message();
+        m.conversationId = conversation.id;
+        m.from = this.settings.userName;
+        m.text = message;
+
+        if (conversation.id) {
+            this.http.post(this.settings.chatAPI, {
+                    to: conversation.id,
+                    text: message
+                })
+                .subscribe(
+                    response => messageSubject.next(m),
+                    error => messageSubject.error(error));
+        } else {
+            this.http.post(this.settings.convAPI, {
+                    to: conversation.attendees.find(a => a.id !== this.settings.userName).id,
+                    text: message
+                })
+                .subscribe(
+                    response => {
+                        conversation.id = response.json();
+                        messageSubject.next(m);
+                    },
+                    error => messageSubject.error(error));
+        }
 
         return  messageSubject.asObservable();
     }

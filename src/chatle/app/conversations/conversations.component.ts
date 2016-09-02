@@ -25,8 +25,9 @@ export class ConversationsComponent implements OnInit {
 
         this.service.joinConversation
             .subscribe(
-                conversation => { this.conversations.unshift(conversation) },
+                conversation => this.conversations.unshift(conversation),
                 error => this.error = error);
+
 
         if (this.service.currentState === ConnectionState.Connected) {
             this.getConversations();

@@ -1,6 +1,6 @@
 ﻿export class Message {
     conversationId: number;
-    from: number;
+    from: string;
     text: string;
     date: Date;
 }

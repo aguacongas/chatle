@@ -1,22 +1,5 @@
 ﻿<div class="row">
     <contacts>Loading ...</contacts>
-    <div class="col-xs-6">
-        <!-- ko with: currentConv -->
-        <h6 data-bind="text: title"></h6>
-        <form class="form-inline">
-            <input id="message" class="form-control" />
-            <button type="submit" class="btn btn-default" data-bind="click: function(data, event) { sendMessage('#message'); }">send</button>
-        </form>
-        <ul data-bind="foreach: messages">
-            <li>
-                <small data-bind="text: from"></small><br />
-                <span data-bind="text: text"></span>
-            </li>
-        </ul>
-        <!-- /ko -->
-        <!-- ko ifnot: currentConv -->
-        <h1>WELCOME TO THIS REALLY SIMPLE CHAT</h1>
-        <!-- /ko -->
-    </div>
+    <conversation>Loading ...</conversation>
     <conversations>Loading ...</conversations>
 </div>
