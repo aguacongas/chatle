@@ -3,8 +3,8 @@
 import { Conversation } from '../shared/conversation';
 
 @Component({
-    selector: 'conversation',
-    templateUrl: '/app/conversations/conversation.component.html'
+    selector: 'conversation-preview',
+    templateUrl: '/app/conversations/conversationPreview.component.html'
 })
 
 export class ConversationComponent {

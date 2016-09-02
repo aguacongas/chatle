@@ -39,13 +39,14 @@ export class ChatService {
     userConnected: Observable<User>;
     userDiscconnected: Observable<string>;
     messageReceived: Observable<Message>;
-    joinConversation: Observable<Conversation>;
+    joinConversation: Observable<Conversation>;    
     
     private connectionStateSubject = new Subject<ConnectionState>();
     private userConnectedSubject = new Subject<User>();
     private userDisconnectedSubject = new Subject<string>();
     private messageReceivedSubject = new Subject<Message>();
     private joinConversationSubject = new Subject<Conversation>();
+    private openConversationSubject = new Subject<User>();
 
     constructor(private http: Http, private settings: Settings) {
         this.connectionState = this.connectionStateSubject.asObservable();
@@ -116,29 +117,17 @@ export class ChatService {
             .fail(error => this.connectionStateSubject.error(error));
 
         return this.connectionState;
-    };
+    }
 
-    createConversation(to: User, message: Message): Observable<Conversation> {
-        let conversationSubjet = new Subject<Conversation>();
+    showConversation(user: User) {
+        if (!user.conversation) {
+            user.conversation = new Conversation();
+        }
 
-        this.http.post(this.settings.convAPI, {
-            to: to.id,
-            message: message
-        }).subscribe(
-            response => {
-                let conversation = new Conversation();
-                let data = response.json();
-                conversation.id = data.id;
-                conversation.messages.unshift(message);
-                conversation.attendees.unshift(to);
-                conversationSubjet.next(conversation);
-            },
-            error => conversationSubjet.error(error));
+        this.onJoinConversation(user.conversation);
+    }
 
-        return conversationSubjet.asObservable();
-    } 
-
-    sendMessage(message: Message): Observable<Message> {
+    sendMessage(conversation: Conversation, message: Message): Observable<Message> {
         let messageSubject = new Subject<Message>();
 
         this.http.post(this.settings.chatAPI, message)
@@ -186,7 +175,7 @@ export class ChatService {
         this.currentState = connectionState;
         this.connectionStateSubject.next(connectionState);
     }
-        
+       
     private onReconnected() {
         this.setConnectionState(ConnectionState.Connected);
     }
