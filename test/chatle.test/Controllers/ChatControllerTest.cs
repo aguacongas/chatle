@@ -443,7 +443,8 @@ namespace chatle.test.Controllers
 				{
 					To = "test1",
 					Text = "test"
-				}
+				};
+				
 				var result = await controller.CreateConversation(message);
 				Assert.NotNull(result);
 			});
