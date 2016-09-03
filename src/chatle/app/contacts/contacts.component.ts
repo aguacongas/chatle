@@ -25,19 +25,28 @@ export class ContactsComponent implements OnInit {
 
         this.service.userConnected
             .subscribe(
-                user => this.users.unshift(user),
+                user => {
+                    this.removeUser(user.id);
+                    this.users.unshift(user)
+                },
                 error => this.error = error);
 
         this.service.userDiscconnected
             .subscribe(
                 id => {
-                    let index = this.users.findIndex(value => value.id === id);
-                    this.users.slice(index);
+                    this.removeUser(id);
                 },
                 error => this.error = error);
 
         if (this.service.currentState === ConnectionState.Connected) {
             this.getUsers();
+        }
+    }
+
+    private removeUser(id: string) {
+        let index = this.users.findIndex(user => user.id === id);
+        if (index !== -1) {
+            this.users.splice(index);
         }
     }
 

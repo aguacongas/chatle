@@ -44,7 +44,7 @@
     "typings": "^1.0.4"
   },
   "scripts": {
-    "start": "concurrently \"npm run watch\" \"npm run tsc:w\" \"dotnet run\"",
+    "start": "concurrently \"npm run gulp\" \"npm run watch\" \"npm run tsc:w\"",
     "postinstall": "typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",

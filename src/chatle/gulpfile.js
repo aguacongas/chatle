@@ -127,7 +127,7 @@ gulp.task("dependencies", ["copy:angular",
 					"copy:app"]);
 
 gulp.task("watch", function () {
-    return watch(paths.app)
+    return watch([paths.app, paths.appmaps, paths.appTemplates])
 			.pipe(gulp.dest(paths.appDest))
 });
 

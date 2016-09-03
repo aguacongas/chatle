@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 
 import { ChatService, ConnectionState } from '../shared/chat.service'
+import { Settings } from '../shared/settings'
 import { Conversation } from '../shared/Conversation'
 
 @Component({
@@ -11,7 +12,7 @@ export class ConversationsComponent implements OnInit {
     conversations: Conversation[];
     error: any;
 
-    constructor(private service: ChatService) { }
+    constructor(private service: ChatService, private settings: Settings) { }
 
     ngOnInit() {
         this.service.connectionState
@@ -25,7 +26,16 @@ export class ConversationsComponent implements OnInit {
 
         this.service.joinConversation
             .subscribe(
-                conversation => this.conversations.unshift(conversation),
+                conversation => {
+                    let title = '';
+                    conversation.attendees.forEach(attendee => {
+                        if (attendee && attendee.userId && attendee.userId !== this.settings.userName) {
+                            title += attendee.userId + ' ';
+                        }                
+                    });
+                    conversation.title = title.trim();
+                    this.conversations.unshift(conversation)
+                },
                 error => this.error = error);
 
 

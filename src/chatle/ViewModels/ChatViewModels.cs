@@ -91,4 +91,9 @@ namespace ChatLe.ViewModels
         public string Id { get; set; }
     }
 
+    public class MessageToSend
+    {
+        public string To { get; set; }
+        public string Text { get; set; }
+    }
 }

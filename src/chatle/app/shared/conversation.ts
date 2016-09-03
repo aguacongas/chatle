@@ -1,9 +1,10 @@
-﻿import { User } from './user';
+﻿import { Attendee } from './attendee';
 import { Message } from './message';
 import { Settings } from './settings';
 
 export class Conversation {
-    id: number;
-    attendees: User[];
+    id: string;
+    title: string;
+    attendees: Attendee[];
     messages: Message[]
 }

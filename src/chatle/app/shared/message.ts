@@ -1,5 +1,5 @@
 ﻿export class Message {
-    conversationId: number;
+    conversationId: string;
     from: string;
     text: string;
     date: Date;

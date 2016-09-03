@@ -121,17 +121,6 @@ export class ChatService {
         return this.connectionState;
     }
 
-    openUserConversation(user: User) {
-        if (!user.conversation) {
-            let conversation = new Conversation();
-            conversation.attendees.push(user);
-
-            this.openConversationSubject.next(conversation);
-        } else {
-            this.openConversationSubject.next(user.conversation);
-        }        
-    }
-
     showConversation(conversation: Conversation) {
         this.openConversationSubject.next(conversation);        
     }
@@ -153,13 +142,15 @@ export class ChatService {
                     response => messageSubject.next(m),
                     error => messageSubject.error(error));
         } else {
+            let attendee = conversation.attendees.find(a => a.userId !== this.settings.userName); 
             this.http.post(this.settings.convAPI, {
-                    to: conversation.attendees.find(a => a.id !== this.settings.userName).id,
+                    to: attendee.userId,
                     text: message
                 })
                 .subscribe(
                     response => {
-                        conversation.id = response.json();
+                        conversation.id = response.text();
+                        this.joinConversationSubject.next(conversation);
                         messageSubject.next(m);
                     },
                     error => messageSubject.error(error));

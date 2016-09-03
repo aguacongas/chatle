@@ -1,4 +1,4 @@
-﻿import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { Conversation } from '../shared/conversation';
 import { ChatService } from '../shared/chat.service';
@@ -26,5 +26,6 @@ export class ConversationComponent implements OnInit {
             .subscribe(
                 m => this.conversation.messages.unshift(m),
                 error => this.error = error);
+        this.message = null;
     }
 }

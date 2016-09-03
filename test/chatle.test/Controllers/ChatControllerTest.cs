@@ -267,7 +267,13 @@ namespace chatle.test.Controllers
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
-				await controller.SendMessage("test1", "test");
+				var message = new MessageToSend 
+				{
+					To = "test1",
+					Text = "test"
+				};
+
+				await controller.SendMessage(message);
 			});
 		}
 
@@ -289,8 +295,14 @@ namespace chatle.test.Controllers
 						, It.IsAny<Message>()
 						, It.IsAny<CancellationToken>()))
 					.ReturnsAsync(null);
+				
+				var message = new MessageToSend 
+				{
+					To = "test1",
+					Text = "test"
+				};
 
-				await controller.SendMessage("test1", "test");
+				await controller.SendMessage(message);
 			});
 		}
 
@@ -331,7 +343,13 @@ namespace chatle.test.Controllers
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)group);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
-				var result = await controller.CreateConversation("test1", "test");
+				var message = new MessageToSend 
+				{
+					To = "test1",
+					Text = "test"
+				};
+
+				var result = await controller.CreateConversation(message);
 				Assert.NotNull(result);
 
 			});
@@ -368,8 +386,14 @@ namespace chatle.test.Controllers
 					});
 
 				mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(null);
+				
+				var message = new MessageToSend 
+				{
+					To = "test1",
+					Text = "test"
+				};
 
-				var result = await controller.CreateConversation("test1", "test");
+				var result = await controller.CreateConversation(message);
 				Assert.Null(result);
 			});
 

@@ -1,1 +1,2 @@
-﻿<a href="#" (click)="onClick()">{{user.id}}</a>
+﻿<a href="#" *ngIf="!isCurrentUser" (click)="onClick()">{{user.id}}</a>
+<a href="/Account/Manage" *ngIf="isCurrentUser">{{user.id}}</a>

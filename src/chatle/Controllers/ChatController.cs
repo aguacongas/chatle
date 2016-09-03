@@ -114,11 +114,14 @@ namespace ChatLe.Controllers
         /// <summary>
         /// Send a message in a conversation asyncronously
         /// </summary>
-        /// <param name="to">the conversation id</param>
+        /// <param name="data">The message to send</param>
         /// <returns>a <see cref="Task"/></returns>
         [HttpPost()]
-        public async Task SendMessage(string to, string text)
+        public async Task SendMessage([FromBody] MessageToSend data)
         {
+            var to = data.To;
+            var text = data.Text;
+            
             var userName = HttpContext.User.Identity.Name;
             var message = new Message() { ConversationId = to, Text  = text, Date = DateTime.Now };
             var conv = await _chatManager.AddMessageAsync(userName, to, message);
@@ -135,13 +138,16 @@ namespace ChatLe.Controllers
         /// <summary>
         /// Get or create a one to one conversation asyncronously
         /// </summary>
-        /// <param name="to">the second user</param>
-        /// <param name="text">the 1st message content</param>
+        /// <param name="data">Initial message to send</param>
         /// <returns>a <see cref="Task<string>"/> with the conversation id as result or null if the user doesn't exist</returns>
         [HttpPost("conv")]
-        public async Task<string> CreateConversation(string to, string text)
+        public async Task<string> CreateConversation([FromBody] MessageToSend data)
         {
+            var to = data.To;
+            var text = data.Text;
+
             var userName = HttpContext.User.Identity.Name;
+            
             var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
 
             var users = new List<ChatLeUser>(conversation.Attendees.Count);
@@ -168,7 +174,17 @@ namespace ChatLe.Controllers
                 messages.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
             }
 
-            _hub.Clients.Group(to).joinConversation(new { id = conversation.Id, attendees = attendees.Select(a => new { userId = a.UserId }), messages = messages.Select(m => new { date = m.Date, from = m.From, text = m.Text }) });
+            _hub.Clients.Group(to).joinConversation(new 
+            { 
+                id = conversation.Id,
+                attendees = attendees.Select(a => new { userId = a.UserId }),
+                messages = messages.Select(m => new 
+                    { 
+                        date = m.Date, 
+                        from = m.From, 
+                        text = m.Text 
+                    }) 
+            });
             
             return conversation.Id;
         }

@@ -14,12 +14,23 @@ export class ConversationPreviewComponent implements OnInit {
     constructor(private service: ChatService) { }
 
     ngOnInit() {
-        this.service.openConversation
+        this.service.messageReceived
             .subscribe(
-            conversation => this.conversation = conversation);
+                message => {
+                        if (message.conversationId === this.conversation.id) {
+                            this.conversation.messages.unshift(message);
+                        }
+                    });
     }
 
     onClick() {
         this.service.showConversation(this.conversation);
+    }
+
+    getLastMessage(): string {
+        let messages = this.conversation.messages;
+        if (messages && messages[0]) {
+            return messages[0].text;
+        }
     }
 }
