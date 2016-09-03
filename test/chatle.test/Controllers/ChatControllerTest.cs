@@ -439,7 +439,12 @@ namespace chatle.test.Controllers
 				mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
 				mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 
-				var result = await controller.CreateConversation("test1", "test");
+				var message = new MessageToSend 
+				{
+					To = "test1",
+					Text = "test"
+				}
+				var result = await controller.CreateConversation(message);
 				Assert.NotNull(result);
 			});
 
