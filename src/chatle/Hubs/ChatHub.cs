@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Hubs;
-using System;
-using ChatLe.Models;
 using Microsoft.Extensions.Logging;
+using ChatLe.Models;
 
 namespace ChatLe.Hubs
 {
@@ -26,19 +29,28 @@ namespace ChatLe.Hubs
 		/// </summary>
 		public ILogger Logger { get; private set; }
 		/// <summary>
+		/// User Manager
+		/// </summary>
+		public UserManager<ChatLeUser> UserManager { get; private set; }
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="manager">The chat repository manager</param>
-		public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager, ILoggerFactory loggerFactory) : base()
+		public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager,
+			UserManager<ChatLeUser> userManager, 
+			ILoggerFactory loggerFactory) : base()
 		{
 			if (manager == null)
 				throw new ArgumentNullException("manager");
+			if (userManager == null)
+				throw new ArgumentNullException("userManager");
 			if (loggerFactory == null)
 				throw new ArgumentNullException("loggerFactory");
 
 			Logger = loggerFactory.CreateLogger<ChatHub>();
 			Logger.LogInformation("constructor");
 			Manager = manager;
+			UserManager = userManager;
 		}
 		/// <summary>
 		/// Called when the connection connects to this hub instance.
@@ -48,6 +60,18 @@ namespace ChatLe.Hubs
 		public override async Task OnConnected()
 		{
 			string name = Context.User.Identity.Name;
+			var identity = Context.User.Identity as ClaimsIdentity;
+			if (identity.Claims.Any(c => c.Type == "guess") &&
+				await UserManager.FindByNameAsync(name) == null)
+			{
+				// recreate the guess user with the same name and id in case of disconnection
+				var idClaim = identity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+				await UserManager.CreateAsync(new ChatLeUser
+				{
+					UserName = name,
+					Id = idClaim.Value
+				});
+			}
 			Logger.LogInformation("OnConnected " + name);
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			await Groups.Add(this.Context.ConnectionId, name);

@@ -258,6 +258,9 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("userName");
 
             var user = await Store.FindUserByNameAsync(userName, cancellationToken);
+            if (user == null)
+                return null;
+
             var conversations = await Store.GetConversationsAsync(user.Id, cancellationToken);
             // TODO: check if it's necessary when EF7 will be release
             foreach (var conv in conversations)
