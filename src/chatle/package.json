@@ -4,20 +4,53 @@
   "name": "chatle",
   "readme": "Olivier Lefebvre all right reserved",
   "license": "Apache-2.0",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/aguacongas/chatle"
-	},
-	"dependencies": {
-		"bower": "1.7.1",
-		"lodash": "3.10.1"
-	},
-	"devDependencies": {
-		"gulp": "3.9.1",
-		"gulp-concat": "2.5.2",
-		"gulp-cssmin": "0.1.7",
-		"gulp-uglify": "1.2.0",
-		"gulp-copy": "0.0.2",
-		"rimraf": "2.2.8"
-	}
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aguacongas/chatle"
+  },
+  "dependencies": {
+    "bower": "1.7.9",
+    "@angular/common": "2.0.0-rc.5",
+    "@angular/compiler": "2.0.0-rc.5",
+    "@angular/core": "2.0.0-rc.5",
+    "@angular/forms": "0.3.0",
+    "@angular/http": "2.0.0-rc.5",
+    "@angular/platform-browser": "2.0.0-rc.5",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.5",
+    "@angular/router": "3.0.0-rc.1",
+    "@angular/router-deprecated": "2.0.0-rc.2",
+    "@angular/upgrade": "2.0.0-rc.5",
+    "systemjs": "0.19.27",
+    "core-js": "^2.4.0",
+    "reflect-metadata": "^0.1.3",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "^0.6.12",
+    "angular2-in-memory-web-api": "0.0.15"
+  },
+  "devDependencies": {
+    "concurrently": "^2.0.0",
+    "gulp": ">=3.9.1",
+    "gulp-concat": ">=2.5.2",
+    "gulp-copy": ">=0.0.2",
+    "gulp-cssmin": ">=0.1.7",
+    "gulp-rename": ">=1.2.2",
+    "gulp-rimraf": ">=0.2.0",
+    "gulp-tsc": ">=1.2.0",
+    "gulp-uglify": ">=1.2.0",
+    "gulp-watch": ">=4.3.9",
+    "jasmine-core": "2.4.1",
+    "tslint": "^3.15.1",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run gulp\" \"npm run watch\" \"npm run tsc:w\"",
+    "postinstall": "typings install",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "typings": "typings",
+    "gulp": "gulp",
+    "watch": "gulp watch",
+    "ngc": "ngc"
+  }
 }

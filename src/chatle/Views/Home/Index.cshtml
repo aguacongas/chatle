@@ -3,77 +3,43 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="row">
-    <div class="col-xs-3">
-        <h6>CONNECTED</h6>
-        <ul data-bind="foreach: users">
-            <li>
-                <!-- ko if: $parent.userName !== id -->
-                <a href="#" data-bind="text: id, click: function() { $parent.showMessage($data); }"></a>
-                <!-- /ko -->
-                <!-- ko if: $parent.userName === id -->
-                @Html.ActionLink(User.Identity.Name, "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
-                <!-- /ko -->
-            </li>
-        </ul>
-    </div>
-    <div class="col-xs-6">
-        <!-- ko with: currentConv -->
-        <h6 data-bind="text: title"></h6>
-        <form class="form-inline">
-            <input id="message" class="form-control" />
-            <button type="submit" class="btn btn-default" data-bind="click: function(data, event) { sendMessage('#message'); }">send</button>
-        </form>
-        <ul data-bind="foreach: messages">
-            <li>
-                <small data-bind="text: from"></small><br />
-                <span data-bind="text: text"></span>
-            </li>
-        </ul>
-        <!-- /ko -->
-        <!-- ko ifnot: currentConv -->
-        <h1>WELCOME TO THIS REALLY SIMPLE CHAT</h1>
-        <!-- /ko -->
-    </div>
-    <div class="col-xs-3">
-        <h6>CONV</h6>
-        <ul data-bind="foreach: conversations">
-            <li>
-                <a href="#" data-bind="text: title, click: function() { $parent.showConversation($data); }"></a><br />
-                <span data-bind="text: messages() && messages()[0] ? messages()[0].text: null"></span>
-            </li>
-        </ul>
-    </div>
-</div>
+<chatle>Loading...</chatle>
 
 @section scripts
 {
 	<environment names="Development">
-		<script src="~/lib/knockout/dist/knockout.js"></script>
 		<script src="~/lib/signalr/jquery.signalR.js"></script>
-		<script src="~/js/chat.js"></script>
-	</environment>
+
+        <script src="~/lib/core-js/client/shim.js"></script>
+        <script src="~/lib/reflect-metadata/Reflect.js"></script>
+        <script src="~/lib/systemjs/dist/system.src.js"></script>
+        <script src="~/lib/zone.js/dist/zone.js"></script>
+    </environment>
 	<environment names="Staging,Production">
-		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.0.js"
-				asp-fallback-src="~/lib/knockout/dist/knockout.js"
-				asp-fallback-test="ko">
-		</script>
 		<script src="http://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.min.js"
 				asp-fallback.src="~/lib/signalr/jquery.signalR.min.js"
 				asp-fallback-test="window.jQuery && window.jQuery.connection">
 		</script>
-		<script src="~/js/chat.min.js"></script>	
+        <script src="~/lib/reflect-metadata/Reflect.js"></script>
+        <script src="~/lib/systemjs/dist/system.js"></script>
+        <script src="~/lib/zone.js/dist/zone.min.js"></script>
+
+        <script src="~/lib/core-js/client/shim.min.js"></script>        
 	</environment>
+    
 	<script src="/signalr/js"></script>
+    <script src="~/js/systemjs.config.js"></script>
+    <script>
+      System.import('app').catch(function(err){ console.error(err); });
+    </script>
 
 	<script>
-		$(document).ready(function () {
-			chatLe.userName = '@User.Identity.Name';
-			chatLe.chatAPI = '@Url.Action("Get", "Chat")'
-			chatLe.convAPI = '@Url.Action("CreateConversation", "Chat")'
-			chatLe.userAPI = '@Url.Action("Get", "User")'
-
-			chatLe.init(true);
-		});
+        window['chatleSetting'] = {
+            userName: '@User.Identity.Name',
+            chatAPI: '@Url.Action("Get", "Chat")',
+            convAPI: '@Url.Action("CreateConversation", "Chat")',
+            userAPI: '@Url.Action("Get", "User")',
+            debug: true
+        };
 	</script>
 }

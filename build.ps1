@@ -34,6 +34,7 @@ cd $PSScriptRoot
 
 $repoFolder = $PSScriptRoot
 $env:REPO_FOLDER = $repoFolder
+$env:KOREBUILD_DOTNET_VERSION="latest"
 
 $koreBuildZip="https://github.com/aspnet/KoreBuild/archive/dev.zip"
 if ($env:KOREBUILD_ZIP)
