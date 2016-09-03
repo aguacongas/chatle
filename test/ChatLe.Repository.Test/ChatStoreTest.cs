@@ -478,18 +478,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetAttendeesAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var conv = AddConv(store);
-                var attendees = await store.GetAttendeesAsync(conv);
-                Assert.NotNull(attendees);
-                Assert.NotNull(attendees.FirstOrDefault());
-            });
-        }
-
-        [Fact]
         public async Task DeleteUserAsyncTest()
         {
             await ExecuteTest(async store =>
@@ -502,7 +490,7 @@ namespace ChatLe.Repository.Test
                 context.Add(new Attendee()
                 {
                     ConversationId = conv.Id,
-                    UserId = "test"
+                    UserId = user.Id,
                 });
 
                 context.Add(user);
@@ -511,7 +499,7 @@ namespace ChatLe.Repository.Test
                     ConnectionDate = DateTime.Now,
                     ConnectionId = "test",
                     NotificationType = "test",
-                    UserId = "test"
+                    UserId = user.Id
                 });
 
                 context.SaveChanges();
@@ -522,6 +510,47 @@ namespace ChatLe.Repository.Test
                 Assert.Empty(context.Users);
 
                 Assert.NotEmpty(context.Conversations);
+            });
+        }
+
+        [Fact]
+        public async Task DeleteUserAsyncTest_all_attendees_disconnected()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var user = new ChatLeUser() { Id = "test" };
+
+                var context = store.Context;
+                
+                foreach(var attendee in conv.Attendees)
+                {
+                    attendee.IsConnected = false;
+                }
+
+                context.Add(new Attendee()
+                {
+                    ConversationId = conv.Id,
+                    UserId = user.Id,
+                });
+
+                context.Add(user);
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = user.Id
+                });
+
+                context.SaveChanges();
+
+                await store.DeleteUserAsync(user);
+
+                Assert.Empty(context.NotificationConnections);
+                Assert.Empty(context.Users);
+
+                Assert.Empty(context.Conversations);
             });
         }
     }

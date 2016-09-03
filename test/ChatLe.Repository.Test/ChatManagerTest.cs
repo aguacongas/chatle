@@ -187,14 +187,7 @@ namespace ChatLe.Repository.Test
                 new Conversation()
                 {
                     Id = "test",
-                }
-            });
-            storeMock.Setup(s => s.GetAttendeesAsync(It.IsAny<Conversation>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Attendee>()
-            {
-                new Attendee()
-                {
-                    ConversationId = "test",
-                    UserId = "test"
+                    Attendees = new List<Attendee<string>>{ new Attendee() }
                 }
             });
             storeMock.Setup(s => s.GetMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Message>()

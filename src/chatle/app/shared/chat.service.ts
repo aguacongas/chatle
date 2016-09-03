@@ -210,11 +210,12 @@ export class ChatService {
     }
 
     private onUserConnected(user: User) {
-        console.log("Chat Hub new user connected " + user.id);
+        console.log("Chat Hub new user connected: " + user.id);
+        this.userConnectedSubject.next(user);
     }
 
     private onUserDisconnected(id: string) {
-        console.log("Chat Hub user disconnected " + id);
+        console.log("Chat Hub user disconnected: " + id);
         if (id !== this.settings.userName) {
             this.userDisconnectedSubject.next(id);
         }

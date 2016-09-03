@@ -139,9 +139,7 @@ namespace ChatLe.Models
             {
                 var conv = await Store.GetConversationAsync(toConversationId, cancellationToken);
                 if (conv != null)
-                {
-                    // TODO: check if it's necessary when EF7 will be release
-                    await Store.GetAttendeesAsync(conv, cancellationToken);
+                {                    
                     // Add the message
                     message.ConversationId = toConversationId;
                     message.UserId = user.Id;
@@ -262,14 +260,9 @@ namespace ChatLe.Models
                 return null;
 
             var conversations = await Store.GetConversationsAsync(user.Id, cancellationToken);
-            // TODO: check if it's necessary when EF7 will be release
+            
             foreach (var conv in conversations)
             {
-                var attendees = await Store.GetAttendeesAsync(conv, cancellationToken);
-                foreach (var attendee in attendees)
-                    if (!conv.Attendees.Any(a => a.UserId.Equals(attendee.UserId)))
-                        conv.Attendees.Add(attendee);
-
                 var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
                 foreach (var message in messages)
                     if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))
