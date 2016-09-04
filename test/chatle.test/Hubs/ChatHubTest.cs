@@ -13,11 +13,37 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using Xunit;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Chatle.test.Controllers;
+using System.Threading.Tasks;
 
 namespace chatle.test.Hubs
 {
     public class ChatHubTest
     {
+		private static Mock<UserManager<TUser>> MockUserManager<TUser>(List<IUserValidator<TUser>> userValidators) where TUser : class
+		{
+			var store = new Mock<ITestUserStore<TUser>>();
+			var options = new Mock<IOptions<IdentityOptions>>();
+			var idOptions = new IdentityOptions();
+			idOptions.Lockout.AllowedForNewUsers = false;
+			options.Setup(o => o.Value).Returns(idOptions);
+			var pwdValidators = new List<PasswordValidator<TUser>>();
+			pwdValidators.Add(new PasswordValidator<TUser>());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
+			var userManager = new Mock<UserManager<TUser>>(store.Object, options.Object, new PasswordHasher<TUser>(),
+				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock<ILogger<UserManager<TUser>>>().Object);
+
+			return userManager;
+		}
+
 		public static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>, Mock<UserManager<ChatLeUser>>> a)
 		{
 			var mockHttpRequest = new Mock<HttpRequest>();
@@ -26,7 +52,15 @@ namespace chatle.test.Hubs
 			var mockChatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
 			var mockLoggerFactory = new Mock<ILoggerFactory>();
 			mockLoggerFactory.Setup(f => f.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger>().Object);
-			var mockUserManager = new Mock<UserManager<ChatLeUser>>();
+			
+			var userValidators = new List<IUserValidator<ChatLeUser>>();
+			var validator = new Mock<IUserValidator<ChatLeUser>>();
+			userValidators.Add(validator.Object);
+			var mockUserManager = MockUserManager<ChatLeUser>(userValidators);
+			mockUserManager.Setup(u => u.CreateAsync(It.IsAny<ChatLeUser>())).ReturnsAsync(IdentityResult.Success);
+			validator.Setup(v => v.ValidateAsync(mockUserManager.Object, It.IsAny<ChatLeUser>()))
+			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
+
 			var hub = new ChatHub(mockChatManager.Object, mockUserManager.Object, mockLoggerFactory.Object);
 			using (hub)
 			{
@@ -41,10 +75,10 @@ namespace chatle.test.Hubs
 			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
-				var mockIndentity = new Mock<IIdentity>();
-				mockClaims.SetupGet(c => c.Claims).Returns(new List<Claim>());
-				mockIndentity.SetupGet(i => i.IsAuthenticated).Returns(true);				
-				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
+				var identity = new ClaimsIdentity("test");
+
+				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
+				mockClaims.SetupGet(c => c.Identity).Returns(identity);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
 
 				var mockGroups = new Mock<IGroupManager>();
@@ -66,10 +100,11 @@ namespace chatle.test.Hubs
 			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
-				var mockIndentity = new Mock<IIdentity>();
-				mockClaims.SetupGet(c => c.Claims).Returns(new List<Claim>{ new Claim("guess", "true")});
-				mockIndentity.SetupGet(i => i.IsAuthenticated).Returns(true);				
-				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
+				var identity = new ClaimsIdentity("test");
+				identity.AddClaim(new Claim("guess", "true"));
+
+				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
+				mockClaims.SetupGet(c => c.Identity).Returns(identity);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
 				mockUserManager.Setup(u => u.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
 				mockUserManager.Setup(u => u.CreateAsync(It.IsAny<ChatLeUser>())).ReturnsAsync(new IdentityResult());
@@ -93,9 +128,10 @@ namespace chatle.test.Hubs
 			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
-				var mockIndentity = new Mock<IIdentity>();
-				mockIndentity.SetupGet(i => i.IsAuthenticated).Returns(true);
-				mockClaims.SetupGet(c => c.Identity).Returns(mockIndentity.Object);
+				var identity = new ClaimsIdentity("test");
+				
+				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
+				mockClaims.SetupGet(c => c.Identity).Returns(identity);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
 
 				var mockGroups = new Mock<IGroupManager>();
