@@ -100,10 +100,21 @@ namespace ChatLe.Repository.Test
         static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
         {  
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase();            
+            builder.UseInMemoryDatabase();
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
                       
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
-            {
+            {            
                 var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
                 await action(store);
             }
@@ -528,13 +539,14 @@ namespace ChatLe.Repository.Test
                     attendee.IsConnected = false;
                 }
 
+                context.Add(user);
+                
                 context.Add(new Attendee()
                 {
                     ConversationId = conv.Id,
                     UserId = user.Id,
                 });
 
-                context.Add(user);
                 context.NotificationConnections.Add(new NotificationConnection()
                 {
                     ConnectionDate = DateTime.Now,

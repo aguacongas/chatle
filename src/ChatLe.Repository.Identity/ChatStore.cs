@@ -359,6 +359,7 @@ namespace ChatLe.Models
                           orderby m.Date descending                          
                           select c).Include(c => c.Attendees).Distinct().ToListAsync();
         }
+
         /// <summary>
         /// Deletes a user 
         /// </summary>
@@ -377,23 +378,22 @@ namespace ChatLe.Models
             {
                 attendee.IsConnected = false;
                 var conversation = await Conversations
-                    .Include(c => c.Attendees)
                     .FirstOrDefaultAsync(c => c.Id.Equals(attendee.ConversationId));
                 
-                conversations.Add(conversation);
+                if (conversation != null) 
+                {
+                    if(Attendees.All(a => a.ConversationId.Equals(conversation.Id) && !a.IsConnected))
+                        conversations.Add(conversation);
+                }
             }
             
-            var conversationsToDelete = conversations.Where(c => c.Attendees.All(a => !a.IsConnected));
-            foreach (var conversation in conversationsToDelete)
+            foreach (var conversation in conversations)
             {
                 Messages.RemoveRange(await Messages.Where(m => m.ConversationId.Equals(conversation.Id)).ToArrayAsync());
-                foreach(var attendee in conversation.Attendees)
-                {
-                    Attendees.Remove(attendee as TAttendee);
-                }                    
+                Attendees.RemoveRange(await Attendees.Where(a => a.ConversationId.Equals(conversation.Id)).ToArrayAsync());
+                Conversations.Remove(conversation);
             }
-            
-            Conversations.RemoveRange(conversationsToDelete);
+                            
             NotificationConnections.RemoveRange(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
