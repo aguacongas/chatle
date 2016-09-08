@@ -46,7 +46,7 @@ export class ContactsComponent implements OnInit {
     private removeUser(id: string) {
         let index = this.users.findIndex(user => user.id === id);
         if (index !== -1) {
-            this.users.splice(index);
+            this.users.splice(index, 1);
         }
     }
 

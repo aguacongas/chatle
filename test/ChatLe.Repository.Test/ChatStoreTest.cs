@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Repository.Test
 {
@@ -115,10 +117,15 @@ namespace ChatLe.Repository.Test
                       
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
                 var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
                 await action(store);
             }
         }
+
 
         [Fact]
         public async Task CreateMessageAsyncTest()
@@ -257,6 +264,67 @@ namespace ChatLe.Repository.Test
             {
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateNotificationConnectionAsync(null));
             });
+        }
+
+        [Fact]
+        public async Task CreateNotificationConnectionAsynctwice_should_not_throw()
+        {
+            var connection = new NotificationConnection
+            {
+                ConnectionId = "test",
+                NotificationType = "test",
+                UserId = "test",
+                ConnectionDate = DateTime.Now
+            };
+
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("Filename=./test.db");
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
+                      
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                
+                await store.CreateNotificationConnectionAsync(connection);
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                await store.DeleteNotificationConnectionAsync(c);     
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                if (c == null)
+                    await store.CreateNotificationConnectionAsync(connection);     
+            }
         }
 
         [Fact]
