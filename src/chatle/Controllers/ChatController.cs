@@ -71,6 +71,9 @@ namespace ChatLe.Controllers
         {
             var userName = HttpContext.User.Identity.Name;
             var conversations = await _chatManager.GetConversationsAsync(userName);
+            if (conversations == null)
+                return null;
+                
             var length = conversations.Count();
             var users = new List<ChatLeUser>(length);
             var conversationsVM = new List<ConversationViewModel>(length);

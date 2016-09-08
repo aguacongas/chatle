@@ -1,0 +1,894 @@
+Project ChatLe.Repository (.NETCoreApp,Version=v1.0) was previously compiled. Skipping compilation.
+Project ChatLe.Repository.Identity (.NETCoreApp,Version=v1.0) was previously compiled. Skipping compilation.
+Project ChatLe.Repository.Identity.Sqlite (.NETCoreApp,Version=v1.0) was previously compiled. Skipping compilation.
+Project ChatLe.Repository.Identity.SqlServer (.NETCoreApp,Version=v1.0) was previously compiled. Skipping compilation.
+Project chatle (.NETCoreApp,Version=v1.0) was previously compiled. Skipping compilation.
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (1 562ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (890ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (285ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "n"."ConnectionId", "n"."NotificationType", "n"."ChatLeUserId", "n"."ConnectionDate", "n"."Discriminator", "n"."UserId"
+      FROM "NotificationConnections" AS "n"
+      WHERE "n"."Discriminator" = 'NotificationConnection'
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (122ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "a"."ConversationId", "a"."UserId", "a"."Discriminator", "a"."IsConnected"
+      FROM "Attendees" AS "a"
+      WHERE "a"."Discriminator" = 'Attendee'
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (114ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "m"."Id", "m"."ConversationId", "m"."Date", "m"."Discriminator", "m"."Text", "m"."UserId"
+      FROM "Messages" AS "m"
+      WHERE "m"."Discriminator" = 'Message'
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (106ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "c"."Id", "c"."Discriminator"
+      FROM "Conversations" AS "c"
+      WHERE "c"."Discriminator" = 'Conversation'
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (93ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."PasswordHash" IS NULL
+[100m[32minfo[39m[0m: Microsoft.Extensions.DependencyInjection.DataProtectionServices[0]
+      User profile is available. Using '/Users/olivierlefebvre/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+Hosting environment: Development
+Content root path: /Users/olivierlefebvre/Documents/chatle/src/chatle
+Now listening on: http://localhost:5000
+Application started. Press Ctrl+C to shut down.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/  
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (2 199ms) [Parameters=[@__id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."Id" = @__id_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (2 199ms) [Parameters=[@__id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."Id" = @__id_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.Application signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.Application signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.External signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.External signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.TwoFactorUserId signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.TwoFactorUserId signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[7]
+      Identity.Application was not authenticated. Failure message: No principal.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[7]
+      Identity.Application was not authenticated. Failure message: No principal.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.HomeController.Index (chatle) with arguments ((null)) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.HomeController.Index (chatle) with arguments ((null)) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.RedirectToRouteResult[1]
+      Executing RedirectToRouteResult, redirecting to /Account from route (null).
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.RedirectToRouteResult[1]
+      Executing RedirectToRouteResult, redirecting to /Account from route (null).
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.HomeController.Index (chatle) in 216.0641ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.HomeController.Index (chatle) in 216.1319ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 2140.6749ms 302 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 1529.2102ms 302 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/Account  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.AccountController.Index (chatle) with arguments (, ) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor[1]
+      Executing ViewResult, running view at path /Views/Account/Index.cshtml.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.AccountController.Index (chatle) in 9814.5583ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 9830.3069ms 200 text/html; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 POST http://localhost:5000/Account/Guess application/x-www-form-urlencoded 196
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.AccountController.Guess (chatle) with arguments (ChatLe.ViewModels.GuessViewModel, ) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (195ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (756ms) [Parameters=[@p0='?', @p1='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?', @p7='?', @p8='?', @p9='?', @p10='?', @p11='?', @p12='?', @p13='?', @p14='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AspNetUsers" ("Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14);
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (62ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (553ms) [Parameters=[@p0='?', @p1='?', @p2='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AspNetUserClaims" ("ClaimType", "ClaimValue", "UserId")
+      VALUES (@p0, @p1, @p2);
+      SELECT "Id"
+      FROM "AspNetUserClaims"
+      WHERE changes() = 1 AND "Id" = last_insert_rowid();
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (33ms) [Parameters=[@p14='?', @p0='?', @p1='?', @p15='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?', @p7='?', @p8='?', @p9='?', @p10='?', @p11='?', @p12='?', @p13='?'], CommandType='Text', CommandTimeout='30']
+      UPDATE "AspNetUsers" SET "AccessFailedCount" = @p0, "ConcurrencyStamp" = @p1, "Email" = @p2, "EmailConfirmed" = @p3, "LockoutEnabled" = @p4, "LockoutEnd" = @p5, "NormalizedEmail" = @p6, "NormalizedUserName" = @p7, "PasswordHash" = @p8, "PhoneNumber" = @p9, "PhoneNumberConfirmed" = @p10, "SecurityStamp" = @p11, "TwoFactorEnabled" = @p12, "UserName" = @p13
+      WHERE "Id" = @p14 AND "ConcurrencyStamp" = @p15;
+      SELECT changes();
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (127ms) [Parameters=[@__userId_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "role"."Name"
+      FROM "AspNetUserRoles" AS "userRole"
+      INNER JOIN "AspNetRoles" AS "role" ON "userRole"."RoleId" = "role"."Id"
+      WHERE "userRole"."UserId" = @__userId_0
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (63ms) [Parameters=[@__user_Id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "uc"."Id", "uc"."ClaimType", "uc"."ClaimValue", "uc"."UserId"
+      FROM "AspNetUserClaims" AS "uc"
+      WHERE "uc"."UserId" = @__user_Id_0
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[10]
+      AuthenticationScheme: Identity.Application signed in.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.RedirectToActionResult[1]
+      Executing RedirectResult, redirecting to /.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.AccountController.Guess (chatle) in 918.5807ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 923.2765ms 302 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.HomeController.Index (chatle) with arguments ((null)) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor[1]
+      Executing ViewResult, running view at path /Views/Home/Index.cshtml.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.HomeController.Index (chatle) in 293.8207ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 297.8748ms 200 text/html; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/js  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 426.6385ms 200 application/javascript; charset=UTF-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/negotiate?clientProtocol=1.5&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&_=1473282487422 application/json; charset=UTF-8 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 265.9479ms 200 application/json; charset=UTF-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionToken=CfDJ8O8nQnOHAPBHmVPy1dZvcDwjOArxjpnJvrzzYVbpaE0s6Xz9jriYiumndLRhVx43%2BPM%2BuovVSlhbEFGr%2FF0iCSG2s1BKBKUc2v5BSsIENxMl9ZpXF8PNcnWtSC744vFOibk%2BchJyLf%2FtScXyezAtMa5lJnNV2x28udRrTh5MXyod&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&tid=9  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.TransportHeartbeat[0]
+      Connection 1cc3ea9e-5a3e-420e-bd7b-36bf9f24c815 is New.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/start?transport=webSockets&clientProtocol=1.5&connectionToken=CfDJ8O8nQnOHAPBHmVPy1dZvcDwjOArxjpnJvrzzYVbpaE0s6Xz9jriYiumndLRhVx43%2BPM%2BuovVSlhbEFGr%2FF0iCSG2s1BKBKUc2v5BSsIENxMl9ZpXF8PNcnWtSC744vFOibk%2BchJyLf%2FtScXyezAtMa5lJnNV2x28udRrTh5MXyod&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&_=1473282487423 application/json; charset=UTF-8 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: ChatLe.Hubs.ChatHub[0]
+      constructor
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (78ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: ChatLe.Hubs.ChatHub[0]
+      OnConnected test
+[100m[32minfo[39m[0m: ChatLe.Models.ChatManager[0]
+      AddConnectionIdAsync test 1cc3ea9e-5a3e-420e-bd7b-36bf9f24c815 signalR
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (229ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."UserName" = @__userName_0
+      ORDER BY "u"."Id"
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (105ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "n"."ConnectionId", "n"."NotificationType", "n"."ChatLeUserId", "n"."ConnectionDate", "n"."Discriminator", "n"."UserId"
+      FROM "NotificationConnections" AS "n"
+      WHERE "n"."Discriminator" IN ('NotificationConnection', 'NotificationConnection<string>') AND EXISTS (
+          SELECT 1
+          FROM "AspNetUsers" AS "u"
+          WHERE ("u"."UserName" = @__userName_0) AND ("n"."ChatLeUserId" = "u"."Id")
+          LIMIT 1)
+      ORDER BY "n"."ChatLeUserId"
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (55ms) [Parameters=[@__connectionId_0='?', @__notificationType_1='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "c"."ConnectionId", "c"."NotificationType", "c"."ChatLeUserId", "c"."ConnectionDate", "c"."Discriminator", "c"."UserId"
+      FROM "NotificationConnections" AS "c"
+      WHERE ("c"."Discriminator" = 'NotificationConnection') AND (("c"."ConnectionId" = @__connectionId_0) AND ("c"."NotificationType" = @__notificationType_1))
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (107ms) [Parameters=[@p0='?', @p1='?', @p2='?', @p3='?', @p4='?', @p5='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "NotificationConnections" ("ConnectionId", "NotificationType", "ChatLeUserId", "ConnectionDate", "Discriminator", "UserId")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5);
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 421.2421ms 200 application/json; charset=UTF-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/api/users  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/api/chat  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.UserController.Get (chatle) with arguments (0) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.ChatController.Get (chatle) with arguments ((null)) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (64ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."UserName" = @__userName_0
+      ORDER BY "u"."Id"
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (22ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "n"."ConnectionId", "n"."NotificationType", "n"."ChatLeUserId", "n"."ConnectionDate", "n"."Discriminator", "n"."UserId"
+      FROM "NotificationConnections" AS "n"
+      WHERE "n"."Discriminator" IN ('NotificationConnection', 'NotificationConnection<string>') AND EXISTS (
+          SELECT 1
+          FROM "AspNetUsers" AS "u"
+          WHERE ("u"."UserName" = @__userName_0) AND ("n"."ChatLeUserId" = "u"."Id")
+          LIMIT 1)
+      ORDER BY "n"."ChatLeUserId"
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'GroupBy([nc].UserId, new <>f__AnonymousType4`2(UserId = [nc].UserId, ConnectionDate = [nc].ConnectionDate))' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'GroupBy([nc].UserId, new <>f__AnonymousType4`2(UserId = [nc].UserId, ConnectionDate = [nc].ConnectionDate))' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Max()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Count()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (203ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "nc"."UserId", "nc"."ConnectionDate"
+      FROM "NotificationConnections" AS "nc"
+      WHERE "nc"."Discriminator" = 'NotificationConnection'
+      ORDER BY "nc"."UserId"
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'GroupBy([nc].UserId, new <>f__AnonymousType4`2(UserId = [nc].UserId, ConnectionDate = [nc].ConnectionDate))' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'GroupBy([nc].UserId, new <>f__AnonymousType4`2(UserId = [nc].UserId, ConnectionDate = [nc].ConnectionDate))' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'orderby {from <>f__AnonymousType4`2 x in [g] select [x].ConnectionDate => Max()} desc' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Max()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Max()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Skip(__p_0)' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[93mwarn[39m[0m: Microsoft.EntityFrameworkCore.Query.RelationalQueryCompilationContextFactory[8]
+      The LINQ expression 'Take(__p_1)' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider.
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (98ms) [Parameters=[@__userId_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT DISTINCT "c"."Id", "c"."Discriminator"
+      FROM "Conversations" AS "c"
+      INNER JOIN "Attendees" AS "a" ON "c"."Id" = "a"."ConversationId"
+      INNER JOIN "Messages" AS "m" ON "c"."Id" = "m"."ConversationId"
+      WHERE ("c"."Discriminator" = 'Conversation') AND ("a"."UserId" = @__userId_0)
+      ORDER BY "c"."Id"
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor[1]
+      Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext.
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.ChatController.Get (chatle) in 265.704ms
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (70ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "nc"."UserId", "nc"."ConnectionDate"
+      FROM "NotificationConnections" AS "nc"
+      WHERE "nc"."Discriminator" = 'NotificationConnection'
+      ORDER BY "nc"."UserId"
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 271.4615ms 200 application/json; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (58ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "a"."Id", "a"."AccessFailedCount", "a"."ConcurrencyStamp", "a"."Email", "a"."EmailConfirmed", "a"."LockoutEnabled", "a"."LockoutEnd", "a"."NormalizedEmail", "a"."NormalizedUserName", "a"."PasswordHash", "a"."PhoneNumber", "a"."PhoneNumberConfirmed", "a"."SecurityStamp", "a"."TwoFactorEnabled", "a"."UserName"
+      FROM "AspNetUsers" AS "a"
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor[1]
+      Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.UserController.Get (chatle) in 346.0026ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 351.7223ms 200 application/json; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 POST http://localhost:5000/Account/LogOff application/x-www-form-urlencoded 233
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[1]
+      Authorization was successful for user: test.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.AccountController.LogOff (chatle) with arguments (Microsoft.AspNetCore.SignalR.Infrastructure.ConnectionManager, ) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (80ms) [Parameters=[@__id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."Id" = @__id_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (61ms) [Parameters=[@__userId_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT DISTINCT "c"."Id", "c"."Discriminator"
+      FROM "Conversations" AS "c"
+      INNER JOIN "Attendees" AS "a" ON "c"."Id" = "a"."ConversationId"
+      INNER JOIN "Messages" AS "m" ON "c"."Id" = "m"."ConversationId"
+      WHERE ("c"."Discriminator" = 'Conversation') AND ("a"."UserId" = @__userId_0)
+      ORDER BY "c"."Id"
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (51ms) [Parameters=[@__user_Id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "n"."ConnectionId", "n"."NotificationType", "n"."ChatLeUserId", "n"."ConnectionDate", "n"."Discriminator", "n"."UserId"
+      FROM "NotificationConnections" AS "n"
+      WHERE ("n"."Discriminator" = 'NotificationConnection') AND ("n"."UserId" = @__user_Id_0)
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (111ms) [Parameters=[@p0='?', @p1='?'], CommandType='Text', CommandTimeout='30']
+      DELETE FROM "AspNetUsers"
+      WHERE "Id" = @p0 AND "ConcurrencyStamp" = @p1;
+      SELECT changes();
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (20ms) [Parameters=[@p0='?', @p1='?'], CommandType='Text', CommandTimeout='30']
+      DELETE FROM "NotificationConnections"
+      WHERE "ConnectionId" = @p0 AND "NotificationType" = @p1;
+      SELECT changes();
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.Application signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.External signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[11]
+      AuthenticationScheme: Identity.TwoFactorUserId signed out.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.RedirectToActionResult[1]
+      Executing RedirectResult, redirecting to /Account.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.AccountController.LogOff (chatle) in 131.9367ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 133.8543ms 302 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/Account  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.AccountController.Index (chatle) with arguments (, ) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor[1]
+      Executing ViewResult, running view at path /Views/Account/Index.cshtml.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.AccountController.Index (chatle) in 6.0783ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 7.7397ms 200 text/html; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 POST http://localhost:5000/signalr/abort?transport=webSockets&clientProtocol=1.5&connectionToken=CfDJ8O8nQnOHAPBHmVPy1dZvcDwjOArxjpnJvrzzYVbpaE0s6Xz9jriYiumndLRhVx43%2BPM%2BuovVSlhbEFGr%2FF0iCSG2s1BKBKUc2v5BSsIENxMl9ZpXF8PNcnWtSC744vFOibk%2BchJyLf%2FtScXyezAtMa5lJnNV2x28udRrTh5MXyod&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D application/json; charset=UTF-8 0
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 5.4551ms 403 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      CloseSocket(1cc3ea9e-5a3e-420e-bd7b-36bf9f24c815)
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 7356.8523ms 101 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 POST http://localhost:5000/Account/Guess application/x-www-form-urlencoded 196
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.AccountController.Guess (chatle) with arguments (ChatLe.ViewModels.GuessViewModel, ) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (246ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (2 285ms) [Parameters=[@p0='?', @p1='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?', @p7='?', @p8='?', @p9='?', @p10='?', @p11='?', @p12='?', @p13='?', @p14='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AspNetUsers" ("Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14);
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (57ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (294ms) [Parameters=[@p0='?', @p1='?', @p2='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AspNetUserClaims" ("ClaimType", "ClaimValue", "UserId")
+      VALUES (@p0, @p1, @p2);
+      SELECT "Id"
+      FROM "AspNetUserClaims"
+      WHERE changes() = 1 AND "Id" = last_insert_rowid();
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (46ms) [Parameters=[@p14='?', @p0='?', @p1='?', @p15='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?', @p7='?', @p8='?', @p9='?', @p10='?', @p11='?', @p12='?', @p13='?'], CommandType='Text', CommandTimeout='30']
+      UPDATE "AspNetUsers" SET "AccessFailedCount" = @p0, "ConcurrencyStamp" = @p1, "Email" = @p2, "EmailConfirmed" = @p3, "LockoutEnabled" = @p4, "LockoutEnd" = @p5, "NormalizedEmail" = @p6, "NormalizedUserName" = @p7, "PasswordHash" = @p8, "PhoneNumber" = @p9, "PhoneNumberConfirmed" = @p10, "SecurityStamp" = @p11, "TwoFactorEnabled" = @p12, "UserName" = @p13
+      WHERE "Id" = @p14 AND "ConcurrencyStamp" = @p15;
+      SELECT changes();
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (80ms) [Parameters=[@__userId_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "role"."Name"
+      FROM "AspNetUserRoles" AS "userRole"
+      INNER JOIN "AspNetRoles" AS "role" ON "userRole"."RoleId" = "role"."Id"
+      WHERE "userRole"."UserId" = @__userId_0
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (78ms) [Parameters=[@__user_Id_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "uc"."Id", "uc"."ClaimType", "uc"."ClaimValue", "uc"."UserId"
+      FROM "AspNetUserClaims" AS "uc"
+      WHERE "uc"."UserId" = @__user_Id_0
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[10]
+      AuthenticationScheme: Identity.Application signed in.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.RedirectToActionResult[1]
+      Executing RedirectResult, redirecting to /.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.AccountController.Guess (chatle) in 302.2497ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 302.6248ms 302 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[1]
+      Executing action method ChatLe.Controllers.HomeController.Index (chatle) with arguments ((null)) - ModelState is Valid
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor[1]
+      Executing ViewResult, running view at path /Views/Home/Index.cshtml.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker[2]
+      Executed action ChatLe.Controllers.HomeController.Index (chatle) in 1.8345ms
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 2.5654ms 200 text/html; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/js  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 1.1395ms 200 application/javascript; charset=UTF-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/negotiate?clientProtocol=1.5&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&_=1473282500212 application/json; charset=UTF-8 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 1.0495ms 200 application/json; charset=UTF-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionToken=CfDJ8O8nQnOHAPBHmVPy1dZvcDxfckPbMbA2%2BfXBuBW6on8yC96Xuz1Sb2tMaZsmDqhtdgB3AocHPrPyRWNk3ZSB3vMQgFyIsv8C5xacYLolhXzGceUjX7AV4ndZYVlkts1rwMqktcMpu8DiMBB5T%2BSpVC1F8bJpkOBvCrdCDsa4J%2BSQ&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&tid=2  
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.TransportHeartbeat[0]
+      Connection 3c1c336a-ede3-4c5d-ac3e-85c5afbb3b43 is New.
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]
+      Request starting HTTP/1.1 GET http://localhost:5000/signalr/start?transport=webSockets&clientProtocol=1.5&connectionToken=CfDJ8O8nQnOHAPBHmVPy1dZvcDxfckPbMbA2%2BfXBuBW6on8yC96Xuz1Sb2tMaZsmDqhtdgB3AocHPrPyRWNk3ZSB3vMQgFyIsv8C5xacYLolhXzGceUjX7AV4ndZYVlkts1rwMqktcMpu8DiMBB5T%2BSpVC1F8bJpkOBvCrdCDsa4J%2BSQ&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&_=1473282500213 application/json; charset=UTF-8 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware[3]
+      HttpContext.User merged via AutomaticAuthentication from authenticationScheme: Identity.Application.
+[100m[32minfo[39m[0m: ChatLe.Hubs.ChatHub[0]
+      constructor
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (59ms) [Parameters=[@__normalizedUserName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."NormalizedUserName" = @__normalizedUserName_0
+      LIMIT 1
+[100m[32minfo[39m[0m: ChatLe.Hubs.ChatHub[0]
+      OnConnected test
+[100m[32minfo[39m[0m: ChatLe.Models.ChatManager[0]
+      AddConnectionIdAsync test 3c1c336a-ede3-4c5d-ac3e-85c5afbb3b43 signalR
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (88ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."AccessFailedCount", "u"."ConcurrencyStamp", "u"."Email", "u"."EmailConfirmed", "u"."LockoutEnabled", "u"."LockoutEnd", "u"."NormalizedEmail", "u"."NormalizedUserName", "u"."PasswordHash", "u"."PhoneNumber", "u"."PhoneNumberConfirmed", "u"."SecurityStamp", "u"."TwoFactorEnabled", "u"."UserName"
+      FROM "AspNetUsers" AS "u"
+      WHERE "u"."UserName" = @__userName_0
+      ORDER BY "u"."Id"
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (16ms) [Parameters=[@__userName_0='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "n"."ConnectionId", "n"."NotificationType", "n"."ChatLeUserId", "n"."ConnectionDate", "n"."Discriminator", "n"."UserId"
+      FROM "NotificationConnections" AS "n"
+      WHERE "n"."Discriminator" IN ('NotificationConnection', 'NotificationConnection<string>') AND EXISTS (
+          SELECT 1
+          FROM "AspNetUsers" AS "u"
+          WHERE ("u"."UserName" = @__userName_0) AND ("n"."ChatLeUserId" = "u"."Id")
+          LIMIT 1)
+      ORDER BY "n"."ChatLeUserId"
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (121ms) [Parameters=[@__connectionId_0='?', @__notificationType_1='?'], CommandType='Text', CommandTimeout='30']
+      SELECT "c"."ConnectionId", "c"."NotificationType", "c"."ChatLeUserId", "c"."ConnectionDate", "c"."Discriminator", "c"."UserId"
+      FROM "NotificationConnections" AS "c"
+      WHERE ("c"."Discriminator" = 'NotificationConnection') AND (("c"."ConnectionId" = @__connectionId_0) AND ("c"."NotificationType" = @__notificationType_1))
+      LIMIT 1
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (71ms) [Parameters=[@p1='?', @p2='?', @p0='?'], CommandType='Text', CommandTimeout='30']
+      UPDATE "NotificationConnections" SET "ChatLeUserId" = @p0
+      WHERE "ConnectionId" = @p1 AND "NotificationType" = @p2;
+      SELECT changes();
+[101m[30mfail[39m[0m: Microsoft.EntityFrameworkCore.DbContext[1]
+      An exception occurred in the database while saving changes.
+      Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.
+         at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ThrowAggregateUpdateConcurrencyException(Int32 commandIndex, Int32 expectedRowsAffected, Int32 rowsAffected)
+         at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeResultSetWithoutPropagationAsync>d__6.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeAsync>d__2.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.<ExecuteAsync>d__32.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.<ExecuteAsync>d__1.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__47.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__45.MoveNext()
+      --- End of stack trace from previous location where exception was thrown ---
+         at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+         at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+         at Microsoft.EntityFrameworkCore.DbContext.<SaveChangesAsync>d__30.MoveNext()
+Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ThrowAggregateUpdateConcurrencyException(Int32 commandIndex, Int32 expectedRowsAffected, Int32 rowsAffected)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeResultSetWithoutPropagationAsync>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeAsync>d__2.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.<ExecuteAsync>d__32.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.<ExecuteAsync>d__1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__47.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__45.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.DbContext.<SaveChangesAsync>d__30.MoveNext()
+[100m[93mwarn[39m[0m: Microsoft.AspNetCore.SignalR.Hubs.HubDispatcher[0]
+      Exception thrown by Task
+System.AggregateException: One or more errors occurred. (Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.) ---> Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ThrowAggregateUpdateConcurrencyException(Int32 commandIndex, Int32 expectedRowsAffected, Int32 rowsAffected)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeResultSetWithoutPropagationAsync>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeAsync>d__2.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.<ExecuteAsync>d__32.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.<ExecuteAsync>d__1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__47.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__45.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.DbContext.<SaveChangesAsync>d__30.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at ChatLe.Models.ChatStore`7.<CreateNotificationConnectionAsync>d__24.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository.Identity/ChatStore.cs:line 255
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Models.ChatManager`6.<AddConnectionIdAsync>d__10.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository/ChatManager.cs:line 88
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Hubs.ChatHub.<OnConnected>d__13.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/chatle/Hubs/ChatHub.cs:line 76
+   --- End of inner exception stack trace ---
+---> (Inner Exception #0) Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ThrowAggregateUpdateConcurrencyException(Int32 commandIndex, Int32 expectedRowsAffected, Int32 rowsAffected)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeResultSetWithoutPropagationAsync>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeAsync>d__2.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.<ExecuteAsync>d__32.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.<ExecuteAsync>d__1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__47.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__45.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.DbContext.<SaveChangesAsync>d__30.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at ChatLe.Models.ChatStore`7.<CreateNotificationConnectionAsync>d__24.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository.Identity/ChatStore.cs:line 255
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Models.ChatManager`6.<AddConnectionIdAsync>d__10.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository/ChatManager.cs:line 88
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Hubs.ChatHub.<OnConnected>d__13.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/chatle/Hubs/ChatHub.cs:line 76<---
+
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (95ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA foreign_keys=ON;
+[100m[32minfo[39m[0m: Microsoft.EntityFrameworkCore.Storage.Internal.RelationalCommandBuilderFactory[1]
+      Executed DbCommand (79ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+[101m[30mfail[39m[0m: Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware[0]
+      An unhandled exception has occurred while executing the request
+Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962 for information on understanding and handling optimistic concurrency exceptions.
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ThrowAggregateUpdateConcurrencyException(Int32 commandIndex, Int32 expectedRowsAffected, Int32 rowsAffected)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeResultSetWithoutPropagationAsync>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.<ConsumeAsync>d__2.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.<ExecuteAsync>d__32.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.<ExecuteAsync>d__1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__47.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<SaveChangesAsync>d__45.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.EntityFrameworkCore.DbContext.<SaveChangesAsync>d__30.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at ChatLe.Models.ChatStore`7.<CreateNotificationConnectionAsync>d__24.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository.Identity/ChatStore.cs:line 255
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Models.ChatManager`6.<AddConnectionIdAsync>d__10.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/ChatLe.Repository/ChatManager.cs:line 88
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ChatLe.Hubs.ChatHub.<OnConnected>d__13.MoveNext() in /Users/olivierlefebvre/Documents/chatle/src/chatle/Hubs/ChatHub.cs:line 76
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.SignalR.PersistentConnection.<ProcessStartRequest>d__77.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.SignalR.PersistentConnection.<ProcessRequestCore>d__62.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Builder.Extensions.MapMiddleware.<Invoke>d__3.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.<Invoke>d__4.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware`1.<Invoke>d__18.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.MigrationsEndPointMiddleware.<Invoke>d__5.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.DatabaseErrorPageMiddleware.<Invoke>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.DatabaseErrorPageMiddleware.<Invoke>d__6.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.<Invoke>d__6.MoveNext()
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 448.0749ms 500 text/html; charset=utf-8
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      CompleteRequest (1cc3ea9e-5a3e-420e-bd7b-36bf9f24c815)
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      CompleteRequest (3c1c336a-ede3-4c5d-ac3e-85c5afbb3b43)
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      CloseSocket(3c1c336a-ede3-4c5d-ac3e-85c5afbb3b43)
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.Hosting.Internal.WebHost[2]
+      Request finished in 10671.1219ms 101 
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.TransportHeartbeat[0]
+      Dispose(). Closing all connections
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      End(3c1c336a-ede3-4c5d-ac3e-85c5afbb3b43)
+[100m[32minfo[39m[0m: Microsoft.AspNetCore.SignalR.Transports.WebSocketTransport[0]
+      End(1cc3ea9e-5a3e-420e-bd7b-36bf9f24c815)

@@ -1,19 +1,26 @@
-﻿using System.Threading.Tasks;
-using ChatLe.ViewModels;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
 using ChatLe.Models;
+using ChatLe.ViewModels;
 
 namespace ChatLe.Controllers
 {
+    public class Role
+    {
+        public string Name { get; set; }
+    }
+
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ChatLeUser> userManager, SignInManager<ChatLeUser> signInManager, IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
+        public AccountController(UserManager<ChatLeUser> userManager, 
+            SignInManager<ChatLeUser> signInManager,
+            IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -21,6 +28,7 @@ namespace ChatLe.Controllers
         }
 
         public UserManager<ChatLeUser> UserManager { get; private set; }
+
         public SignInManager<ChatLeUser> SignInManager { get; private set; }
 
         public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> ChatManager { get; private set; }
@@ -69,7 +77,9 @@ namespace ChatLe.Controllers
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
                     await SignInManager.SignInAsync(user, isPersistent: false);
+
                     return RedirectToAction("Index", "Home");
                 }
                 else

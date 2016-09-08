@@ -193,7 +193,9 @@ namespace ChatLe.Models
         public virtual async Task<TConversation> GetConversationAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Conversations.FirstOrDefaultAsync(c => c.Id.Equals(convId));
+            return await Conversations
+                .Include(c => c.Attendees)
+                .FirstOrDefaultAsync(c => c.Id.Equals(convId));
         }
         /// <summary>
         /// Gets messages in a conversation
@@ -313,7 +315,7 @@ namespace ChatLe.Models
         public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType == notificationType).ToListAsync();
+            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType.Equals(notificationType)).ToListAsync();
         }
         /// <summary>
         /// Check if a user has connection
@@ -330,7 +332,7 @@ namespace ChatLe.Models
         /// <param name="conv">the conversation</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
-        public virtual async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<IEnumerable<TAttendee>>GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
@@ -357,8 +359,9 @@ namespace ChatLe.Models
                               on c.Id equals m.ConversationId
                           where a.UserId.Equals(userId)
                           orderby m.Date descending                          
-                          select c).Distinct().ToListAsync();
+                          select c).Include(c => c.Attendees).Distinct().ToListAsync();
         }
+
         /// <summary>
         /// Deletes a user 
         /// </summary>
@@ -371,10 +374,30 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            Messages.RemoveRange(await Messages.Where(m => m.UserId.Equals(user.Id)).ToArrayAsync());
-            Attendees.RemoveRange(await Attendees.Where(a => a.UserId.Equals(user.Id)).ToArrayAsync());
-            Conversations.RemoveRange(await Conversations.Where(c => c.Attendees.Count < 2).ToArrayAsync());
-            NotificationConnections.RemoveRange(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
+            var conversations = await GetConversationsAsync(user.Id, cancellationToken);
+            var conversationsToDelete = new List<TConversation>();
+            
+            foreach(var conversation in conversations)
+            {
+                foreach(var attendee in conversation.Attendees) 
+                {
+                    if (attendee.UserId.Equals(user.Id))
+                        attendee.IsConnected = false;                    
+                }
+
+                if(conversation.Attendees.All(a => a.IsConnected.Equals(false)))
+                    conversationsToDelete.Add(conversation);                    
+            }            
+            
+            foreach (var conversation in conversationsToDelete)
+            {
+                Messages.RemoveRange(await Messages.Where(m => m.ConversationId.Equals(conversation.Id)).ToArrayAsync());
+                Attendees.RemoveRange(await Attendees.Where(a => a.ConversationId.Equals(conversation.Id)).ToArrayAsync());
+                Conversations.Remove(conversation);
+            }
+                            
+            var userConnection = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
+            NotificationConnections.RemoveRange(userConnection);
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }

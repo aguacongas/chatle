@@ -24,7 +24,9 @@ namespace ChatLe.Models
         where TNotificationConnection : NotificationConnection<TKey>
     {
         public ChatLeIdentityDbContext(DbContextOptions options):base(options)
-        { }
+        { 
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
 
         protected ChatLeIdentityDbContext()
         { }

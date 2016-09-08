@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Repository.Test
 {
@@ -100,14 +102,30 @@ namespace ChatLe.Repository.Test
         static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
         {  
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase();            
+            builder.UseInMemoryDatabase();
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
                       
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
-            {
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
                 var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
                 await action(store);
             }
         }
+
 
         [Fact]
         public async Task CreateMessageAsyncTest()
@@ -246,6 +264,67 @@ namespace ChatLe.Repository.Test
             {
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateNotificationConnectionAsync(null));
             });
+        }
+
+        [Fact]
+        public async Task CreateNotificationConnectionAsynctwice_should_not_throw()
+        {
+            var connection = new NotificationConnection
+            {
+                ConnectionId = "test",
+                NotificationType = "test",
+                UserId = "test",
+                ConnectionDate = DateTime.Now
+            };
+
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("Filename=./test.db");
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
+                      
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                
+                await store.CreateNotificationConnectionAsync(connection);
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                await store.DeleteNotificationConnectionAsync(c);     
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                if (c == null)
+                    await store.CreateNotificationConnectionAsync(connection);     
+            }
         }
 
         [Fact]
@@ -478,18 +557,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetAttendeesAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var conv = AddConv(store);
-                var attendees = await store.GetAttendeesAsync(conv);
-                Assert.NotNull(attendees);
-                Assert.NotNull(attendees.FirstOrDefault());
-            });
-        }
-
-        [Fact]
         public async Task DeleteUserAsyncTest()
         {
             await ExecuteTest(async store =>
@@ -502,7 +569,7 @@ namespace ChatLe.Repository.Test
                 context.Add(new Attendee()
                 {
                     ConversationId = conv.Id,
-                    UserId = "test"
+                    UserId = user.Id,
                 });
 
                 context.Add(user);
@@ -511,7 +578,7 @@ namespace ChatLe.Repository.Test
                     ConnectionDate = DateTime.Now,
                     ConnectionId = "test",
                     NotificationType = "test",
-                    UserId = "test"
+                    UserId = user.Id
                 });
 
                 context.SaveChanges();
@@ -522,6 +589,48 @@ namespace ChatLe.Repository.Test
                 Assert.Empty(context.Users);
 
                 Assert.NotEmpty(context.Conversations);
+            });
+        }
+
+        [Fact]
+        public async Task DeleteUserAsyncTest_all_attendees_disconnected()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var user = new ChatLeUser() { Id = "test" };
+
+                var context = store.Context;
+                
+                foreach(var attendee in conv.Attendees)
+                {
+                    attendee.IsConnected = false;
+                }
+
+                context.Add(user);
+                
+                context.Add(new Attendee()
+                {
+                    ConversationId = conv.Id,
+                    UserId = user.Id,
+                });
+
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = user.Id
+                });
+
+                context.SaveChanges();
+
+                await store.DeleteUserAsync(user);
+
+                Assert.Empty(context.NotificationConnections);
+                Assert.Empty(context.Users);
+
+                Assert.Empty(context.Conversations);
             });
         }
     }
