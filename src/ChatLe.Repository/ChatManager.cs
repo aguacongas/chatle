@@ -263,7 +263,6 @@ namespace ChatLe.Models
             
             foreach (var conv in conversations)
             {
-                await Store.GetAttendeesAsync(conv, cancellationToken);
                 var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
                 foreach (var message in messages)
                     if (!conv.Messages.Any(m => m.Id.Equals(message.Id)))

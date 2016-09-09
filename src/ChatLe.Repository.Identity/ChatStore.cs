@@ -19,6 +19,7 @@ namespace ChatLe.Models
         /// <param name="loggerFactory"></param>
         public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
     }
+    
     /// <summary>
     /// Chat store for TUser
     /// </summary>
@@ -33,6 +34,7 @@ namespace ChatLe.Models
         /// <param name="loggerFactory"></param>
         public ChatStore(DbContext context) : base(context) { }
     }
+    
     /// <summary>
     /// Chat store, implement <see cref="IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}"/>
     /// </summary>
@@ -63,30 +65,37 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("context");
             Context = context;
         }
+        
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
         public virtual TContext Context { get; private set; }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TUser}"/>
         /// </summary>
         public virtual DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TConversation}"/>
         /// </summary>
         public DbSet<TConversation> Conversations { get { return Context.Set<TConversation>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TMessage}"/>
         /// </summary>
         public DbSet<TMessage> Messages { get { return Context.Set<TMessage>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TAttendee}"/>
         /// </summary>
         public virtual DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TNotificationConnection}"/>
         /// </summary>
         public virtual DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
+        
         /// <summary>
         /// Create a message on the database
         /// </summary>
@@ -102,6 +111,7 @@ namespace ChatLe.Models
             Context.Add(message);
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         /// <summary>
         /// Create an attendee on the database
         /// </summary>
@@ -118,6 +128,7 @@ namespace ChatLe.Models
             Context.Add(attendee);
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         /// <summary>
         /// Create a conversation on the database
         /// </summary>
@@ -133,6 +144,7 @@ namespace ChatLe.Models
             Context.Add(conversation);
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         /// <summary>
         /// Find a user by her name
         /// </summary>
@@ -144,6 +156,7 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
+
         /// <summary>
         /// Update the user on the database
         /// </summary>
@@ -159,6 +172,7 @@ namespace ChatLe.Models
             Context.Update(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         /// <summary>
         /// Gets a conversation for 2 attendees
         /// </summary>
@@ -174,17 +188,20 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            var convs = from c in Conversations
+            var convs = (from c in Conversations
                        join a1 in Attendees
                             on c.Id equals a1.ConversationId
                        join a2 in Attendees
                             on c.Id equals a2.ConversationId
                        where a1.UserId.Equals(attendee1.Id)
                             && a2.UserId.Equals(attendee2.Id)
-                       select c;
+                            && c.Attendees.Count.Equals(2)
+                       select c)
+                       .Include(c => c.Attendees);
 
             return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
         }
+
         /// <summary>
         /// Gets a conversation by her id
         /// </summary>
@@ -197,6 +214,7 @@ namespace ChatLe.Models
                 .Include(c => c.Attendees)
                 .FirstOrDefaultAsync(c => c.Id.Equals(convId));
         }
+
         /// <summary>
         /// Gets messages in a conversation
         /// </summary>
@@ -209,6 +227,7 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             return await Messages.Where(m => m.ConversationId.Equals(convId)).OrderByDescending(m=>m.Date).Take(max).ToListAsync();
         }
+
         /// <summary>
         /// Gets connected users
         /// </summary>
@@ -241,6 +260,7 @@ namespace ChatLe.Models
 
             return await Task.FromResult(new Page<TUser>(query.ToList(), pageIndex, pageCount));
         }
+
         /// <summary>
         /// Create a notification connection on the database
         /// </summary>
@@ -253,9 +273,15 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
+            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
+            Context.ChangeTracker.AutoDetectChangesEnabled = false;
             Context.Add(connection);
+            
             await Context.SaveChangesAsync(cancellationToken);
+            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
+            Context.ChangeTracker.AutoDetectChangesEnabled = true;
         }
+
         /// <summary>
         /// Delete a notification connection on the database
         /// </summary>
@@ -271,6 +297,7 @@ namespace ChatLe.Models
             Context.Remove(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         /// <summary>
         /// Gets a notification connection by her id and her type
         /// </summary>
@@ -288,6 +315,7 @@ namespace ChatLe.Models
 
             return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
         }
+        
         /// <summary>
         /// Initialise the database
         /// </summary>
@@ -305,6 +333,7 @@ namespace ChatLe.Models
             Users.RemoveRange(Users.Where(u => u.PasswordHash == null).ToArray());
             Context.SaveChanges();
         }
+        
         /// <summary>
         /// Gets notification connections for a user id and notification type
         /// </summary>
@@ -317,6 +346,7 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType.Equals(notificationType)).ToListAsync();
         }
+        
         /// <summary>
         /// Check if a user has connection
         /// </summary>
@@ -326,23 +356,7 @@ namespace ChatLe.Models
         {
             return await NotificationConnections.AnyAsync(n => n.UserId.Equals(userId));
         }
-        /// <summary>
-        /// Gets attendees in a conversation
-        /// </summary>
-        /// <param name="conv">the conversation</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
-        public virtual async Task<IEnumerable<TAttendee>>GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
-            var atts = conv.Attendees;
-            foreach(var attendee in attendees)
-                if (!atts.Any(a => a.UserId.Equals(attendee.UserId)))
-                    atts.Add(attendee);
-
-            return attendees;
-        }
+        
         /// <summary>
         /// Gets conversations for a user id
         /// </summary>
