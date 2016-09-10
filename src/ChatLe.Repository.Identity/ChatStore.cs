@@ -199,7 +199,7 @@ namespace ChatLe.Models
                        select c)
                        .Include(c => c.Attendees);
 
-            return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
+            return await convs.FirstOrDefaultAsync();
         }
 
         /// <summary>

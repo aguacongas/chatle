@@ -71,6 +71,8 @@ namespace ChatLe
 
             ConfigureEntity(services);
 
+            services.AddCors();
+
             services.AddMvc();
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
@@ -118,7 +120,12 @@ namespace ChatLe
         {
             ConfigureErrors(app);
 
-            app.UseStaticFiles()             
+            app.UseCors(
+                builder => builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials())
+                .UseStaticFiles()             
                 .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
@@ -130,7 +137,6 @@ namespace ChatLe
                 })
                 .UseSignalR()
                 .UseChatLe();
-
         }
 
         protected virtual void ConfigureErrors(IApplicationBuilder app)
