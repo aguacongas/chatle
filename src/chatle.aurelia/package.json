@@ -12,10 +12,13 @@
     "aurelia-fetch-client": "^1.0.0",
     "aurelia-animator-css": "^1.0.0",
     "aurelia-http-client": "^1.0.0",
+    "jquery": "^3.1.0",
+    "signalR": "^2.2.1",
     "bluebird": "^3.4.1"
   },
   "peerDependencies": {},
   "devDependencies": {
+    "concurrently": "^2.2.0",
     "aurelia-cli": "^0.18.0",
     "aurelia-testing": "^1.0.0-beta.2.0.0",
     "aurelia-tools": "^0.2.2",
@@ -42,5 +45,9 @@
     "karma-chrome-launcher": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-typescript-preprocessor": "^0.2.1"
+  },
+  "scripts": {
+    "start": "concurrently \"au run --watch\" \"npm run chatle\"",
+    "chatle": "dotnet run -p ../chatle -- ../chatle"
   }
 }

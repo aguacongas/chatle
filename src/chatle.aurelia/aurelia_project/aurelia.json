@@ -112,6 +112,7 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
+          "aurelia-http-client",
           {
             "name": "text",
             "path": "../scripts/text"
@@ -131,6 +132,18 @@
             "path": "../node_modules/aurelia-testing/dist/amd",
             "main": "aurelia-testing",
             "env": "dev"
+          },
+          {
+            "name": "jquery",
+            "path": "../node_modules/jquery/dist/jquery"
+          },
+          {
+            "name": "signalR",
+            "path": "../node_modules/signalR/jquery.signalR"
+          },
+          {
+            "name": "chatle.signalR",
+            "path": "../scripts/chatle.signalR"
           }
         ]
       }

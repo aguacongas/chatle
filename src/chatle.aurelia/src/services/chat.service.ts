@@ -1,10 +1,12 @@
-﻿import {EventAggregator} from 'aurelia-event-aggregator';
-import {HttpClient} from 'aurelia-http-client';
+﻿import { EventAggregator } from 'aurelia-event-aggregator';
+import { HttpClient } from 'aurelia-http-client';
+import {autoinject} from 'aurelia-framework';
 
 import { Settings } from '../config/settings';
 import { User } from '../model/user';
 import { Message } from '../model/message';
 import { Conversation } from '../model/conversation';
+import { Attendee } from '../model/attendee';
 
 import { ConnectionStateChanged } from '../events/connectionStateChanged';
 import { ConversationJoined } from '../events/conversationJoined';
@@ -34,18 +36,19 @@ export enum ConnectionState {
     Error = 3
 }
 
+@autoinject
 export class ChatService {
 
     currentState = ConnectionState.Disconnected;
 
-    constructor(private settings: Settings, private ea: EventAggregator) {  }
+    constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {  }
     
     start() {
         let debug = this.settings.debug;
         // only for debug
-        $.connection.hub.logging = debug;
+        jQuery.connection.hub.logging = debug;
         // get the signalR hub named 'chat'
-        let connection = <ChatSignalR>$.connection;
+        let connection = <ChatSignalR>jQuery.connection;
         let chatHub = connection.chat;
         
         /**
@@ -72,15 +75,15 @@ export class ChatService {
 
         if (debug) {
             // for debug only, callback on connection state change
-            $.connection.hub.stateChanged(change => {
+            jQuery.connection.hub.stateChanged(change => {
                 let oldState: string,
                     newState: string;
 
-                for (var state in $.signalR.connectionState) {
-                    if ($.signalR.connectionState[state] === change.oldState) {
+                for (var state in jQuery.signalR.connectionState) {
+                    if (jQuery.signalR.connectionState[state] === change.oldState) {
                         oldState = state;
                     }
-                    if ($.signalR.connectionState[state] === change.newState) {
+                    if (jQuery.signalR.connectionState[state] === change.newState) {
                         newState = state;
                     }
                 }
@@ -90,14 +93,14 @@ export class ChatService {
         }
 
         // callback on connection reconnect
-        $.connection.hub.reconnected(() => this.onReconnected());
+        jQuery.connection.hub.reconnected(() => this.onReconnected());
         // callback on connection error
-        $.connection.hub.error(error => this.onError(error) );
+        jQuery.connection.hub.error(error => this.onError(error) );
         // callback on connection disconnect
-        $.connection.hub.disconnected(() => this.onDisconnected());
+        jQuery.connection.hub.disconnected(() => this.onDisconnected());
     
         // start the connection
-        $.connection.hub.start()
+        jQuery.connection.hub.start()
             .done(response => this.setConnectionState(ConnectionState.Connected))
             .fail(error => this.setConnectionState(ConnectionState.Error));
     }
@@ -106,70 +109,70 @@ export class ChatService {
         this.ea.publish(new ConversationJoined(conversation));        
     }
 
-    sendMessage(conversation: Conversation, message: string): Observable<Message> {
-        let messageSubject = new Subject<Message>();
-
+    sendMessage(conversation: Conversation, message: string): Promise<Message> {
         let m = new Message();
         m.conversationId = conversation.id;
         m.from = this.settings.userName;
         m.text = message;
 
         if (conversation.id) {
-            this.http.post(this.settings.chatAPI, {
+            return new Promise<Message>((resolve, reject) => {
+                this.http.post(this.settings.chatAPI, {
                     to: conversation.id,
                     text: message
                 })
-                .subscribe(
-                    response => messageSubject.next(m),
-                    error => messageSubject.error(error));
+                .then(response => resolve(m))
+                .catch(error => reject(error));
+            });
         } else {
-            let attendee = conversation.attendees.find(a => a.userId !== this.settings.userName); 
-            this.http.post(this.settings.convAPI, {
+            let attendee: Attendee;
+             conversation.attendees.forEach(a => {
+                 if (a.userId !== this.settings.userName) {
+                     attendee = a;
+                 }
+             });
+
+             return new Promise<Message>((resolve, reject) => {
+                this.http.post(this.settings.convAPI, {
                     to: attendee.userId,
                     text: message
                 })
-                .subscribe(
+                .then(
                     response => {
-                        conversation.id = response.text();
-                        this.joinConversationSubject.next(conversation);
-                        messageSubject.next(m);
-                    },
-                    error => messageSubject.error(error));
+                        conversation.id = response.content;
+                        this.ea.publish(new ConversationJoined(conversation));
+                        resolve(m);
+                    })
+                .catch(error => reject(error));
+            });
+            
         }
-
-        return  messageSubject.asObservable();
     }
     
-    getUsers(): Observable<User[]> {
-        let subject = new Subject<User[]>();
-
-        this.http.get(this.settings.userAPI)
-            .subscribe(
-                response => {
-                    var data = response.json();
-                    if (data && data.users) {
-                        subject.next(data.users as User[]);
-                    }
-                },
-                error => subject.error(error));
-        
-        return subject.asObservable();
+    getUsers(): Promise<User[]> {
+        return new Promise<User[]>((resolve, reject) => {
+            this.http.get(this.settings.userAPI)
+                .then(response => {
+                        var data = response.content;
+                        if (data && data.users) {
+                            resolve(data.users as User[]);
+                        }
+                    })
+                .catch(error => reject(error));
+        });
     }
 
-    getConversations(): Observable<Conversation[]> {
-        let subject = new Subject<Conversation[]>();
-
-        this.http.get(this.settings.chatAPI)
-            .subscribe(
-                response => {
-                    var data = response.json();
+    getConversations(): Promise<Conversation[]> {
+        return new Promise<Conversation[]>((resolve, reject) => {
+            this.http.get(this.settings.chatAPI)
+                .then(response => {
+                    var data = response.content;
                     if (data) {
-                        subject.next(data as Conversation[]);
+                        resolve(data as Conversation[]);
                     }
-                },
-                error => subject.error(error));
-        
-        return subject.asObservable();
+                })
+                .catch(error => reject(error));
+        });
     }
 
     private setConnectionState(connectionState: ConnectionState) {
@@ -192,21 +195,21 @@ export class ChatService {
 
     private onUserConnected(user: User) {
         console.log("Chat Hub new user connected: " + user.id);
-        this.userConnectedSubject.next(user);
+        this.ea.publish(new UserConnected(user));
     }
 
     private onUserDisconnected(id: string) {
         console.log("Chat Hub user disconnected: " + id);
         if (id !== this.settings.userName) {
-            this.userDisconnectedSubject.next(id);
+            this.ea.publish(new UserDisconnected(id));
         }
     }   
 
     private onMessageReceived(message: Message) {
-        this.messageReceivedSubject.next(message);
+        this.ea.publish(new MessageReceived(message));
     }
 
     private onJoinConversation(conversation: Conversation) {
-        this.joinConversationSubject.next(conversation);
+        this.ea.publish(new ConversationJoined(conversation));
     }
 }
