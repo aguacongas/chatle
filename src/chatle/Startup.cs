@@ -26,7 +26,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetCurrentDirectory())
+				.SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -157,9 +157,13 @@ namespace ChatLe
 
 		public static void Main(string[] args)
 		{
+            string rootPath = Directory.GetCurrentDirectory();
+            if (args.Length == 1)
+                rootPath += '/' + args[0];
+
 			var host = new WebHostBuilder()
 				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
+				.UseContentRoot(rootPath)
 				.UseIISIntegration()
 				.UseStartup<Startup>()
 				.Build();
