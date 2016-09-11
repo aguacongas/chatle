@@ -10,8 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatLe
 {
@@ -125,32 +123,21 @@ namespace ChatLe
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
             ConfigureErrors(app);
-
+            var logger = LoggerFactory.CreateLogger("reques");
             app.UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials())
-                .UseStaticFiles()
-                .Use(next => context =>
-                {
-                    if (string.Equals(context.Request.Path.Value, "/xhrf", StringComparison.OrdinalIgnoreCase)) 
-                    {
-                        var tokens = antiforgery.GetAndStoreTokens(context);
-                        var response = context.Response;
-                        response.Cookies.Append(
-                            "XSRF-TOKEN", 
-                            tokens.CookieToken,
-                            new CookieOptions { HttpOnly = false });
-                        var buffer = Encoding.UTF8.GetBytes(tokens.RequestToken);
-                        response.Body.Write(buffer, 0, buffer.Length);
-                        return Task.FromResult(0);
-                    }
-                    
-                    return next(context);
-                })             
+                .UseStaticFiles()                             
                 .UseWebSockets()
                 .UseIdentity()
+                .Map("/xhrf", a => a.Run(async context => 
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+                    await context.Response.WriteAsync(tokens.RequestToken);
+                }))
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(

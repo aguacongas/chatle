@@ -135,14 +135,6 @@
           },
           "jquery",
           {
-            "name": "signalR",
-            "path": "../node_modules/signalR/jquery.signalR"
-          },
-          {
-            "name": "chatle.signalR",
-            "path": "../scripts/chatle.signalR"
-          },
-          {
             "name": "bootstrap",
             "path": "../node_modules/bootstrap/dist",
             "main": "js/bootstrap.min",

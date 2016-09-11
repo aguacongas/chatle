@@ -91,6 +91,28 @@ namespace ChatLe.Controllers
         }
 
         //
+        // POST: /Account/SpaGuess
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> SpaGuess(string userName)
+        {
+            var user = new ChatLeUser { UserName = userName };                    
+                var result = await UserManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+
+                    return new JsonResult("OK");
+                }
+                else
+                {
+                    AddErrors(result);
+                    return new JsonResult(result);
+                }
+        }
+
+        //
         // GET: /Account/Register
         [AllowAnonymous]
         [HttpGet]

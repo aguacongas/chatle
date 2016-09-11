@@ -1,0 +1,15 @@
+<template>
+    <require from="../resources/elements/contact-list"></require>
+    <require from="../resources/elements/conversation"></require>
+    <require from="../resources/elements/conversation-list"></require>
+
+    <ul class="nav nav-bar">
+        <li click.delegate="manage">Welcom ${settings.userName}!</li>
+        <li click.delegate="logoff">Log off</li>
+    </ul>
+    <div>
+        <contact-list class="col-xs-3"></contact-list>
+        <conversation class="col-xs-6"></conversation>
+        <conversation-list class="col-xs-3"></conversation-list>
+    </div> 
+</template>
