@@ -1,6 +1,7 @@
 ﻿import { EventAggregator } from 'aurelia-event-aggregator';
 import { HttpClient } from 'aurelia-http-client';
-import {autoinject} from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
+import environment from '../environment';
 
 import { Settings } from '../config/settings';
 import { User } from '../model/user';
@@ -41,10 +42,15 @@ export class ChatService {
 
     currentState = ConnectionState.Disconnected;
 
-    constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {  }
+    constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
+        http.configure(
+            builder => builder
+                .withBaseUrl(settings.apiBaseUrl)
+                .withCredentials(true));
+    }
     
     start() {
-        let debug = this.settings.debug;
+        let debug = environment.debug;
         // only for debug
         jQuery.connection.hub.logging = debug;
         // get the signalR hub named 'chat'

@@ -1,0 +1,8 @@
+<template>
+  <require from="./conversation-preview"></require>
+  <div class="conversation-list">
+    <ul class="list-group">
+      <conversation-preview repeat.for="conversation of conversations" conversation.bind="conversation"></conversation-preview>
+    </ul>
+  </div>
+</template>

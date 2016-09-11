@@ -133,10 +133,7 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
-          {
-            "name": "jquery",
-            "path": "../node_modules/jquery/dist/jquery"
-          },
+          "jquery",
           {
             "name": "signalR",
             "path": "../node_modules/signalR/jquery.signalR"
@@ -144,6 +141,16 @@
           {
             "name": "chatle.signalR",
             "path": "../scripts/chatle.signalR"
+          },
+          {
+            "name": "bootstrap",
+            "path": "../node_modules/bootstrap/dist",
+            "main": "js/bootstrap.min",
+            "deps": ["jquery"],
+            "exports": "$",
+            "resources": [
+              "css/bootstrap.css"
+            ]
           }
         ]
       }

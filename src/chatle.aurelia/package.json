@@ -8,13 +8,14 @@
   },
   "license": "MIT",
   "dependencies": {
+    "aurelia-animator-css": "^1.0.0",
     "aurelia-bootstrapper": "^1.0.0",
     "aurelia-fetch-client": "^1.0.0",
-    "aurelia-animator-css": "^1.0.0",
     "aurelia-http-client": "^1.0.0",
+    "bluebird": "^3.4.1",
+    "bootstrap": "^3.3.7",
     "jquery": "^3.1.0",
-    "signalR": "^2.2.1",
-    "bluebird": "^3.4.1"
+    "signalR": "^2.2.1"
   },
   "peerDependencies": {},
   "devDependencies": {

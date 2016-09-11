@@ -2,11 +2,10 @@ define('config/settings',["require", "exports"], function (require, exports) {
     "use strict";
     var Settings = (function () {
         function Settings() {
-            this.debug = true;
-            this.userName = 'test';
-            this.userAPI = 'http://localhost:5000/api/users';
-            this.convAPI = 'http://localhost:5000/api/chat/conv';
-            this.chatAPI = 'http://localhost:5000/api/chat';
+            this.apiBaseUrl = 'http://localhost:5000';
+            this.userAPI = '/api/users';
+            this.convAPI = '/api/chat/conv';
+            this.chatAPI = '/api/chat';
         }
         return Settings;
     }());
@@ -122,7 +121,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('services/chat.service',["require", "exports", 'aurelia-event-aggregator', 'aurelia-http-client', 'aurelia-framework', '../config/settings', '../model/message', '../events/connectionStateChanged', '../events/conversationJoined', '../events/messageReceived', '../events/userConnected', '../events/userDisconnected'], function (require, exports, aurelia_event_aggregator_1, aurelia_http_client_1, aurelia_framework_1, settings_1, message_1, connectionStateChanged_1, conversationJoined_1, messageReceived_1, userConnected_1, userDisconnected_1) {
+define('services/chat.service',["require", "exports", 'aurelia-event-aggregator', 'aurelia-http-client', 'aurelia-framework', '../environment', '../config/settings', '../model/message', '../events/connectionStateChanged', '../events/conversationJoined', '../events/messageReceived', '../events/userConnected', '../events/userDisconnected'], function (require, exports, aurelia_event_aggregator_1, aurelia_http_client_1, aurelia_framework_1, environment_1, settings_1, message_1, connectionStateChanged_1, conversationJoined_1, messageReceived_1, userConnected_1, userDisconnected_1) {
     "use strict";
     (function (ConnectionState) {
         ConnectionState[ConnectionState["Connected"] = 1] = "Connected";
@@ -136,10 +135,13 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             this.ea = ea;
             this.http = http;
             this.currentState = ConnectionState.Disconnected;
+            http.configure(function (builder) { return builder
+                .withBaseUrl(settings.apiBaseUrl)
+                .withCredentials(true); });
         }
         ChatService.prototype.start = function () {
             var _this = this;
-            var debug = this.settings.debug;
+            var debug = environment_1.default.debug;
             jQuery.connection.hub.logging = debug;
             var connection = jQuery.connection;
             var chatHub = connection.chat;
@@ -290,6 +292,15 @@ define('app',["require", "exports", 'aurelia-framework', './services/chat.servic
             this.message = 'Hello World!';
             service.start();
         }
+        App.prototype.configureRouter = function (config, router) {
+            config.title = 'Chatle';
+            config.map([
+                { route: '', moduleId: 'home', title: 'Home' },
+                { route: 'account', moduleId: 'account', title: 'Account' },
+                { route: 'login', moduleId: 'login', title: 'Login' }
+            ]);
+            this.router = router;
+        };
         App = __decorate([
             aurelia_framework_1.autoinject, 
             __metadata('design:paramtypes', [chat_service_1.ChatService])
