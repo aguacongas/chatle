@@ -8,6 +8,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ChatLe
 {
@@ -73,6 +77,8 @@ namespace ChatLe
 
             services.AddCors();
 
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+
             services.AddMvc();
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
@@ -116,7 +122,7 @@ namespace ChatLe
             }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
-        public virtual void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
             ConfigureErrors(app);
 
@@ -125,7 +131,24 @@ namespace ChatLe
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials())
-                .UseStaticFiles()             
+                .UseStaticFiles()
+                .Use(next => context =>
+                {
+                    if (string.Equals(context.Request.Path.Value, "/xhrf", StringComparison.OrdinalIgnoreCase)) 
+                    {
+                        var tokens = antiforgery.GetAndStoreTokens(context);
+                        var response = context.Response;
+                        response.Cookies.Append(
+                            "XSRF-TOKEN", 
+                            tokens.CookieToken,
+                            new CookieOptions { HttpOnly = false });
+                        var buffer = Encoding.UTF8.GetBytes(tokens.RequestToken);
+                        response.Body.Write(buffer, 0, buffer.Length);
+                        return Task.FromResult(0);
+                    }
+                    
+                    return next(context);
+                })             
                 .UseWebSockets()
                 .UseIdentity()
                 .UseMvc(routes =>
