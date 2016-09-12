@@ -206,7 +206,6 @@ namespace ChatLe.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();

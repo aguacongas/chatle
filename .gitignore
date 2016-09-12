@@ -1,7 +1,5 @@
-﻿################################################################################
-# Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
-################################################################################
-
+﻿.idea
+.DS_STORE
 /.build
 /.vs
 /artifacts
@@ -26,6 +24,7 @@ node_modules
 /src/chatle/wwwroot/js/chat.min.js
 /src/chatle/wwwroot/app
 /src/chatle/app/**/*.js*
+/src/chatle.aurelia/scripts/*.*
 npm-debug.log
 npm-shrinkwrap.json
 *.ngfactory.ts

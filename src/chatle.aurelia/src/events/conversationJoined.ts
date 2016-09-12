@@ -1,5 +1,5 @@
 import { Conversation } from '../model/conversation';
 
 export class ConversationJoined {
-    constructor(conversation: Conversation) { }
+    constructor(public conversation: Conversation) { }
 }

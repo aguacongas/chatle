@@ -19,12 +19,12 @@ export class ConversationList {
       .then(conversations => {
         this.conversations = conversations;
 
-        this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, id => {
+        this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
           this.conversations.forEach(c => {
             let attendees = c.attendees;
             if (attendees.length === 2) {
               attendees.forEach(a => {
-                if (a.userId === id) {
+                if (a.userId === e.id) {
                   let index = this.conversations.indexOf(c);
                   this.conversations.splice(index, 1);
                 }
@@ -33,8 +33,8 @@ export class ConversationList {
           });          
         });
 
-        this.conversationJoinedSubscription = this.ea.subscribe(ConversationJoined, c => {
-          this.conversations.unshift(c);
+        this.conversationJoinedSubscription = this.ea.subscribe(ConversationJoined, e => {
+          this.conversations.unshift(e.conversation);
         });
       });
     }

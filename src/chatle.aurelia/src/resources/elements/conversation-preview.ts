@@ -18,8 +18,8 @@ export class ConversationPreview {
     }
 
     attached() {
-        this.conversationSelectecSubscription = this.ea.subscribe(ConversationSelected, c => {
-            if (c.id === this.conversation.id) {
+        this.conversationSelectecSubscription = this.ea.subscribe(ConversationSelected, e => {
+            if (e.conversation.id === this.conversation.id) {
                 this.isSelected = true;
             } else {
                 this.isSelected = false;

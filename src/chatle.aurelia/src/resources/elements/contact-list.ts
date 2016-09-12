@@ -42,14 +42,14 @@ export class ContactList {
             .then(users => {
                 this.users = users;
 
-                this.userConnectedSubscription = this.ea.subscribe(UserConnected, user => {
-                    this.users.unshift(user);
+                this.userConnectedSubscription = this.ea.subscribe(UserConnected, e => {
+                    this.users.unshift(e.user);
                 });
 
-                this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, id => {
+                this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
                     let user: User;
                     this.users.forEach(u => {
-                        if (u.id === id) {
+                        if (u.id === e.id) {
                             user = u;
                         }
                     });

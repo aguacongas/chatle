@@ -34,8 +34,8 @@ export class Contact {
   }
 
   attached() {
-    this.conversationSelectedSubscription = this.ea.subscribe(ConversationSelected, c => {
-      let conv = c as Conversation;
+    this.conversationSelectedSubscription = this.ea.subscribe(ConversationSelected, e => {
+      let conv = e.conversation as Conversation;
       let attendees = conv.attendees;
 
       this.isSelected = false;

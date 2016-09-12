@@ -160,8 +160,6 @@ export class ChatService {
         return new Promise<any>((resolve, reject) => {
             this.http.get('xhrf')
                 .then(response => {
-                    this.xhrf = response.response;
-
                     this.http.createRequest(this.settings.loginAPI)
                         .asPost()
                         .withHeader("X-XSRF-TOKEN", response.response)
@@ -183,13 +181,7 @@ export class ChatService {
         delete this.settings.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
-        this.http.get('xhrf')
-            .then(response => {
-                this.http.createRequest(this.settings.logoffAPI)
-                    .asPost()
-                    .withHeader("X-XSRF-TOKEN", response.response)
-                    .send()
-            });
+        this.http.post(this.settings.logoffAPI, null);
     }
     
     getUsers(): Promise<User[]> {

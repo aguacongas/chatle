@@ -1,3 +1,3 @@
 export class UserDisconnected {
-    constructor(id: string) { }
+    constructor(public id: string) { }
 }

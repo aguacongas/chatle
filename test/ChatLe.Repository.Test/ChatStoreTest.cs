@@ -5,8 +5,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ChatLe.Repository.Test
 {
@@ -17,7 +19,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<UserTest>(context, new Mock<IOptions<ChatOptions>>().Object);
             }
         }
 
@@ -25,7 +27,8 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void Construtor_should_throw_argumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
+            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null, null));
+            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(new FakeContextTest(new DbContextOptionsBuilder().Options), null));
         }
 
         class FakeContextTest : DbContext
@@ -58,7 +61,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsAssignableFrom<DbSet<Conversation>>(conversations);
@@ -70,7 +73,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsAssignableFrom<DbSet<Message>>(messages);
@@ -82,7 +85,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsAssignableFrom<DbSet<UserTest>>(users);
@@ -94,7 +97,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new ChatDbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
             }
         }
@@ -121,7 +124,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 await action(store);
             }
         }
@@ -297,7 +300,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 
                 await store.CreateNotificationConnectionAsync(connection);
             }
@@ -308,7 +311,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 await store.DeleteNotificationConnectionAsync(c);     
@@ -320,7 +323,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 if (c == null)
                     await store.CreateNotificationConnectionAsync(connection);     
@@ -358,7 +361,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, new Mock<IOptions<ChatOptions>>().Object);
                 
                 await store.CreateNotificationConnectionAsync(connection);
                 

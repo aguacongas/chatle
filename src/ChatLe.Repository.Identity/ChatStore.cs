@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 
 namespace ChatLe.Models
 {
@@ -17,7 +18,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
     }
     
     /// <summary>
@@ -32,7 +33,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(DbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
     }
     
     /// <summary>
@@ -59,11 +60,18 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context)
+        public ChatStore(TContext context, IOptions<ChatOptions> optionsAccessor)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            Context = context;
+            if (optionsAccessor == null || optionsAccessor.Value == null)
+                throw new ArgumentNullException("optionsAccessor");
+
+            if (!optionsAccessor.Value.ContextEnableTracking)
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            
+            context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
+            Context = context;            
         }
         
         /// <summary>
@@ -273,9 +281,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            if (NotificationConnections.Any(n => n.NotificationType.Equals(connection.NotificationType) && n.UserId.Equals(connection.UserId)) == false)
-                Context.Add(connection);
-            
+            Context.Add(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -291,9 +297,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            if (NotificationConnections.Any(n => n.NotificationType.Equals(connection.NotificationType) && n.UserId.Equals(connection.UserId)))
-                Context.Remove(connection);
-
+            Context.Remove(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
