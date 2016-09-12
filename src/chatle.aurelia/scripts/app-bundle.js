@@ -7,70 +7,11 @@ define('config/settings',["require", "exports"], function (require, exports) {
             this.convAPI = '/api/chat/conv';
             this.chatAPI = '/api/chat';
             this.loginAPI = "/account/spaguess";
+            this.logoffAPI = "/account/spalogoff";
         }
         return Settings;
     }());
     exports.Settings = Settings;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', './config/settings'], function (require, exports, aurelia_framework_1, aurelia_router_1, settings_1) {
-    "use strict";
-    var App = (function () {
-        function App(settings) {
-            this.settings = settings;
-            this.loadUser();
-        }
-        App.prototype.configureRouter = function (config, router) {
-            config.title = 'Chatle';
-            config.addPipelineStep('authorize', AuthorizeStep);
-            config.map([
-                { route: ['', 'home'], name: 'home', moduleId: 'pages/home', title: 'Home' },
-                { route: 'account', name: 'account', moduleId: 'pages/account', title: 'Account' },
-                { route: 'login', name: 'login', moduleId: 'pages/login', title: 'Login', anomymous: true }
-            ]);
-            this.router = router;
-        };
-        App.prototype.loadUser = function () {
-            this.settings.userName = sessionStorage.getItem('userName');
-        };
-        App = __decorate([
-            aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [settings_1.Settings])
-        ], App);
-        return App;
-    }());
-    exports.App = App;
-    var AuthorizeStep = (function () {
-        function AuthorizeStep(settings) {
-            this.settings = settings;
-        }
-        AuthorizeStep.prototype.run = function (navigationInstruction, next) {
-            if (navigationInstruction.getAllInstructions().some(function (i) {
-                var route = i.config;
-                return !route.anomymous;
-            })) {
-                var isLoggedIn = this.settings.userName;
-                if (!isLoggedIn) {
-                    return next.cancel(new aurelia_router_1.Redirect('login'));
-                }
-            }
-            return next();
-        };
-        AuthorizeStep = __decorate([
-            aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [settings_1.Settings])
-        ], AuthorizeStep);
-        return AuthorizeStep;
-    }());
 });
 
 define('environment',["require", "exports"], function (require, exports) {
@@ -80,28 +21,6 @@ define('environment',["require", "exports"], function (require, exports) {
         debug: true,
         testing: true
     };
-});
-
-define('main',["require", "exports", './environment'], function (require, exports, environment_1) {
-    "use strict";
-    Promise.config({
-        warnings: {
-            wForgottenReturn: false
-        }
-    });
-    function configure(aurelia) {
-        aurelia.use
-            .standardConfiguration()
-            .feature('resources');
-        if (environment_1.default.debug) {
-            aurelia.use.developmentLogging();
-        }
-        if (environment_1.default.testing) {
-            aurelia.use.plugin('aurelia-testing');
-        }
-        aurelia.start().then(function () { return aurelia.setRoot(); });
-    }
-    exports.configure = configure;
 });
 
 define('model/attendee',["require", "exports"], function (require, exports) {
@@ -142,6 +61,16 @@ define('model/user',["require", "exports"], function (require, exports) {
         return User;
     }());
     exports.User = User;
+});
+
+define('events/connectionStateChanged',["require", "exports"], function (require, exports) {
+    "use strict";
+    var ConnectionStateChanged = (function () {
+        function ConnectionStateChanged(state) {
+        }
+        return ConnectionStateChanged;
+    }());
+    exports.ConnectionStateChanged = ConnectionStateChanged;
 });
 
 define('events/conversationJoined',["require", "exports"], function (require, exports) {
@@ -220,6 +149,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             http.configure(function (builder) { return builder
                 .withBaseUrl(settings.apiBaseUrl)
                 .withCredentials(true); });
+            settings.userName = sessionStorage.getItem('userName');
         }
         ChatService.prototype.start = function () {
             var _this = this;
@@ -297,7 +227,8 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             return new Promise(function (resolve, reject) {
                 _this.http.get('xhrf')
                     .then(function (response) {
-                    return _this.http.createRequest(_this.settings.loginAPI)
+                    _this.xhrf = response.response;
+                    _this.http.createRequest(_this.settings.loginAPI)
                         .asPost()
                         .withHeader("X-XSRF-TOKEN", response.response)
                         .withContent({ userName: userName })
@@ -314,9 +245,17 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             });
         };
         ChatService.prototype.logoff = function () {
+            var _this = this;
             delete this.settings.userName;
             sessionStorage.removeItem('userName');
             jQuery.connection.hub.stop();
+            this.http.get('xhrf')
+                .then(function (response) {
+                _this.http.createRequest(_this.settings.logoffAPI)
+                    .asPost()
+                    .withHeader("X-XSRF-TOKEN", response.response)
+                    .send();
+            });
         };
         ChatService.prototype.getUsers = function () {
             var _this = this;
@@ -388,14 +327,102 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
     exports.ChatService = ChatService;
 });
 
-define('events/connectionStateChanged',["require", "exports"], function (require, exports) {
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', './config/settings', './services/chat.service', './events/connectionStateChanged'], function (require, exports, aurelia_framework_1, aurelia_router_1, aurelia_event_aggregator_1, settings_1, chat_service_1, connectionStateChanged_1) {
     "use strict";
-    var ConnectionStateChanged = (function () {
-        function ConnectionStateChanged(state) {
+    var App = (function () {
+        function App(settings, service, ea) {
+            this.settings = settings;
+            this.service = service;
+            this.ea = ea;
+            this.setIsConnected();
         }
-        return ConnectionStateChanged;
+        App.prototype.configureRouter = function (config, router) {
+            config.title = 'Chatle';
+            config.addPipelineStep('authorize', AuthorizeStep);
+            config.map([
+                { route: ['', 'home'], name: 'home', moduleId: 'pages/home', title: 'Home' },
+                { route: 'account', name: 'account', moduleId: 'pages/account', title: 'Account' },
+                { route: 'login', name: 'login', moduleId: 'pages/login', title: 'Login', anomymous: true }
+            ]);
+            this.router = router;
+        };
+        App.prototype.setIsConnected = function () {
+            this.isConnected = this.settings.userName !== undefined && this.settings.userName != null;
+            this.userName = this.settings.userName;
+        };
+        App.prototype.created = function () {
+            var _this = this;
+            this.ea.subscribe(connectionStateChanged_1.ConnectionStateChanged, function (state) {
+                _this.setIsConnected();
+            });
+        };
+        App.prototype.logoff = function () {
+            this.service.logoff();
+            this.router.navigateToRoute('login');
+        };
+        App.prototype.manage = function () {
+            this.router.navigateToRoute('account');
+        };
+        App = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [settings_1.Settings, chat_service_1.ChatService, aurelia_event_aggregator_1.EventAggregator])
+        ], App);
+        return App;
     }());
-    exports.ConnectionStateChanged = ConnectionStateChanged;
+    exports.App = App;
+    var AuthorizeStep = (function () {
+        function AuthorizeStep(settings) {
+            this.settings = settings;
+        }
+        AuthorizeStep.prototype.run = function (navigationInstruction, next) {
+            if (navigationInstruction.getAllInstructions().some(function (i) {
+                var route = i.config;
+                return !route.anomymous;
+            })) {
+                var isLoggedIn = this.settings.userName;
+                if (!isLoggedIn) {
+                    return next.cancel(new aurelia_router_1.Redirect('login'));
+                }
+            }
+            return next();
+        };
+        AuthorizeStep = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [settings_1.Settings])
+        ], AuthorizeStep);
+        return AuthorizeStep;
+    }());
+});
+
+define('main',["require", "exports", './environment'], function (require, exports, environment_1) {
+    "use strict";
+    Promise.config({
+        warnings: {
+            wForgottenReturn: false
+        }
+    });
+    function configure(aurelia) {
+        aurelia.use
+            .standardConfiguration()
+            .feature('resources');
+        if (environment_1.default.debug) {
+            aurelia.use.developmentLogging();
+        }
+        if (environment_1.default.testing) {
+            aurelia.use.plugin('aurelia-testing');
+        }
+        aurelia.start().then(function () { return aurelia.setRoot(); });
+    }
+    exports.configure = configure;
 });
 
 
@@ -423,13 +450,6 @@ define('pages/home',["require", "exports", 'aurelia-framework', 'aurelia-router'
                 this.service.start();
             }
         };
-        Home.prototype.logoff = function () {
-            this.service.logoff();
-            this.router.navigateToRoute('login');
-        };
-        Home.prototype.manage = function () {
-            this.router.navigateToRoute('account');
-        };
         Home = __decorate([
             aurelia_framework_1.autoinject, 
             __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_router_1.Router])
@@ -448,17 +468,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('pages/login',["require", "exports", 'aurelia-http-client', 'aurelia-framework', 'aurelia-router', '../services/chat.service'], function (require, exports, aurelia_http_client_1, aurelia_framework_1, aurelia_router_1, chat_service_1) {
+define('pages/login',["require", "exports", 'aurelia-framework', 'aurelia-router', '../services/chat.service'], function (require, exports, aurelia_framework_1, aurelia_router_1, chat_service_1) {
     "use strict";
     var Login = (function () {
-        function Login(service, http, router) {
+        function Login(service, router) {
             this.service = service;
-            this.http = http;
             this.router = router;
         }
-        Login.prototype.login = function () {
+        Login.prototype.login = function (userName) {
             var _this = this;
-            this.service.login(this.userName)
+            this.service.login(userName)
                 .then(function () {
                 _this.router.navigateToRoute('home');
             })
@@ -466,7 +485,7 @@ define('pages/login',["require", "exports", 'aurelia-http-client', 'aurelia-fram
         };
         Login = __decorate([
             aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_http_client_1.HttpClient, aurelia_router_1.Router])
+            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_router_1.Router])
         ], Login);
         return Login;
     }());
@@ -683,7 +702,7 @@ define('resources/elements/conversation-preview',["require", "exports", 'aurelia
         };
         ConversationPreview.prototype.attached = function () {
             var _this = this;
-            this.ea.subscribe(conversationSelected_1.ConversationSelected, function (c) {
+            this.conversationSelectecSubscription = this.ea.subscribe(conversationSelected_1.ConversationSelected, function (c) {
                 if (c.id === _this.conversation.id) {
                     _this.isSelected = true;
                 }
@@ -729,10 +748,12 @@ define('resources/elements/conversation',["require", "exports", 'aurelia-framewo
     exports.Conversation = Conversation;
 });
 
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\r\n  <router-view></router-view>\r\n</template>\r\n"; });
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\r\n  <require from=\"./css/site.css\"></require>\r\n    <div class=\"navbar navbar-default navbar-fixed-top\">\r\n        <div class=\"container\">\r\n            <div class=\"navbar-header\">\r\n                <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                </button>\r\n                <a class=\"navbar-brand title\" href=\"/\">chatle</a>\r\n            </div>\r\n            <div class=\"navbar-collapse collapse\">\r\n                <ul class=\"nav navbar-nav\" if.bind=\"isConnected\">\r\n                    <li click.delegate=\"manage()\"><a>Welcom ${userName}!</a></li>\r\n                    <li click.delegate=\"logoff()\"><a>Log off</a></li>\r\n                </ul>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class=\"container body-content\">\r\n        <router-view></router-view>\r\n    </div>\r\n    <footer>\r\n        <p>� 2016 - chatle</p>\r\n    </footer>\r\n</template>\r\n"; });
+define('text!css/site.css', ['module'], function(module) { module.exports = "html {\r\n    font-family: cursive\r\n}\r\n/* Move down content because we have a fixed navbar that is 50px tall */\r\nbody.chatle {\r\n    padding-top: 50px;\r\n    padding-bottom: 20px;\r\n}\r\n\r\n/* Wrapping element */\r\n/* Set some basic padding to keep content from hitting the edges */\r\n.body-content {\r\n    padding-left: 15px;\r\n    padding-right: 15px;\r\n}\r\n\r\n.navbar.navbar-default {\r\n    background-color: #000;\r\n}\r\n\r\n.title.navbar-brand:focus,\r\n.title.navbar-brand:hover,\r\n.nav.navbar-nav > li > a:hover {\r\n    color: #fff;    \r\n}\r\n\r\nli:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n/* Set widths on the form inputs since otherwise they're 100% wide */\r\ninput,\r\nselect,\r\ntextarea {\r\n    max-width: 280px;\r\n}\r\n\r\nul\r\n{\r\n    padding-left: 0;\r\n    list-style-type: none;\r\n}\r\n\r\nsmall {\r\n    color: #666666;\r\n}\r\n\r\n/* Responsive: Portrait tablets and up */\r\n@media screen and (min-width: 768px) {\r\n    .jumbotron {\r\n        margin-top: 20px;\r\n    }\r\n\r\n    .body-content {\r\n        padding: 0;\r\n    }\r\n}\r\n"; });
 define('text!pages/account.html', ['module'], function(module) { module.exports = ""; });
-define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"../resources/elements/contact-list\"></require>\r\n    <require from=\"../resources/elements/conversation\"></require>\r\n    <require from=\"../resources/elements/conversation-list\"></require>\r\n\r\n    <div class=\"navbar navbar-default navbar-fixed-top\">\r\n        <div class=\"container\">\r\n            <div class=\"navbar-header\">\r\n                <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                </button>\r\n                <a class=\"navbar-brand title\" href=\"/\">chatle</a>\r\n            </div>\r\n            <div class=\"navbar-collapse collapse\">\r\n                <ul class=\"nav navbar-nav\">\r\n                    <li click.delegate=\"manage()\"><a>Welcom ${settings.userName}!</a></li>\r\n                    <li click.delegate=\"logoff()\"><a>Log off</a></li>\r\n                </ul>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class=\"container body-content\">\r\n        <div class=\"row\">\r\n            <div class=\"col-xs-3\">\r\n                <h6>CONNECTED</h6>\r\n                <contact-list></contact-list>\r\n            </div>\r\n            <conversation class=\"col-xs-6\"></conversation>\r\n            <div class=\"col-xs-3\">\r\n                <h6>CONVERSATION</h6>\r\n                <conversation-list></conversation-list>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <footer>\r\n        <p>� 2016 - chatle</p>\r\n    </footer>\r\n</template>"; });
-define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\r\n    <h2>Loging</h2>\r\n    <hr/>\r\n    <form class=\"form-horizontal\">\r\n        <div class=\"form-group\">\r\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\r\n            <div class=\"col-xs-9\">\r\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\r\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <div class=\"col-xs-offset-3 col-xs-9\">\r\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login()\" />\r\n            </div>\r\n        </div>\r\n    </form>\r\n</template>"; });
+define('text!css/site.min.css', ['module'], function(module) { module.exports = "html{font-family:cursive}body{padding-top:50px;padding-bottom:20px}.console{font-family:'Lucida Console',Monaco,monospace}.body-content{padding-left:15px;padding-right:15px}.navbar.navbar-default{background-color:#fff}.nav.navbar-nav>li>a:hover,.title.navbar-brand:focus,.title.navbar-brand:hover{color:#222}input,select,textarea{max-width:280px}ul{padding-left:0;list-style-type:none}small{color:#666}@media screen and (min-width:768px){.jumbotron{margin-top:20px}.body-content{padding:0}}"; });
+define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"../resources/elements/contact-list\"></require>\r\n    <require from=\"../resources/elements/conversation\"></require>\r\n    <require from=\"../resources/elements/conversation-list\"></require>\r\n\r\n    <div class=\"row\">\r\n        <div class=\"col-xs-3\">\r\n            <h6>CONVERSATION</h6>\r\n            <conversation-list></conversation-list>\r\n        </div>\r\n        <conversation class=\"col-xs-6\"></conversation>\r\n        <div class=\"col-xs-3\">\r\n            <h6>CONNECTED</h6>\r\n            <contact-list></contact-list>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\r\n    <h2>Loging</h2>\r\n    <hr />\r\n    <div class=\"form-horizontal\">\r\n        <div class=\"form-group\">\r\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\r\n            <div class=\"col-xs-9\">\r\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\r\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <div class=\"col-xs-offset-3 col-xs-9\">\r\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!resources/elements/contact-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"./contact\"></require>\r\n  <div class=\"contact-list\">\r\n    <span if.bind=\"!users\">${loadingMessage}</span>\r\n    <ul class=\"list-group\" if.bind=\"users\">\r\n      <contact repeat.for=\"user of users\" user.bind=\"user\"></contact>\r\n    </ul>\r\n  </div>\r\n</template>"; });
 define('text!resources/elements/contact.html', ['module'], function(module) { module.exports = "<template>\r\n    <li class=\"list-group-item ${isSelected ? 'active' : ''}\">\r\n        <a click.delegate=\"select()\">${user.id}</a>\r\n    </li>\r\n</template>"; });
 define('text!resources/elements/conversation-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"./conversation-preview\"></require>\r\n  <div class=\"conversation-list\">\r\n    <ul class=\"list-group\">\r\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\r\n    </ul>\r\n  </div>\r\n</template>"; });

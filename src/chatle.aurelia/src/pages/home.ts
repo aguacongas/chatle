@@ -13,13 +13,4 @@ export class Home {
             this.service.start();
         }        
     }
-
-    logoff() {
-        this.service.logoff();
-        this.router.navigateToRoute('login');
-    }
-
-    manage() {
-        this.router.navigateToRoute('account');
-    }
 }

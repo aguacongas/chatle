@@ -205,6 +205,23 @@ namespace ChatLe.Controllers
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user != null)
+            {
+                if (user.PasswordHash == null)
+                {
+                    var hub = signalRConnectionManager.GetHubContext<ChatHub>();
+                    hub.Clients.All.userDisconnected(user.UserName);
+                    await ChatManager.RemoveUserAsync(user);
+                }
+            }
+            await SignInManager.SignOutAsync();            
+        }
+
         #region Helpers
 
         private void AddErrors(IdentityResult result)

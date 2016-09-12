@@ -6,29 +6,29 @@ import { Conversation } from '../../model/conversation';
 import { ConversationSelected } from '../../events/conversationSelected';
 
 export class ConversationPreview {
-  @bindable conversation: Conversation;
-  isSelected: boolean;
-  private conversationSelectecSubscription: Subscription;
+    @bindable conversation: Conversation;
+    isSelected: boolean;
+    private conversationSelectecSubscription: Subscription;
 
-  constructor(private service: ChatService, private ea: EventAggregator) { }
+    constructor(private service: ChatService, private ea: EventAggregator) { }
 
-  select() {
-    this.isSelected = true;
-    this.service.showConversation(this.conversation);
-  }
-
-  attached() {
-    this.ea.subscribe(ConversationSelected, c => {
-      if (c.id === this.conversation.id) {
+    select() {
         this.isSelected = true;
-      } else {
-        this.isSelected = false;
-      }
-    });
-  }
+        this.service.showConversation(this.conversation);
+    }
 
-  detached() {
-    this.conversationSelectecSubscription.dispose();
-  }
+    attached() {
+        this.conversationSelectecSubscription = this.ea.subscribe(ConversationSelected, c => {
+            if (c.id === this.conversation.id) {
+                this.isSelected = true;
+            } else {
+                this.isSelected = false;
+            }
+        });
+    }
+
+    detached() {
+        this.conversationSelectecSubscription.dispose();
+    }
 }
 

@@ -39,7 +39,6 @@ export enum ConnectionState {
 
 @autoinject
 export class ChatService {
-
     currentState = ConnectionState.Disconnected;
 
     constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
@@ -47,6 +46,8 @@ export class ChatService {
             builder => builder
                 .withBaseUrl(settings.apiBaseUrl)
                 .withCredentials(true));
+
+        settings.userName = sessionStorage.getItem('userName');
     }
     
     start() {
@@ -154,11 +155,13 @@ export class ChatService {
             
         }
     }
-
+    
     login(userName: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.http.get('xhrf')
-                .then(response =>
+                .then(response => {
+                    this.xhrf = response.response;
+
                     this.http.createRequest(this.settings.loginAPI)
                         .asPost()
                         .withHeader("X-XSRF-TOKEN", response.response)
@@ -170,7 +173,8 @@ export class ChatService {
                             resolve();
                             this.start();
                         })
-                        .catch(error => reject(error)))
+                        .catch(error => reject(error))
+                })
                 .catch(error => reject(error));
         });
     }
@@ -179,6 +183,13 @@ export class ChatService {
         delete this.settings.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
+        this.http.get('xhrf')
+            .then(response => {
+                this.http.createRequest(this.settings.logoffAPI)
+                    .asPost()
+                    .withHeader("X-XSRF-TOKEN", response.response)
+                    .send()
+            });
     }
     
     getUsers(): Promise<User[]> {

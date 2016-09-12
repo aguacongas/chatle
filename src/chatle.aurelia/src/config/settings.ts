@@ -5,4 +5,5 @@
     convAPI = '/api/chat/conv';
     chatAPI = '/api/chat';
     loginAPI = "/account/spaguess"
+    logoffAPI = "/account/spalogoff"
 }

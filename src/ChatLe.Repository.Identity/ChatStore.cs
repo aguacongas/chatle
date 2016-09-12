@@ -273,13 +273,10 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
-            Context.ChangeTracker.AutoDetectChangesEnabled = false;
-            Context.Add(connection);
+            if (NotificationConnections.Any(n => n.NotificationType.Equals(connection.NotificationType) && n.UserId.Equals(connection.UserId)) == false)
+                Context.Add(connection);
             
             await Context.SaveChangesAsync(cancellationToken);
-            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
-            Context.ChangeTracker.AutoDetectChangesEnabled = true;
         }
 
         /// <summary>
@@ -294,7 +291,9 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Remove(connection);
+            if (NotificationConnections.Any(n => n.NotificationType.Equals(connection.NotificationType) && n.UserId.Equals(connection.UserId)))
+                Context.Remove(connection);
+
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -410,8 +409,8 @@ namespace ChatLe.Models
                 Conversations.Remove(conversation);
             }
                             
-            var userConnection = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
-            NotificationConnections.RemoveRange(userConnection);
+            var userConnections = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
+            NotificationConnections.RemoveRange(userConnections);
             Users.Remove(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
