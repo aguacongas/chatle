@@ -8,6 +8,7 @@
 /// <reference path="../app/conversations/conversationPreview.component.js" />
 /// <reference path="../app/conversations/conversations.component.js" />
 /// <reference path="../app/main.js" />
+/// <reference path="../app/shared/attendee.js" />
 /// <reference path="../app/shared/chat.service.js" />
 /// <reference path="../app/shared/chat.service.spec.js" />
 /// <reference path="../app/shared/conversation.js" />

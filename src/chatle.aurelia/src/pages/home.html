@@ -3,13 +3,38 @@
     <require from="../resources/elements/conversation"></require>
     <require from="../resources/elements/conversation-list"></require>
 
-    <ul class="nav nav-bar">
-        <li click.delegate="manage">Welcom ${settings.userName}!</li>
-        <li click.delegate="logoff">Log off</li>
-    </ul>
-    <div>
-        <contact-list class="col-xs-3"></contact-list>
-        <conversation class="col-xs-6"></conversation>
-        <conversation-list class="col-xs-3"></conversation-list>
-    </div> 
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar menu"></span>
+                    <span class="icon-bar menu"></span>
+                    <span class="icon-bar menu"></span>
+                </button>
+                <a class="navbar-brand title" href="/">chatle</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li click.delegate="manage()"><a>Welcom ${settings.userName}!</a></li>
+                    <li click.delegate="logoff()"><a>Log off</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        <div class="row">
+            <div class="col-xs-3">
+                <h6>CONNECTED</h6>
+                <contact-list></contact-list>
+            </div>
+            <conversation class="col-xs-6"></conversation>
+            <div class="col-xs-3">
+                <h6>CONVERSATION</h6>
+                <conversation-list></conversation-list>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2016 - chatle</p>
+    </footer>
 </template>

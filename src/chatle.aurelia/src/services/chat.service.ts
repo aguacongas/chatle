@@ -154,6 +154,32 @@ export class ChatService {
             
         }
     }
+
+    login(userName: string): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.http.get('xhrf')
+                .then(response =>
+                    this.http.createRequest(this.settings.loginAPI)
+                        .asPost()
+                        .withHeader("X-XSRF-TOKEN", response.response)
+                        .withContent({ userName: userName })
+                        .send()
+                        .then(response => {
+                            this.settings.userName = userName;
+                            sessionStorage.setItem('userName', userName);
+                            resolve();
+                            this.start();
+                        })
+                        .catch(error => reject(error)))
+                .catch(error => reject(error));
+        });
+    }
+
+    logoff() {
+        delete this.settings.userName;
+        sessionStorage.removeItem('userName');
+        jQuery.connection.hub.stop();
+    }
     
     getUsers(): Promise<User[]> {
         return new Promise<User[]>((resolve, reject) => {
@@ -172,9 +198,13 @@ export class ChatService {
         return new Promise<Conversation[]>((resolve, reject) => {
             this.http.get(this.settings.chatAPI)
                 .then(response => {
-                    var data = response.content;
-                    if (data) {
-                        resolve(data as Conversation[]);
+                    if (response.response) {
+                        var data = response.content;
+                        if (data) {
+                            resolve(data as Conversation[]);
+                        }
+                    } else {
+                        resolve(null);
                     }
                 })
                 .catch(error => reject(error));

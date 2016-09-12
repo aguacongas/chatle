@@ -1,16 +1,21 @@
 import { autoinject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
 
-import { Settings } from '../config/settings';
+import { ChatService, ConnectionState } from '../services/chat.service';
 
 @autoinject
 export class Home {
 
-    constructor(public settings: Settings, private router: Router) { }
+    constructor(public service: ChatService, private router: Router) { }
+
+    attached() {
+        if (this.service.currentState !== ConnectionState.Connected) {
+            this.service.start();
+        }        
+    }
 
     logoff() {
-        delete this.settings.userName;
-        sessionStorage.removeItem('userName');
+        this.service.logoff();
         this.router.navigateToRoute('login');
     }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
+using System.Net;
 
 namespace ChatLe.Controllers
 {
@@ -94,9 +95,11 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaGuess
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> SpaGuess(string userName)
+        public async Task<JsonResult> SpaGuess([FromBody] GuessViewModel model)
         {
-            var user = new ChatLeUser { UserName = userName };                    
+            var user = new ChatLeUser { UserName = model.UserName };
+            if (ModelState.IsValid)
+            {
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -108,8 +111,11 @@ namespace ChatLe.Controllers
                 else
                 {
                     AddErrors(result);
-                    return new JsonResult(result);
                 }
+            }
+
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            return new JsonResult(ModelState.Root.Children);
         }
 
         //
