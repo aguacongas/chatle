@@ -18,7 +18,8 @@ export class ConversationList {
     this.service.getConversations()
       .then(conversations => {
         this.conversations = conversations;
-
+        this.conversations.forEach(c => this.setConversationTitle(c));
+        
         this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
           this.conversations.forEach(c => {
             let attendees = c.attendees;
@@ -34,6 +35,14 @@ export class ConversationList {
         });
 
         this.conversationJoinedSubscription = this.ea.subscribe(ConversationJoined, e => {
+          let conversation = (<ConversationJoined>e).conversation;
+          let title = '';
+          conversation.attendees.forEach(attendee => {
+              if (attendee && attendee.userId && attendee.userId !== this.service.userName) {
+                  title += attendee.userId + ' ';
+              }                
+          });
+          conversation.title = title.trim();
           this.conversations.unshift(e.conversation);
         });
       });
@@ -46,5 +55,15 @@ export class ConversationList {
     if (this.userDisconnectedSubscription) {
       this.userDisconnectedSubscription.dispose();
     }
+  }
+
+  private setConversationTitle(conversation: Conversation) {
+      let title = '';
+      conversation.attendees.forEach(attendee => {
+          if (attendee && attendee.userId && attendee.userId !== this.service.userName) {
+              title += attendee.userId + ' ';
+          }                
+      });
+      conversation.title = title.trim();
   }
 }

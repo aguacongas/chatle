@@ -67,10 +67,10 @@ namespace ChatLe.Models
             if (optionsAccessor == null || optionsAccessor.Value == null)
                 throw new ArgumentNullException("optionsAccessor");
 
-            if (!optionsAccessor.Value.ContextEnableQueryTracking)
-                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            // if (!optionsAccessor.Value.ContextEnableQueryTracking)
+            //     context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             
-            context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
+            // context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
             Context = context;            
         }
         

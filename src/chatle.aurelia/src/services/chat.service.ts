@@ -40,6 +40,7 @@ export enum ConnectionState {
 @autoinject
 export class ChatService {
     currentState = ConnectionState.Disconnected;
+    userName: string;
 
     constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
         http.configure(
@@ -119,7 +120,7 @@ export class ChatService {
     sendMessage(conversation: Conversation, message: string): Promise<Message> {
         let m = new Message();
         m.conversationId = conversation.id;
-        m.from = this.settings.userName;
+        m.from = this.userName;
         m.text = message;
 
         if (conversation.id) {
@@ -134,7 +135,7 @@ export class ChatService {
         } else {
             let attendee: Attendee;
              conversation.attendees.forEach(a => {
-                 if (a.userId !== this.settings.userName) {
+                 if (a.userId !== this.userName) {
                      attendee = a;
                  }
              });
@@ -166,7 +167,7 @@ export class ChatService {
                         .withContent({ userName: userName })
                         .send()
                         .then(response => {
-                            this.settings.userName = userName;
+                            this.userName = userName;
                             sessionStorage.setItem('userName', userName);
                             resolve();
                             this.start();
@@ -178,10 +179,12 @@ export class ChatService {
     }
 
     logoff() {
-        delete this.settings.userName;
+        delete this.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
-        this.http.post(this.settings.logoffAPI, null);
+        this.http.createRequest(this.settings.logoffAPI)
+            .asPost()
+            .send();
     }
     
     getUsers(): Promise<User[]> {
@@ -239,7 +242,7 @@ export class ChatService {
 
     private onUserDisconnected(id: string) {
         console.log("Chat Hub user disconnected: " + id);
-        if (id !== this.settings.userName) {
+        if (id !== this.userName) {
             this.ea.publish(new UserDisconnected(id));
         }
     }   

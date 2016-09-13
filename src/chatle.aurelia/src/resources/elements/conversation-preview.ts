@@ -5,6 +5,7 @@ import { ChatService } from '../../services/chat.service';
 import { Conversation } from '../../model/conversation';
 import { ConversationSelected } from '../../events/conversationSelected';
 
+@autoinject
 export class ConversationPreview {
     @bindable conversation: Conversation;
     isSelected: boolean;
@@ -31,4 +32,3 @@ export class ConversationPreview {
         this.conversationSelectecSubscription.dispose();
     }
 }
-

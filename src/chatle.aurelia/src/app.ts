@@ -2,8 +2,6 @@ import { autoinject } from 'aurelia-framework';
 import { Router, Redirect, NavigationInstruction, RouterConfiguration, Next, RouteConfig } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
-
-import { Settings } from './config/settings';
 import { ChatService, ConnectionState } from './services/chat.service';
 import { ConnectionStateChanged } from './events/connectionStateChanged';
 
@@ -17,7 +15,7 @@ export class App {
     isConnected: boolean;
     userName: string;
 
-    constructor(private settings: Settings, private service: ChatService, private ea: EventAggregator) {
+    constructor(private service: ChatService, private ea: EventAggregator) {
         this.setIsConnected();
     }
 
@@ -49,8 +47,8 @@ export class App {
     }
 
     private setIsConnected() {
-        this.isConnected = this.settings.userName !== undefined && this.settings.userName != null;
-        this.userName = this.settings.userName;
+        this.isConnected = this.service.userName !== undefined && this.service.userName != null;
+        this.userName = this.service.userName;
     }
 
 }
@@ -58,14 +56,14 @@ export class App {
 @autoinject
 class AuthorizeStep {
 
-    constructor(private settings: Settings) { }
+    constructor(private service: ChatService) { }
 
     run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
         if (navigationInstruction.getAllInstructions().some(i => {
             let route = i.config as CustomRouteConfig;
             return !route.anomymous
         })) {
-            var isLoggedIn = this.settings.userName;
+            var isLoggedIn = this.service.userName;
             if (!isLoggedIn) {
                 return next.cancel(new Redirect('login'));
             }

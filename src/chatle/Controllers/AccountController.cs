@@ -208,7 +208,6 @@ namespace ChatLe.Controllers
         //
         // POST: /Account/LogOff
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
@@ -225,8 +224,9 @@ namespace ChatLe.Controllers
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
+        //
+        // POST: /Account/SpaLogOff
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
@@ -239,7 +239,8 @@ namespace ChatLe.Controllers
                     await ChatManager.RemoveUserAsync(user);
                 }
             }
-            await SignInManager.SignOutAsync();            
+
+            await SignInManager.SignOutAsync();
         }
 
         #region Helpers

@@ -195,7 +195,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             var _this = this;
             var m = new message_1.Message();
             m.conversationId = conversation.id;
-            m.from = this.settings.userName;
+            m.from = this.userName;
             m.text = message;
             if (conversation.id) {
                 return new Promise(function (resolve, reject) {
@@ -210,7 +210,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             else {
                 var attendee_1;
                 conversation.attendees.forEach(function (a) {
-                    if (a.userId !== _this.settings.userName) {
+                    if (a.userId !== _this.userName) {
                         attendee_1 = a;
                     }
                 });
@@ -239,7 +239,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         .withContent({ userName: userName })
                         .send()
                         .then(function (response) {
-                        _this.settings.userName = userName;
+                        _this.userName = userName;
                         sessionStorage.setItem('userName', userName);
                         resolve();
                         _this.start();
@@ -250,10 +250,12 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             });
         };
         ChatService.prototype.logoff = function () {
-            delete this.settings.userName;
+            delete this.userName;
             sessionStorage.removeItem('userName');
             jQuery.connection.hub.stop();
-            this.http.post(this.settings.logoffAPI, null);
+            this.http.createRequest(this.settings.logoffAPI)
+                .asPost()
+                .send();
         };
         ChatService.prototype.getUsers = function () {
             var _this = this;
@@ -306,7 +308,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
         };
         ChatService.prototype.onUserDisconnected = function (id) {
             console.log("Chat Hub user disconnected: " + id);
-            if (id !== this.settings.userName) {
+            if (id !== this.userName) {
                 this.ea.publish(new userDisconnected_1.UserDisconnected(id));
             }
         };
@@ -334,11 +336,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', './config/settings', './services/chat.service', './events/connectionStateChanged'], function (require, exports, aurelia_framework_1, aurelia_router_1, aurelia_event_aggregator_1, settings_1, chat_service_1, connectionStateChanged_1) {
+define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', './services/chat.service', './events/connectionStateChanged'], function (require, exports, aurelia_framework_1, aurelia_router_1, aurelia_event_aggregator_1, chat_service_1, connectionStateChanged_1) {
     "use strict";
     var App = (function () {
-        function App(settings, service, ea) {
-            this.settings = settings;
+        function App(service, ea) {
             this.service = service;
             this.ea = ea;
             this.setIsConnected();
@@ -367,26 +368,26 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
             this.router.navigateToRoute('account');
         };
         App.prototype.setIsConnected = function () {
-            this.isConnected = this.settings.userName !== undefined && this.settings.userName != null;
-            this.userName = this.settings.userName;
+            this.isConnected = this.service.userName !== undefined && this.service.userName != null;
+            this.userName = this.service.userName;
         };
         App = __decorate([
             aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [settings_1.Settings, chat_service_1.ChatService, aurelia_event_aggregator_1.EventAggregator])
+            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_event_aggregator_1.EventAggregator])
         ], App);
         return App;
     }());
     exports.App = App;
     var AuthorizeStep = (function () {
-        function AuthorizeStep(settings) {
-            this.settings = settings;
+        function AuthorizeStep(service) {
+            this.service = service;
         }
         AuthorizeStep.prototype.run = function (navigationInstruction, next) {
             if (navigationInstruction.getAllInstructions().some(function (i) {
                 var route = i.config;
                 return !route.anomymous;
             })) {
-                var isLoggedIn = this.settings.userName;
+                var isLoggedIn = this.service.userName;
                 if (!isLoggedIn) {
                     return next.cancel(new aurelia_router_1.Redirect('login'));
                 }
@@ -395,7 +396,7 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
         };
         AuthorizeStep = __decorate([
             aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [settings_1.Settings])
+            __metadata('design:paramtypes', [chat_service_1.ChatService])
         ], AuthorizeStep);
         return AuthorizeStep;
     }());
@@ -668,6 +669,7 @@ define('resources/elements/conversation-list',["require", "exports", 'aurelia-fr
             this.service.getConversations()
                 .then(function (conversations) {
                 _this.conversations = conversations;
+                _this.conversations.forEach(function (c) { return _this.setConversationTitle(c); });
                 _this.userDisconnectedSubscription = _this.ea.subscribe(userDisconnected_1.UserDisconnected, function (e) {
                     _this.conversations.forEach(function (c) {
                         var attendees = c.attendees;
@@ -682,6 +684,14 @@ define('resources/elements/conversation-list',["require", "exports", 'aurelia-fr
                     });
                 });
                 _this.conversationJoinedSubscription = _this.ea.subscribe(conversationJoined_1.ConversationJoined, function (e) {
+                    var conversation = e.conversation;
+                    var title = '';
+                    conversation.attendees.forEach(function (attendee) {
+                        if (attendee && attendee.userId && attendee.userId !== _this.service.userName) {
+                            title += attendee.userId + ' ';
+                        }
+                    });
+                    conversation.title = title.trim();
                     _this.conversations.unshift(e.conversation);
                 });
             });
@@ -693,6 +703,16 @@ define('resources/elements/conversation-list',["require", "exports", 'aurelia-fr
             if (this.userDisconnectedSubscription) {
                 this.userDisconnectedSubscription.dispose();
             }
+        };
+        ConversationList.prototype.setConversationTitle = function (conversation) {
+            var _this = this;
+            var title = '';
+            conversation.attendees.forEach(function (attendee) {
+                if (attendee && attendee.userId && attendee.userId !== _this.service.userName) {
+                    title += attendee.userId + ' ';
+                }
+            });
+            conversation.title = title.trim();
         };
         ConversationList = __decorate([
             aurelia_framework_1.autoinject, 
@@ -712,7 +732,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('resources/elements/conversation-preview',["require", "exports", 'aurelia-framework', '../../model/conversation', '../../events/conversationSelected'], function (require, exports, aurelia_framework_1, conversation_1, conversationSelected_1) {
+define('resources/elements/conversation-preview',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../../services/chat.service', '../../model/conversation', '../../events/conversationSelected'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, chat_service_1, conversation_1, conversationSelected_1) {
     "use strict";
     var ConversationPreview = (function () {
         function ConversationPreview(service, ea) {
@@ -741,6 +761,10 @@ define('resources/elements/conversation-preview',["require", "exports", 'aurelia
             aurelia_framework_1.bindable, 
             __metadata('design:type', conversation_1.Conversation)
         ], ConversationPreview.prototype, "conversation", void 0);
+        ConversationPreview = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_event_aggregator_1.EventAggregator])
+        ], ConversationPreview);
         return ConversationPreview;
     }());
     exports.ConversationPreview = ConversationPreview;
@@ -771,15 +795,15 @@ define('resources/elements/conversation',["require", "exports", 'aurelia-framewo
     exports.Conversation = Conversation;
 });
 
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\r\n  <require from=\"./css/site.css\"></require>\r\n    <div class=\"navbar navbar-default navbar-fixed-top\">\r\n        <div class=\"container\">\r\n            <div class=\"navbar-header\">\r\n                <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                    <span class=\"icon-bar menu\"></span>\r\n                </button>\r\n                <a class=\"navbar-brand title\" href=\"/\">chatle</a>\r\n            </div>\r\n            <div class=\"navbar-collapse collapse\">\r\n                <ul class=\"nav navbar-nav\" if.bind=\"isConnected\">\r\n                    <li click.delegate=\"manage()\"><a>Welcom ${userName}!</a></li>\r\n                    <li click.delegate=\"logoff()\"><a>Log off</a></li>\r\n                </ul>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <div class=\"container body-content\">\r\n        <router-view></router-view>\r\n    </div>\r\n    <footer>\r\n        <p>� 2016 - chatle</p>\r\n    </footer>\r\n</template>\r\n"; });
-define('text!css/site.css', ['module'], function(module) { module.exports = "html {\r\n    font-family: cursive\r\n}\r\n/* Move down content because we have a fixed navbar that is 50px tall */\r\nbody.chatle {\r\n    padding-top: 50px;\r\n    padding-bottom: 20px;\r\n}\r\n\r\n/* Wrapping element */\r\n/* Set some basic padding to keep content from hitting the edges */\r\n.body-content {\r\n    padding-left: 15px;\r\n    padding-right: 15px;\r\n}\r\n\r\n.navbar.navbar-default {\r\n    background-color: #000;\r\n}\r\n\r\n.title.navbar-brand:focus,\r\n.title.navbar-brand:hover,\r\n.nav.navbar-nav > li > a:hover {\r\n    color: #fff;    \r\n}\r\n\r\nli:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n/* Set widths on the form inputs since otherwise they're 100% wide */\r\ninput,\r\nselect,\r\ntextarea {\r\n    max-width: 280px;\r\n}\r\n\r\nul\r\n{\r\n    padding-left: 0;\r\n    list-style-type: none;\r\n}\r\n\r\nsmall {\r\n    color: #666666;\r\n}\r\n\r\n/* Responsive: Portrait tablets and up */\r\n@media screen and (min-width: 768px) {\r\n    .jumbotron {\r\n        margin-top: 20px;\r\n    }\r\n\r\n    .body-content {\r\n        padding: 0;\r\n    }\r\n}\r\n"; });
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"bootstrap/css/bootstrap.css\"></require>\n  <require from=\"./css/site.css\"></require>\n    <div class=\"navbar navbar-default navbar-fixed-top\">\n        <div class=\"container\">\n            <div class=\"navbar-header\">\n                <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\n                    <span class=\"icon-bar menu\"></span>\n                    <span class=\"icon-bar menu\"></span>\n                    <span class=\"icon-bar menu\"></span>\n                </button>\n                <a class=\"navbar-brand title\" href=\"/\">chatle</a>\n            </div>\n            <div class=\"navbar-collapse collapse\">\n                <ul class=\"nav navbar-nav\" if.bind=\"isConnected\">\n                    <li click.delegate=\"manage()\"><a>Welcom ${userName}!</a></li>\n                    <li click.delegate=\"logoff()\"><a>Log off</a></li>\n                </ul>\n            </div>\n        </div>\n    </div>\n    <div class=\"container body-content\">\n        <router-view></router-view>\n    </div>\n    <footer>\n        <p>� 2016 - chatle</p>\n    </footer>\n</template>\n"; });
+define('text!css/site.css', ['module'], function(module) { module.exports = "html {\n    font-family: cursive\n}\n/* Move down content because we have a fixed navbar that is 50px tall */\nbody.chatle {\n    padding-top: 50px;\n    padding-bottom: 20px;\n}\n\n/* Wrapping element */\n/* Set some basic padding to keep content from hitting the edges */\n.body-content {\n    padding-left: 15px;\n    padding-right: 15px;\n}\n\n.navbar.navbar-default {\n    background-color: #000;\n}\n\n.title.navbar-brand:focus,\n.title.navbar-brand:hover,\n.nav.navbar-nav > li > a:hover {\n    color: #fff;    \n}\n\nli:hover {\n    cursor: pointer;\n}\n\n/* Set widths on the form inputs since otherwise they're 100% wide */\ninput,\nselect,\ntextarea {\n    max-width: 280px;\n}\n\nul\n{\n    padding-left: 0;\n    list-style-type: none;\n}\n\nsmall {\n    color: #666666;\n}\n\n/* Responsive: Portrait tablets and up */\n@media screen and (min-width: 768px) {\n    .jumbotron {\n        margin-top: 20px;\n    }\n\n    .body-content {\n        padding: 0;\n    }\n}\n"; });
 define('text!pages/account.html', ['module'], function(module) { module.exports = ""; });
 define('text!css/site.min.css', ['module'], function(module) { module.exports = "html{font-family:cursive}body{padding-top:50px;padding-bottom:20px}.console{font-family:'Lucida Console',Monaco,monospace}.body-content{padding-left:15px;padding-right:15px}.navbar.navbar-default{background-color:#fff}.nav.navbar-nav>li>a:hover,.title.navbar-brand:focus,.title.navbar-brand:hover{color:#222}input,select,textarea{max-width:280px}ul{padding-left:0;list-style-type:none}small{color:#666}@media screen and (min-width:768px){.jumbotron{margin-top:20px}.body-content{padding:0}}"; });
-define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"../resources/elements/contact-list\"></require>\r\n    <require from=\"../resources/elements/conversation\"></require>\r\n    <require from=\"../resources/elements/conversation-list\"></require>\r\n\r\n    <div class=\"row\">\r\n        <ul if.bind=\"isDisconnected\">\r\n            <li><a class=\"text-danger\" href=\"/home\">You are disconnected</a></li>\r\n        </ul>\r\n        <div class=\"col-xs-3\">\r\n            <h6>CONVERSATION</h6>\r\n            <conversation-list></conversation-list>\r\n        </div>\r\n        <conversation class=\"col-xs-6\"></conversation>\r\n        <div class=\"col-xs-3\">\r\n            <h6>CONNECTED</h6>\r\n            <contact-list></contact-list>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\r\n    <h2>Loging</h2>\r\n    <hr />\r\n    <form class=\"form-horizontal\">\r\n        <div class=\"form-group\">\r\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\r\n            <div class=\"col-xs-9\">\r\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\r\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <div class=\"col-xs-offset-3 col-xs-9\">\r\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\r\n            </div>\r\n        </div>\r\n    </form>\r\n</template>"; });
-define('text!resources/elements/contact-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"./contact\"></require>\r\n  <div class=\"contact-list\">\r\n    <span if.bind=\"!users\">${loadingMessage}</span>\r\n    <ul class=\"list-group\" if.bind=\"users\">\r\n      <contact repeat.for=\"user of users\" user.bind=\"user\"></contact>\r\n    </ul>\r\n  </div>\r\n</template>"; });
-define('text!resources/elements/contact.html', ['module'], function(module) { module.exports = "<template>\r\n    <li class=\"list-group-item ${isSelected ? 'active' : ''}\">\r\n        <a click.delegate=\"select()\">${user.id}</a>\r\n    </li>\r\n</template>"; });
-define('text!resources/elements/conversation-list.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"./conversation-preview\"></require>\r\n  <div class=\"conversation-list\">\r\n    <ul class=\"list-group\">\r\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\r\n    </ul>\r\n  </div>\r\n</template>"; });
-define('text!resources/elements/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\r\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">${conversation.title}</li>\r\n</template>"; });
-define('text!resources/elements/conversation.html', ['module'], function(module) { module.exports = "<template>\r\n  <h1>${value}</h1>\r\n</template>"; });
+define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../resources/elements/contact-list\"></require>\n    <require from=\"../resources/elements/conversation\"></require>\n    <require from=\"../resources/elements/conversation-list\"></require>\n\n    <div class=\"row\">\n        <ul if.bind=\"isDisconnected\">\n            <li><a class=\"text-danger\" href=\"/home\">You are disconnected</a></li>\n        </ul>\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <conversation class=\"col-xs-6\"></conversation>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
+define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Loging</h2>\n    <hr />\n    <form class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\n            <div class=\"col-xs-9\">\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-xs-offset-3 col-xs-9\">\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\n            </div>\n        </div>\n    </form>\n</template>"; });
+define('text!resources/elements/contact-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./contact\"></require>\n  <div class=\"contact-list\">\n    <span if.bind=\"!users\">${loadingMessage}</span>\n    <ul class=\"list-group\" if.bind=\"users\">\n      <contact repeat.for=\"user of users\" user.bind=\"user\"></contact>\n    </ul>\n  </div>\n</template>"; });
+define('text!resources/elements/contact.html', ['module'], function(module) { module.exports = "<template>\n    <li class=\"list-group-item ${isSelected ? 'active' : ''}\">\n        <a click.delegate=\"select()\">${user.id}</a>\n    </li>\n</template>"; });
+define('text!resources/elements/conversation-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./conversation-preview\"></require>\n  <div class=\"conversation-list\">\n    <ul class=\"list-group\">\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\n    </ul>\n  </div>\n</template>"; });
+define('text!resources/elements/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">${conversation.title}</li>\n</template>"; });
+define('text!resources/elements/conversation.html', ['module'], function(module) { module.exports = "<template>\n  <h1>${value}</h1>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

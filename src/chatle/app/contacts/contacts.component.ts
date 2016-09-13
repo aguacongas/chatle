@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { ChatService, ConnectionState } from '../shared/chat.service'
 import { User } from '../shared/user'
@@ -11,7 +11,7 @@ export class ContactsComponent implements OnInit {
     users: User[];
     error: any;
 
-    constructor(private service: ChatService) { }
+    constructor(private service: ChatService, private detector: ChangeDetectorRef) { }
 
     ngOnInit() {
         this.service.connectionState
@@ -27,7 +27,8 @@ export class ContactsComponent implements OnInit {
             .subscribe(
                 user => {
                     this.removeUser(user.id);
-                    this.users.unshift(user)
+                    this.users.unshift(user);
+                    this.detector.detectChanges();
                 },
                 error => this.error = error);
 
@@ -35,6 +36,7 @@ export class ContactsComponent implements OnInit {
             .subscribe(
                 id => {
                     this.removeUser(id);
+                    this.detector.detectChanges();
                 },
                 error => this.error = error);
 
@@ -53,7 +55,10 @@ export class ContactsComponent implements OnInit {
     private getUsers() {
         this.service.getUsers()
             .subscribe(
-            users => this.users = users,
-            error => this.error = error);
+                users => {
+                    this.users = users;
+                    this.detector.detectChanges();
+                },
+                error => this.error = error);
     }
 }
