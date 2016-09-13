@@ -74,15 +74,16 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ChatLeUser { UserName = model.UserName };                    
+                var user = await UserManager.FindByNameAsync(model.UserName);
+
+                if (user == null)
+                    user = new ChatLeUser { UserName = model.UserName };
+                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                    return await SignGuessUser(user);
+
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
-                {
-                    await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
-                    await SignInManager.SignInAsync(user, isPersistent: false);
-
-                    return RedirectToAction("Index", "Home");
-                }
+                    return await SignGuessUser(user);
                 else
                     AddErrors(result);
             }
@@ -91,22 +92,33 @@ namespace ChatLe.Controllers
             return View("Index", new LoginPageViewModel() { Guess = model });
         }
 
+        private async Task<IActionResult> SignGuessUser(ChatLeUser user)
+        {
+            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
+            await SignInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // POST: /Account/SpaGuess
         [HttpPost]
         [AllowAnonymous]
         public async Task<JsonResult> SpaGuess([FromBody] GuessViewModel model)
         {
-            var user = new ChatLeUser { UserName = model.UserName };
             if (ModelState.IsValid)
             {
+                var user = await UserManager.FindByNameAsync(model.UserName);
+
+                if (user == null)
+                    user = new ChatLeUser { UserName = model.UserName };
+                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                    return await SignInSpaGuess(user);
+
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
-                    await SignInManager.SignInAsync(user, isPersistent: false);
-
-                    return new JsonResult("OK");
+                    return await SignInSpaGuess(user);
                 }
                 else
                 {
@@ -116,6 +128,14 @@ namespace ChatLe.Controllers
 
             Response.StatusCode = (int)HttpStatusCode.BadRequest;
             return new JsonResult(ModelState.Root.Children);
+        }
+
+        private async Task<JsonResult> SignInSpaGuess(ChatLeUser user)
+        {
+            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
+            await SignInManager.SignInAsync(user, isPersistent: false);
+
+            return new JsonResult("OK");
         }
 
         //
@@ -206,6 +226,7 @@ namespace ChatLe.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();

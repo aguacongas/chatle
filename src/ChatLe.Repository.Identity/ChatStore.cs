@@ -67,7 +67,7 @@ namespace ChatLe.Models
             if (optionsAccessor == null || optionsAccessor.Value == null)
                 throw new ArgumentNullException("optionsAccessor");
 
-            if (!optionsAccessor.Value.ContextEnableTracking)
+            if (!optionsAccessor.Value.ContextEnableQueryTracking)
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             
             context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
@@ -116,7 +116,7 @@ namespace ChatLe.Models
             if(message == null)
                 throw new ArgumentNullException("message");
 
-            Context.Add(message);
+            Messages.Add(message);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -133,7 +133,7 @@ namespace ChatLe.Models
             {
                 throw new ArgumentNullException("attendee");
             }
-            Context.Add(attendee);
+            Attendees.Add(attendee);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -149,7 +149,7 @@ namespace ChatLe.Models
             if (conversation == null)
                 throw new ArgumentNullException("conversation");
 
-            Context.Add(conversation);
+            Conversations.Add(conversation);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -176,8 +176,8 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
                 throw new ArgumentNullException("user");
-            
-            Context.Update(user);
+
+            Users.Update(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -281,7 +281,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Add(connection);
+            NotificationConnections.Add(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -297,7 +297,7 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Remove(connection);
+            NotificationConnections.Remove(connection);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -415,7 +415,7 @@ namespace ChatLe.Models
                             
             var userConnections = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
             NotificationConnections.RemoveRange(userConnections);
-            Users.Remove(user);
+            
             await Context.SaveChangesAsync(cancellationToken);
         }
 

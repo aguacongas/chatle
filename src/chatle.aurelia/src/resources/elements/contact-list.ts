@@ -18,8 +18,10 @@ export class ContactList {
     constructor(private service: ChatService, private ea: EventAggregator) { }
 
     attached() {
-        this.connectionStateChangeSubscription = this.ea.subscribe(ConnectionStateChanged, state => {
-            this.getUser();
+        this.connectionStateChangeSubscription = this.ea.subscribe(ConnectionStateChanged, e => {
+            if ((<ConnectionStateChanged>e).state === ConnectionState.Connected) {
+                this.getUser();
+            }            
         });
 
         if (this.service.currentState === ConnectionState.Connected) {
@@ -43,20 +45,28 @@ export class ContactList {
                 this.users = users;
 
                 this.userConnectedSubscription = this.ea.subscribe(UserConnected, e => {
+                    this.removeUser((<UserConnected>e).user.id);
                     this.users.unshift(e.user);
                 });
 
                 this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
-                    let user: User;
-                    this.users.forEach(u => {
-                        if (u.id === e.id) {
-                            user = u;
-                        }
-                    });
-                    let index = this.users.indexOf(user);
-                    this.users.splice(index, 1);
+                    this.removeUser((<UserDisconnected>e).id);
                 });
             })
             .catch(error => this.loadingMessage = error);
+    }
+
+    private removeUser(id: string) {
+        let user: User;
+        this.users.forEach(u => {
+            if (u.id === id) {
+                user = u;
+            }
+        });
+
+        if (user) {
+            let index = this.users.indexOf(user);
+            this.users.splice(index, 1);
+        }        
     }
 }

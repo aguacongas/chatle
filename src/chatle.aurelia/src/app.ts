@@ -33,13 +33,8 @@ export class App {
         this.router = router;
     }
 
-    private setIsConnected() {
-        this.isConnected = this.settings.userName !== undefined && this.settings.userName != null;
-        this.userName = this.settings.userName;
-    }
-
     created() {
-        this.ea.subscribe(ConnectionStateChanged, state => {
+        this.ea.subscribe(ConnectionStateChanged, e => {
             this.setIsConnected();
         });
     }
@@ -52,6 +47,12 @@ export class App {
     manage() {
         this.router.navigateToRoute('account');
     }
+
+    private setIsConnected() {
+        this.isConnected = this.settings.userName !== undefined && this.settings.userName != null;
+        this.userName = this.settings.userName;
+    }
+
 }
 
 @autoinject

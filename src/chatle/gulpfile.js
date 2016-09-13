@@ -34,9 +34,7 @@ paths.systemjs = paths.node_modules + "systemjs/dist/*.js";
 paths.rxjs = paths.node_modules + "rxjs/**/*.js";
 paths.jasminejs = paths.node_modules + "jasmine-core/lib/jasmine-core/*.*";
 
-paths.app = "app/**/*.js";
-paths.appTemplates = "app/**/*.html"
-paths.appmaps = "app/**/*.map"
+paths.app = "app/**/*.*";
 paths.appDest = paths.webroot + "app";
 gulp.task("clean:js", function (cb) {
     return rimraf(paths.concatJsDest, cb);
@@ -106,7 +104,7 @@ gulp.task("copy:rxjs", function () {
 });
 
 gulp.task("copy:app", function () {
-    return gulp.src([paths.app, paths.appmaps, paths.appTemplates])
+    return gulp.src(paths.app)
 			.pipe(gulp.dest(paths.appDest));
 });
 
@@ -127,7 +125,7 @@ gulp.task("dependencies", ["copy:angular",
 					"copy:app"]);
 
 gulp.task("watch", function () {
-    return watch([paths.app, paths.appmaps, paths.appTemplates])
+    return watch(paths.app)
 			.pipe(gulp.dest(paths.appDest))
 });
 
@@ -142,4 +140,4 @@ gulp.task("min:app", function () {
 
 gulp.task("min", ["min:js", "min:css", "min:app"]);
 
-gulp.task("default", ["clean", "min", "dependencies"]);
+gulp.task("default", ["clean", "dependencies"]);
