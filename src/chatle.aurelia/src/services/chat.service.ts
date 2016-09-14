@@ -135,7 +135,7 @@ export class ChatService {
                     text: message
                 })
                 .then(response => resolve(m))
-                .catch(error => reject(error));
+                .catch(error => reject('Error when sending the message'));
             });
         } else {
             let attendee: Attendee;
@@ -156,7 +156,7 @@ export class ChatService {
                         this.ea.publish(new ConversationJoined(conversation));
                         resolve(m);
                     })
-                .catch(error => reject(error));
+                    .catch(error => reject('Error when creating the conversation'));
             });
             
         }
@@ -177,9 +177,15 @@ export class ChatService {
                             resolve();
                             this.start();
                         })
-                        .catch(error => reject(error))
+                        .catch(error => {
+                            if (error.statusCode === 409) {
+                                reject("This user name already exists, please chose a different name");
+                            } else {
+                                reject(error.content.errors[0].ErrorMessage);
+                            }
+                        })
                 })
-                .catch(error => reject(error));
+                .catch(error => reject('The service is down'));
         });
     }
 
@@ -201,7 +207,7 @@ export class ChatService {
                             resolve(data.users as User[]);
                         }
                     })
-                .catch(error => reject(error));
+                .catch(error => reject('The service is down'));
         });
     }
 
@@ -218,7 +224,7 @@ export class ChatService {
                         resolve(null);
                     }
                 })
-                .catch(error => reject(error));
+                .catch(error => reject('The service is down'));
         });
     }
 

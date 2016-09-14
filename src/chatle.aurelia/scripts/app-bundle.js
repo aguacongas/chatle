@@ -207,7 +207,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         text: message
                     })
                         .then(function (response) { return resolve(m); })
-                        .catch(function (error) { return reject(error); });
+                        .catch(function (error) { return reject('Error when sending the message'); });
                 });
             }
             else {
@@ -227,7 +227,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         _this.ea.publish(new conversationJoined_1.ConversationJoined(conversation));
                         resolve(m);
                     })
-                        .catch(function (error) { return reject(error); });
+                        .catch(function (error) { return reject('Error when creating the conversation'); });
                 });
             }
         };
@@ -247,9 +247,16 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         resolve();
                         _this.start();
                     })
-                        .catch(function (error) { return reject(error); });
+                        .catch(function (error) {
+                        if (error.statusCode === 409) {
+                            reject("This user name already exists, please chose a different name");
+                        }
+                        else {
+                            reject(error.content.errors[0].ErrorMessage);
+                        }
+                    });
                 })
-                    .catch(function (error) { return reject(error); });
+                    .catch(function (error) { return reject('The service is down'); });
             });
         };
         ChatService.prototype.logoff = function () {
@@ -270,7 +277,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         resolve(data.users);
                     }
                 })
-                    .catch(function (error) { return reject(error); });
+                    .catch(function (error) { return reject('The service is down'); });
             });
         };
         ChatService.prototype.getConversations = function () {
@@ -288,7 +295,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         resolve(null);
                     }
                 })
-                    .catch(function (error) { return reject(error); });
+                    .catch(function (error) { return reject('The service is down'); });
             });
         };
         ChatService.prototype.setConverationTitle = function (conversation) {
@@ -605,9 +612,6 @@ define('components/conversation-component',["require", "exports", 'aurelia-frame
         };
         ConversationComponent.prototype.sendMessage = function () {
             var _this = this;
-            if (!this.message) {
-                return;
-            }
             this.service.sendMessage(this.conversation, this.message)
                 .then(function (message) { return _this.conversation.messages.unshift(message); });
             this.message = '';

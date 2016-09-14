@@ -28,10 +28,6 @@ export class ConversationComponent {
     }
 
     sendMessage() {
-        if (!this.message) {
-            return;
-        }
-
         this.service.sendMessage(this.conversation, this.message)
             .then(message => this.conversation.messages.unshift(message));
 

@@ -8,6 +8,7 @@ using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
 using System.Net;
+using System.Linq;
 
 namespace ChatLe.Controllers
 {
@@ -111,18 +112,25 @@ namespace ChatLe.Controllers
                 var user = await UserManager.FindByNameAsync(model.UserName);
 
                 if (user == null)
+                {
                     user = new ChatLeUser { UserName = model.UserName };
+                    var result = await UserManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return await SignInSpaGuess(user);
+                    }
+                    else
+                    {
+                        AddErrors(result);
+                    }
+                }
                 else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
                     return await SignInSpaGuess(user);
-
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    return await SignInSpaGuess(user);
-                }
                 else
                 {
-                    AddErrors(result);
+                    ModelState.AddModelError("UserAlreadyExists", "This user name already exists, please chose a different name");
+                    Response.StatusCode = 409;
+                    return new JsonResult(ModelState.Root.Children);
                 }
             }
 
