@@ -1,11 +1,11 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
-import { ChatService, ConnectionState } from '../../services/chat.service';
-import { User } from '../../model/user';
-import { UserConnected } from '../../events/userConnected'
-import { UserDisconnected } from '../../events/userDisconnected'
-import { ConnectionStateChanged } from '../../events/connectionStateChanged';
+import { ChatService, ConnectionState } from '../services/chat.service';
+import { User } from '../model/user';
+import { UserConnected } from '../events/userConnected'
+import { UserDisconnected } from '../events/userDisconnected'
+import { ConnectionStateChanged } from '../events/connectionStateChanged';
 
 @autoinject
 export class ContactList {

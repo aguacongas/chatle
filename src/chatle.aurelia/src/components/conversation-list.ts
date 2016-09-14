@@ -1,10 +1,10 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
-import { ChatService } from '../../services/chat.service';
-import { Conversation } from '../../model/conversation';
-import { ConversationJoined } from '../../events/conversationJoined'
-import { UserDisconnected } from '../../events/userDisconnected'
+import { ChatService } from '../services/chat.service';
+import { Conversation } from '../model/conversation';
+import { ConversationJoined } from '../events/conversationJoined'
+import { UserDisconnected } from '../events/userDisconnected'
 
 @autoinject
 export class ConversationList {
@@ -35,14 +35,7 @@ export class ConversationList {
         });
 
         this.conversationJoinedSubscription = this.ea.subscribe(ConversationJoined, e => {
-          let conversation = (<ConversationJoined>e).conversation;
-          let title = '';
-          conversation.attendees.forEach(attendee => {
-              if (attendee && attendee.userId && attendee.userId !== this.service.userName) {
-                  title += attendee.userId + ' ';
-              }                
-          });
-          conversation.title = title.trim();
+          let conversation = (<ConversationJoined>e).conversation;          
           this.conversations.unshift(e.conversation);
         });
       });

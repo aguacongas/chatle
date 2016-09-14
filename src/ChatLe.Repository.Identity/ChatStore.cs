@@ -282,7 +282,42 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("connection");
 
             NotificationConnections.Add(connection);
-            await Context.SaveChangesAsync(cancellationToken);
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection<TKey>;
+                    if (entry.Entity != null)
+                    {                        
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        if (databaseEntity == null)
+                        {
+                            var databaseEntry = Context.Entry(connection);
+
+                            foreach (var property in entry.Metadata.GetProperties())
+                            {
+                                if (property.IsKey())
+                                    continue;
+
+                                entry.Property(property.Name).IsModified = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+                    }
+                }
+
+                // Retry the save operation
+                Context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -298,7 +333,42 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("connection");
 
             NotificationConnections.Remove(connection);
-            await Context.SaveChangesAsync(cancellationToken);
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection<TKey>;
+                    if (entry.Entity != null)
+                    {
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        if (databaseEntity == null)
+                            return;
+
+                        var databaseEntry = Context.Entry(databaseEntity);
+
+                        foreach (var property in entry.Metadata.GetProperties())
+                        {
+                            if (property.IsKey())
+                                continue;
+
+                            var proposedValue = entry.Property(property.Name).CurrentValue;
+                            var originalValue = entry.Property(property.Name).OriginalValue;
+                            var databaseValue = databaseEntry.Property(property.Name).CurrentValue;
+                            entry.Property(property.Name).OriginalValue = databaseEntry.Property(property.Name).CurrentValue;
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+                    }
+                }
+            }
         }
 
         /// <summary>

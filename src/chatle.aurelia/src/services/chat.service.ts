@@ -1,6 +1,7 @@
 ﻿import { EventAggregator } from 'aurelia-event-aggregator';
 import { HttpClient } from 'aurelia-http-client';
 import { autoinject } from 'aurelia-framework';
+import { Router } from 'aurelia-router';
 import environment from '../environment';
 
 import { Settings } from '../config/settings';
@@ -39,8 +40,9 @@ export enum ConnectionState {
 
 @autoinject
 export class ChatService {
-    currentState = ConnectionState.Disconnected;
+    currentState = ConnectionState.Disconnected;    
     userName: string;
+    currentConversation: Conversation;
 
     constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
         http.configure(
@@ -48,7 +50,7 @@ export class ChatService {
                 .withBaseUrl(settings.apiBaseUrl)
                 .withCredentials(true));
 
-        settings.userName = sessionStorage.getItem('userName');
+        this.userName = sessionStorage.getItem('userName');
     }
     
     start() {
@@ -113,8 +115,11 @@ export class ChatService {
             .fail(error => this.setConnectionState(ConnectionState.Error));
     }
 
-    showConversation(conversation: Conversation) {
-        this.ea.publish(new ConversationJoined(conversation));        
+    showConversation(conversation: Conversation, router: Router) {
+        this.currentConversation = conversation;
+        this.setConverationTitle(conversation);
+        this.ea.publish(new ConversationSelected(conversation));
+        router.navigateToRoute('conversation', { id: conversation.title });
     }
 
     sendMessage(conversation: Conversation, message: string): Promise<Message> {
@@ -217,6 +222,20 @@ export class ChatService {
         });
     }
 
+    private setConverationTitle(conversation: Conversation) {
+        if (conversation.title) {
+            return;
+        }
+
+        let title = '';
+        conversation.attendees.forEach(attendee => {
+            if (attendee && attendee.userId && attendee.userId !== this.userName) {
+                title += attendee.userId + ' ';
+            }
+        });
+        conversation.title = title.trim();
+    }
+
     private setConnectionState(connectionState: ConnectionState) {
         console.log('connection state changed to: ' + connectionState);
         this.currentState = connectionState;
@@ -252,6 +271,7 @@ export class ChatService {
     }
 
     private onJoinConversation(conversation: Conversation) {
+        this.setConverationTitle(conversation);
         this.ea.publish(new ConversationJoined(conversation));
     }
 }

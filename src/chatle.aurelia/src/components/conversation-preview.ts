@@ -1,9 +1,10 @@
 import { bindable, autoinject } from 'aurelia-framework';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
+import { Router, RouterConfiguration } from 'aurelia-router';
 
-import { ChatService } from '../../services/chat.service';
-import { Conversation } from '../../model/conversation';
-import { ConversationSelected } from '../../events/conversationSelected';
+import { ChatService } from '../services/chat.service';
+import { Conversation } from '../model/conversation';
+import { ConversationSelected } from '../events/conversationSelected';
 
 @autoinject
 export class ConversationPreview {
@@ -11,11 +12,10 @@ export class ConversationPreview {
     isSelected: boolean;
     private conversationSelectecSubscription: Subscription;
 
-    constructor(private service: ChatService, private ea: EventAggregator) { }
+    constructor(private service: ChatService, private ea: EventAggregator, private router: Router) { }
 
     select() {
-        this.isSelected = true;
-        this.service.showConversation(this.conversation);
+        this.service.showConversation(this.conversation, this.router);
     }
 
     attached() {
