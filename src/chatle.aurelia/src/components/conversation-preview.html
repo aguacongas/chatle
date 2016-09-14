@@ -1,3 +1,6 @@
 <template>
-  <li class="list-group-item ${isSelected ? 'active' : ''}" click.delegate="select()">${conversation.title}</li>
+  <li class="list-group-item ${isSelected ? 'active' : ''}" click.delegate="select()">
+    <a>${conversation.title}</a><br/>
+    <span>${conversation.messages[0].text}</span>
+  </li>
 </template>

@@ -24,7 +24,9 @@ node_modules
 /src/chatle/wwwroot/js/chat.min.js
 /src/chatle/wwwroot/app
 /src/chatle/app/**/*.js*
-/src/chatle.aurelia/scripts/*.*
+/src/chatle.aurelia/scripts/app-bundle.js
+/src/chatle.aurelia/scripts/app-bundle.js.map
+/src/chatle.aurelia/scripts/vendor-bundle.js
 npm-debug.log
 npm-shrinkwrap.json
 *.ngfactory.ts

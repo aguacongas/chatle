@@ -55,3 +55,11 @@ small {
         padding: 0;
     }
 }
+
+.list-group-item {
+    border: 0;
+    padding: 0;
+}
+.list-group-item.active {
+    background-color: #eee;
+}
