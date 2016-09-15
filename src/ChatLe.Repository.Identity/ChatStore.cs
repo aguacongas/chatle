@@ -18,7 +18,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
+        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
     }
     
     /// <summary>
@@ -33,7 +33,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
+        public ChatStore(DbContext context) : base(context) { }
     }
     
     /// <summary>
@@ -60,17 +60,10 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context, IOptions<ChatOptions> optionsAccessor)
+        public ChatStore(TContext context)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            if (optionsAccessor == null || optionsAccessor.Value == null)
-                throw new ArgumentNullException("optionsAccessor");
-
-            // if (!optionsAccessor.Value.ContextEnableQueryTracking)
-            //     context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            
-            // context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
             Context = context;            
         }
         

@@ -8,12 +8,12 @@
 		"Selenium.Support": "2.53.1",
 		"Selenium.WebDriver": "2.53.1"
 	},
-	"frameworks": {
-		"dnx451": {
-			"dependencies": {
-				"System.Runtime": "4.1.0"
-			}
-		}
-	},
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "System.Runtime": "4.1.0"
+      }
+    }
+  },
 	"testRunner": "xunit"
 }
