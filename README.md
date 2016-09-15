@@ -13,4 +13,7 @@ chatle is projects samples for
 [ASP.NET Core](https://github.com/aspnet/home)  
 A website using [MVC 6](https://github.com/aspnet/mvc), [SingleR](https://github.com/aspnet/signalR-Server), [EF 7] (https://github.com/aspnet/EntityFramework) ...  
 
-And now an [Angular2](https://angular.io/) sample
+An [Angular2](https://angular.io/) and an [aurelia](http://aurelia.io) sample too.
+
+
+Fill free to enter issue, if you want to discuss about it.
