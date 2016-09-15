@@ -1,5 +1,5 @@
 ﻿@model LoginViewModel
-<form class="form-horizontal" role="form" method="post" asp-controller="Account" asp-action="Login" asp-antiforgery="true" asp-route-returnurl="@ViewData["ReturnUrl"]">
+<form class="form-horizontal" role="form" method="post" asp-action="Login" asp-antiforgery="true" asp-route-returnurl="@ViewData["ReturnUrl"]">
 	<h4>Use a local account to log in.</h4>
 	<hr />
 	<div asp-validation-summary="All" class="text-danger"></div>

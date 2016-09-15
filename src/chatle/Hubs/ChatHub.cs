@@ -52,7 +52,8 @@ namespace ChatLe.Hubs
 			Manager = manager;
 			UserManager = userManager;
 		}
-		/// <summary>
+		
+        /// <summary>
 		/// Called when the connection connects to this hub instance.
 		/// <para>Create a signalR group for the connected user with is name</para>
 		/// </summary>
@@ -60,25 +61,14 @@ namespace ChatLe.Hubs
 		public override async Task OnConnected()
 		{
 			string name = Context.User.Identity.Name;
-			var identity = Context.User.Identity as ClaimsIdentity;
-			if (identity.Claims.Any(c => c.Type == "guess") &&
-				await UserManager.FindByNameAsync(name) == null)
-			{
-				// recreate the guess user with the same name and id in case of disconnection
-				var idClaim = identity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-				await UserManager.CreateAsync(new ChatLeUser
-				{
-					UserName = name,
-					Id = idClaim.Value
-				});
-			}
 			Logger.LogInformation("OnConnected " + name);
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
-			await Groups.Add(this.Context.ConnectionId, name);
+			await Groups.Add(Context.ConnectionId, name);
 			Clients.Others.userConnected(new { id = name });
 			await base.OnConnected();
 		}
-		/// <summary>
+		
+        /// <summary>
 		/// Called when the connection reconnects to this hub instance.
 		/// <para>Create a signalR group for the connected user with is name</para>
 		/// </summary>
@@ -92,6 +82,7 @@ namespace ChatLe.Hubs
 			Clients.Others.userConnected(new { id = name });
 			await base.OnReconnected();
 		}
+
 		/// <summary>
 		/// Called when a connection disconnects from this hub gracefully or due to a timeout.
 		/// <para>Remove the signalR group for the user</para>

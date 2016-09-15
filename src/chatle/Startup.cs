@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatLe
 {
@@ -26,7 +28,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetCurrentDirectory())
+				.SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -71,6 +73,10 @@ namespace ChatLe
 
             ConfigureEntity(services);
 
+            services.AddCors();
+
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+
             services.AddMvc();
 
             services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
@@ -114,13 +120,24 @@ namespace ChatLe
             }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
-        public virtual void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
             ConfigureErrors(app);
-
-            app.UseStaticFiles()             
+            var logger = LoggerFactory.CreateLogger("reques");
+            app.UseCors(
+                builder => builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials())
+                .UseStaticFiles()                             
                 .UseWebSockets()
                 .UseIdentity()
+                .Map("/xhrf", a => a.Run(async context => 
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+                    await context.Response.WriteAsync(tokens.RequestToken);
+                }))
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
@@ -130,7 +147,6 @@ namespace ChatLe
                 })
                 .UseSignalR()
                 .UseChatLe();
-
         }
 
         protected virtual void ConfigureErrors(IApplicationBuilder app)
@@ -151,9 +167,13 @@ namespace ChatLe
 
 		public static void Main(string[] args)
 		{
+            string rootPath = Directory.GetCurrentDirectory();
+            if (args.Length == 1)
+                rootPath += '/' + args[0];
+
 			var host = new WebHostBuilder()
 				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
+				.UseContentRoot(rootPath)
 				.UseIISIntegration()
 				.UseStartup<Startup>()
 				.Build();

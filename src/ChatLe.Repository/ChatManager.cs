@@ -114,6 +114,7 @@ namespace ChatLe.Models
 					var ret = await Store.UserHasConnectionAsync(user.Id);
 					if (!ret && user.PasswordHash == null)
 						await Store.DeleteUserAsync(user, cancellationToken);
+
 					return user;
 				}
 			}

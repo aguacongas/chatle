@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
+using System.Net;
+using System.Linq;
 
 namespace ChatLe.Controllers
 {
@@ -73,21 +75,75 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ChatLeUser { UserName = model.UserName };                    
+                var user = await UserManager.FindByNameAsync(model.UserName);
+
+                if (user == null)
+                    user = new ChatLeUser { UserName = model.UserName };
+                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                    return await SignGuessUser(user);
+
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
-                {
-                    await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
-                    await SignInManager.SignInAsync(user, isPersistent: false);
-
-                    return RedirectToAction("Index", "Home");
-                }
+                    return await SignGuessUser(user);
                 else
                     AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return View("Index", new LoginPageViewModel() { Guess = model });
+        }
+
+        private async Task<IActionResult> SignGuessUser(ChatLeUser user)
+        {
+            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
+            await SignInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        //
+        // POST: /Account/SpaGuess
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> SpaGuess([FromBody] GuessViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByNameAsync(model.UserName);
+
+                if (user == null)
+                {
+                    user = new ChatLeUser { UserName = model.UserName };
+                    var result = await UserManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return await SignInSpaGuess(user);
+                    }
+                    else
+                    {
+                        AddErrors(result);
+                    }
+                }
+                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                    return await SignInSpaGuess(user);
+                else
+                {
+                    ModelState.AddModelError("UserAlreadyExists", "This user name already exists, please chose a different name");
+                    Response.StatusCode = 409;
+                    return new JsonResult(ModelState.Root.Children);
+                }
+            }
+
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            return new JsonResult(ModelState.Root.Children);
+        }
+
+        private async Task<JsonResult> SignInSpaGuess(ChatLeUser user)
+        {
+            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
+            await SignInManager.SignInAsync(user, isPersistent: false);
+
+            return new JsonResult("OK");
         }
 
         //
@@ -160,7 +216,6 @@ namespace ChatLe.Controllers
         //
         // POST: /Account/LogOff
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
@@ -175,6 +230,25 @@ namespace ChatLe.Controllers
 			}
             await SignInManager.SignOutAsync();
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
+        }
+
+        //
+        // POST: /Account/SpaLogOff
+        [HttpPost]
+        public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user != null)
+            {
+                if (user.PasswordHash == null)
+                {
+                    var hub = signalRConnectionManager.GetHubContext<ChatHub>();
+                    hub.Clients.All.userDisconnected(user.UserName);
+                    await ChatManager.RemoveUserAsync(user);
+                }
+            }
+
+            await SignInManager.SignOutAsync();
         }
 
         #region Helpers

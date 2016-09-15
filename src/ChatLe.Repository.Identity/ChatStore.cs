@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 
 namespace ChatLe.Models
 {
@@ -17,7 +18,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
     }
     
     /// <summary>
@@ -32,7 +33,7 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(DbContext context, IOptions<ChatOptions> optionsAccessor) : base(context, optionsAccessor) { }
     }
     
     /// <summary>
@@ -59,11 +60,18 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context)
+        public ChatStore(TContext context, IOptions<ChatOptions> optionsAccessor)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            Context = context;
+            if (optionsAccessor == null || optionsAccessor.Value == null)
+                throw new ArgumentNullException("optionsAccessor");
+
+            // if (!optionsAccessor.Value.ContextEnableQueryTracking)
+            //     context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            
+            // context.ChangeTracker.AutoDetectChangesEnabled = optionsAccessor.Value.ContextAutoDetectChanges;
+            Context = context;            
         }
         
         /// <summary>
@@ -108,7 +116,7 @@ namespace ChatLe.Models
             if(message == null)
                 throw new ArgumentNullException("message");
 
-            Context.Add(message);
+            Messages.Add(message);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -125,7 +133,7 @@ namespace ChatLe.Models
             {
                 throw new ArgumentNullException("attendee");
             }
-            Context.Add(attendee);
+            Attendees.Add(attendee);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -141,7 +149,7 @@ namespace ChatLe.Models
             if (conversation == null)
                 throw new ArgumentNullException("conversation");
 
-            Context.Add(conversation);
+            Conversations.Add(conversation);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -168,8 +176,8 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
                 throw new ArgumentNullException("user");
-            
-            Context.Update(user);
+
+            Users.Update(user);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -199,7 +207,7 @@ namespace ChatLe.Models
                        select c)
                        .Include(c => c.Attendees);
 
-            return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
+            return await convs.FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -273,13 +281,43 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
-            Context.ChangeTracker.AutoDetectChangesEnabled = false;
-            Context.Add(connection);
-            
-            await Context.SaveChangesAsync(cancellationToken);
-            // TODO: Remove ChangeTracker AutoDetectChangesEnabled when issue cause found
-            Context.ChangeTracker.AutoDetectChangesEnabled = true;
+            NotificationConnections.Add(connection);
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection<TKey>;
+                    if (entry.Entity != null)
+                    {                        
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        if (databaseEntity == null)
+                        {
+                            var databaseEntry = Context.Entry(connection);
+
+                            foreach (var property in entry.Metadata.GetProperties())
+                            {
+                                if (property.IsKey())
+                                    continue;
+
+                                entry.Property(property.Name).IsModified = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+                    }
+                }
+
+                // Retry the save operation
+                Context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -294,8 +332,43 @@ namespace ChatLe.Models
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Remove(connection);
-            await Context.SaveChangesAsync(cancellationToken);
+            NotificationConnections.Remove(connection);
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection<TKey>;
+                    if (entry.Entity != null)
+                    {
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        if (databaseEntity == null)
+                            return;
+
+                        var databaseEntry = Context.Entry(databaseEntity);
+
+                        foreach (var property in entry.Metadata.GetProperties())
+                        {
+                            if (property.IsKey())
+                                continue;
+
+                            var proposedValue = entry.Property(property.Name).CurrentValue;
+                            var originalValue = entry.Property(property.Name).OriginalValue;
+                            var databaseValue = databaseEntry.Property(property.Name).CurrentValue;
+                            entry.Property(property.Name).OriginalValue = databaseEntry.Property(property.Name).CurrentValue;
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -410,9 +483,9 @@ namespace ChatLe.Models
                 Conversations.Remove(conversation);
             }
                             
-            var userConnection = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
-            NotificationConnections.RemoveRange(userConnection);
-            Users.Remove(user);
+            var userConnections = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
+            NotificationConnections.RemoveRange(userConnections);
+            
             await Context.SaveChangesAsync(cancellationToken);
         }
 
