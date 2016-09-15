@@ -1,10 +1,10 @@
 <div class="col-xs-6">
     <div *ngIf="conversation">
         <h6>{{conversation.title}}</h6>
-        <div class="form-inline">
+        <form class="form-inline">
             <input class="form-control" [(ngModel)]="message" placeholder="message...">
             <button type="submit" class="btn btn-default" (click)="send()">send</button>
-        </div>
+        </form>
         <ul *ngFor="let message of conversation.messages">
             <li>
                 <small>{{message.from}}</small><br />
