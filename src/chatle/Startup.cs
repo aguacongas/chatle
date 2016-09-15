@@ -97,10 +97,10 @@ namespace ChatLe
                         options.UseInMemoryDatabase();
                         break;
                     case DBEngine.SqlServer:
-                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
+                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.SqlServer"));
                         break;
                     case DBEngine.SQLite:
-                        options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"]);
+                        options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
                         break;
                     //case DBEngine.Redis:
                     //    int port;

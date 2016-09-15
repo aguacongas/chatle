@@ -1,9 +1,0 @@
-﻿{
-  "authors": [
-    "Olivier Lefebvre"
-  ],
-  "description": "chatle.aurelia is simple chat website using aurelia",
-  "frameworks": {
-    "net451": {} // avoids MS build error
-  }
-}

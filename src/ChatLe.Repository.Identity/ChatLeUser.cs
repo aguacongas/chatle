@@ -17,5 +17,12 @@ namespace ChatLe.Models
         }
 
         public virtual ICollection<NotificationConnection<string>> NotificationConnections { get; set; } = new List<NotificationConnection<string>>();
+
+        public bool IsGuess
+        {
+            get { return PasswordHash == null; }
+        }
+
+        public DateTime LastLoginDate { get; set; }
     }
 }

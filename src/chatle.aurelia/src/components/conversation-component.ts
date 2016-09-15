@@ -28,9 +28,7 @@ export class ConversationComponent {
     }
 
     sendMessage() {
-        this.service.sendMessage(this.conversation, this.message)
-            .then(message => this.conversation.messages.unshift(message));
-
+        this.service.sendMessage(this.conversation, this.message);
         this.message = '';
     }
 }

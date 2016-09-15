@@ -8,9 +8,10 @@ using ChatLe.Repository.Identity.Sqlite;
 namespace ChatLe.Repository.Identity.Sqlite.Migrations
 {
     [DbContext(typeof(ChatLeIdentityDbContext))]
-    partial class ChatLeIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160915162806_login-activity")]
+    partial class loginactivity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");

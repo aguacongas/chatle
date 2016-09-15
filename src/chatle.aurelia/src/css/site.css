@@ -60,6 +60,13 @@ small {
     border: 0;
     padding: 0;
 }
-.list-group-item.active {
+
+.list-group-item.active {    
+    background-color: #ddd;
+    color: #808080
+}
+
+.list-group-item.active:hover {    
     background-color: #eee;
+    color: #666;
 }

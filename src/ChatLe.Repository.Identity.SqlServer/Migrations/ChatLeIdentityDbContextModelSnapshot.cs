@@ -25,6 +25,8 @@ namespace ChatLe.Repository.Identity.SqlServer.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
+                    b.Property<bool>("IsConnected");
+
                     b.HasKey("ConversationId", "UserId");
 
                     b.HasIndex("ConversationId");
@@ -47,6 +49,8 @@ namespace ChatLe.Repository.Identity.SqlServer.Migrations
                         .HasAnnotation("MaxLength", 256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<DateTime>("LastLoginDate");
 
                     b.Property<bool>("LockoutEnabled");
 

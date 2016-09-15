@@ -112,7 +112,7 @@ namespace ChatLe.Models
 				if (user != null)
 				{
 					var ret = await Store.UserHasConnectionAsync(user.Id);
-					if (!ret && user.PasswordHash == null)
+					if (!ret && user.IsGuess)
 						await Store.DeleteUserAsync(user, cancellationToken);
 
 					return user;
