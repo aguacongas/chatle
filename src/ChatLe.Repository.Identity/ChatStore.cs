@@ -396,7 +396,7 @@ namespace ChatLe.Models
             Context.SaveChanges();
             Conversations.RemoveRange(Conversations.ToArray());
             Context.SaveChanges();
-            Users.RemoveRange(Users.Where(u => u.PasswordHash == null).ToArray());
+            Users.RemoveRange(Users.Where(u => u.IsGuess).ToArray());
             Context.SaveChanges();
         }
         

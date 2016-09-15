@@ -3,17 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using ChatLe.Repository.Identity.Sqlite;
+using ChatLe.Repository.Identity.SqlServer;
 
-namespace ChatLe.Repository.Identity.Sqlite.Migrations
+namespace ChatLe.Repository.Identity.SqlServer.Migrations
 {
     [DbContext(typeof(ChatLeIdentityDbContext))]
-    partial class ChatLeIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20160915163305_login-activity")]
+    partial class loginactivity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
+                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("ChatLe.Models.Attendee<string>", b =>
                 {

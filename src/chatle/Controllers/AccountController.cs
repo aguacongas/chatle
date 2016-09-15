@@ -8,7 +8,7 @@ using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
 using System.Net;
-using System.Linq;
+using ChatLe.Repository.Identity;
 
 namespace ChatLe.Controllers
 {
@@ -21,7 +21,7 @@ namespace ChatLe.Controllers
     public class AccountController : Controller
     {
         public AccountController(UserManager<ChatLeUser> userManager, 
-            SignInManager<ChatLeUser> signInManager,
+            SignInManager signInManager,
             IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
         {
             UserManager = userManager;
@@ -79,7 +79,7 @@ namespace ChatLe.Controllers
 
                 if (user == null)
                     user = new ChatLeUser { UserName = model.UserName };
-                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                else if (user.IsGuess && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
                     return await SignGuessUser(user);
 
                 var result = await UserManager.CreateAsync(user);
@@ -124,7 +124,7 @@ namespace ChatLe.Controllers
                         AddErrors(result);
                     }
                 }
-                else if (user.PasswordHash == null && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
+                else if (user.IsGuess && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
                     return await SignInSpaGuess(user);
                 else
                 {
@@ -221,7 +221,7 @@ namespace ChatLe.Controllers
             var user = await GetCurrentUserAsync();
 			if (user != null)
 			{
-				if (user.PasswordHash == null)
+				if (user.IsGuess)
 				{
 					var hub = signalRConnectionManager.GetHubContext<ChatHub>();
 					hub.Clients.All.userDisconnected(user.UserName);
@@ -240,7 +240,7 @@ namespace ChatLe.Controllers
             var user = await GetCurrentUserAsync();
             if (user != null)
             {
-                if (user.PasswordHash == null)
+                if (user.IsGuess)
                 {
                     var hub = signalRConnectionManager.GetHubContext<ChatHub>();
                     hub.Clients.All.userDisconnected(user.UserName);

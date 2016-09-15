@@ -12,6 +12,7 @@ import { MessageReceived } from '../events/messageReceived';
 export class ConversationPreview {
     @bindable conversation: Conversation;
     isSelected: boolean;
+    lastMessage: string;
     
     private conversationSelectedSubscription: Subscription;
     private messageReceivedSubscription: Subscription;
@@ -23,6 +24,8 @@ export class ConversationPreview {
     }
 
     attached() {
+        this.lastMessage = this.conversation.messages[0].text;
+
         this.conversationSelectedSubscription = this.ea.subscribe(ConversationSelected, e => {
             if (e.conversation.id === this.conversation.id) {
                 this.isSelected = true;
@@ -31,9 +34,10 @@ export class ConversationPreview {
             }
         });
         this.messageReceivedSubscription = this.ea.subscribe(MessageReceived, e => {
-            let message = e.messaqe as Message;
-            if (message.conversationId === this.conversation.id) {
-                this.conversation.messages.unshift(e.message);
+            let message = (<MessageReceived>e).message;
+            if (message.conversationId === this.conversation.id) {                
+                this.conversation.messages.unshift(message);
+                this.lastMessage = message.text;
             }
         });
     }

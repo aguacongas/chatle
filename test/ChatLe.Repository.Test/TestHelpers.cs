@@ -23,8 +23,9 @@ namespace ChatLe.Repository.Test
 
         public string UserName { get; set; } = "test";
 
-        public string PasswordHash { get; set; } = null;
+        public bool IsGuess { get; set; } = true;
 
+        public DateTime LastLoginDate { get; set; } = DateTime.Now;
     }
 
     public class ChatDbContext:ChatDbContext<string, UserTest, Message, Attendee, Conversation, NotificationConnection>

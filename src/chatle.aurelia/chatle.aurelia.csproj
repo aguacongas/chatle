@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{81606DE9-6149-451D-A8D8-57DBD70EEF80}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+    <Content Include="index.html" />
+    <Content Include="karma.conf.js" />
+    <Content Include="scripts\app-bundle.js" />
+    <Content Include="scripts\chatle.signalR.js" />
+    <Content Include="scripts\require.js" />
+    <Content Include="scripts\text.js" />
+    <Content Include="scripts\vendor-bundle.js" />
+    <Content Include="src\app.html" />
+    <Content Include="src\components\contact-list.html" />
+    <Content Include="src\components\contact.html" />
+    <Content Include="src\components\conversation-component.html" />
+    <Content Include="src\components\conversation-list.html" />
+    <Content Include="src\components\conversation-preview.html" />
+    <Content Include="src\css\site.css" />
+    <Content Include="src\css\site.min.css">
+      <DependentUpon>site.css</DependentUpon>
+    </Content>
+    <Content Include="src\pages\account.html" />
+    <Content Include="src\pages\home.html" />
+    <Content Include="src\pages\login.html" />
+    <Content Include="test\aurelia-karma.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="aurelia_project\environments\dev.ts" />
+    <TypeScriptCompile Include="aurelia_project\environments\prod.ts" />
+    <TypeScriptCompile Include="aurelia_project\environments\stage.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\attribute.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\binding-behavior.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\element.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\generator.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\task.ts" />
+    <TypeScriptCompile Include="aurelia_project\generators\value-converter.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\build.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\process-css.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\process-markup.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\run.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\test.ts" />
+    <TypeScriptCompile Include="aurelia_project\tasks\transpile.ts" />
+    <TypeScriptCompile Include="custom_typings\aurelia-protractor.d.ts" />
+    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\components\contact-list.ts" />
+    <TypeScriptCompile Include="src\components\contact.ts" />
+    <TypeScriptCompile Include="src\components\conversation-component.ts" />
+    <TypeScriptCompile Include="src\components\conversation-list.ts" />
+    <TypeScriptCompile Include="src\components\conversation-preview.ts" />
+    <TypeScriptCompile Include="src\config\settings.ts" />
+    <TypeScriptCompile Include="src\environment.ts" />
+    <TypeScriptCompile Include="src\events\connectionStateChanged.ts" />
+    <TypeScriptCompile Include="src\events\conversationJoined.ts" />
+    <TypeScriptCompile Include="src\events\conversationSelected.ts" />
+    <TypeScriptCompile Include="src\events\messageReceived.ts" />
+    <TypeScriptCompile Include="src\events\userConnected.ts" />
+    <TypeScriptCompile Include="src\events\userDisconnected.ts" />
+    <TypeScriptCompile Include="src\main.ts" />
+    <TypeScriptCompile Include="src\model\attendee.ts" />
+    <TypeScriptCompile Include="src\model\conversation.ts" />
+    <TypeScriptCompile Include="src\model\message.ts" />
+    <TypeScriptCompile Include="src\model\user.ts" />
+    <TypeScriptCompile Include="src\pages\account.ts" />
+    <TypeScriptCompile Include="src\pages\home.ts" />
+    <TypeScriptCompile Include="src\pages\login.ts" />
+    <TypeScriptCompile Include="src\resources\index.ts" />
+    <TypeScriptCompile Include="src\services\chat.service.ts" />
+    <TypeScriptCompile Include="test\unit\services\chat.service.spec.ts" />
+    <TypeScriptCompile Include="test\unit\setup.ts" />
+    <TypeScriptCompile Include="typings\globals\angular-protractor\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\es6-promise\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jasmine\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jquery\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\selenium-webdriver\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\signalr\index.d.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="aurelia_project\generators\attribute.json" />
+    <Content Include="aurelia_project\generators\binding-behavior.json" />
+    <Content Include="aurelia_project\generators\element.json" />
+    <Content Include="aurelia_project\generators\generator.json" />
+    <Content Include="aurelia_project\generators\task.json" />
+    <Content Include="aurelia_project\generators\value-converter.json" />
+    <Content Include="aurelia_project\tasks\build.json" />
+    <Content Include="aurelia_project\tasks\run.json" />
+    <Content Include="aurelia_project\tasks\test.json" />
+    <Content Include="aurelia_project\aurelia.json" />
+    <Content Include="scripts\app-bundle.js.map" />
+    <Content Include=".vscode\settings.json" />
+    <Content Include=".editorconfig" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Content Include="tsconfig.json" />
+    <Content Include="tslint.json" />
+    <Content Include="typings.json" />
+    <Content Include="typings\globals\angular-protractor\typings.json" />
+    <Content Include="typings\globals\es6-promise\typings.json" />
+    <Content Include="typings\globals\jasmine\typings.json" />
+    <Content Include="typings\globals\jquery\typings.json" />
+    <Content Include="typings\globals\node\typings.json" />
+    <Content Include="typings\globals\selenium-webdriver\typings.json" />
+    <Content Include="typings\globals\signalr\typings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\resources\elements\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>chatle.au</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>61848</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:61848/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>

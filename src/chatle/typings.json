@@ -1,9 +1,9 @@
 {
   "globalDependencies": {
-    "core-js": "registry:dt/core-js#0.0.0+20160725163759",
-    "node": "registry:dt/node#6.0.0+20160823142437",
-    "jquery": "registry:dt/jquery#1.10.0+20160704162008",
-    "signalr": "registry:dt/signalr#2.2.0+20160509082439",
-    "jasmine": "registry:dt/jasmine#2.2.0+20160621224255"
+    "core-js": "registry:dt/core-js",
+    "node": "registry:dt/node",
+    "jquery": "registry:dt/jquery",
+    "signalr": "registry:dt/signalr",
+    "jasmine": "registry:dt/jasmine"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "aurelia": {
+      "executablePath": "au",
+      "commandLineArgs": "run --watch",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:9000"
+    }
+  }
+}

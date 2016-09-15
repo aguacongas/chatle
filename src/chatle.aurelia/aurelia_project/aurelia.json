@@ -2,9 +2,10 @@
   "name": "chatle.aurelia",
   "type": "project:application",
   "platform": {
-    "id": "web",
-    "displayName": "Web",
-    "output": "scripts"
+    "id": "aspnetcore",
+    "displayName": "ASP.NET Core",
+    "output": "wwwroot/scripts",
+    "baseUrl": "scripts"
   },
   "transpiler": {
     "id": "typescript",
@@ -29,8 +30,8 @@
     "source": "src/**/*.css"
   },
   "editor": {
-    "id": "vscode",
-    "displayName": "Visual Studio Code"
+    "id": "visualstudio",
+    "displayName": "Visual Studio"
   },
   "unitTestRunner": {
     "id": "karma",
@@ -52,9 +53,10 @@
   "build": {
     "targets": [
       {
-        "id": "web",
-        "displayName": "Web",
-        "output": "scripts"
+        "id": "aspnetcore",
+        "displayName": "ASP.NET Core",
+        "output": "wwwroot/scripts",
+        "baseUrl": "scripts"
       }
     ],
     "loader": {
@@ -88,7 +90,7 @@
         "name": "vendor-bundle.js",
         "prepend": [
           "node_modules/bluebird/js/browser/bluebird.core.js",
-          "scripts/require.js"
+          "wwwroot/scripts/require.js"
         ],
         "dependencies": [
           "aurelia-binding",
@@ -112,10 +114,9 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
-          "aurelia-http-client",
           {
             "name": "text",
-            "path": "../scripts/text"
+            "path": "../wwwroot/scripts/text"
           },
           {
             "name": "aurelia-templating-resources",
@@ -133,7 +134,7 @@
             "main": "aurelia-testing",
             "env": "dev"
           }
-        ]              
+        ]
       }
     ]
   }
