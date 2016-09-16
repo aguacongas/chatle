@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.SignalR.Hubs;
 using System.Dynamic;
 using ChatLe.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using ChatLe.Repository.Identity;
 
 namespace Chatle.test.Controllers
 {
@@ -76,7 +77,7 @@ namespace Chatle.test.Controllers
 		}
 
 
-		private static Mock<SignInManager<TUser>> MockSigninManager<TUser>(UserManager<TUser> userManager) where TUser : class
+		private static Mock<SignInManager> MockSigninManager<TUser>(UserManager<TUser> userManager) where TUser : class
 		{
 			var context = new Mock<HttpContext>();
 			var contextAccessor = new Mock<IHttpContextAccessor>();
@@ -87,7 +88,7 @@ namespace Chatle.test.Controllers
 			var options = new Mock<IOptions<IdentityOptions>>();
 			options.Setup(a => a.Value).Returns(identityOptions);
 			var claimsFactory = new UserClaimsPrincipalFactory<TUser, TestRole>(userManager, roleManager, options.Object);
-			return new Mock<SignInManager<TUser>>(userManager, contextAccessor.Object, claimsFactory, options.Object, null);
+			return new Mock<SignInManager>(userManager, contextAccessor.Object, claimsFactory, options.Object, null);
 		}
 
 
