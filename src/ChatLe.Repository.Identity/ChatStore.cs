@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 
 namespace ChatLe.Models
 {
@@ -471,14 +470,17 @@ namespace ChatLe.Models
             
             foreach (var conversation in conversationsToDelete)
             {
-                Messages.RemoveRange(await Messages.Where(m => m.ConversationId.Equals(conversation.Id)).ToArrayAsync());
-                Attendees.RemoveRange(await Attendees.Where(a => a.ConversationId.Equals(conversation.Id)).ToArrayAsync());
+                Messages.RemoveRange(Messages.Where(m => m.ConversationId.Equals(conversation.Id)));
+                Attendees.RemoveRange(Attendees.Where(a => a.ConversationId.Equals(conversation.Id)));
                 Conversations.Remove(conversation);
             }
                             
-            var userConnections = await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync();
+            var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
+            var inactiveUsers = Users.Where(u => u.LastLoginDate < DateTime.UtcNow.AddDays(-1));
+            Users.RemoveRange(inactiveUsers);
+
             await Context.SaveChangesAsync(cancellationToken);
         }
 
