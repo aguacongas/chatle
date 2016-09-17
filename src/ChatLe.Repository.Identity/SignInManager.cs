@@ -21,16 +21,11 @@ namespace ChatLe.Repository.Identity
         {
         }
 
-        public override Task SignInAsync(ChatLeUser user, bool isPersistent, string authenticationMethod = null)
+        public override async Task SignInAsync(ChatLeUser user, AuthenticationProperties authenticationProperties, string authenticationMethod = null)
         {
             user.LastLoginDate = DateTime.UtcNow;
-            return base.SignInAsync(user, isPersistent, authenticationMethod);
-        }
-
-        public override Task SignInAsync(ChatLeUser user, AuthenticationProperties authenticationProperties, string authenticationMethod = null)
-        {
-            user.LastLoginDate = DateTime.UtcNow;
-            return base.SignInAsync(user, authenticationProperties, authenticationMethod);
+            await this.UserManager.UpdateAsync(user);
+            await  base.SignInAsync(user, authenticationProperties, authenticationMethod);
         }
     }
 }

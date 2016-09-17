@@ -160,6 +160,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
         ChatService.prototype.start = function () {
             var _this = this;
             var debug = environment_1.default.debug;
+            var hub = jQuery.connection.hub;
             jQuery.connection.hub.logging = debug;
             var connection = jQuery.connection;
             var chatHub = connection.chat;
@@ -187,6 +188,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             jQuery.connection.hub.start()
                 .done(function (response) { return _this.setConnectionState(ConnectionState.Connected); })
                 .fail(function (error) { return _this.setConnectionState(ConnectionState.Error); });
+            this.settings.apiBaseUrl = hub.baseUrl;
         };
         ChatService.prototype.showConversation = function (conversation, router) {
             this.currentConversation = conversation;

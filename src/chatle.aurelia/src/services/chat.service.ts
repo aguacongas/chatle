@@ -18,7 +18,8 @@ import { UserConnected } from '../events/userConnected';
 import { UserDisconnected } from '../events/userDisconnected';
 
 interface ChatSignalR extends SignalR {
-    chat: ChatProxy
+    chat: ChatProxy,
+    hub: any
 }
 
 interface ChatProxy {
@@ -56,6 +57,7 @@ export class ChatService {
     start() {
         let debug = environment.debug;
         // only for debug
+        let hub = jQuery.connection.hub; 
         jQuery.connection.hub.logging = debug;
         // get the signalR hub named 'chat'
         let connection = <ChatSignalR>jQuery.connection;
@@ -113,6 +115,8 @@ export class ChatService {
         jQuery.connection.hub.start()
             .done(response => this.setConnectionState(ConnectionState.Connected))
             .fail(error => this.setConnectionState(ConnectionState.Error));
+
+        this.settings.apiBaseUrl = hub.baseUrl;
     }
 
     showConversation(conversation: Conversation, router: Router) {
@@ -204,7 +208,7 @@ export class ChatService {
                 .then(response => {
                         var data = response.content;
                         if (data && data.users) {
-                            resolve(data.users as User[]);
+                            resolve(<User[]>data.users);
                         }
                     })
                 .catch(error => reject('The service is down'));
@@ -218,7 +222,7 @@ export class ChatService {
                     if (response.response) {
                         var data = response.content;
                         if (data) {
-                            resolve(data as Conversation[]);
+                            resolve(<Conversation[]>data);
                         }
                     } else {
                         resolve(null);

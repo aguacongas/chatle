@@ -478,7 +478,7 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
-            var inactiveUsers = Users.Where(u => u.LastLoginDate < DateTime.UtcNow.AddDays(-1));
+            var inactiveUsers = Users.Where(u => u.LastLoginDate < DateTime.UtcNow.AddDays(-1) && u.IsGuess);
             Users.RemoveRange(inactiveUsers);
 
             await Context.SaveChangesAsync(cancellationToken);
