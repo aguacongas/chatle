@@ -29,6 +29,7 @@ export class ConversationComponent {
 
     sendMessage() {
         this.service.sendMessage(this.conversation, this.message);
+        this.conversation.messages.unshift();
         this.message = '';
     }
 }

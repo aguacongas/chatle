@@ -15,6 +15,8 @@ export class ConversationList {
   constructor(private service: ChatService, private ea: EventAggregator) { }
 
   attached() {
+    this.conversations = new Array<Conversation>();
+
     this.service.getConversations()
       .then(conversations => {
         this.conversations = conversations;

@@ -33,6 +33,7 @@ export class ConversationPreview {
                 this.isSelected = false;
             }
         });
+        
         this.messageReceivedSubscription = this.ea.subscribe(MessageReceived, e => {
             let message = (<MessageReceived>e).message;
             if (message.conversationId === this.conversation.id) {                

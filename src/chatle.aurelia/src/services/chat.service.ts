@@ -46,6 +46,7 @@ export class ChatService {
     currentConversation: Conversation;
 
     constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
+        settings.apiBaseUrl = environment.apiBaseUrl;
         http.configure(
             builder => builder
                 .withBaseUrl(settings.apiBaseUrl)
@@ -58,7 +59,8 @@ export class ChatService {
         let debug = environment.debug;
         // only for debug
         let hub = jQuery.connection.hub; 
-        jQuery.connection.hub.logging = debug;
+        hub.logging = debug;
+        hub.url = this.settings.apiBaseUrl + '/signalr';
         // get the signalR hub named 'chat'
         let connection = <ChatSignalR>jQuery.connection;
         let chatHub = connection.chat;
@@ -87,15 +89,16 @@ export class ChatService {
 
         if (debug) {
             // for debug only, callback on connection state change
-            jQuery.connection.hub.stateChanged(change => {
+            hub.stateChanged(change => {
                 let oldState: string,
                     newState: string;
-
-                for (var state in jQuery.signalR.connectionState) {
-                    if (jQuery.signalR.connectionState[state] === change.oldState) {
+                
+                let signalR = jQuery.signalR;
+                for (var state in signalR.connectionState) {
+                    if (signalR.connectionState[state] === change.oldState) {
                         oldState = state;
                     }
-                    if (jQuery.signalR.connectionState[state] === change.newState) {
+                    if (signalR.connectionState[state] === change.newState) {
                         newState = state;
                     }
                 }
@@ -105,18 +108,16 @@ export class ChatService {
         }
 
         // callback on connection reconnect
-        jQuery.connection.hub.reconnected(() => this.onReconnected());
+        hub.reconnected(() => this.onReconnected());
         // callback on connection error
-        jQuery.connection.hub.error(error => this.onError(error) );
+        hub.error(error => this.onError(error) );
         // callback on connection disconnect
-        jQuery.connection.hub.disconnected(() => this.onDisconnected());
+        hub.disconnected(() => this.onDisconnected());
     
         // start the connection
-        jQuery.connection.hub.start()
+        hub.start()
             .done(response => this.setConnectionState(ConnectionState.Connected))
-            .fail(error => this.setConnectionState(ConnectionState.Error));
-
-        this.settings.apiBaseUrl = hub.baseUrl;
+            .fail(error => this.setConnectionState(ConnectionState.Error));        
     }
 
     showConversation(conversation: Conversation, router: Router) {
@@ -138,7 +139,10 @@ export class ChatService {
                     to: conversation.id,
                     text: message
                 })
-                .then(response => resolve(m))
+                .then(response => {
+                    conversation.messages.unshift(m);
+                    resolve(m);
+                })
                 .catch(error => reject('Error when sending the message'));
             });
         } else {
@@ -158,6 +162,7 @@ export class ChatService {
                     response => {
                         conversation.id = response.content;
                         this.ea.publish(new ConversationJoined(conversation));
+                        conversation.messages.unshift(m);
                         resolve(m);
                     })
                     .catch(error => reject('Error when creating the conversation'));

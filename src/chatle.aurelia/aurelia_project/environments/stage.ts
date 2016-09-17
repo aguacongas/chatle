@@ -1,4 +1,5 @@
 export default {
   debug: true,
-  testing: false
+  testing: false,
+  apiBaseUrl: 'http://localhost:5000'
 };

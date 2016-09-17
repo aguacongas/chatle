@@ -3,7 +3,8 @@ define('environment',["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
         debug: true,
-        testing: true
+        testing: true,
+        apiBaseUrl: 'http://localhost:5000'
     };
 });
 
@@ -152,6 +153,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             this.ea = ea;
             this.http = http;
             this.currentState = ConnectionState.Disconnected;
+            settings.apiBaseUrl = environment_1.default.apiBaseUrl;
             http.configure(function (builder) { return builder
                 .withBaseUrl(settings.apiBaseUrl)
                 .withCredentials(true); });
@@ -161,7 +163,8 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             var _this = this;
             var debug = environment_1.default.debug;
             var hub = jQuery.connection.hub;
-            jQuery.connection.hub.logging = debug;
+            hub.logging = debug;
+            hub.url = this.settings.apiBaseUrl + '/signalr';
             var connection = jQuery.connection;
             var chatHub = connection.chat;
             chatHub.client.userConnected = function (user) { return _this.onUserConnected(user); };
@@ -169,26 +172,26 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             chatHub.client.messageReceived = function (message) { return _this.onMessageReceived(message); };
             chatHub.client.joinConversation = function (conversation) { return _this.onJoinConversation(conversation); };
             if (debug) {
-                jQuery.connection.hub.stateChanged(function (change) {
+                hub.stateChanged(function (change) {
                     var oldState, newState;
-                    for (var state in jQuery.signalR.connectionState) {
-                        if (jQuery.signalR.connectionState[state] === change.oldState) {
+                    var signalR = jQuery.signalR;
+                    for (var state in signalR.connectionState) {
+                        if (signalR.connectionState[state] === change.oldState) {
                             oldState = state;
                         }
-                        if (jQuery.signalR.connectionState[state] === change.newState) {
+                        if (signalR.connectionState[state] === change.newState) {
                             newState = state;
                         }
                     }
                     console.log("Chat Hub state changed from " + oldState + " to " + newState);
                 });
             }
-            jQuery.connection.hub.reconnected(function () { return _this.onReconnected(); });
-            jQuery.connection.hub.error(function (error) { return _this.onError(error); });
-            jQuery.connection.hub.disconnected(function () { return _this.onDisconnected(); });
-            jQuery.connection.hub.start()
+            hub.reconnected(function () { return _this.onReconnected(); });
+            hub.error(function (error) { return _this.onError(error); });
+            hub.disconnected(function () { return _this.onDisconnected(); });
+            hub.start()
                 .done(function (response) { return _this.setConnectionState(ConnectionState.Connected); })
                 .fail(function (error) { return _this.setConnectionState(ConnectionState.Error); });
-            this.settings.apiBaseUrl = hub.baseUrl;
         };
         ChatService.prototype.showConversation = function (conversation, router) {
             this.currentConversation = conversation;
@@ -208,7 +211,10 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         to: conversation.id,
                         text: message
                     })
-                        .then(function (response) { return resolve(m); })
+                        .then(function (response) {
+                        conversation.messages.unshift(m);
+                        resolve(m);
+                    })
                         .catch(function (error) { return reject('Error when sending the message'); });
                 });
             }
@@ -227,6 +233,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         .then(function (response) {
                         conversation.id = response.content;
                         _this.ea.publish(new conversationJoined_1.ConversationJoined(conversation));
+                        conversation.messages.unshift(m);
                         resolve(m);
                     })
                         .catch(function (error) { return reject('Error when creating the conversation'); });
@@ -614,6 +621,7 @@ define('components/conversation-component',["require", "exports", 'aurelia-frame
         };
         ConversationComponent.prototype.sendMessage = function () {
             this.service.sendMessage(this.conversation, this.message);
+            this.conversation.messages.unshift();
             this.message = '';
         };
         ConversationComponent = __decorate([
@@ -643,6 +651,7 @@ define('components/conversation-list',["require", "exports", 'aurelia-framework'
         }
         ConversationList.prototype.attached = function () {
             var _this = this;
+            this.conversations = new Array();
             this.service.getConversations()
                 .then(function (conversations) {
                 _this.conversations = conversations;

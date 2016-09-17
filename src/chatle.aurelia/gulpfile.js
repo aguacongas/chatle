@@ -4,18 +4,14 @@
 var gulp = require("gulp");
 
 var paths = {
-    webroot: "./wwwroot/",
-    node_modules: "./node_modules/"
+    webroot: "./wwwroot/node_modules",
+    node_modules: "./node_modules/**/*.js"
 };
 
-paths.lib = paths.webroot + "lib/";
+gulp.task("copy:lib", function () {
 
-paths.signalr = paths.node_modules + "signalr/**/*.js"
-
-gulp.task("copy:signalr", function () {
-
-    return gulp.src(paths.signalr)
-			.pipe(gulp.dest(paths.lib));
+    return gulp.src(paths.node_modules)
+			.pipe(gulp.dest(paths.webroot));
 });
 
-gulp.task("default", gulp.series("copy:signalr"));
+gulp.task("default", gulp.series("copy:lib"));
