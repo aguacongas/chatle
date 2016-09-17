@@ -58,7 +58,7 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
     "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*",
     "Microsoft.AspNetCore.WebSockets": "0.2.0-*",
-	"Microsoft.AspNetCore.Cors": "1.0.0"
+	  "Microsoft.AspNetCore.Cors": "1.0.0"
   },
 	"frameworks": {
 		"net451": {},

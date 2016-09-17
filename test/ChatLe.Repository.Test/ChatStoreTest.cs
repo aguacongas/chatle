@@ -632,7 +632,7 @@ namespace ChatLe.Repository.Test
                 await store.DeleteUserAsync(user);
 
                 Assert.Empty(context.NotificationConnections);
-                Assert.NotEmpty(context.Users); // Delete notification connection shoul not remove user
+                Assert.Empty(context.Users); // Delete notification connection shoul not remove user
 
                 Assert.NotEmpty(context.Conversations);
             });
@@ -674,7 +674,7 @@ namespace ChatLe.Repository.Test
                 await store.DeleteUserAsync(user);
 
                 Assert.Empty(context.NotificationConnections);
-                Assert.NotEmpty(context.Users); // Delete notification connection shoul not remove user
+                Assert.Empty(context.Users); // Delete notification connection shoul not remove user
 
                 Assert.Empty(context.Conversations);
             });

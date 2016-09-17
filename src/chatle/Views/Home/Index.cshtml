@@ -11,9 +11,9 @@
 		<script src="~/lib/signalr/jquery.signalR.js"></script>
 
         <script src="~/lib/core-js/client/shim.js"></script>
+        <script src="~/lib/zone.js/dist/zone.js"></script>
         <script src="~/lib/reflect-metadata/Reflect.js"></script>
         <script src="~/lib/systemjs/dist/system.src.js"></script>
-        <script src="~/lib/zone.js/dist/zone.js"></script>
     </environment>
 	<environment names="Staging,Production">
 		<script src="~/lib/signalr/jquery.signalR.min.js"></script>
@@ -22,11 +22,10 @@
 				asp-fallback.src="~/lib/signalr/jquery.signalR.min.js"
 				asp-fallback-test="window.jQuery && window.jQuery.connection">
 		</script>
+        <script src="~/lib/core-js/client/shim.min.js"></script>        
         <script src="~/lib/reflect-metadata/Reflect.js"></script>
         <script src="~/lib/systemjs/dist/system.js"></script>
         <script src="~/lib/zone.js/dist/zone.min.js"></script>
-
-        <script src="~/lib/core-js/client/shim.min.js"></script>        
 	</environment>
     
 	<script src="/signalr/js"></script>

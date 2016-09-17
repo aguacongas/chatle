@@ -50,6 +50,7 @@
   "scripts": {
     "start": "concurrently \"au run --watch\" \"npm run chatle\"",
     "postinstall": "typings install",
-    "chatle": "dotnet run -p ../chatle -- ../chatle"
+    "chatle": "dotnet run -p ../chatle -- ../chatle",
+    "gulp": "gulp"
   }
 }

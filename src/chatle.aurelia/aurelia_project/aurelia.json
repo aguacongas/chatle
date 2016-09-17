@@ -134,6 +134,11 @@
             "path": "../node_modules/aurelia-testing/dist/amd",
             "main": "aurelia-testing",
             "env": "dev"
+          },
+          {
+            "name": "signalr",
+            "path": "../node_modules/signalr",
+            "main": "jquery.signalR"
           }
         ]
       }
