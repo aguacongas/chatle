@@ -84,7 +84,6 @@ namespace ChatLe.Repository.Test
 
             Assert.NotEqual(DateTime.MinValue, user.LastLoginDate);
             userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ChatLeUser>()), Times.Once);
-
         }
     }
 }
