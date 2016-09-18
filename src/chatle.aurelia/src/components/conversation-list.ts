@@ -21,17 +21,17 @@ export class ConversationList {
 
     this.getConversations();
 
-      this.connectionStateSubscription = this.ea.subscribe(ConnectionStateChanged, e => {
-        let state = (<ConnectionStateChanged>e).state;
-        if (state === ConnectionState.Disconnected) { 
-          // remove conversation on log off, disconnection
-          this.conversations.splice(this.conversations.length);
-        } else if (state === ConnectionState.Connected) {
-          // get conversation for reconnect
-          this.getConversations();
-        }
-      });
-    }
+    this.connectionStateSubscription = this.ea.subscribe(ConnectionStateChanged, e => {
+      let state = (<ConnectionStateChanged>e).state;
+      if (state === ConnectionState.Disconnected) { 
+        // remove conversation on log off, disconnection
+        this.conversations.splice(this.conversations.length);
+      } else if (state === ConnectionState.Connected) {
+        // get conversation for reconnect
+        this.getConversations();
+      }
+    });
+  }
 
   detached() {
     this.Unsubscribe();

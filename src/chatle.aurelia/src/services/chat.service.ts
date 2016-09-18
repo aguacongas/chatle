@@ -9,6 +9,7 @@ import { User } from '../model/user';
 import { Message } from '../model/message';
 import { Conversation } from '../model/conversation';
 import { Attendee } from '../model/attendee';
+import { ChangePassword } from '../model/changePassword';
 
 import { ConnectionStateChanged } from '../events/connectionStateChanged';
 import { ConversationJoined } from '../events/conversationJoined';
@@ -116,7 +117,7 @@ export class ChatService {
         hub.disconnected(() => this.onDisconnected());
     
         // start the connection
-        return new Promise<Conversation[]>((resolve, reject) => {
+        return new Promise<ConnectionState>((resolve, reject) => {
             hub.start()
                 .done(response => { 
                     this.setConnectionState(ConnectionState.Connected);
@@ -182,28 +183,35 @@ export class ChatService {
     
     login(userName: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            this.http.get('xhrf')
-                .then(response => {
-                    this.http.createRequest(this.settings.loginAPI)
-                        .asPost()
-                        .withHeader("X-XSRF-TOKEN", response.response)
-                        .withContent({ userName: userName })
-                        .send()
-                        .then(response => {
-                            this.userName = userName;
-                            sessionStorage.setItem('userName', userName);
-                            resolve();
-                            this.start();
-                        })
-                        .catch(error => {
-                            if (error.statusCode === 409) {
-                                reject("This user name already exists, please chose a different name");
-                            } else {
-                                reject(error.content.errors[0].ErrorMessage);
-                            }
-                        })
-                })
-                .catch(error => reject('The service is down'));
+                this.http.get('xhrf')
+                    .then(response => {
+                        this.http.createRequest(this.settings.loginAPI)
+                            .asPost()
+                            .withHeader('X-XSRF-TOKEN', response.response)
+                            .withContent({ userName: userName })
+                            .send()
+                            .then(response => {
+                                this.userName = userName;
+                                sessionStorage.setItem('userName', userName);
+                                resolve();
+                                this.start();
+                                // get a new token for the session lifecycle
+                                this.http.get('xhrf')
+                                    .then(r => {
+                                        this.http.configure(builder => {
+                                            builder.withHeader('X-XSRF-TOKEN', r.response);
+                                        });
+                                    });
+                            })
+                            .catch(error => {
+                                if (error.statusCode === 409) {
+                                    reject("This user name already exists, please chose a different name");
+                                } else {
+                                    reject(error.content.errors[0].ErrorMessage);
+                                }
+                            })
+                    })
+                    .catch(error => reject('The service is down'));
         });
     }
 
@@ -211,9 +219,7 @@ export class ChatService {
         delete this.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
-        this.http.createRequest(this.settings.logoffAPI)
-            .asPost()
-            .send();
+        this.http.post(this.settings.logoffAPI, null);
     }
     
     getUsers(): Promise<User[]> {
@@ -246,6 +252,14 @@ export class ChatService {
         });
     }
 
+    changePassword(model: ChangePassword): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.http.post(this.settings.passwordAPI, model)
+                .then(response => resolve())
+                .catch(error => reject(error));
+        });
+    }
+
     private setConverationTitle(conversation: Conversation) {
         if (conversation.title) {
             return;
@@ -261,6 +275,10 @@ export class ChatService {
     }
 
     private setConnectionState(connectionState: ConnectionState) {
+        if (this.currentState === connectionState) {
+            return;
+        }
+        
         console.log('connection state changed to: ' + connectionState);
         this.currentState = connectionState;
         this.ea.publish(new ConnectionStateChanged(connectionState));

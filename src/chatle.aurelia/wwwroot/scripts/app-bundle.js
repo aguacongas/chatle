@@ -18,6 +18,7 @@ define('config/settings',["require", "exports"], function (require, exports) {
             this.chatAPI = '/api/chat';
             this.loginAPI = "/account/spaguess";
             this.logoffAPI = "/account/spalogoff";
+            this.passwordAPI = "/account/changePassword";
         }
         return Settings;
     }());
@@ -62,6 +63,16 @@ define('model/user',["require", "exports"], function (require, exports) {
         return User;
     }());
     exports.User = User;
+});
+
+define('model/changePassword',["require", "exports"], function (require, exports) {
+    "use strict";
+    var ChangePassword = (function () {
+        function ChangePassword() {
+        }
+        return ChangePassword;
+    }());
+    exports.ChangePassword = ChangePassword;
 });
 
 define('events/connectionStateChanged',["require", "exports"], function (require, exports) {
@@ -255,7 +266,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                     .then(function (response) {
                     _this.http.createRequest(_this.settings.loginAPI)
                         .asPost()
-                        .withHeader("X-XSRF-TOKEN", response.response)
+                        .withHeader('X-XSRF-TOKEN', response.response)
                         .withContent({ userName: userName })
                         .send()
                         .then(function (response) {
@@ -263,6 +274,12 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                         sessionStorage.setItem('userName', userName);
                         resolve();
                         _this.start();
+                        _this.http.get('xhrf')
+                            .then(function (r) {
+                            _this.http.configure(function (builder) {
+                                builder.withHeader('X-XSRF-TOKEN', r.response);
+                            });
+                        });
                     })
                         .catch(function (error) {
                         if (error.statusCode === 409) {
@@ -280,9 +297,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             delete this.userName;
             sessionStorage.removeItem('userName');
             jQuery.connection.hub.stop();
-            this.http.createRequest(this.settings.logoffAPI)
-                .asPost()
-                .send();
+            this.http.post(this.settings.logoffAPI, null);
         };
         ChatService.prototype.getUsers = function () {
             var _this = this;
@@ -315,6 +330,14 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                     .catch(function (error) { return reject('The service is down'); });
             });
         };
+        ChatService.prototype.changePassword = function (model) {
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                _this.http.post(_this.settings.passwordAPI, model)
+                    .then(function (response) { return resolve(); })
+                    .catch(function (error) { return reject(error); });
+            });
+        };
         ChatService.prototype.setConverationTitle = function (conversation) {
             var _this = this;
             if (conversation.title) {
@@ -329,6 +352,9 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             conversation.title = title.trim();
         };
         ChatService.prototype.setConnectionState = function (connectionState) {
+            if (this.currentState === connectionState) {
+                return;
+            }
             console.log('connection state changed to: ' + connectionState);
             this.currentState = connectionState;
             this.ea.publish(new connectionStateChanged_1.ConnectionStateChanged(connectionState));
@@ -789,9 +815,40 @@ define('components/conversation-preview',["require", "exports", 'aurelia-framewo
     exports.ConversationPreview = ConversationPreview;
 });
 
-
-
-define("pages/account", [],function(){});
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-router', '../services/chat.service', '../model/changePassword'], function (require, exports, aurelia_framework_1, aurelia_router_1, chat_service_1, changePassword_1) {
+    "use strict";
+    var Account = (function () {
+        function Account(service, router) {
+            this.service = service;
+            this.router = router;
+            this.model = new changePassword_1.ChangePassword();
+            this.userName = service.userName;
+        }
+        Account.prototype.changePassword = function () {
+            var _this = this;
+            this.service.changePassword(this.model)
+                .then(function () {
+                _this.router.navigateToRoute('home');
+            })
+                .catch(function (error) { return _this.errorMessage = error; });
+        };
+        Account = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_router_1.Router])
+        ], Account);
+        return Account;
+    }());
+    exports.Account = Account;
+});
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -897,7 +954,7 @@ define('text!components/contact.html', ['module'], function(module) { module.exp
 define('text!components/conversation-component.html', ['module'], function(module) { module.exports = "<template>\n    <div if.bind=\"conversation\">\n        <h6>${conversation.title}</h6>\n        <form class=\"form-inline\">\n            <input class=\"form-control\" value.bind=\"message\" placeholder=\"message...\">\n            <button type=\"submit\" class=\"btn btn-default\" click.delegate=\"sendMessage()\" disabled.bind=\"!message\">send</button>\n        </form>\n        <ul>\n            <li repeat.for=\"message of conversation.messages\">\n                <small>${message.from}</small><br />\n                <span>${message.text}</span>\n            </li>\n        </ul>\n    </div>\n    <h1 if.bind=\"!conversation\">WELCOME TO THIS REALLY SIMPLE CHAT</h1>\n</template>"; });
 define('text!components/conversation-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./conversation-preview\"></require>\n  <div class=\"conversation-list\">\n    <ul class=\"list-group\">\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\n    </ul>\n  </div>\n</template>"; });
 define('text!components/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">\n    <a>${conversation.title}</a><br/>\n    <span>${lastMessage}</span>\n  </li>\n</template>"; });
-define('text!pages/account.html', ['module'], function(module) { module.exports = ""; });
+define('text!pages/account.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Manage Account.</h2>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <p>You're logged in as <strong>${userName}</strong>.</p>\n            <form class=\"form-horizontal\">\n                <h4>Change Password Form</h4>\n                <hr>\n                <div if.bind=\"errorMessage\" class=\"text-danger\">\n                    <ul>\n                        <li>${errorMessage}</li>\n                    </ul>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"OldPassword\">Current password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"OldPassword\" value.bind=\"model.oldPassword\" />\t\t\t\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"NewPassword\">New password</label>\t\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"NewPassword\" value.bind=\"model.newPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"ConfirmPassword\">Confirm new password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"ConfirmPassword\" value.bind=\"confirmPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <div class=\"col-md-offset-2 col-md-10\">\n                        <input class=\"btn btn-default\" type=\"submit\" value=\"Change password\" click.delegate=\"model.changePassword()\" />\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../components/contact-list\"></require>\n    <require from=\"../components/conversation-list\"></require>\n\n    <div class=\"row\">\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <router-view class=\"col-xs-6\"></router-view>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Loging</h2>\n    <hr />\n    <form class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\n            <div class=\"col-xs-9\">\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-xs-offset-3 col-xs-9\">\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\n            </div>\n        </div>\n    </form>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

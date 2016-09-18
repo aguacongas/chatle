@@ -9,6 +9,8 @@ using ChatLe.Models;
 using ChatLe.ViewModels;
 using System.Net;
 using ChatLe.Repository.Identity;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatLe.Controllers
 {
@@ -75,30 +77,20 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.UserName);
-
-                if (user == null)
-                    user = new ChatLeUser { UserName = model.UserName };
-                else if (user.IsGuess && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
-                    return await SignGuessUser(user);
+                var user = new ChatLeUser { UserName = model.UserName };
 
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
-                    return await SignGuessUser(user);
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
                 else
                     AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return View("Index", new LoginPageViewModel() { Guess = model });
-        }
-
-        private async Task<IActionResult> SignGuessUser(ChatLeUser user)
-        {
-            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
-            await SignInManager.SignInAsync(user, isPersistent: false);
-
-            return RedirectToAction("Index", "Home");
         }
 
         //
@@ -109,41 +101,20 @@ namespace ChatLe.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.UserName);
-
-                if (user == null)
+                var user = new ChatLeUser { UserName = model.UserName };
+                var result = await UserManager.CreateAsync(user);
+                if (result.Succeeded)
                 {
-                    user = new ChatLeUser { UserName = model.UserName };
-                    var result = await UserManager.CreateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        return await SignInSpaGuess(user);
-                    }
-                    else
-                    {
-                        AddErrors(result);
-                    }
+                    await SignInManager.SignInAsync(user, isPersistent: false);
                 }
-                else if (user.IsGuess && await ChatManager.Store.UserHasConnectionAsync(user.Id) == false)
-                    return await SignInSpaGuess(user);
                 else
                 {
-                    ModelState.AddModelError("UserAlreadyExists", "This user name already exists, please chose a different name");
-                    Response.StatusCode = 409;
-                    return new JsonResult(ModelState.Root.Children);
+                    AddErrors(result);
                 }
             }
 
             Response.StatusCode = (int)HttpStatusCode.BadRequest;
             return new JsonResult(ModelState.Root.Children);
-        }
-
-        private async Task<JsonResult> SignInSpaGuess(ChatLeUser user)
-        {
-            await UserManager.AddClaimAsync(user, new Claim("guess", "true"));
-            await SignInManager.SignInAsync(user, isPersistent: false);
-
-            return new JsonResult("OK");
         }
 
         //
@@ -216,6 +187,7 @@ namespace ChatLe.Controllers
         //
         // POST: /Account/LogOff
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
@@ -235,6 +207,7 @@ namespace ChatLe.Controllers
         //
         // POST: /Account/SpaLogOff
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
             var user = await GetCurrentUserAsync();
