@@ -189,9 +189,17 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             hub.reconnected(function () { return _this.onReconnected(); });
             hub.error(function (error) { return _this.onError(error); });
             hub.disconnected(function () { return _this.onDisconnected(); });
-            hub.start()
-                .done(function (response) { return _this.setConnectionState(ConnectionState.Connected); })
-                .fail(function (error) { return _this.setConnectionState(ConnectionState.Error); });
+            return new Promise(function (resolve, reject) {
+                hub.start()
+                    .done(function (response) {
+                    _this.setConnectionState(ConnectionState.Connected);
+                    resolve(ConnectionState.Connected);
+                })
+                    .fail(function (error) {
+                    _this.setConnectionState(ConnectionState.Error);
+                    reject(ConnectionState.Error);
+                });
+            });
         };
         ChatService.prototype.showConversation = function (conversation, router) {
             this.currentConversation = conversation;
@@ -817,7 +825,10 @@ define('pages/home',["require", "exports", 'aurelia-framework', 'aurelia-router'
             this.connectionStateSubscription.dispose();
         };
         Home.prototype.setIsDisconnected = function (state) {
-            if (state === chat_service_1.ConnectionState.Disconnected || state === chat_service_1.ConnectionState.Error) {
+            if (state === chat_service_1.ConnectionState.Error) {
+                this.router.navigateToRoute('login');
+            }
+            if (state === chat_service_1.ConnectionState.Disconnected) {
                 this.isDisconnected = true;
             }
             else {
@@ -882,6 +893,6 @@ define('text!components/conversation-component.html', ['module'], function(modul
 define('text!components/conversation-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./conversation-preview\"></require>\n  <div class=\"conversation-list\">\n    <ul class=\"list-group\">\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\n    </ul>\n  </div>\n</template>"; });
 define('text!components/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">\n    <a>${conversation.title}</a><br/>\n    <span>${lastMessage}</span>\n  </li>\n</template>"; });
 define('text!pages/account.html', ['module'], function(module) { module.exports = ""; });
-define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../components/contact-list\"></require>\n    <require from=\"../components/conversation-list\"></require>\n\n    <div class=\"row\">\n        <ul if.bind=\"isDisconnected\">\n            <li><a class=\"text-danger\" href=\"/home\">You are disconnected</a></li>\n        </ul>\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <router-view class=\"col-xs-6\"></router-view>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
+define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../components/contact-list\"></require>\n    <require from=\"../components/conversation-list\"></require>\n\n    <div class=\"row\">\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <router-view class=\"col-xs-6\"></router-view>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Loging</h2>\n    <hr />\n    <form class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\n            <div class=\"col-xs-9\">\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-xs-offset-3 col-xs-9\">\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\n            </div>\n        </div>\n    </form>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

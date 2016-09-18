@@ -472,9 +472,7 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
-            // We need to recreate the user in case of page reloading, so we delete only inactive user from 1 day
-            var inactiveUsers = Users.Where(u => u.LastLoginDate < DateTime.UtcNow.AddDays(-1) && u.IsGuess);
-            Users.RemoveRange(inactiveUsers);
+            Users.Remove(user);
 
             try
             {

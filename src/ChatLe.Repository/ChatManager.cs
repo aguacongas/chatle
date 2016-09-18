@@ -88,7 +88,8 @@ namespace ChatLe.Models
                     await Store.CreateNotificationConnectionAsync(nc, cancellationToken);
                 }
                 user.NotificationConnections.Add(nc);
-            }
+            } else
+                throw new InvalidOperationException($"The user '{userName}' doesn't exist");
         }
         /// <summary>
         /// Removes a notification connection assotiate to a user

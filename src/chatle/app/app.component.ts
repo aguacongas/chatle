@@ -13,6 +13,8 @@ export class AppComponent implements OnInit{
   constructor(private service: ChatService) { }
 
   ngOnInit() {
-    this.service.start(true);
+    this.service.start(true).subscribe(
+      null,
+      error => location.assign('/Account?reason=disconnected'));
   }
 }

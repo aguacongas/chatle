@@ -40,7 +40,9 @@ export class Home {
     }
 
     private setIsDisconnected(state: ConnectionState) {
-        if (state === ConnectionState.Disconnected || state === ConnectionState.Error) {
+        if (state === ConnectionState.Error) {
+            this.router.navigateToRoute('login');
+        } if (state === ConnectionState.Disconnected) {
             this.isDisconnected = true;
         } else {
             this.isDisconnected = false;

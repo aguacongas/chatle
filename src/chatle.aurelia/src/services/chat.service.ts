@@ -55,7 +55,8 @@ export class ChatService {
         this.userName = sessionStorage.getItem('userName');
     }
     
-    start() {
+    start(): Promise<ConnectionState> {
+        
         let debug = environment.debug;
         // only for debug
         let hub = jQuery.connection.hub; 
@@ -115,9 +116,17 @@ export class ChatService {
         hub.disconnected(() => this.onDisconnected());
     
         // start the connection
-        hub.start()
-            .done(response => this.setConnectionState(ConnectionState.Connected))
-            .fail(error => this.setConnectionState(ConnectionState.Error));        
+        return new Promise<Conversation[]>((resolve, reject) => {
+            hub.start()
+                .done(response => { 
+                    this.setConnectionState(ConnectionState.Connected);
+                    resolve(ConnectionState.Connected);
+                })
+                .fail(error => {
+                    this.setConnectionState(ConnectionState.Error)
+                    reject(ConnectionState.Error);
+                });
+        });
     }
 
     showConversation(conversation: Conversation, router: Router) {
