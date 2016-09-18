@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ChatLe.Models
 {
@@ -292,13 +293,7 @@ namespace ChatLe.Models
                         {
                             var databaseEntry = Context.Entry(connection);
 
-                            foreach (var property in entry.Metadata.GetProperties())
-                            {
-                                if (property.IsKey())
-                                    continue;
-
-                                entry.Property(property.Name).IsModified = false;
-                            }
+                            ResetDbEntry<TNotificationConnection>(databaseEntry);
                         }
                     }
                     else
@@ -309,6 +304,17 @@ namespace ChatLe.Models
 
                 // Retry the save operation
                 Context.SaveChanges();
+            }
+        }
+
+        void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
+        {
+            foreach (var property in entry.Metadata.GetProperties())
+            {
+                if (property.IsKey())
+                    continue;
+
+                entry.Property(property.Name).IsModified = false;
             }
         }
 
@@ -331,35 +337,36 @@ namespace ChatLe.Models
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                foreach (var entry in ex.Entries)
-                {
-                    var notification = entry.Entity as NotificationConnection<TKey>;
-                    if (entry.Entity != null)
-                    {
-                        // Using a NoTracking query means we get the entity but it is not tracked by the context
-                        // and will not be merged with existing entities in the context.
-                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
-                        if (databaseEntity == null)
-                            return;
+                await RetryDeleteNotificationConnection(ex);
+            }
+        }
 
-                        var databaseEntry = Context.Entry(databaseEntity);
+        async Task RetryDeleteNotificationConnection(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                await RetryDeleteNotificationConnection(entry);
+            }
+        }
 
-                        foreach (var property in entry.Metadata.GetProperties())
-                        {
-                            if (property.IsKey())
-                                continue;
+        async Task RetryDeleteNotificationConnection(EntityEntry entry)
+        {
+            var notification = entry.Entity as NotificationConnection<TKey>;
+            if (notification != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                if (databaseEntity == null)
+                    return;
 
-                            var proposedValue = entry.Property(property.Name).CurrentValue;
-                            var originalValue = entry.Property(property.Name).OriginalValue;
-                            var databaseValue = databaseEntry.Property(property.Name).CurrentValue;
-                            entry.Property(property.Name).OriginalValue = databaseEntry.Property(property.Name).CurrentValue;
-                        }
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
-                    }
-                }
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
             }
         }
 
@@ -453,22 +460,9 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
+            // Remove all conversations the user attends
             var conversations = await GetConversationsAsync(user.Id, cancellationToken);
-            var conversationsToDelete = new List<TConversation>();
-            
-            foreach(var conversation in conversations)
-            {
-                foreach(var attendee in conversation.Attendees) 
-                {
-                    if (attendee.UserId.Equals(user.Id))
-                        attendee.IsConnected = false;                    
-                }
-
-                if(conversation.Attendees.All(a => a.IsConnected.Equals(false)))
-                    conversationsToDelete.Add(conversation);                    
-            }            
-            
-            foreach (var conversation in conversationsToDelete)
+            foreach (var conversation in conversations)
             {
                 Messages.RemoveRange(Messages.Where(m => m.ConversationId.Equals(conversation.Id)));
                 Attendees.RemoveRange(Attendees.Where(a => a.ConversationId.Equals(conversation.Id)));
@@ -478,10 +472,67 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
+            // We need to recreate the user in case of page reloading, so we delete only inactive user from 1 day
             var inactiveUsers = Users.Where(u => u.LastLoginDate < DateTime.UtcNow.AddDays(-1) && u.IsGuess);
             Users.RemoveRange(inactiveUsers);
 
-            await Context.SaveChangesAsync(cancellationToken);
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);            
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                await RetryDeleteUser(ex);
+            }
+        }
+
+        async Task RetryDeleteUser(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                if (entry.Entity is TNotificationConnection)
+                {
+                    await RetryDeleteNotificationConnection(entry);
+                }
+                if (entry.Entity is TMessage)
+                {
+                    await RetryDeleteEntity<TMessage>(entry, Messages);
+                }
+                if (entry.Entity is TAttendee)
+                {
+                    await RetryDeleteEntity<TAttendee>(entry, async entity => await Attendees.AsNoTracking().SingleOrDefaultAsync(a => a.ConversationId.Equals(entity.ConversationId) && a.UserId.Equals(entity.UserId)));
+                }
+                if (entry.Entity is TUser)
+                {
+                    await RetryDeleteEntity<TUser>(entry, Users);
+                }
+            }
+        }
+
+        async Task RetryDeleteEntity<TIdentifiable>(EntityEntry entry, DbSet<TIdentifiable> dbSet) where TIdentifiable: class, IIdentifiable<TKey>
+        {
+            await RetryDeleteEntity<TIdentifiable>(entry, async entity => await dbSet.AsNoTracking().SingleOrDefaultAsync(m => m.Id.Equals(entity as TIdentifiable)));
+        }
+
+        async Task RetryDeleteEntity<TEntity>(EntityEntry entry, Func<TEntity, Task<TEntity>> getEntity) where TEntity: class
+        {
+            var entity = entry.Entity as TEntity;
+            if (entity != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = await getEntity(entity);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+            }
         }
 
 		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))

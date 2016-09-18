@@ -642,7 +642,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/conversation-list',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../services/chat.service', '../events/conversationJoined', '../events/userDisconnected'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, chat_service_1, conversationJoined_1, userDisconnected_1) {
+define('components/conversation-list',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../services/chat.service', '../events/conversationJoined', '../events/userDisconnected', '../events/connectionStateChanged'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, chat_service_1, conversationJoined_1, userDisconnected_1, connectionStateChanged_1) {
     "use strict";
     var ConversationList = (function () {
         function ConversationList(service, ea) {
@@ -652,10 +652,36 @@ define('components/conversation-list',["require", "exports", 'aurelia-framework'
         ConversationList.prototype.attached = function () {
             var _this = this;
             this.conversations = new Array();
+            this.getConversations();
+            this.connectionStateSubscription = this.ea.subscribe(connectionStateChanged_1.ConnectionStateChanged, function (e) {
+                var state = e.state;
+                if (state === chat_service_1.ConnectionState.Disconnected) {
+                    _this.conversations.splice(_this.conversations.length);
+                }
+                else if (state === chat_service_1.ConnectionState.Connected) {
+                    _this.getConversations();
+                }
+            });
+        };
+        ConversationList.prototype.detached = function () {
+            this.Unsubscribe();
+            this.connectionStateSubscription.dispose();
+        };
+        ConversationList.prototype.Unsubscribe = function () {
+            if (this.conversationJoinedSubscription) {
+                this.conversationJoinedSubscription.dispose();
+            }
+            if (this.userDisconnectedSubscription) {
+                this.userDisconnectedSubscription.dispose();
+            }
+        };
+        ConversationList.prototype.getConversations = function () {
+            var _this = this;
             this.service.getConversations()
                 .then(function (conversations) {
                 _this.conversations = conversations;
                 _this.conversations.forEach(function (c) { return _this.setConversationTitle(c); });
+                _this.Unsubscribe();
                 _this.userDisconnectedSubscription = _this.ea.subscribe(userDisconnected_1.UserDisconnected, function (e) {
                     _this.conversations.forEach(function (c) {
                         var attendees = c.attendees;
@@ -674,14 +700,6 @@ define('components/conversation-list',["require", "exports", 'aurelia-framework'
                     _this.conversations.unshift(e.conversation);
                 });
             });
-        };
-        ConversationList.prototype.detached = function () {
-            if (this.conversationJoinedSubscription) {
-                this.conversationJoinedSubscription.dispose();
-            }
-            if (this.userDisconnectedSubscription) {
-                this.userDisconnectedSubscription.dispose();
-            }
         };
         ConversationList.prototype.setConversationTitle = function (conversation) {
             var _this = this;

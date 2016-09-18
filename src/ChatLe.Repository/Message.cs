@@ -10,7 +10,7 @@ namespace ChatLe.Models
         }
     }
 
-    public class Message<TKey> where TKey : IEquatable<TKey>
+    public class Message<TKey> : IIdentifiable<TKey> where TKey : IEquatable<TKey>
     {
         public virtual TKey Id { get; set; }
         public virtual TKey ConversationId { get; set; }

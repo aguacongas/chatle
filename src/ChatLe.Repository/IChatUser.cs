@@ -3,12 +3,8 @@ using System.Collections.Generic;
 
 namespace ChatLe.Models
 {
-    public interface IChatUser<TKey> where TKey : IEquatable<TKey>
+    public interface IChatUser<TKey> : IIdentifiable<TKey>where TKey : IEquatable<TKey>
     {
-        /// <summary>
-        /// Gets or sets the primary key for this user.
-        /// </summary>
-        TKey Id { get; set; }
         /// <summary>
         /// Gets or sets the user name for this user.
         /// </summary>

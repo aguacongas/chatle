@@ -1,27 +1,61 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
-import { ChatService } from '../services/chat.service';
+import { ChatService,ConnectionState } from '../services/chat.service';
 import { Conversation } from '../model/conversation';
-import { ConversationJoined } from '../events/conversationJoined'
-import { UserDisconnected } from '../events/userDisconnected'
+import { ConversationJoined } from '../events/conversationJoined';
+import { UserDisconnected } from '../events/userDisconnected';
+import { ConnectionStateChanged } from '../events/connectionStateChanged';
 
 @autoinject
 export class ConversationList {
   conversations: Conversation[];
   private conversationJoinedSubscription: Subscription;
   private userDisconnectedSubscription: Subscription;
+  private connectionStateSubscription: Subscription;
 
   constructor(private service: ChatService, private ea: EventAggregator) { }
 
   attached() {
     this.conversations = new Array<Conversation>();
 
+    this.getConversations();
+
+      this.connectionStateSubscription = this.ea.subscribe(ConnectionStateChanged, e => {
+        let state = (<ConnectionStateChanged>e).state;
+        if (state === ConnectionState.Disconnected) { 
+          // remove conversation on log off disconnection
+          this.conversations.splice(this.conversations.length);
+        } else if (state === ConnectionState.Connected) {
+          // get conversation for reconnect
+          this.getConversations();
+        }
+      });
+    }
+
+  detached() {
+    this.Unsubscribe();
+    this.connectionStateSubscription.dispose();
+  }
+
+  private Unsubscribe() {
+    if (this.conversationJoinedSubscription) {
+      this.conversationJoinedSubscription.dispose();
+    }
+    if (this.userDisconnectedSubscription) {
+      this.userDisconnectedSubscription.dispose();
+    }
+  }
+
+  private getConversations() {
     this.service.getConversations()
       .then(conversations => {
         this.conversations = conversations;
         this.conversations.forEach(c => this.setConversationTitle(c));
         
+        // Unsubscribe before in case of connection state changed to connected
+        this.Unsubscribe();
+
         this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
           this.conversations.forEach(c => {
             let attendees = c.attendees;
@@ -41,15 +75,6 @@ export class ConversationList {
           this.conversations.unshift(e.conversation);
         });
       });
-    }
-
-  detached() {
-    if (this.conversationJoinedSubscription) {
-      this.conversationJoinedSubscription.dispose();
-    }
-    if (this.userDisconnectedSubscription) {
-      this.userDisconnectedSubscription.dispose();
-    }
   }
 
   private setConversationTitle(conversation: Conversation) {
