@@ -383,7 +383,6 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
         function App(service, ea) {
             this.service = service;
             this.ea = ea;
-            this.setIsConnected();
         }
         App.prototype.configureRouter = function (config, router) {
             config.title = 'Chatle';
@@ -395,15 +394,15 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
             ]);
             this.router = router;
         };
-        App.prototype.created = function () {
+        App.prototype.attached = function () {
             var _this = this;
             this.ea.subscribe(connectionStateChanged_1.ConnectionStateChanged, function (e) {
                 _this.setIsConnected();
             });
+            this.setIsConnected();
         };
         App.prototype.logoff = function () {
             this.service.logoff();
-            this.router.navigateToRoute('login');
         };
         App.prototype.manage = function () {
             this.router.navigateToRoute('account');
@@ -411,6 +410,9 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
         App.prototype.setIsConnected = function () {
             this.isConnected = this.service.userName !== undefined && this.service.userName != null;
             this.userName = this.service.userName;
+            if (!this.isConnected) {
+                this.router.navigateToRoute('login');
+            }
         };
         App = __decorate([
             aurelia_framework_1.autoinject, 
@@ -687,9 +689,12 @@ define('components/conversation-list',["require", "exports", 'aurelia-framework'
             var _this = this;
             this.service.getConversations()
                 .then(function (conversations) {
-                _this.conversations = conversations;
-                _this.conversations.forEach(function (c) { return _this.setConversationTitle(c); });
                 _this.Unsubscribe();
+                if (!conversations) {
+                    return;
+                }
+                conversations.forEach(function (c) { return _this.setConversationTitle(c); });
+                _this.conversations = conversations;
                 _this.userDisconnectedSubscription = _this.ea.subscribe(userDisconnected_1.UserDisconnected, function (e) {
                     _this.conversations.forEach(function (c) {
                         var attendees = c.attendees;
@@ -826,7 +831,7 @@ define('pages/home',["require", "exports", 'aurelia-framework', 'aurelia-router'
         };
         Home.prototype.setIsDisconnected = function (state) {
             if (state === chat_service_1.ConnectionState.Error) {
-                this.router.navigateToRoute('login');
+                this.service.logoff();
             }
             if (state === chat_service_1.ConnectionState.Disconnected) {
                 this.isDisconnected = true;

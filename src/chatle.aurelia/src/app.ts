@@ -15,9 +15,7 @@ export class App {
     isConnected: boolean;
     userName: string;
 
-    constructor(private service: ChatService, private ea: EventAggregator) {
-        this.setIsConnected();
-    }
+    constructor(private service: ChatService, private ea: EventAggregator) { }
 
     configureRouter(config: RouterConfiguration, router: Router) {
         config.title = 'Chatle';
@@ -31,15 +29,15 @@ export class App {
         this.router = router;
     }
 
-    created() {
+    attached() {
         this.ea.subscribe(ConnectionStateChanged, e => {
             this.setIsConnected();
         });
+        this.setIsConnected();
     }
 
     logoff() {
         this.service.logoff();
-        this.router.navigateToRoute('login');
     }
 
     manage() {
@@ -49,6 +47,9 @@ export class App {
     private setIsConnected() {
         this.isConnected = this.service.userName !== undefined && this.service.userName != null;
         this.userName = this.service.userName;
+        if (!this.isConnected) {
+            this.router.navigateToRoute('login');
+        }
     }
 
 }

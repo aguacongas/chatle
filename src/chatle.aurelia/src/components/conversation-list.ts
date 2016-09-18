@@ -24,7 +24,7 @@ export class ConversationList {
       this.connectionStateSubscription = this.ea.subscribe(ConnectionStateChanged, e => {
         let state = (<ConnectionStateChanged>e).state;
         if (state === ConnectionState.Disconnected) { 
-          // remove conversation on log off disconnection
+          // remove conversation on log off, disconnection
           this.conversations.splice(this.conversations.length);
         } else if (state === ConnectionState.Connected) {
           // get conversation for reconnect
@@ -50,12 +50,16 @@ export class ConversationList {
   private getConversations() {
     this.service.getConversations()
       .then(conversations => {
-        this.conversations = conversations;
-        this.conversations.forEach(c => this.setConversationTitle(c));
-        
         // Unsubscribe before in case of connection state changed to connected
         this.Unsubscribe();
 
+        if (!conversations) {
+          return;
+        }
+
+        conversations.forEach(c => this.setConversationTitle(c));
+        this.conversations = conversations;      
+        
         this.userDisconnectedSubscription = this.ea.subscribe(UserDisconnected, e => {
           this.conversations.forEach(c => {
             let attendees = c.attendees;

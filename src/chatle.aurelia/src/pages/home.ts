@@ -41,7 +41,7 @@ export class Home {
 
     private setIsDisconnected(state: ConnectionState) {
         if (state === ConnectionState.Error) {
-            this.router.navigateToRoute('login');
+            this.service.logoff();
         } if (state === ConnectionState.Disconnected) {
             this.isDisconnected = true;
         } else {
