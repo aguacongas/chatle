@@ -254,7 +254,7 @@ export class ChatService {
 
     changePassword(model: ChangePassword): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            this.http.post(this.settings.passwordAPI, model)
+            this.http.put(this.settings.passwordAPI, model)
                 .then(response => resolve())
                 .catch(error => reject(error));
         });

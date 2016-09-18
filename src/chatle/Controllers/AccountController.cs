@@ -11,6 +11,7 @@ using System.Net;
 using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ChatLe.Controllers
 {
@@ -106,6 +107,7 @@ namespace ChatLe.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);
+                    return new JsonResult(result.Succeeded);
                 }
                 else
                 {
@@ -113,8 +115,7 @@ namespace ChatLe.Controllers
                 }
             }
 
-            Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            return new JsonResult(ModelState.Root.Children);
+            return ReturnSpaError();
         }
 
         //
@@ -184,6 +185,51 @@ namespace ChatLe.Controllers
             return View(model);
         }
 
+        //
+        // PUT: /Account/ChangePassword
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword([FromBody] ManageUserViewModel model)
+        {
+            ViewBag.ReturnUrl = Url.Action("Manage");
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
+                else
+                    AddErrors(result);
+            }
+
+            return ReturnSpaError();
+        }
+
+        //
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetChangePassword([FromBody] ManageUserViewModel model)
+        {
+            ViewBag.ReturnUrl = Url.Action("Manage");
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
+                else
+                    AddErrors(result);
+            }
+
+            return ReturnSpaError();
+        }
+
+        JsonResult ReturnSpaError()
+        {
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            return new JsonResult(ModelState.Root.Children);            
+        }
         //
         // POST: /Account/LogOff
         [HttpPost]

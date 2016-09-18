@@ -26,12 +26,12 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="ConfirmPassword">Confirm new password</label>
                     <div class="col-md-10">
-                        <input class="form-control" type="password" name="ConfirmPassword" value.bind="confirmPassword" />
+                        <input class="form-control" type="password" name="ConfirmPassword" value.bind="model.confirmPassword" />
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input class="btn btn-default" type="submit" value="Change password" click.delegate="model.changePassword()" />
+                        <input class="btn btn-default" type="submit" value="Change password" click.delegate="changePassword()" />
                     </div>
                 </div>
             </form>
