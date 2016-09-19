@@ -11,7 +11,7 @@
                         <li>${errorMessage}</li>
                     </ul>
                 </div>
-                <div class="form-group">
+                <div class="form-group" if.bind="!isGuess">
                     <label class="col-md-2 control-label" for="OldPassword">Current password</label>
                     <div class="col-md-10">
                         <input class="form-control" type="password" name="OldPassword" value.bind="model.oldPassword" />			

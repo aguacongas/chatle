@@ -16,9 +16,7 @@ define('config/settings',["require", "exports"], function (require, exports) {
             this.userAPI = '/api/users';
             this.convAPI = '/api/chat/conv';
             this.chatAPI = '/api/chat';
-            this.loginAPI = "/account/spaguess";
-            this.logoffAPI = "/account/spalogoff";
-            this.passwordAPI = "/account/changePassword";
+            this.accountdAPI = "/account";
         }
         return Settings;
     }());
@@ -259,12 +257,13 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
                 });
             }
         };
-        ChatService.prototype.login = function (userName) {
+        ChatService.prototype.login = function (userName, password) {
             var _this = this;
+            this.isGuess = !password;
             return new Promise(function (resolve, reject) {
                 _this.http.get('xhrf')
                     .then(function (response) {
-                    _this.http.createRequest(_this.settings.loginAPI)
+                    _this.http.createRequest(_this.settings.accountdAPI + '/spaguess')
                         .asPost()
                         .withHeader('X-XSRF-TOKEN', response.response)
                         .withContent({ userName: userName })
@@ -297,7 +296,7 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             delete this.userName;
             sessionStorage.removeItem('userName');
             jQuery.connection.hub.stop();
-            this.http.post(this.settings.logoffAPI, null);
+            this.http.post(this.settings.accountdAPI + '/logoff', null);
         };
         ChatService.prototype.getUsers = function () {
             var _this = this;
@@ -332,11 +331,20 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
         };
         ChatService.prototype.changePassword = function (model) {
             var _this = this;
-            return new Promise(function (resolve, reject) {
-                _this.http.put(_this.settings.passwordAPI, model)
-                    .then(function (response) { return resolve(); })
-                    .catch(function (error) { return reject(error); });
-            });
+            if (this.isGuess) {
+                return new Promise(function (resolve, reject) {
+                    _this.http.post(_this.settings.accountdAPI + '/setpassword', model)
+                        .then(function (response) { return resolve(); })
+                        .catch(function (error) { return reject(error); });
+                });
+            }
+            else {
+                return new Promise(function (resolve, reject) {
+                    _this.http.put(_this.settings.accountdAPI + '/changepassword', model)
+                        .then(function (response) { return resolve(); })
+                        .catch(function (error) { return reject(error); });
+                });
+            }
         };
         ChatService.prototype.setConverationTitle = function (conversation) {
             var _this = this;
@@ -824,15 +832,28 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-router', '../services/chat.service', '../model/changePassword'], function (require, exports, aurelia_framework_1, aurelia_router_1, chat_service_1, changePassword_1) {
+define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aurelia-event-aggregator', '../services/chat.service', '../model/changePassword', '../events/connectionStateChanged'], function (require, exports, aurelia_framework_1, aurelia_router_1, aurelia_event_aggregator_1, chat_service_1, changePassword_1, connectionStateChanged_1) {
     "use strict";
     var Account = (function () {
-        function Account(service, router) {
+        function Account(service, router, ea) {
             this.service = service;
             this.router = router;
+            this.ea = ea;
             this.model = new changePassword_1.ChangePassword();
             this.userName = service.userName;
+            this.isGuess = service.isGuess;
         }
+        Account.prototype.attached = function () {
+            var _this = this;
+            this.connectionStateSubscription = this.ea.subscribe(connectionStateChanged_1.ConnectionStateChanged, function (e) {
+                if (e.state === chat_service_1.ConnectionState.Connected) {
+                    _this.isGuess = _this.service.isGuess;
+                }
+            });
+        };
+        Account.prototype.detached = function () {
+            this.connectionStateSubscription.dispose();
+        };
         Account.prototype.changePassword = function () {
             var _this = this;
             this.service.changePassword(this.model)
@@ -843,7 +864,7 @@ define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-rout
         };
         Account = __decorate([
             aurelia_framework_1.autoinject, 
-            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_router_1.Router])
+            __metadata('design:paramtypes', [chat_service_1.ChatService, aurelia_router_1.Router, aurelia_event_aggregator_1.EventAggregator])
         ], Account);
         return Account;
     }());
@@ -954,7 +975,7 @@ define('text!components/contact.html', ['module'], function(module) { module.exp
 define('text!components/conversation-component.html', ['module'], function(module) { module.exports = "<template>\n    <div if.bind=\"conversation\">\n        <h6>${conversation.title}</h6>\n        <form class=\"form-inline\">\n            <input class=\"form-control\" value.bind=\"message\" placeholder=\"message...\">\n            <button type=\"submit\" class=\"btn btn-default\" click.delegate=\"sendMessage()\" disabled.bind=\"!message\">send</button>\n        </form>\n        <ul>\n            <li repeat.for=\"message of conversation.messages\">\n                <small>${message.from}</small><br />\n                <span>${message.text}</span>\n            </li>\n        </ul>\n    </div>\n    <h1 if.bind=\"!conversation\">WELCOME TO THIS REALLY SIMPLE CHAT</h1>\n</template>"; });
 define('text!components/conversation-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./conversation-preview\"></require>\n  <div class=\"conversation-list\">\n    <ul class=\"list-group\">\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\n    </ul>\n  </div>\n</template>"; });
 define('text!components/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">\n    <a>${conversation.title}</a><br/>\n    <span>${lastMessage}</span>\n  </li>\n</template>"; });
-define('text!pages/account.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Manage Account.</h2>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <p>You're logged in as <strong>${userName}</strong>.</p>\n            <form class=\"form-horizontal\">\n                <h4>Change Password Form</h4>\n                <hr>\n                <div if.bind=\"errorMessage\" class=\"text-danger\">\n                    <ul>\n                        <li>${errorMessage}</li>\n                    </ul>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"OldPassword\">Current password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"OldPassword\" value.bind=\"model.oldPassword\" />\t\t\t\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"NewPassword\">New password</label>\t\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"NewPassword\" value.bind=\"model.newPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"ConfirmPassword\">Confirm new password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"ConfirmPassword\" value.bind=\"model.confirmPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <div class=\"col-md-offset-2 col-md-10\">\n                        <input class=\"btn btn-default\" type=\"submit\" value=\"Change password\" click.delegate=\"changePassword()\" />\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</template>"; });
+define('text!pages/account.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Manage Account.</h2>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <p>You're logged in as <strong>${userName}</strong>.</p>\n            <form class=\"form-horizontal\">\n                <h4>Change Password Form</h4>\n                <hr>\n                <div if.bind=\"errorMessage\" class=\"text-danger\">\n                    <ul>\n                        <li>${errorMessage}</li>\n                    </ul>\n                </div>\n                <div class=\"form-group\" if.bind=\"!isGuess\">\n                    <label class=\"col-md-2 control-label\" for=\"OldPassword\">Current password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"OldPassword\" value.bind=\"model.oldPassword\" />\t\t\t\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"NewPassword\">New password</label>\t\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"NewPassword\" value.bind=\"model.newPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label class=\"col-md-2 control-label\" for=\"ConfirmPassword\">Confirm new password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"ConfirmPassword\" value.bind=\"model.confirmPassword\" />\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <div class=\"col-md-offset-2 col-md-10\">\n                        <input class=\"btn btn-default\" type=\"submit\" value=\"Change password\" click.delegate=\"changePassword()\" />\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../components/contact-list\"></require>\n    <require from=\"../components/conversation-list\"></require>\n\n    <div class=\"row\">\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <router-view class=\"col-xs-6\"></router-view>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Loging</h2>\n    <hr />\n    <form class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\n            <div class=\"col-xs-9\">\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-xs-offset-3 col-xs-9\">\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\n            </div>\n        </div>\n    </form>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

@@ -45,6 +45,7 @@ export class ChatService {
     currentState = ConnectionState.Disconnected;    
     userName: string;
     currentConversation: Conversation;
+    isGuess: boolean;
 
     constructor(private settings: Settings, private ea: EventAggregator, private http: HttpClient) {
         settings.apiBaseUrl = environment.apiBaseUrl;
@@ -181,27 +182,23 @@ export class ChatService {
         }
     }
     
-    login(userName: string): Promise<any> {
+    login(userName: string, password: string): Promise<any> {
+        this.isGuess = !password;
+
         return new Promise<any>((resolve, reject) => {
                 this.http.get('xhrf')
                     .then(response => {
-                        this.http.createRequest(this.settings.loginAPI)
+                        if (this.isGuess) {
+                        this.http.createRequest(this.settings.accountdAPI + '/spaguess')
                             .asPost()
                             .withHeader('X-XSRF-TOKEN', response.response)
                             .withContent({ userName: userName })
                             .send()
                             .then(response => {
                                 this.userName = userName;
-                                sessionStorage.setItem('userName', userName);
-                                resolve();
                                 this.start();
                                 // get a new token for the session lifecycle
-                                this.http.get('xhrf')
-                                    .then(r => {
-                                        this.http.configure(builder => {
-                                            builder.withHeader('X-XSRF-TOKEN', r.response);
-                                        });
-                                    });
+                                this.setXhrf(resolve, reject);
                             })
                             .catch(error => {
                                 if (error.statusCode === 409) {
@@ -210,6 +207,27 @@ export class ChatService {
                                     reject(error.content.errors[0].ErrorMessage);
                                 }
                             })
+                        } else {
+                            this.http.createRequest(this.settings.accountdAPI + '/spalogin')
+                            .asPost()
+                            .withHeader('X-XSRF-TOKEN', response.response)
+                            .withContent({ userName: userName, password: password })
+                            .send()
+                            .then(response => {
+                                this.userName = userName;
+                                sessionStorage.setItem('userName', userName);
+                                this.start();
+                                // get a new token for the session lifecycle
+                                this.setXhrf(resolve, reject);
+                            })
+                            .catch(error => {
+                                if (error.statusCode === 409) {
+                                    reject("This user name already exists, please chose a different name");
+                                } else {
+                                    reject(error.content.errors[0].ErrorMessage);
+                                }
+                            })
+                        }                        
                     })
                     .catch(error => reject('The service is down'));
         });
@@ -219,7 +237,7 @@ export class ChatService {
         delete this.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
-        this.http.post(this.settings.logoffAPI, null);
+        this.http.post(this.settings.accountdAPI + '/logoff', null);
     }
     
     getUsers(): Promise<User[]> {
@@ -253,11 +271,34 @@ export class ChatService {
     }
 
     changePassword(model: ChangePassword): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            this.http.put(this.settings.passwordAPI, model)
-                .then(response => resolve())
-                .catch(error => reject(error));
-        });
+        if (this.isGuess) {
+            return new Promise<any>((resolve, reject) => {
+                this.http.post(this.settings.accountdAPI + '/setpassword', model)
+                    .then(response => {
+                        this.isGuess = false;
+                        sessionStorage.setItem('userName', this.userName);
+                        resolve();
+                    })
+                    .catch(error => reject(error));
+            });
+        } else {
+            return new Promise<any>((resolve, reject) => {
+                this.http.put(this.settings.accountdAPI + '/changepassword', model)
+                    .then(response => resolve())
+                    .catch(error => reject(error));
+            });
+        }
+    }
+
+    private setXhrf(resolve: Function, reject: Function) {
+        this.http.get('xhrf')
+            .then(r => {
+                this.http.configure(builder => {
+                    builder.withHeader('X-XSRF-TOKEN', r.response);
+                });
+                resolve();
+            })
+            .catch(error => reject('the service is down'));
     }
 
     private setConverationTitle(conversation: Conversation) {

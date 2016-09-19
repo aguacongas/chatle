@@ -3,7 +3,5 @@
     userAPI = '/api/users';
     convAPI = '/api/chat/conv';
     chatAPI = '/api/chat';
-    loginAPI = "/account/spaguess";
-    logoffAPI = "/account/spalogoff";
-    passwordAPI = "/account/changePassword";
+    accountdAPI = "/account";
 }

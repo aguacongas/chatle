@@ -12,7 +12,8 @@ import environment from './environment';
 export function configure(aurelia: Aurelia) {
   aurelia.use
     .standardConfiguration()
-    .feature('resources');
+    .feature('resources')
+    .plugin('aurelia-validation');
 
   if (environment.debug) {
     aurelia.use.developmentLogging();
