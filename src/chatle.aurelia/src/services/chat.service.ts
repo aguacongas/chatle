@@ -276,7 +276,7 @@ export class ChatService {
                 this.http.post(this.settings.accountdAPI + '/setpassword', model)
                     .then(response => {
                         this.isGuess = false;
-                        sessionStorage.setItem('userName', this.userName);
+                        sessionStorage.setItem('userName', this.userName)
                         resolve();
                     })
                     .catch(error => reject(error));

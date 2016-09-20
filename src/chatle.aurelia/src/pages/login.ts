@@ -9,7 +9,7 @@ export class Login {
     constructor(private service: ChatService, private router: Router) { }
 
     login(userName: string) {
-        this.service.login(userName)
+        this.service.login(userName, null)
             .then(() => {
                 this.router.navigateToRoute('home');
             })
