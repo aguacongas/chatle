@@ -61,12 +61,14 @@ small {
     padding: 0;
 }
 
-.list-group-item.active {    
-    background-color: #ddd;
-    color: #808080
+.list-group-item.active {
+    border: 1px;    
+    border-color: #ddd;
+    color: #666;
+    background-color: #fff;
+    padding: 6px
 }
 
 .list-group-item.active:hover {    
-    background-color: #eee;
     color: #666;
 }
