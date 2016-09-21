@@ -510,8 +510,12 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
     }());
 });
 
-define('main',["require", "exports", './environment'], function (require, exports, environment_1) {
+define('main',["require", "exports", 'aurelia-framework', 'aurelia-logging-console', './environment'], function (require, exports, aurelia_framework_1, aurelia_logging_console_1, environment_1) {
     "use strict";
+    if (environment_1.default.debug) {
+        aurelia_framework_1.LogManager.addAppender(new aurelia_logging_console_1.ConsoleAppender());
+        aurelia_framework_1.LogManager.setLevel(aurelia_framework_1.LogManager.logLevel.debug);
+    }
     Promise.config({
         warnings: {
             wForgottenReturn: false
@@ -873,15 +877,6 @@ define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-rout
             this.ea = ea;
             this.userName = service.userName;
             this.isGuess = service.isGuess;
-            aurelia_validation_1.ValidationRules
-                .ensure(function (a) { return a.confirmPassword; })
-                .equals(this.newPassword).withMessage("The new password and confirmation password do not match.")
-                .on(this);
-            aurelia_validation_1.ValidationRules
-                .ensure(function (a) { return a.newPassword; })
-                .matches(new RegExp('^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])$')).withMessage('Your password must contains at least one uppercase letter, one digit and one special charactere.')
-                .minLength(6).withMessage('Your password must be 6 characteres long')
-                .on(this);
             this.controller = controllerFactory.createForCurrentScope();
         }
         Account.prototype.attached = function () {
@@ -897,21 +892,20 @@ define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-rout
         };
         Account.prototype.changePassword = function () {
             var _this = this;
-            this.controller.validate()
-                .then(function () {
+            this.controller.validate();
+            if (this.controller.errors.length === 0) {
                 var model = {
-                    oldPassword: _this.oldPassword,
-                    newPassword: _this.newPassword,
-                    confirmPassword: _this.confirmPassword
+                    oldPassword: this.oldPassword,
+                    newPassword: this.newPassword,
+                    confirmPassword: this.confirmPassword
                 };
-                _this.service.changePassword(model)
+                this.service.changePassword(model)
                     .then(function () {
                     _this.isGuess = false;
                     _this.router.navigateToRoute('home');
                 })
                     .catch(function (error) { return _this.errorMessage = error; });
-            })
-                .catch(function (error) { return console.error(error); });
+            }
         };
         Account = __decorate([
             aurelia_framework_1.autoinject, 
@@ -920,6 +914,26 @@ define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-rout
         return Account;
     }());
     exports.Account = Account;
+    aurelia_validation_1.ValidationRules.customRule('matchesProperty', function (value, obj, otherPropertyName) {
+        return value === null
+            || value === undefined
+            || value === ''
+            || obj[otherPropertyName] === null
+            || obj[otherPropertyName] === undefined
+            || obj[otherPropertyName] === ''
+            || value === obj[otherPropertyName];
+    }, '${$displayName} must match ${$config.otherPropertyName}', function (otherPropertyName) { return ({ otherPropertyName: otherPropertyName }); });
+    aurelia_validation_1.ValidationRules
+        .ensure(function (a) { return a.confirmPassword; })
+        .displayName('Confirm new password')
+        .required()
+        .satisfiesRule('matchesProperty', 'password')
+        .ensure(function (a) { return a.newPassword; })
+        .displayName("New password")
+        .required()
+        .matches(/(?=.*[A-Z])(?=.*[!@#$&\.\*\-\+\=\?£€])(?=.*[0-9])/).withMessage('${$displayName} must contains at least one uppercase letter, one digit and one special charactere.')
+        .minLength(6)
+        .on(Account);
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2352,7 +2366,7 @@ define('text!components/contact.html', ['module'], function(module) { module.exp
 define('text!components/conversation-component.html', ['module'], function(module) { module.exports = "<template>\n    <div if.bind=\"conversation\">\n        <h6>${conversation.title}</h6>\n        <form class=\"form-inline\">\n            <input class=\"form-control\" value.bind=\"message\" placeholder=\"message...\">\n            <button type=\"submit\" class=\"btn btn-default\" click.delegate=\"sendMessage()\" disabled.bind=\"!message\">send</button>\n        </form>\n        <ul>\n            <li repeat.for=\"message of conversation.messages\">\n                <small>${message.from}</small><br />\n                <span>${message.text}</span>\n            </li>\n        </ul>\n    </div>\n    <h1 if.bind=\"!conversation\">WELCOME TO THIS REALLY SIMPLE CHAT</h1>\n</template>"; });
 define('text!components/conversation-list.html', ['module'], function(module) { module.exports = "<template>\n  <require from=\"./conversation-preview\"></require>\n  <div class=\"conversation-list\">\n    <ul class=\"list-group\">\n      <conversation-preview repeat.for=\"conversation of conversations\" conversation.bind=\"conversation\"></conversation-preview>\n    </ul>\n  </div>\n</template>"; });
 define('text!components/conversation-preview.html', ['module'], function(module) { module.exports = "<template>\n  <li class=\"list-group-item ${isSelected ? 'active' : ''}\" click.delegate=\"select()\">\n    <a>${conversation.title}</a><br/>\n    <span>${lastMessage}</span>\n  </li>\n</template>"; });
-define('text!pages/account.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Manage Account.</h2>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <p>You're logged in as <strong>${userName}</strong>.</p>\n            <form class=\"form-horizontal\">\n                <h4>Change Password Form</h4>\n                <hr>\n                <div if.bind=\"errorMessage\" class=\"text-danger\">\n                    <ul>\n                        <li>${errorMessage}</li>\n                    </ul>\n                </div>\n                <div class=\"form-group\" if.bind=\"!isGuess\">\n                    <label class=\"col-md-2 control-label\" for=\"oldPassword\">Current password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"oldPassword\" value.bind=\"model.oldPassword\" />\t\t\t\n                    </div>\n                </div>\n                <div class=\"form-group\" validation-errors.bind=\"newPasswordErrors\" class.bind=\"confirmPasswordErrors.length || newPasswordErrors.length ? 'has-error' : ''\">\n                    <label class=\"col-md-2 control-label\" for=\"newPassword\">New password</label>\t\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"newPassword\" value.bind=\"newPassword\" />\n                    </div>\n                    <span class=\"help-block\" repeat.for=\"errorInfo of newPasswordErrors\">\n                        ${errorInfo.error.message}\n                    <span>\n                </div>\n                <div class=\"form-group\" validation-errors.bind=\"newPasswordErrors\" class.bind=\"confirmPasswordErrors.length ? 'has-error' : ''\">\n                    <label class=\"col-md-2 control-label\" for=\"confirmPassword\">Confirm new password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" name=\"confirmPassword\" value.bind=\"confirmPassword & validate\" />\n                    </div>\n                    <span class=\"help-block\" repeat.for=\"errorInfo of confirmPasswordErrors\">\n                        ${errorInfo.error.message}\n                    <span>\n                </div>\n                <div class=\"form-group\">\n                    <div class=\"col-md-offset-2 col-md-10\">\n                        <input class=\"btn btn-default\" type=\"submit\" value=\"Change password\" click.delegate=\"changePassword()\" />\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</template>"; });
+define('text!pages/account.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Manage Account.</h2>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <p>You're logged in as <strong>${userName}</strong>.</p>\n            <form class=\"form-horizontal\">\n                <h4 if.bind=\"!isGuess\">Change Password Form</h4>\n                <h4 if.bind=\"isGuess\">Create Password Form</h4>\n                <hr>\n                <div if.bind=\"errorMessage\" class=\"text-danger\">\n                    <ul>\n                        <li>${errorMessage}</li>\n                    </ul>\n                </div>\n                <div class=\"form-group\" if.bind=\"!isGuess\">\n                    <label class=\"col-md-2 control-label\" for=\"oldPassword\">Current password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" id=\"oldPassword\" value.bind=\"model.oldPassword\" />\t\t\t\n                    </div>\n                </div>\n                <div class=\"form-group\" validation-errors.bind=\"newPasswordErrors\" class.bind=\"newPasswordErrors.length ? 'has-error' : ''\">\n                    <label class=\"col-md-2 control-label\" for=\"newPassword\">New password</label>\t\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" id=\"newPassword\" value.bind=\"newPassword & validate\" change.delegate=\"confirmPassword = ''\"/>\n                    </div>\n                    <span class=\"help-block\" repeat.for=\"errorInfo of newPasswordErrors\">\n                        ${errorInfo.error.message}\n                    <span>\n                </div>\n                <div class=\"form-group\" validation-errors.bind=\"confirmPasswordErrors\" class.bind=\"confirmPasswordErrors.length ? 'has-error' : ''\">\n                    <label class=\"col-md-2 control-label\" for=\"confirmPassword\">Confirm new password</label>\n                    <div class=\"col-md-10\">\n                        <input class=\"form-control\" type=\"password\" id=\"confirmPassword\" value.bind=\"confirmPassword & validate\" />\n                    </div>\n                    <span class=\"help-block\" repeat.for=\"errorInfo of confirmPasswordErrors\">\n                        ${errorInfo.error.message}\n                    <span>\n                </div>\n                <div class=\"form-group\">\n                    <div class=\"col-md-offset-2 col-md-10\">\n                        <input class=\"btn btn-default\" type=\"submit\" value=\"Change password\" click.delegate=\"changePassword()\" disabled.bind=\"controller.errors.length > 0\"/>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/home.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"../components/contact-list\"></require>\n    <require from=\"../components/conversation-list\"></require>\n\n    <div class=\"row\">\n        <div class=\"col-xs-3\">\n            <h6>CONVERSATION</h6>\n            <conversation-list></conversation-list>\n        </div>\n        <router-view class=\"col-xs-6\"></router-view>\n        <div class=\"col-xs-3\">\n            <h6>CONNECTED</h6>\n            <contact-list></contact-list>\n        </div>\n    </div>\n</template>"; });
 define('text!pages/login.html', ['module'], function(module) { module.exports = "<template>\n    <h2>Loging</h2>\n    <hr />\n    <form class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-xs-3 control-label\" for=\"userName\"></label>\n            <div class=\"col-xs-9\">\n                <input class=\"form-control\" name=\"userName\" value.bind=\"userName\" />\n                <span class=\"text-danger\" if.bind=\"errorMessage\">${errorMessage}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-xs-offset-3 col-xs-9\">\n                <input type=\"submit\" value=\"Log in\" class=\"btn btn-default\" click.delegate=\"login(userName)\" />\n            </div>\n        </div>\n    </form>\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

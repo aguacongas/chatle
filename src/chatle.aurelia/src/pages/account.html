@@ -4,7 +4,8 @@
         <div class="col-md-12">
             <p>You're logged in as <strong>${userName}</strong>.</p>
             <form class="form-horizontal">
-                <h4>Change Password Form</h4>
+                <h4 if.bind="!isGuess">Change Password Form</h4>
+                <h4 if.bind="isGuess">Create Password Form</h4>
                 <hr>
                 <div if.bind="errorMessage" class="text-danger">
                     <ul>
@@ -14,22 +15,22 @@
                 <div class="form-group" if.bind="!isGuess">
                     <label class="col-md-2 control-label" for="oldPassword">Current password</label>
                     <div class="col-md-10">
-                        <input class="form-control" type="password" name="oldPassword" value.bind="model.oldPassword" />			
+                        <input class="form-control" type="password" id="oldPassword" value.bind="model.oldPassword" />			
                     </div>
                 </div>
-                <div class="form-group" validation-errors.bind="newPasswordErrors" class.bind="confirmPasswordErrors.length || newPasswordErrors.length ? 'has-error' : ''">
+                <div class="form-group" validation-errors.bind="newPasswordErrors" class.bind="newPasswordErrors.length ? 'has-error' : ''">
                     <label class="col-md-2 control-label" for="newPassword">New password</label>	
                     <div class="col-md-10">
-                        <input class="form-control" type="password" name="newPassword" value.bind="newPassword" />
+                        <input class="form-control" type="password" id="newPassword" value.bind="newPassword & validate" change.delegate="confirmPassword = ''"/>
                     </div>
                     <span class="help-block" repeat.for="errorInfo of newPasswordErrors">
                         ${errorInfo.error.message}
                     <span>
                 </div>
-                <div class="form-group" validation-errors.bind="newPasswordErrors" class.bind="confirmPasswordErrors.length ? 'has-error' : ''">
+                <div class="form-group" validation-errors.bind="confirmPasswordErrors" class.bind="confirmPasswordErrors.length ? 'has-error' : ''">
                     <label class="col-md-2 control-label" for="confirmPassword">Confirm new password</label>
                     <div class="col-md-10">
-                        <input class="form-control" type="password" name="confirmPassword" value.bind="confirmPassword & validate" />
+                        <input class="form-control" type="password" id="confirmPassword" value.bind="confirmPassword & validate" />
                     </div>
                     <span class="help-block" repeat.for="errorInfo of confirmPasswordErrors">
                         ${errorInfo.error.message}
@@ -37,7 +38,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input class="btn btn-default" type="submit" value="Change password" click.delegate="changePassword()" />
+                        <input class="btn btn-default" type="submit" value="Change password" click.delegate="changePassword()" disabled.bind="controller.errors.length > 0"/>
                     </div>
                 </div>
             </form>

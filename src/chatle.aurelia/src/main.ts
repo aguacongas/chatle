@@ -1,5 +1,11 @@
-import {Aurelia} from 'aurelia-framework'
+import { Aurelia, LogManager } from 'aurelia-framework'
+import {ConsoleAppender} from 'aurelia-logging-console';
 import environment from './environment';
+
+if (environment.debug) {
+    LogManager.addAppender(new ConsoleAppender());
+    LogManager.setLevel(LogManager.logLevel.debug);
+}
 
 //Configure Bluebird Promises.
 //Note: You may want to use environment-specific configuration.
