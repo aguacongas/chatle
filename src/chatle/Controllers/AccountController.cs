@@ -72,7 +72,7 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SpaLogin(LoginViewModel model)
+        public async Task<IActionResult> SpaLogin([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
             {

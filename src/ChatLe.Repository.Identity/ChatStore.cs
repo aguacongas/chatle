@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ChatLe.Models
 {
@@ -18,7 +19,8 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
     
     /// <summary>
@@ -33,7 +35,8 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(DbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
     
     /// <summary>
@@ -55,17 +58,20 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
+        readonly IHostingEnvironment _env;
         /// <summary>
         /// Construtor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context)
+        public ChatStore(TContext context, IHostingEnvironment env)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            Context = context;            
-        }
+
+            Context = context;
+            _env = env;
+        }        
         
         /// <summary>
         /// Gets the <see cref="DbContext"/>
@@ -393,6 +399,9 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
+            if (_env!= null &&  _env.IsDevelopment())
+                Context.Database.EnsureDeletedAsync();
+
             Context.Database.EnsureCreated();
             NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();

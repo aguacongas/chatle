@@ -189,44 +189,44 @@ export class ChatService {
                 this.http.get('xhrf')
                     .then(response => {
                         if (this.isGuess) {
-                        this.http.createRequest(this.settings.accountdAPI + '/spaguess')
-                            .asPost()
-                            .withHeader('X-XSRF-TOKEN', response.response)
-                            .withContent({ userName: userName })
-                            .send()
-                            .then(response => {
-                                this.userName = userName;
-                                this.start();
-                                // get a new token for the session lifecycle
-                                this.setXhrf(resolve, reject);
-                            })
-                            .catch(error => {
-                                if (error.statusCode === 409) {
-                                    reject("This user name already exists, please chose a different name");
-                                } else {
-                                    reject(error.content.errors[0].ErrorMessage);
-                                }
+                            this.http.createRequest(this.settings.accountdAPI + '/spaguess')
+                                .asPost()
+                                .withHeader('X-XSRF-TOKEN', response.response)
+                                .withContent({ userName: userName })
+                                .send()
+                                .then(response => {
+                                    this.userName = userName;
+                                    this.start();
+                                    // get a new token for the session lifecycle
+                                    this.setXhrf(resolve, reject);
+                                })
+                                .catch(error => {
+                                    if (error.statusCode === 409) {
+                                        reject("This user name already exists, please chose a different name");
+                                    } else {
+                                        reject(error.content.errors[0].ErrorMessage);
+                                    }
                             })
                         } else {
                             this.http.createRequest(this.settings.accountdAPI + '/spalogin')
-                            .asPost()
-                            .withHeader('X-XSRF-TOKEN', response.response)
-                            .withContent({ userName: userName, password: password })
-                            .send()
-                            .then(response => {
-                                this.userName = userName;
-                                sessionStorage.setItem('userName', userName);
-                                this.start();
-                                // get a new token for the session lifecycle
-                                this.setXhrf(resolve, reject);
-                            })
-                            .catch(error => {
-                                if (error.statusCode === 409) {
-                                    reject("This user name already exists, please chose a different name");
-                                } else {
-                                    reject(error.content.errors[0].ErrorMessage);
-                                }
-                            })
+                                .asPost()
+                                .withHeader('X-XSRF-TOKEN', response.response)
+                                .withContent({ userName: userName, password: password })
+                                .send()
+                                .then(response => {
+                                    this.userName = userName;
+                                    sessionStorage.setItem('userName', userName);
+                                    this.start();
+                                    // get a new token for the session lifecycle
+                                    this.setXhrf(resolve, reject);
+                                })
+                                .catch(error => {
+                                    if (error.statusCode === 409) {
+                                        reject("This user name already exists, please chose a different name");
+                                    } else {
+                                        reject(error.content.errors[0].ErrorMessage);
+                                    }
+                                })
                         }                        
                     })
                     .catch(error => reject('The service is down'));

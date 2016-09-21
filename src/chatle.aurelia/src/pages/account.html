@@ -21,7 +21,7 @@
                 <div class="form-group" validation-errors.bind="newPasswordErrors" class.bind="newPasswordErrors.length ? 'has-error' : ''">
                     <label class="col-md-2 control-label" for="newPassword">New password</label>	
                     <div class="col-md-10">
-                        <input class="form-control" type="password" id="newPassword" value.bind="newPassword & validate" change.delegate="confirmPassword = ''"/>
+                        <input class="form-control" type="password" name="newPassword" value.bind="newPassword & validate" change.delegate="confirmPassword = ''"/>
                     </div>
                     <span class="help-block" repeat.for="errorInfo of newPasswordErrors">
                         ${errorInfo.error.message}
@@ -30,7 +30,7 @@
                 <div class="form-group" validation-errors.bind="confirmPasswordErrors" class.bind="confirmPasswordErrors.length ? 'has-error' : ''">
                     <label class="col-md-2 control-label" for="confirmPassword">Confirm new password</label>
                     <div class="col-md-10">
-                        <input class="form-control" type="password" id="confirmPassword" value.bind="confirmPassword & validate" />
+                        <input class="form-control" type="password" name="confirmPassword" value.bind="confirmPassword & validate" />
                     </div>
                     <span class="help-block" repeat.for="errorInfo of confirmPasswordErrors">
                         ${errorInfo.error.message}

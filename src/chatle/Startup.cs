@@ -122,8 +122,11 @@ namespace ChatLe
 
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
+            
             ConfigureErrors(app);
-            var logger = LoggerFactory.CreateLogger("reques");
+            
+            var logger = LoggerFactory.CreateLogger("request");
+
             app.UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
