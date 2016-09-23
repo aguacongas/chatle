@@ -261,51 +261,39 @@ define('services/chat.service',["require", "exports", 'aurelia-event-aggregator'
             var _this = this;
             this.isGuess = !password;
             return new Promise(function (resolve, reject) {
-                _this.http.get('xhrf')
-                    .then(function (response) {
-                    if (_this.isGuess) {
-                        _this.http.createRequest(_this.settings.accountdAPI + '/spaguess')
-                            .asPost()
-                            .withHeader('X-XSRF-TOKEN', response.response)
-                            .withContent({ userName: userName })
-                            .send()
-                            .then(function (response) {
-                            _this.userName = userName;
-                            _this.start();
-                            _this.setXhrf(resolve, reject);
-                        })
-                            .catch(function (error) {
-                            if (error.statusCode === 409) {
-                                reject("This user name already exists, please chose a different name");
-                            }
-                            else {
-                                reject(error.content.errors[0].ErrorMessage);
-                            }
-                        });
-                    }
-                    else {
-                        _this.http.createRequest(_this.settings.accountdAPI + '/spalogin')
-                            .asPost()
-                            .withHeader('X-XSRF-TOKEN', response.response)
-                            .withContent({ userName: userName, password: password })
-                            .send()
-                            .then(function (response) {
-                            _this.userName = userName;
-                            sessionStorage.setItem('userName', userName);
-                            _this.start();
-                            _this.setXhrf(resolve, reject);
-                        })
-                            .catch(function (error) {
-                            if (error.statusCode === 409) {
-                                reject("This user name already exists, please chose a different name");
-                            }
-                            else {
-                                reject(error.content.errors[0].ErrorMessage);
-                            }
-                        });
-                    }
-                })
-                    .catch(function (error) { return reject('The service is down'); });
+                if (_this.isGuess) {
+                    _this.http.post(_this.settings.accountdAPI + '/spaguess', { userName: userName })
+                        .then(function (response) {
+                        _this.userName = userName;
+                        _this.start();
+                        _this.setXhrf(resolve, reject);
+                    })
+                        .catch(function (error) {
+                        if (error.statusCode === 409) {
+                            reject("This user name already exists, please chose a different name");
+                        }
+                        else {
+                            reject(error.content.errors[0].ErrorMessage);
+                        }
+                    });
+                }
+                else {
+                    _this.http.post(_this.settings.accountdAPI + '/spalogin', { userName: userName, password: password })
+                        .then(function (response) {
+                        _this.userName = userName;
+                        sessionStorage.setItem('userName', userName);
+                        _this.start();
+                        _this.setXhrf(resolve, reject);
+                    })
+                        .catch(function (error) {
+                        if (error.statusCode === 409) {
+                            reject("This user name already exists, please chose a different name");
+                        }
+                        else {
+                            reject(error.content.errors[0].ErrorMessage);
+                        }
+                    });
+                }
             });
         };
         ChatService.prototype.logoff = function () {
@@ -465,6 +453,7 @@ define('app',["require", "exports", 'aurelia-framework', 'aurelia-router', 'aure
                 _this.setIsConnected();
             });
             this.setIsConnected();
+            this.service.setXhrf(function () { }, function () { });
         };
         App.prototype.logoff = function () {
             this.service.logoff();
@@ -927,11 +916,13 @@ define('pages/account',["require", "exports", 'aurelia-framework', 'aurelia-rout
         .ensure(function (a) { return a.confirmPassword; })
         .displayName('Confirm new password')
         .required()
-        .satisfiesRule('matchesProperty', 'password')
+        .satisfiesRule('matchesProperty', 'newPassword')
+        .withMessage('Confirm new password must match New password')
         .ensure(function (a) { return a.newPassword; })
         .displayName("New password")
         .required()
-        .matches(/(?=.*[A-Z])(?=.*[!@#$&\.\*\-\+\=\?£€])(?=.*[0-9])/).withMessage('${$displayName} must contains at least one uppercase letter, one digit and one special charactere.')
+        .matches(/(?=.*[A-Z])(?=.*[!@#$&\.\*\-\+\=\?£€])(?=.*[0-9])/)
+        .withMessage('${$displayName} must contains at least one uppercase letter, one digit and one special charactere.')
         .minLength(6)
         .on(Account);
 });

@@ -34,6 +34,7 @@ export class App {
             this.setIsConnected();
         });
         this.setIsConnected();
+        this.service.setXhrf(() => {}, () => {});
     }
 
     logoff() {

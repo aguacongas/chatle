@@ -294,7 +294,13 @@ namespace ChatLe.Models
                     {                        
                         // Using a NoTracking query means we get the entity but it is not tracked by the context
                         // and will not be merged with existing entities in the context.
-                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        var connectionId = notification.ConnectionId;
+                        var type = notification.NotificationType;
+
+                        var databaseEntity = await NotificationConnections
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(nc => nc.ConnectionId.Equals(connectionId) && nc.NotificationType.Equals(type));
+
                         if (databaseEntity == null)
                         {
                             var databaseEntry = Context.Entry(connection);
@@ -391,7 +397,9 @@ namespace ChatLe.Models
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
 
-            return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
+            return await NotificationConnections
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
         }
         
         /// <summary>
@@ -425,7 +433,9 @@ namespace ChatLe.Models
         public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType.Equals(notificationType)).ToListAsync();
+            return await NotificationConnections
+                .AsNoTracking()
+                .Where(n => n.UserId.Equals(userId) && n.NotificationType.Equals(notificationType)).ToListAsync();
         }
         
         /// <summary>
