@@ -1,0 +1,10 @@
+{
+    "subKey": {
+        "value": "DuplicateUserName"
+    },
+    "errors": [
+        {
+            "errorMessage": "User name 'titi' is already taken."
+        }
+    ]
+}

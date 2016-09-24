@@ -17,6 +17,7 @@ import { ConversationSelected } from '../events/conversationSelected';
 import { MessageReceived } from '../events/messageReceived';
 import { UserConnected } from '../events/userConnected';
 import { UserDisconnected } from '../events/userDisconnected';
+import { Error } from '../model/error';
 
 interface ChatSignalR extends SignalR {
     chat: ChatProxy,
@@ -198,8 +199,8 @@ export class ChatService {
                         if (error.statusCode === 409) {
                             reject("This user name already exists, please chose a different name");
                         } else {
-                            reject(error.content.errors[0].ErrorMessage);
-                        }
+                            reject(this.getErrorMessage(error));
+                        }   
                 })
             } else {
                 this.http.post(this.settings.accountdAPI + '/spalogin', { userName: userName, password: password })
@@ -214,7 +215,7 @@ export class ChatService {
                         if (error.statusCode === 409) {
                             reject("This user name already exists, please chose a different name");
                         } else {
-                            reject(error.content.errors[0].ErrorMessage);
+                            reject(this.getErrorMessage(error));
                         }
                     })
             }
@@ -225,7 +226,7 @@ export class ChatService {
         delete this.userName;
         sessionStorage.removeItem('userName');
         jQuery.connection.hub.stop();
-        this.http.post(this.settings.accountdAPI + '/logoff', null);
+        this.http.post(this.settings.accountdAPI + '/spalogoff', null);
     }
     
     getUsers(): Promise<User[]> {
@@ -267,13 +268,13 @@ export class ChatService {
                         sessionStorage.setItem('userName', this.userName)
                         resolve();
                     })
-                    .catch(error => reject(error));
+                    .catch(error => reject(this.getErrorMessage(error)));
             });
         } else {
             return new Promise<any>((resolve, reject) => {
                 this.http.put(this.settings.accountdAPI + '/changepassword', model)
                     .then(response => resolve())
-                    .catch(error => reject(error));
+                    .catch(error => reject(this.getErrorMessage(error)));
             });
         }
     }
@@ -287,6 +288,10 @@ export class ChatService {
                 resolve();
             })
             .catch(error => reject('the service is down'));
+    }
+
+    private getErrorMessage(error: any) {
+        return (<Error[]>error.content)[0].errors[0].errorMessage
     }
 
     private setConverationTitle(conversation: Conversation) {

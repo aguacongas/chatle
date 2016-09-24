@@ -2,6 +2,11 @@
     <h2>Loging</h2>
     <hr />
     <form class="form-horizontal">
+        <div if.bind="errorMessage" class="text-danger">
+            <ul>
+                <li>${errorMessage}</li>
+            </ul>
+        </div>
         <div class="form-group">
             <label class="col-xs-3 control-label" for="userName"></label>
             <div class="col-xs-9">
@@ -16,7 +21,7 @@
                 <div>
                     <span>Don't enter a password il you want to login as guess user.</span>
                 </div>
-            </div>            
+            </div>
         </div>
         <div class="form-group">
             <div class="col-xs-offset-3 col-xs-9">

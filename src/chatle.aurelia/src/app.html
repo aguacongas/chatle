@@ -19,6 +19,11 @@
         </div>
     </div>
     <div class="container body-content">
+        <div if.bind="errorMessage" class="text-danger">
+            <ul>
+                <li>${errorMessage}</li>
+            </ul>
+        </div>
         <router-view></router-view>
     </div>
     <footer>

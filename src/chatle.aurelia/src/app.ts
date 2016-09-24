@@ -14,6 +14,7 @@ export class App {
     router: Router;
     isConnected: boolean;
     userName: string;
+    errorMessage: string;
 
     constructor(private service: ChatService, private ea: EventAggregator) { }
 
@@ -34,7 +35,7 @@ export class App {
             this.setIsConnected();
         });
         this.setIsConnected();
-        this.service.setXhrf(() => {}, () => {});
+        this.service.setXhrf(() => {}, error => this.errorMessage = error);
     }
 
     logoff() {
