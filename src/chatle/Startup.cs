@@ -90,7 +90,10 @@ namespace ChatLe
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
 
             services.AddDbContext<ChatLeIdentityDbContext>(options =>
-            {                
+            {
+                if (_environment.IsDevelopment())
+                    options.EnableSensitiveDataLogging();
+                
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:

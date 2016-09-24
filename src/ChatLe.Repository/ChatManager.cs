@@ -26,6 +26,7 @@ namespace ChatLe.Models
         where TNotificationConnection : NotificationConnection<TKey>, new()
     {
         private readonly ILogger _logger;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -44,10 +45,12 @@ namespace ChatLe.Models
             else
                 _logger = new FakeLogger();            
         }
+
         /// <summary>
         /// Gets the store
         /// </summary>
         public virtual IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> Store { get; private set; }
+        
         /// <summary>
         /// Gets the options
         /// </summary>
@@ -91,14 +94,16 @@ namespace ChatLe.Models
             } else
                 throw new InvalidOperationException($"The user '{userName}' doesn't exist");
         }
+
         /// <summary>
         /// Removes a notification connection assotiate to a user
         /// </summary>
         /// <param name="connectionId">The connection id</param>
         /// <param name="notificationType">the type of notification</param>
+        /// <param name="inactif">true if the user is disconnected because of inactivity</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>A Task</returns>
-        public virtual async Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, bool inactif, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (connectionId == null)
                 throw new ArgumentNullException("connectionId");
@@ -111,16 +116,17 @@ namespace ChatLe.Models
 				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
 				var user = await Store.FindUserByIdAsync(nc.UserId);
 				if (user != null)
-				{
-					var ret = await Store.UserHasConnectionAsync(user.Id);
-					if (!ret && user.IsGuess)
-						await Store.DeleteUserAsync(user, cancellationToken);
-
-					return user;
-				}
-			}
+                {
+                    if (inactif && user.IsGuess)
+                    {
+                        await RemoveUserAsync(user, cancellationToken);
+                    }
+                    return user;
+                }
+            }
 			return default(TUser);
         }
+
         /// <summary>
         /// Adds a message to a conversation
         /// </summary>
@@ -153,6 +159,7 @@ namespace ChatLe.Models
 
             return null;
         }
+        
         /// <summary>
         /// Gets or creates a conversation
         /// </summary>
@@ -186,6 +193,7 @@ namespace ChatLe.Models
 
             return conv;
         }
+
         /// <summary>
         /// Add a message in a conversation
         /// </summary>
@@ -207,6 +215,7 @@ namespace ChatLe.Models
             if (!messages.Any(m => m.Id.Equals(message.Id)))
                 messages.Add(message);
         }
+
         /// <summary>
         /// Add an attendee in a conversation by ids
         /// </summary>
@@ -225,6 +234,7 @@ namespace ChatLe.Models
                 attendees.Add(attendee);
             return attendee;
         }
+
         /// <summary>
         /// Gets the messages list for a conversation
         /// </summary>

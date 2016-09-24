@@ -24,33 +24,28 @@ namespace ChatLe.Hubs
 			get;
 			private set;
 		}
+
 		/// <summary>
 		/// Logger
 		/// </summary>
 		public ILogger Logger { get; private set; }
-		/// <summary>
-		/// User Manager
-		/// </summary>
-		public UserManager<ChatLeUser> UserManager { get; private set; }
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="manager">The chat repository manager</param>
+		/// <param name="loggerFactory">The logger factory</param>
 		public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager,
-			UserManager<ChatLeUser> userManager, 
 			ILoggerFactory loggerFactory) : base()
 		{
 			if (manager == null)
 				throw new ArgumentNullException("manager");
-			if (userManager == null)
-				throw new ArgumentNullException("userManager");
 			if (loggerFactory == null)
 				throw new ArgumentNullException("loggerFactory");
 
 			Logger = loggerFactory.CreateLogger<ChatHub>();
 			Logger.LogInformation("constructor");
 			Manager = manager;
-			UserManager = userManager;
 		}
 		
         /// <summary>
@@ -62,7 +57,9 @@ namespace ChatLe.Hubs
 		{
 			string name = Context.User.Identity.Name;
 			Logger.LogInformation("OnConnected " + name);
+
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
+			
 			await Groups.Add(Context.ConnectionId, name);
 			Clients.Others.userConnected(new { id = name });
 			await base.OnConnected();
@@ -77,7 +74,9 @@ namespace ChatLe.Hubs
 		{
 			string name = Context.User.Identity.Name;
 			Logger.LogInformation("OnReconnected " + name);
+
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
+				
 			await Groups.Add(this.Context.ConnectionId, name);
 			Clients.Others.userConnected(new { id = name });
 			await base.OnReconnected();
@@ -95,7 +94,7 @@ namespace ChatLe.Hubs
 		public override async Task OnDisconnected(bool stopCalled)
 		{
 			Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
-			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR");
+			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
 			if (user != null)
 				Clients.Others.userDisconnected(user.UserName);
 			await base.OnDisconnected(stopCalled);

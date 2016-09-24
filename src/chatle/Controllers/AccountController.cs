@@ -256,17 +256,7 @@ namespace ChatLe.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
-            var user = await GetCurrentUserAsync();
-			if (user != null)
-			{
-				if (user.IsGuess)
-				{
-					var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-					hub.Clients.All.userDisconnected(user.UserName);
-					await ChatManager.RemoveUserAsync(user);
-				}
-			}
-            await SignInManager.SignOutAsync();
+            await SignOut(signalRConnectionManager);
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
@@ -276,21 +266,25 @@ namespace ChatLe.Controllers
         [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
-            var user = await GetCurrentUserAsync();
-            if (user != null)
-            {
-                if (user.IsGuess)
-                {
-                    var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-                    hub.Clients.All.userDisconnected(user.UserName);
-                    await ChatManager.RemoveUserAsync(user);
-                }
-            }
-
-            await SignInManager.SignOutAsync();
+            await SignOut(signalRConnectionManager);        
         }
 
         #region Helpers
+
+        private async Task SignOut(IConnectionManager signalRConnectionManager)
+        {
+            await SignInManager.SignOutAsync();
+            var user = await GetCurrentUserAsync();
+			if (user != null)
+			{
+                var hub = signalRConnectionManager.GetHubContext<ChatHub>();
+                hub.Clients.All.userDisconnected(user.UserName);
+				if (user.IsGuess)
+				{
+					await ChatManager.RemoveUserAsync(user);
+				}
+			}
+        }
 
         private void AddErrors(IdentityResult result)
         {
