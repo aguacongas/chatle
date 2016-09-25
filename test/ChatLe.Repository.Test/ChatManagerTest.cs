@@ -41,7 +41,6 @@ namespace ChatLe.Repository.Test
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();            
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-            await manager.AddConnectionIdAsync("test", "test", "test");
             storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(new UserTest());
             await manager.AddConnectionIdAsync("test", "test", "test");
             storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection());
@@ -63,9 +62,7 @@ namespace ChatLe.Repository.Test
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-            await manager.AddConnectionIdAsync("test", "test", "test");
-            storeMock.Setup(s => s.FindUserByNameAsync("test", default(CancellationToken))).ReturnsAsync(null);
-            await manager.AddConnectionIdAsync("test", "test", "test");
+            await Assert.ThrowsAsync<InvalidOperationException>(() => manager.AddConnectionIdAsync("test", "test", "test"));            
         }
 
         [Fact]

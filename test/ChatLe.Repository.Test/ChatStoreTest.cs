@@ -613,9 +613,9 @@ namespace ChatLe.Repository.Test
                 await store.DeleteUserAsync(user);
 
                 Assert.Empty(context.NotificationConnections);
-                Assert.Empty(context.Users); // Delete notification connection shoul not remove user
+                Assert.Empty(context.Users); 
 
-                Assert.NotEmpty(context.Conversations);
+                Assert.Empty(context.Conversations);
             });
         }
 
