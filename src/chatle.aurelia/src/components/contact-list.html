@@ -1,9 +1,0 @@
-<template>
-  <require from="./contact"></require>
-  <div class="contact-list">
-    <span if.bind="!users">${loadingMessage}</span>
-    <ul class="list-group" if.bind="users">
-      <contact repeat.for="user of users" user.bind="user"></contact>
-    </ul>
-  </div>
-</template>
