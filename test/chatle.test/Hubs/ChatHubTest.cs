@@ -44,7 +44,7 @@ namespace chatle.test.Hubs
 			return userManager;
 		}
 
-		public static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>, Mock<UserManager<ChatLeUser>>> a)
+		public static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>> a)
 		{
 			var mockHttpRequest = new Mock<HttpRequest>();
 			var mockHttpContext = new Mock<HttpContext>();
@@ -56,23 +56,19 @@ namespace chatle.test.Hubs
 			var userValidators = new List<IUserValidator<ChatLeUser>>();
 			var validator = new Mock<IUserValidator<ChatLeUser>>();
 			userValidators.Add(validator.Object);
-			var mockUserManager = MockUserManager<ChatLeUser>(userValidators);
-			mockUserManager.Setup(u => u.CreateAsync(It.IsAny<ChatLeUser>())).ReturnsAsync(IdentityResult.Success);
-			validator.Setup(v => v.ValidateAsync(mockUserManager.Object, It.IsAny<ChatLeUser>()))
-			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
-			var hub = new ChatHub(mockChatManager.Object, mockUserManager.Object, mockLoggerFactory.Object);
+			var hub = new ChatHub(mockChatManager.Object, mockLoggerFactory.Object);
 			using (hub)
 			{
 				hub.Context = new HubCallerContext(mockHttpRequest.Object, "test");
-				a.Invoke(hub, mockChatManager, mockHttpContext, mockUserManager);
+				a.Invoke(hub, mockChatManager, mockHttpContext);
 			}
 		}
 
 		[Fact]
 		public void OnConnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
+			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
 				var identity = new ClaimsIdentity("test");
@@ -97,7 +93,7 @@ namespace chatle.test.Hubs
 		[Fact]
 		public void OnGuessConnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
+			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
 				var identity = new ClaimsIdentity("test");
@@ -106,9 +102,7 @@ namespace chatle.test.Hubs
 				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
 				mockClaims.SetupGet(c => c.Identity).Returns(identity);
 				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-				mockUserManager.Setup(u => u.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
-				mockUserManager.Setup(u => u.CreateAsync(It.IsAny<ChatLeUser>())).ReturnsAsync(new IdentityResult());
-				
+
 				var mockGroups = new Mock<IGroupManager>();
 				hub.Groups = mockGroups.Object;
 				
@@ -125,7 +119,7 @@ namespace chatle.test.Hubs
 		[Fact]
 		public void OnReconnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
+			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
 				var identity = new ClaimsIdentity("test");
@@ -150,9 +144,9 @@ namespace chatle.test.Hubs
 		[Fact]
 		public void OnDisconnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext, mockUserManager) =>
+			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
 			{
-				mockChatManager.Setup(c => c.RemoveConnectionIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ChatLeUser());
+				mockChatManager.Setup(c => c.RemoveConnectionIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ChatLeUser());
 				var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
 				dynamic others = new ExpandoObject();
 				others.userDisconnected = new Action<object>(o => { });

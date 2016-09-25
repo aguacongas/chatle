@@ -565,25 +565,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetNotificationConnectionsAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var context = store.Context;
-
-                context.NotificationConnections.Add(new NotificationConnection()
-                {
-                    ConnectionDate = DateTime.Now,
-                    ConnectionId = "test",
-                    NotificationType = "test",
-                    UserId = "test"
-                });
-
-                Assert.NotNull(await store.GetNotificationConnectionsAsync("test", "test"));
-            });
-        }
-
-        [Fact]
         public async Task UserHasConnectionAsyncTest()
         {
             await ExecuteTest(async store =>

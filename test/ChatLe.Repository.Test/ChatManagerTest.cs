@@ -87,7 +87,7 @@ namespace ChatLe.Repository.Test
         public async Task RemoveConnectionIdAsync_Should_ThrowArgumentNullException(string connectionId, string notificationType)
         {
             var manager = CreateManager();
-            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(connectionId, notificationType));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => manager.RemoveConnectionIdAsync(connectionId, notificationType, false));
         }
 
         [Fact]
@@ -95,14 +95,14 @@ namespace ChatLe.Repository.Test
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
-			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test"));
+			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test", false));
             storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection() { UserId = "test" });
-			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test"));
+			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test", false));
             storeMock.Setup(s => s.FindUserByIdAsync("test", CancellationToken.None)).ReturnsAsync(new UserTest());
 			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(true);
-			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test"));
+			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test", true));
 			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(false);
-			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test"));
+			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test", true));
         }
 
         [Theory]
