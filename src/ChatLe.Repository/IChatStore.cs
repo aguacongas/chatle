@@ -151,15 +151,6 @@ namespace ChatLe.Models
         void Init();
         
         /// <summary>
-        /// Gets notification connections for a user id and notification type
-        /// </summary>
-        /// <param name="userId">the user id</param>
-        /// <param name="notificationType">the notification type</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
-        Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
-        
-        /// <summary>
         /// Gets conversations for a user id
         /// </summary>
         /// <param name="userId">the user id</param>

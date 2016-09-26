@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +8,8 @@ using ChatLe.Models;
 using ChatLe.ViewModels;
 using System.Net;
 using ChatLe.Repository.Identity;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Controllers
 {
@@ -70,6 +68,26 @@ namespace ChatLe.Controllers
         }
 
         //
+        // POST: /Account/SpaLogin
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SpaLogin([FromBody] LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var signInStatus = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+                if (signInStatus.Succeeded)
+                    return new JsonResult(signInStatus.Succeeded);
+
+                ModelState.AddModelError("", "Invalid username or password.");                
+            }
+
+            return ReturnSpaError();
+        }
+
+        //
         // POST: /Account/Guess
         [HttpPost]
         [AllowAnonymous]
@@ -81,6 +99,7 @@ namespace ChatLe.Controllers
                 var user = new ChatLeUser { UserName = model.UserName };
 
                 var result = await UserManager.CreateAsync(user);
+                
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);
@@ -138,6 +157,7 @@ namespace ChatLe.Controllers
             {
                 var user = new ChatLeUser { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);
@@ -206,16 +226,16 @@ namespace ChatLe.Controllers
         }
 
         //
-        // POST: /Account/ChangePassword
+        // POST: /Account/SetPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetChangePassword([FromBody] ManageUserViewModel model)
+        public async Task<IActionResult> SetPassword([FromBody] CreatePasswordViewModel model)
         {
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (ModelState.IsValid)
             {
                 var user = await GetCurrentUserAsync();
-                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
                 if (result.Succeeded)
                     return new JsonResult(ManageMessageId.ChangePasswordSuccess);
                 else
@@ -236,17 +256,7 @@ namespace ChatLe.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
-            var user = await GetCurrentUserAsync();
-			if (user != null)
-			{
-				if (user.IsGuess)
-				{
-					var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-					hub.Clients.All.userDisconnected(user.UserName);
-					await ChatManager.RemoveUserAsync(user);
-				}
-			}
-            await SignInManager.SignOutAsync();
+            await SignOut(signalRConnectionManager);
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
@@ -256,21 +266,25 @@ namespace ChatLe.Controllers
         [ValidateAntiForgeryToken]
         public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
         {
-            var user = await GetCurrentUserAsync();
-            if (user != null)
-            {
-                if (user.IsGuess)
-                {
-                    var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-                    hub.Clients.All.userDisconnected(user.UserName);
-                    await ChatManager.RemoveUserAsync(user);
-                }
-            }
-
-            await SignInManager.SignOutAsync();
+            await SignOut(signalRConnectionManager);        
         }
 
         #region Helpers
+
+        private async Task SignOut(IConnectionManager signalRConnectionManager)
+        {
+            await SignInManager.SignOutAsync();
+            var user = await GetCurrentUserAsync();
+			if (user != null)
+			{
+                var hub = signalRConnectionManager.GetHubContext<ChatHub>();
+                hub.Clients.All.userDisconnected(user.UserName);
+				if (user.IsGuess)
+				{
+					await ChatManager.RemoveUserAsync(user);
+				}
+			}
+        }
 
         private void AddErrors(IdentityResult result)
         {

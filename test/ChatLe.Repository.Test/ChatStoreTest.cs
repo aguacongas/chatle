@@ -19,7 +19,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<UserTest>(context, null);
             }
         }
 
@@ -27,7 +27,7 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void Construtor_should_throw_argumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
+            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null, null));
         }
 
         class FakeContextTest : DbContext
@@ -60,7 +60,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsAssignableFrom<DbSet<Conversation>>(conversations);
@@ -72,7 +72,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsAssignableFrom<DbSet<Message>>(messages);
@@ -84,7 +84,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsAssignableFrom<DbSet<UserTest>>(users);
@@ -96,7 +96,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new ChatDbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
             }
         }
@@ -123,7 +123,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Error);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 await action(store);
             }
         }
@@ -299,7 +299,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 
                 await store.CreateNotificationConnectionAsync(connection);
             }
@@ -310,7 +310,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 await store.DeleteNotificationConnectionAsync(c);     
@@ -322,7 +322,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 if (c == null)
                     await store.CreateNotificationConnectionAsync(connection);     
@@ -360,7 +360,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
                 
                 await store.CreateNotificationConnectionAsync(connection);
                 
@@ -428,10 +428,10 @@ namespace ChatLe.Repository.Test
         [Fact]
         public async Task InitTest()
         {
-            await ExecuteTest(async store =>
+            await ExecuteTest(store =>
             {
-                await store.Context.Database.EnsureCreatedAsync();
                 store.Init();
+                return Task.FromResult(0);
             });
         }
 
@@ -565,25 +565,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetNotificationConnectionsAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var context = store.Context;
-
-                context.NotificationConnections.Add(new NotificationConnection()
-                {
-                    ConnectionDate = DateTime.Now,
-                    ConnectionId = "test",
-                    NotificationType = "test",
-                    UserId = "test"
-                });
-
-                Assert.NotNull(await store.GetNotificationConnectionsAsync("test", "test"));
-            });
-        }
-
-        [Fact]
         public async Task UserHasConnectionAsyncTest()
         {
             await ExecuteTest(async store =>
@@ -632,9 +613,9 @@ namespace ChatLe.Repository.Test
                 await store.DeleteUserAsync(user);
 
                 Assert.Empty(context.NotificationConnections);
-                Assert.Empty(context.Users); // Delete notification connection shoul not remove user
+                Assert.Empty(context.Users); 
 
-                Assert.NotEmpty(context.Conversations);
+                Assert.Empty(context.Conversations);
             });
         }
 

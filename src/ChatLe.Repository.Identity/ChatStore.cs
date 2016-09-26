@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ChatLe.Models
 {
@@ -18,7 +19,8 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
     
     /// <summary>
@@ -33,7 +35,8 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(DbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
     
     /// <summary>
@@ -55,17 +58,20 @@ namespace ChatLe.Models
         where TMessage : Message<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
     {
+        readonly IHostingEnvironment _env;
         /// <summary>
         /// Construtor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context)
+        public ChatStore(TContext context, IHostingEnvironment env)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            Context = context;            
-        }
+
+            Context = context;
+            _env = env;
+        }        
         
         /// <summary>
         /// Gets the <see cref="DbContext"/>
@@ -103,14 +109,16 @@ namespace ChatLe.Models
         /// <param name="message">The message to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(message == null)
                 throw new ArgumentNullException("message");
 
             Messages.Add(message);
-            await Context.SaveChangesAsync(cancellationToken);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -119,7 +127,7 @@ namespace ChatLe.Models
         /// <param name="attendee">The attendee to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(attendee == null)
@@ -127,7 +135,9 @@ namespace ChatLe.Models
                 throw new ArgumentNullException("attendee");
             }
             Attendees.Add(attendee);
-            await Context.SaveChangesAsync(cancellationToken);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -136,14 +146,16 @@ namespace ChatLe.Models
         /// <param name="conversation">The conversation to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (conversation == null)
                 throw new ArgumentNullException("conversation");
 
             Conversations.Add(conversation);
-            await Context.SaveChangesAsync(cancellationToken);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -164,14 +176,16 @@ namespace ChatLe.Models
         /// <param name="user">The user to update</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
                 throw new ArgumentNullException("user");
 
             Users.Update(user);
-            await Context.SaveChangesAsync(cancellationToken);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -268,7 +282,7 @@ namespace ChatLe.Models
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
@@ -277,7 +291,7 @@ namespace ChatLe.Models
             NotificationConnections.Add(connection);
             try
             {
-                await Context.SaveChangesAsync(cancellationToken);
+                Context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -285,14 +299,20 @@ namespace ChatLe.Models
                 {
                     var notification = entry.Entity as NotificationConnection<TKey>;
                     if (entry.Entity != null)
-                    {                        
+                    {
+                        entry.State = EntityState.Added;
                         // Using a NoTracking query means we get the entity but it is not tracked by the context
                         // and will not be merged with existing entities in the context.
-                        var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
+                        var connectionId = connection.ConnectionId;
+                        var type = connection.NotificationType;
+
+                        var databaseEntity = NotificationConnections
+                            .AsNoTracking()
+                            .FirstOrDefault(nc => nc.ConnectionId == connectionId && nc.NotificationType == type);
+
                         if (databaseEntity == null)
                         {
                             var databaseEntry = Context.Entry(connection);
-
                             ResetDbEntry<TNotificationConnection>(databaseEntry);
                         }
                     }
@@ -305,17 +325,8 @@ namespace ChatLe.Models
                 // Retry the save operation
                 Context.SaveChanges();
             }
-        }
 
-        void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
-        {
-            foreach (var property in entry.Metadata.GetProperties())
-            {
-                if (property.IsKey())
-                    continue;
-
-                entry.Property(property.Name).IsModified = false;
-            }
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -324,52 +335,26 @@ namespace ChatLe.Models
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
             NotificationConnections.Remove(connection);
+
             try
             {
-                await Context.SaveChangesAsync(cancellationToken);
+                Context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                await RetryDeleteNotificationConnection(ex);
+                RetryDeleteNotificationConnection(ex);
             }
+
+            return Task.FromResult(0);
         }
-
-        async Task RetryDeleteNotificationConnection(DbUpdateConcurrencyException ex)
-        {
-            foreach (var entry in ex.Entries)
-            {
-                await RetryDeleteNotificationConnection(entry);
-            }
-        }
-
-        async Task RetryDeleteNotificationConnection(EntityEntry entry)
-        {
-            var notification = entry.Entity as NotificationConnection<TKey>;
-            if (notification != null)
-            {
-                // Using a NoTracking query means we get the entity but it is not tracked by the context
-                // and will not be merged with existing entities in the context.
-                var databaseEntity = await NotificationConnections.AsNoTracking().SingleOrDefaultAsync(nc => nc.ConnectionId.Equals(notification.ConnectionId) && nc.NotificationType.Equals(notification.NotificationType));
-                if (databaseEntity == null)
-                    return;
-
-                var databaseEntry = Context.Entry(databaseEntity);
-
-                ResetDbEntry(databaseEntry);
-            }
-            else
-            {
-                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
-            }
-        }
-
+        
         /// <summary>
         /// Gets a notification connection by her id and her type
         /// </summary>
@@ -385,7 +370,8 @@ namespace ChatLe.Models
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
 
-            return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
+            return await NotificationConnections
+                .FirstOrDefaultAsync(c => c.ConnectionId == connectionId && c.NotificationType == notificationType);
         }
         
         /// <summary>
@@ -393,6 +379,9 @@ namespace ChatLe.Models
         /// </summary>
         public virtual void Init()
         {
+            if (_env!= null &&  _env.IsDevelopment())
+                Context.Database.EnsureDeletedAsync();
+
             Context.Database.EnsureCreated();
             NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();
@@ -404,19 +393,6 @@ namespace ChatLe.Models
             Context.SaveChanges();
             Users.RemoveRange(Users.Where(u => u.IsGuess).ToArray());
             Context.SaveChanges();
-        }
-        
-        /// <summary>
-        /// Gets notification connections for a user id and notification type
-        /// </summary>
-        /// <param name="userId">the user id</param>
-        /// <param name="notificationType">the notification type</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
-        public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType.Equals(notificationType)).ToListAsync();
         }
         
         /// <summary>
@@ -476,50 +452,48 @@ namespace ChatLe.Models
 
             try
             {
-                await Context.SaveChangesAsync(cancellationToken);            
+                Context.SaveChanges();            
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                await RetryDeleteUser(ex);
+                RetryDeleteUser(ex);
             }
         }
 
-        async Task RetryDeleteUser(DbUpdateConcurrencyException ex)
+
+		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+		}
+
+        void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
+        {
+            foreach (var property in entry.Metadata.GetProperties())
+            {
+                if (property.IsKey())
+                    continue;
+
+                entry.Property(property.Name).IsModified = false;
+            }
+        }
+
+        void RetryDeleteNotificationConnection(DbUpdateConcurrencyException ex)
         {
             foreach (var entry in ex.Entries)
             {
-                if (entry.Entity is TNotificationConnection)
-                {
-                    await RetryDeleteNotificationConnection(entry);
-                }
-                if (entry.Entity is TMessage)
-                {
-                    await RetryDeleteEntity<TMessage>(entry, Messages);
-                }
-                if (entry.Entity is TAttendee)
-                {
-                    await RetryDeleteEntity<TAttendee>(entry, async entity => await Attendees.AsNoTracking().SingleOrDefaultAsync(a => a.ConversationId.Equals(entity.ConversationId) && a.UserId.Equals(entity.UserId)));
-                }
-                if (entry.Entity is TUser)
-                {
-                    await RetryDeleteEntity<TUser>(entry, Users);
-                }
+                RetryDeleteNotificationConnection(entry);
             }
         }
 
-        async Task RetryDeleteEntity<TIdentifiable>(EntityEntry entry, DbSet<TIdentifiable> dbSet) where TIdentifiable: class, IIdentifiable<TKey>
+        void RetryDeleteNotificationConnection(EntityEntry entry)
         {
-            await RetryDeleteEntity<TIdentifiable>(entry, async entity => await dbSet.AsNoTracking().SingleOrDefaultAsync(m => m.Id.Equals(entity as TIdentifiable)));
-        }
-
-        async Task RetryDeleteEntity<TEntity>(EntityEntry entry, Func<TEntity, Task<TEntity>> getEntity) where TEntity: class
-        {
-            var entity = entry.Entity as TEntity;
-            if (entity != null)
+            var notification = entry.Entity as NotificationConnection<TKey>;
+            if (notification != null)
             {
                 // Using a NoTracking query means we get the entity but it is not tracked by the context
                 // and will not be merged with existing entities in the context.
-                var databaseEntity = await getEntity(entity);
+                var databaseEntity = NotificationConnections.AsNoTracking().SingleOrDefault(nc => nc.ConnectionId == notification.ConnectionId && nc.NotificationType == notification.NotificationType);
                 if (databaseEntity == null)
                     return;
 
@@ -533,10 +507,54 @@ namespace ChatLe.Models
             }
         }
 
-		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
-		}
+
+        void RetryDeleteUser(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                if (entry.Entity is TNotificationConnection)
+                {
+                    RetryDeleteNotificationConnection(entry);
+                }
+                if (entry.Entity is TMessage)
+                {
+                    RetryDeleteEntity<TMessage>(entry, Messages);
+                }
+                if (entry.Entity is TAttendee)
+                {
+                    RetryDeleteEntity<TAttendee>(entry,  entity => Attendees.AsNoTracking().SingleOrDefault(a => a.ConversationId.Equals(entity.ConversationId) && a.UserId.Equals(entity.UserId)));
+                }
+                if (entry.Entity is TUser)
+                {
+                    RetryDeleteEntity<TUser>(entry, Users);
+                }
+            }
+        }
+
+        void RetryDeleteEntity<TIdentifiable>(EntityEntry entry, DbSet<TIdentifiable> dbSet) where TIdentifiable: class, IIdentifiable<TKey>
+        {
+            RetryDeleteEntity<TIdentifiable>(entry, entity => dbSet.AsNoTracking().SingleOrDefault(m => m.Id.Equals(entity as TIdentifiable)));
+        }
+
+        void RetryDeleteEntity<TEntity>(EntityEntry entry, Func<TEntity, TEntity> getEntity) where TEntity: class
+        {
+            var entity = entry.Entity as TEntity;
+            if (entity != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = getEntity(entity);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+            }
+        }
 	}
 }

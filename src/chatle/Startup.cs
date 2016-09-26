@@ -90,7 +90,10 @@ namespace ChatLe
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
 
             services.AddDbContext<ChatLeIdentityDbContext>(options =>
-            {                
+            {
+                if (_environment.IsDevelopment())
+                    options.EnableSensitiveDataLogging();
+                
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
@@ -122,8 +125,11 @@ namespace ChatLe
 
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
+            
             ConfigureErrors(app);
-            var logger = LoggerFactory.CreateLogger("reques");
+            
+            var logger = LoggerFactory.CreateLogger("request");
+
             app.UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
