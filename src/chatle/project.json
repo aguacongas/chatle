@@ -62,6 +62,7 @@
 	  "Microsoft.AspNetCore.Cors": "1.0.0"
   },
 	"frameworks": {
+		"net451": {},
 		"netcoreapp1.0": {
 			"Microsoft.NETCore.App": {
 				"version": "1.0.0"
