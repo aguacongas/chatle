@@ -142,8 +142,7 @@ gulp.task("min:app", function () {
 gulp.task("replace", function () {
 	return gulp.src(['wwwroot/js/systemjs.config.js'])
 		.pipe(replace('umd.js', 'umd.min.js'))
-		.pipe(gulp.dest('wwwroot/js/systemjs.config.js.tmp'))
-		.pipe(copy('wwwroot/js'));
+		.pipe(gulp.dest('wwwroot/js'));
 });
 
 gulp.task("min", ["min:js", "min:css", "min:app"]);
