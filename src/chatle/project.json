@@ -86,6 +86,7 @@
       "wwwroot/css/site.min.css",
       "wwwroot/app/**/*.js",
       "wwwroot/app/**/*.html",
+      "wwwroot/js",
       "wwwroot/lib/angular/**/*.min.js",
       "wwwroot/lib/angular2-in-memory-web-api/*.js",
       "wwwroot/lib/core-js/client/shim.min.js",
