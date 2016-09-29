@@ -17,3 +17,5 @@ An [Angular2](https://angular.io/) and an [aurelia](http://aurelia.io) sample to
 
 
 Fill free to enter issue, if you want to discuss about it.
+
+The project is live on [HEROKU](https://www.heroku.com/) at [https://chatle-server.herokuapp.com](https://chatle-server.herokuapp.com)
