@@ -244,12 +244,6 @@ namespace ChatLe.Controllers
 
             return ReturnSpaError();
         }
-
-        JsonResult ReturnSpaError()
-        {
-            Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            return new JsonResult(ModelState.Root.Children);            
-        }
         //
         // POST: /Account/LogOff
         [HttpPost]
@@ -269,7 +263,20 @@ namespace ChatLe.Controllers
             await SignOut(signalRConnectionManager);        
         }
 
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public async Task<bool> Exists(string userName)
+        {
+            return await UserManager.FindByNameAsync(userName) != null;
+        }
+
         #region Helpers
+
+        private JsonResult ReturnSpaError()
+        {
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            return new JsonResult(ModelState.Root.Children);            
+        }
 
         private async Task SignOut(IConnectionManager signalRConnectionManager)
         {
@@ -297,18 +304,18 @@ namespace ChatLe.Controllers
             return await UserManager.GetUserAsync(HttpContext.User);
         }
 
-        public enum ManageMessageId
-        {
-            ChangePasswordSuccess,
-            Error
-        }
-
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
             else
                 return RedirectToAction("Index", "Home");
+        }
+
+        public enum ManageMessageId
+        {
+            ChangePasswordSuccess,
+            Error
         }
         #endregion
     }
