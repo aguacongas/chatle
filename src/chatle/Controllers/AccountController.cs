@@ -81,7 +81,7 @@ namespace ChatLe.Controllers
                 if (signInStatus.Succeeded)
                     return new JsonResult(signInStatus.Succeeded);
 
-                ModelState.AddModelError("", "Invalid username or password.");                
+                ModelState.AddModelError("InvalidUserOrPAssword", "Invalid username or password.");                
             }
 
             return ReturnSpaError();
@@ -237,7 +237,10 @@ namespace ChatLe.Controllers
                 var user = await GetCurrentUserAsync();
                 var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
                 if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, false);
                     return new JsonResult(ManageMessageId.ChangePasswordSuccess);
+                }                
                 else
                     AddErrors(result);
             }

@@ -88,9 +88,9 @@ namespace ChatLe.Models
                         NotificationType = notificationType,
                         ConnectionDate = DateTime.UtcNow
                     };
+                    
                     await Store.CreateNotificationConnectionAsync(nc, cancellationToken);
                 }
-                user.NotificationConnections.Add(nc);
             } else
                 throw new InvalidOperationException($"The user '{userName}' doesn't exist");
         }
@@ -113,7 +113,7 @@ namespace ChatLe.Models
             var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
 			if (nc != null)
 			{
-				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);
+				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);   
 				var user = await Store.FindUserByIdAsync(nc.UserId);
 				if (user != null)
                 {

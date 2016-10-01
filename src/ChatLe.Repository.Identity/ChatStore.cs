@@ -167,7 +167,7 @@ namespace ChatLe.Models
         public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            return await Users.SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
 
         /// <summary>
@@ -460,11 +460,11 @@ namespace ChatLe.Models
             }
         }
 
-
 		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+            var user = await Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+            return user;
 		}
 
         void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
