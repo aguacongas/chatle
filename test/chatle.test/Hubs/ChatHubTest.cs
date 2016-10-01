@@ -10,14 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading;
 using Xunit;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Chatle.test.Controllers;
-using System.Threading.Tasks;
 
 namespace chatle.test.Hubs
 {
@@ -57,7 +55,11 @@ namespace chatle.test.Hubs
 			var validator = new Mock<IUserValidator<ChatLeUser>>();
 			userValidators.Add(validator.Object);
 
-			var hub = new ChatHub(mockChatManager.Object, mockLoggerFactory.Object);
+			var provideMock = new Mock<IServiceProvider>();
+			provideMock.Setup(p => p.GetService(It.IsAny<Type>()))
+				.Returns(mockChatManager.Object);
+
+			var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
 			using (hub)
 			{
 				hub.Context = new HubCallerContext(mockHttpRequest.Object, "test");

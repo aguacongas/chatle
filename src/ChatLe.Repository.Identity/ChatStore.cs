@@ -448,8 +448,6 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
-            Users.Remove(user);
-
             try
             {
                 Context.SaveChanges();            
@@ -463,7 +461,7 @@ namespace ChatLe.Models
 		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-            var user = await Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+            var user = await Users.SingleOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
             return user;
 		}
 

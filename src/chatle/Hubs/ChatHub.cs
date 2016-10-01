@@ -16,13 +16,16 @@ namespace ChatLe.Hubs
 	[HubName("chat")]
 	public class ChatHub : Hub
 	{
+		readonly IServiceProvider _provider;
 		/// <summary>
 		/// The chat repository manager
 		/// </summary>
 		public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> Manager
 		{
-			get;
-			private set;
+			get
+			{
+				return _provider.GetService(typeof(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>)) as IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>;
+			}
 		}
 
 		/// <summary>
@@ -35,17 +38,17 @@ namespace ChatLe.Hubs
 		/// </summary>
 		/// <param name="manager">The chat repository manager</param>
 		/// <param name="loggerFactory">The logger factory</param>
-		public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager,
+		public ChatHub(IServiceProvider provider,
 			ILoggerFactory loggerFactory) : base()
 		{
-			if (manager == null)
-				throw new ArgumentNullException("manager");
+			if (provider == null)
+				throw new ArgumentNullException("provider");
 			if (loggerFactory == null)
 				throw new ArgumentNullException("loggerFactory");
 
 			Logger = loggerFactory.CreateLogger<ChatHub>();
 			Logger.LogInformation("constructor");
-			Manager = manager;
+			_provider = provider;
 		}
 		
         /// <summary>
