@@ -448,6 +448,8 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
+            Users.Remove(user);
+            
             try
             {
                 Context.SaveChanges();            
