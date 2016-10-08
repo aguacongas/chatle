@@ -9,7 +9,7 @@ fi
 
 buildFolder=".build"
 buildFile="$buildFolder/KoreBuild.sh"
-export KOREBUILD_DOTNET_VERSION="latest"
+#export KOREBUILD_DOTNET_VERSION="latest"
 
 if test ! -d $buildFolder; then
     echo "Downloading KoreBuild from $koreBuildZip"
