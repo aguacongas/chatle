@@ -34,8 +34,8 @@ export class ContactsComponent implements OnInit {
 
         this.service.userDiscconnected
             .subscribe(
-                id => {
-                    this.removeUser(id);
+                user => {
+                    this.removeUser(user.id);
                     this.detector.detectChanges();
                 },
                 error => this.error = error);

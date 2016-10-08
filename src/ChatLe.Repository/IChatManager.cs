@@ -50,7 +50,7 @@ namespace ChatLe.Models
 		/// <param name="cancellationToken">an optional cancellation token</param>
 		/// <returns>A <see cref="Task{TUser} with the disconnected user or null if the user has an other connection or no user found</returns>
 		Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, bool inactif, CancellationToken cancellationToken = default(CancellationToken));
-
+        
         /// <summary>
         /// Gets or creates a conversation
         /// </summary>

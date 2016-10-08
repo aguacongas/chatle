@@ -20,9 +20,14 @@ interface ChatProxy {
 
 interface ChatClient {
     userConnected: (user: User) => void;
-    userDisconnected: (id: string) => void;
+    userDisconnected: (user: UserDiscconnected) => void;
     messageReceived: (message: Message) => void;
     joinConversation: (conversation: Conversation) => void;
+}
+
+interface UserDiscconnected {
+    id: string;
+    isRemoved: boolean
 }
 
 export enum ConnectionState {  
@@ -37,14 +42,14 @@ export class ChatService {
     currentState = ConnectionState.Disconnected;
     connectionState: Observable<ConnectionState>;
     userConnected: Observable<User>;
-    userDiscconnected: Observable<string>;
+    userDiscconnected: Observable<UserDiscconnected>;
     messageReceived: Observable<Message>;
     joinConversation: Observable<Conversation>;    
     openConversation: Observable<Conversation>;
 
     private connectionStateSubject = new Subject<ConnectionState>();
     private userConnectedSubject = new Subject<User>();
-    private userDisconnectedSubject = new Subject<string>();
+    private userDisconnectedSubject = new Subject<UserDiscconnected>();
     private messageReceivedSubject = new Subject<Message>();
     private joinConversationSubject = new Subject<Conversation>();
     private openConversationSubject = new Subject<Conversation>();
@@ -74,7 +79,7 @@ export class ChatService {
           * @desc callback when a new user disconnect the chat
           * @param id, the disconnected user id
         */
-        chatHub.client.userDisconnected = id => this.onUserDisconnected(id);
+        chatHub.client.userDisconnected = user => this.onUserDisconnected(user);
         /**
           * @desc callback when a message is received
           * @param String to, the conversation id
@@ -214,10 +219,10 @@ export class ChatService {
         this.userConnectedSubject.next(user);
     }
 
-    private onUserDisconnected(id: string) {
-        console.log("Chat Hub user disconnected: " + id);
-        if (id !== this.settings.userName) {
-            this.userDisconnectedSubject.next(id);
+    private onUserDisconnected(user: UserDiscconnected) {
+        console.log("Chat Hub user disconnected: " + user.id);
+        if (user.id !== this.settings.userName) {
+            this.userDisconnectedSubject.next(user);
         }
     }   
 

@@ -37,7 +37,18 @@ export class ConversationsComponent implements OnInit {
                     this.conversations.unshift(conversation)
                 },
                 error => this.error = error);
-
+        
+        this.service.userDiscconnected
+            .subscribe(
+                user => { 
+                    if (user.isRemoved) {
+                        let index = this.conversations.findIndex(c => c.attendees.length < 3
+                            && c.attendees.some(a => a.userId === user.id)) 
+                        if (index > -1) {
+                            this.conversations.splice(index, 1);
+                        }
+                    }
+                });
 
         if (this.service.currentState === ConnectionState.Connected) {
             this.getConversations();

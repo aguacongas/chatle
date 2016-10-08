@@ -99,7 +99,7 @@ namespace ChatLe.Hubs
 			Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
 			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
 			if (user != null)
-				Clients.Others.userDisconnected(user.UserName);
+				Clients.Others.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
 			await base.OnDisconnected(stopCalled);
 		}
 	}

@@ -19,6 +19,16 @@ export class ConversationComponent implements OnInit {
         this.service.openConversation
             .subscribe(
                 conversation => this.conversation = conversation);
+        this.service.userDiscconnected
+            .subscribe(
+                user => {
+                    if (user.isRemoved 
+                        && this.conversation.attendees.some(a => a.userId === user.id) 
+                        && this.conversation.attendees.length < 3) {
+                            delete this.conversation;
+                    }
+                }
+            );
     }
 
     send() {        

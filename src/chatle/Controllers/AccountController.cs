@@ -288,7 +288,7 @@ namespace ChatLe.Controllers
 			if (user != null)
 			{
                 var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-                hub.Clients.All.userDisconnected(user.UserName);
+                hub.Clients.All.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
 				if (user.IsGuess)
 				{
 					await ChatManager.RemoveUserAsync(user);
