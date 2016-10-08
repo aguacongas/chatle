@@ -1,6 +1,6 @@
 chatle
 ======
-AppVeyor build status: [![Build status](https://ci.appveyor.com/api/projects/status/4q8ib00p44p1n6wv?svg=true)](https://ci.appveyor.com/project/aguacongas/chatle)
+AppVeyor build status: [![Build status](https://ci.appveyor.com/project/github/aguacongas/chatle?svg=true&retina=true)](https://ci.appveyor.com/project/aguacongas/chatle)
 
 Travis build status: [![Build Status](https://travis-ci.org/aguacongas/chatle.svg?branch=dev)](https://travis-ci.org/aguacongas/chatle)
 
