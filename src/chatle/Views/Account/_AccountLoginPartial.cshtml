@@ -1,35 +1,22 @@
-﻿@model LoginViewModel
-<form class="form-horizontal" role="form" method="post" asp-action="Login" asp-antiforgery="true" asp-route-returnurl="@ViewData["ReturnUrl"]">
-	<h4>Use a local account to log in.</h4>
-	<hr />
-	<div asp-validation-summary="All" class="text-danger"></div>
-	<div class="form-group">
-		<label class="col-xs-3 control-label" asp-for="UserName"></label>
-		<div class="col-xs-9">
-			<input class="form-control" asp-for="UserName" />
-			<span class="text-danger" asp-validation-for="UserName"></span>
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@using ChatLe.Models
+@model LoginViewModel
+@inject SignInManager<ChatLeUser> SignInManager
+
+<h4>Use another service to log in.</h4>
+<hr />
+@{
+	var loginProviders = SignInManager.GetExternalAuthenticationSchemes().ToList();
+	<form class="form-horizontal" role="form" asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+		<div>
+			<p>
+				@foreach (var provider in loginProviders)
+				{
+					<button type="submit" class="btn btn-default" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+				}
+			</p>
 		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-xs-3 control-label" asp-for="Password"></label>
-		<div class="col-xs-9">
-			<input class="form-control" asp-for="Password" />
-			<span class="text-danger" asp-validation-for="Password"></span>
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-xs-offset-3 col-xs-9">
-			<div class="checkbox">
-				<label asp-for="RememberMe">
-					<input asp-for="RememberMe" />
-					@Html.DisplayNameFor(m => m.RememberMe)
-				</label>
-			</div>
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-xs-offset-3 col-xs-9">
-			<input type="submit" value="Log in" class="btn btn-default" />
-		</div>
-	</div>
-</form>
+	</form>
+}

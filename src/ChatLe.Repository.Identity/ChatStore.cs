@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Models
 {
@@ -27,8 +28,8 @@ namespace ChatLe.Models
     /// Chat store for TUser
     /// </summary>
     /// <typeparam name="TUser">type of user, must a class and implement <see cref="IChatUser{string}"/></typeparam>
-    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection>
-        where TUser : class, IChatUser<string>
+    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>
+        where TUser : IdentityUser<string>, IChatUser<string>
     {
         /// <summary>
         /// Constructor
@@ -48,15 +49,18 @@ namespace ChatLe.Models
     /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation{TKey}"/></typeparam>
     /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee{TKey}"/></typeparam>
     /// <typeparam name="TMessage">type of message, must be a <see cref="Message{TKey}"/></typeparam>
-    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam>
-    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
+    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam> <summary>
+    /// <typeparam name="TUserLogin">type of the user login object.</typeparam>
+    /// </summary>
+    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, TUserLogin> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TKey : IEquatable<TKey>
-        where TUser : class, IChatUser<TKey>
+        where TUser : IdentityUser<TKey>, IChatUser<TKey>
         where TContext : DbContext
         where TConversation : Conversation<TKey>
         where TAttendee : Attendee<TKey>
         where TMessage : Message<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
     {
         readonly IHostingEnvironment _env;
         /// <summary>
@@ -102,6 +106,11 @@ namespace ChatLe.Models
         /// Gets the <see cref="DbSet{TNotificationConnection}"/>
         /// </summary>
         public virtual DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
+        
+        /// <summary>
+        /// Gets the <see cref="DbSet{TUserLogin}"/>
+        /// </summary>
+        public virtual DbSet<TUserLogin> Logins { get { return Context.Set<TUserLogin>(); } }
         
         /// <summary>
         /// Create a message on the database
@@ -167,7 +176,9 @@ namespace ChatLe.Models
         public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Users.SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            return await Users
+                .Include(u => u.Logins)
+                .SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
 
         /// <summary>

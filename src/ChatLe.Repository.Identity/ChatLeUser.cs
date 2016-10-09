@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Models
@@ -18,7 +17,7 @@ namespace ChatLe.Models
 
         public bool IsGuess
         {
-            get { return PasswordHash == null; }
+            get { return PasswordHash == null && Logins.Count == 0; }
         }
 
         public DateTime LastLoginDate { get; set; }

@@ -9,7 +9,7 @@ using ChatLe.ViewModels;
 using System.Net;
 using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ChatLe.Controllers
 {
@@ -266,6 +266,90 @@ namespace ChatLe.Controllers
             await SignOut(signalRConnectionManager);        
         }
 
+        //
+        // POST: /Account/ExternalLogin
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            // Request a redirect to the external login provider.
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(properties, provider);
+        }
+
+        //
+        // GET: /Account/ExternalLoginCallback
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+                return View(nameof(Login));
+            }
+            var info = await SignInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await SignInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                // Update any authentication tokens if login succeeded
+                await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+                return RedirectToLocal(returnUrl);
+            }
+
+            // If the user does not have an account, then ask the user to create an account.
+            ViewData["ReturnUrl"] = returnUrl;
+            ViewData["LoginProvider"] = info.LoginProvider;
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+            return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = name });
+        }
+
+        //
+        // POST: /Account/ExternalLoginConfirmation
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                // Get the information about the user from the external login provider
+                var info = await SignInManager.GetExternalLoginInfoAsync();
+                if (info == null)
+                {
+                    return View("ExternalLoginFailure");
+                }
+                var user = new ChatLeUser { UserName = model.UserName };
+                var result = await UserManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    result = await UserManager.AddLoginAsync(user, info);
+                    if (result.Succeeded)
+                    {
+                        await SignInManager.SignInAsync(user, isPersistent: false);
+
+                        // Update any authentication tokens as well
+                        await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+                        return RedirectToLocal(returnUrl);
+                    }
+                }
+                AddErrors(result);
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(model);
+        }
+
         [HttpGet]
         [ValidateAntiForgeryToken]
         public async Task<bool> Exists(string userName)
@@ -283,17 +367,18 @@ namespace ChatLe.Controllers
 
         private async Task SignOut(IConnectionManager signalRConnectionManager)
         {
-            await SignInManager.SignOutAsync();
             var user = await GetCurrentUserAsync();
 			if (user != null)
 			{
                 var hub = signalRConnectionManager.GetHubContext<ChatHub>();
                 hub.Clients.All.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
-				if (user.IsGuess)
+                var info = await SignInManager.GetExternalLoginInfoAsync();
+				if (user.IsGuess && info == null)
 				{
 					await ChatManager.RemoveUserAsync(user);
 				}
 			}
+            await SignInManager.SignOutAsync();
         }
 
         private void AddErrors(IdentityResult result)

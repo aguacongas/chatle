@@ -9,6 +9,8 @@ using Moq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ChatLe.Repository.Test
 {
@@ -27,7 +29,12 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void Construtor_should_throw_argumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null, null));
+            Assert.Throws<ArgumentNullException>(() => GetStore(null, null));
+        }
+
+        ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> GetStore(DbContext context, IHostingEnvironment env)
+        {
+            return new ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, env);
         }
 
         class FakeContextTest : DbContext
@@ -44,6 +51,9 @@ namespace ChatLe.Repository.Test
             public DbSet<Attendee> Attendee { get; set; }
             public DbSet<Conversation> Conversations { get; set; }
             public DbSet<NotificationConnection> NotificationConnections { get; set; }
+            public DbSet<IdentityUserLogin<string>> Logins { get; set; }
+
+            public DbSet<IdentityUserRole<string>> Roles { get; set; }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
@@ -52,6 +62,12 @@ namespace ChatLe.Repository.Test
                 
                 modelBuilder.Entity<NotificationConnection<string>>()
                     .HasKey(nc => new { nc.ConnectionId, nc.UserId, nc.NotificationType });
+
+                modelBuilder.Entity<IdentityUserLogin<string>>()
+                    .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+
+                modelBuilder.Entity<IdentityUserRole<string>>()
+                    .HasKey(r => new { r.UserId, r.RoleId });
             }
         }
 
@@ -60,7 +76,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsAssignableFrom<DbSet<Conversation>>(conversations);
@@ -72,7 +88,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsAssignableFrom<DbSet<Message>>(messages);
@@ -84,7 +100,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsAssignableFrom<DbSet<UserTest>>(users);
@@ -96,12 +112,12 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new ChatDbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
             }
         }
 
-        static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
+        static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>, Task> action)
         {  
             var builder = new DbContextOptionsBuilder();
             builder.UseInMemoryDatabase();
@@ -123,7 +139,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Error);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, null);
                 await action(store);
             }
         }
@@ -299,7 +315,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 
                 await store.CreateNotificationConnectionAsync(connection);
             }
@@ -310,7 +326,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 await store.DeleteNotificationConnectionAsync(c);     
@@ -322,7 +338,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
                 if (c == null)
                     await store.CreateNotificationConnectionAsync(connection);     
@@ -360,7 +376,7 @@ namespace ChatLe.Repository.Test
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Debug);
 
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context, null);
+                var store = GetStore(context, null);
                 
                 await store.CreateNotificationConnectionAsync(connection);
                 
@@ -491,7 +507,7 @@ namespace ChatLe.Repository.Test
             });
         }
 
-        private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection> store)
+        private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> store)
         {
             var context = store.Context;
             var conv = new Conversation();

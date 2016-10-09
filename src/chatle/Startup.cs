@@ -129,7 +129,6 @@ namespace ChatLe
             ConfigureErrors(app);
             
             var logger = LoggerFactory.CreateLogger("request");
-
             app.UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
@@ -138,6 +137,24 @@ namespace ChatLe
                 .UseStaticFiles()                             
                 .UseWebSockets()
                 .UseIdentity()
+                .UseFacebookAuthentication(new FacebookOptions()
+                {
+                    AppId = Configuration["Authentication:Facebook:AppId"],
+                    AppSecret = Configuration["Authentication:Facebook:AppSecret"]
+                })
+                .UseTwitterAuthentication(new TwitterOptions {
+                    ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
+                    ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
+                })
+                .UseGoogleAuthentication(new GoogleOptions
+                {
+                    ClientId = Configuration["Authentication:Google:ClientId"],
+                    ClientSecret = Configuration["Authentication:Google:ClientId"]
+                })
+                .UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
+                    ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
+                    ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"]
+                })
                 .Map("/xhrf", a => a.Run(async context => 
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Models
 {
@@ -16,7 +17,7 @@ namespace ChatLe.Models
         }
 
         public static IServiceCollection AddChatLe<TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection>(this IServiceCollection services, Action<ChatOptions> configure = null)
-            where TUser : class, IChatUser<string>
+            where TUser : IdentityUser<string>, IChatUser<string>
             where TContext : DbContext
             where TConversation : Conversation<string>, new()
             where TAttendee : Attendee<string>, new()
@@ -26,7 +27,7 @@ namespace ChatLe.Models
             if (configure != null)
                 services.ConfigureChatLe(configure);
                         
-            services.AddTransient<IChatStore<string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>, ChatStore<string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection>>();
+            services.AddTransient<IChatStore<string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>, ChatStore<string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, IdentityUserLogin<string>>>();
             services.AddTransient<IChatManager<string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>, ChatManager<string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>>();
             services.AddScoped<SignInManager>();
 
