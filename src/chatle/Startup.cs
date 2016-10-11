@@ -46,24 +46,7 @@ namespace ChatLe
             _environment = env;
             LoggerFactory = loggerFactory;
 
-            loggerFactory.AddConsole();
-            
-#if DNX451
-            int io, worker;
-            ThreadPool.GetMinThreads(out worker, out io);
-            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
-            ThreadPool.GetMaxThreads(out worker, out io);
-            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
-            ThreadPool.SetMaxThreads(32767, 1000);
-            ThreadPool.SetMinThreads(50, 50);
-            ThreadPool.GetMinThreads(out worker, out io);
-            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
-            ThreadPool.GetMaxThreads(out worker, out io);
-            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
-
-            var sourceSwitch = new SourceSwitch("chatle");
-            loggerFactory.AddTraceSource(sourceSwitch, new ConsoleTraceListener());
-#endif
+            loggerFactory.AddConsole();            
         }
 
         public IConfiguration Configuration { get; private set; }
@@ -120,6 +103,8 @@ namespace ChatLe
             services.AddIdentity<ChatLeUser, IdentityRole>(options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
+                var userOptions = options.User;
+                userOptions.AllowedUserNameCharacters += " ";
             }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
@@ -149,7 +134,7 @@ namespace ChatLe
                 .UseGoogleAuthentication(new GoogleOptions
                 {
                     ClientId = Configuration["Authentication:Google:ClientId"],
-                    ClientSecret = Configuration["Authentication:Google:ClientId"]
+                    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
                 })
                 .UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
                     ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],

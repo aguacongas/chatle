@@ -10,6 +10,7 @@ using System.Net;
 using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using System.Linq;
 
 namespace ChatLe.Controllers
 {
@@ -42,6 +43,7 @@ namespace ChatLe.Controllers
         public IActionResult Index(string returnUrl = null, string reason = null)
         {
             ViewBag.ReturnUrl = returnUrl;
+            DeleteExternalCookie();
             return View(new LoginPageViewModel());
         }
 
@@ -172,82 +174,6 @@ namespace ChatLe.Controllers
         }
 
         //
-        // GET: /Account/Manage
-        [HttpGet]
-        public IActionResult Manage(ManageMessageId? message = null)
-        {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
-        }
-
-        //
-        // POST: /Account/Manage
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Manage(ManageUserViewModel model)
-        {
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (ModelState.IsValid)
-            {
-                var user = await GetCurrentUserAsync();
-                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
-                    return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
-                else
-                    AddErrors(result);
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        //
-        // PUT: /Account/ChangePassword
-        [HttpPut]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword([FromBody] ManageUserViewModel model)
-        {
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (ModelState.IsValid)
-            {
-                var user = await GetCurrentUserAsync();
-                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
-                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
-                else
-                    AddErrors(result);
-            }
-
-            return ReturnSpaError();
-        }
-
-        //
-        // POST: /Account/SetPassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetPassword([FromBody] CreatePasswordViewModel model)
-        {
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (ModelState.IsValid)
-            {
-                var user = await GetCurrentUserAsync();
-                var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, false);
-                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
-                }                
-                else
-                    AddErrors(result);
-            }
-
-            return ReturnSpaError();
-        }
-        //
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -310,6 +236,7 @@ namespace ChatLe.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             ViewData["LoginProvider"] = info.LoginProvider;
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
             return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = name });
         }
 
@@ -357,7 +284,180 @@ namespace ChatLe.Controllers
             return await UserManager.FindByNameAsync(userName) != null;
         }
 
+        //GET: /Manage/Manage
+        [HttpGet]
+        public async Task<IActionResult> Manage(ManageMessageId? message = null)
+        {
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
+                : message == ManageMessageId.AddLoginSuccess ? "The external login was added."
+                : message == ManageMessageId.Error ? "An error has occurred."
+                : "";
+
+            var user = await GetCurrentUserAsync();
+            var vm = await GetLogins(user);
+            ViewData["ShowRemoveButton"] = user.PasswordHash != null || vm.CurrentLogins.Count > 1;
+            DeleteExternalCookie();
+            return View(vm);
+        }
+
+        //
+        // POST: /Account/UpdatePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordViewModel model)
+        {
+            ViewBag.ReturnUrl = Url.Action("Manage");
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+                else
+                    AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        //
+        // PUT: /Account/ChangePassword
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordViewModel model)
+        {
+            ViewBag.ReturnUrl = Url.Action("Manage");
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                var result = await UserManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
+                else
+                    AddErrors(result);
+            }
+
+            return ReturnSpaError();
+        }
+
+        //
+        // POST: /Account/SetPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPassword([FromBody] CreatePasswordViewModel model)
+        {
+            ViewBag.ReturnUrl = Url.Action("Manage");
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, false);
+                    return new JsonResult(ManageMessageId.ChangePasswordSuccess);
+                }
+                else
+                    AddErrors(result);
+            }
+
+            return ReturnSpaError();
+        }
+
+        [HttpGet]
+        public async Task<ManageLoginsViewModel> Logins()
+        {
+            var user = await GetCurrentUserAsync();
+            return await GetLogins(user);
+        }
+
+        //
+        // POST: /Manage/RemoveLogin
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveLogin(RemoveLoginViewModel account)
+        {
+            if (await InternalRemoveLogin(account))
+            {
+                return RedirectToAction(nameof(Manage), new { ManageMessageId.RemoveLoginSuccess });
+            }
+            return RedirectToAction(nameof(Manage));
+        }
+
+        [HttpDelete]
+        [ValidateAntiForgeryToken]
+        public async Task SpaRemoveLogin(RemoveLoginViewModel account)
+        {
+            await InternalRemoveLogin(account);
+        }
+
+        //
+        // POST: /Manage/LinkLogin
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LinkLogin(string provider)
+        {
+            // Request a redirect to the external login provider to link a login for the current user
+            var redirectUrl = Url.Action("LinkLoginCallback", "Account");
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
+            return Challenge(properties, provider);
+        }
+
+        //
+        // GET: /Manage/LinkLoginCallback
+        [HttpGet]
+        public async Task<ActionResult> LinkLoginCallback()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var info = await SignInManager.GetExternalLoginInfoAsync(await UserManager.GetUserIdAsync(user));
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Manage), new { Message = ManageMessageId.Error });
+            }
+            var result = await UserManager.AddLoginAsync(user, info);
+            var message = result.Succeeded ? ManageMessageId.AddLoginSuccess : ManageMessageId.Error;
+            return RedirectToAction(nameof(Manage), new { Message = message });
+        }
+
         #region Helpers
+        private void DeleteExternalCookie()
+        {
+            Response.Cookies.Delete("Identity.External");
+        }
+
+        private async Task<ManageLoginsViewModel> GetLogins(ChatLeUser user)
+        {
+            var userLogins = await UserManager.GetLoginsAsync(user);
+            var otherLogins = SignInManager.GetExternalAuthenticationSchemes().Where(auth => userLogins.All(ul => auth.AuthenticationScheme != ul.LoginProvider)).ToList();
+
+            return new ManageLoginsViewModel
+            {
+                CurrentLogins = userLogins,
+                OtherLogins = otherLogins,
+                Passwords = user.PasswordHash != null ? new UpdatePasswordViewModel() : null                
+            };
+        }
+
+        private async Task<bool> InternalRemoveLogin(RemoveLoginViewModel account)
+        {
+            var user = await GetCurrentUserAsync();
+            if (user != null)
+            {
+                var result = await UserManager.RemoveLoginAsync(user, account.LoginProvider, account.ProviderKey);
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         private JsonResult ReturnSpaError()
         {
@@ -403,7 +503,9 @@ namespace ChatLe.Controllers
         public enum ManageMessageId
         {
             ChangePasswordSuccess,
-            Error
+            Error,
+            AddLoginSuccess,
+            RemoveLoginSuccess
         }
         #endregion
     }

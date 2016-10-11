@@ -9,7 +9,7 @@ namespace ChatLe.ViewModels
         public string UserName { get; set; }
     }
 
-    public class ManageUserViewModel
+    public class UpdatePasswordViewModel
     {
         [Required]
         [DataType(DataType.Password)]

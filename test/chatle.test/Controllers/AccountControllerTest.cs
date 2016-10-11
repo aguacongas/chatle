@@ -272,7 +272,7 @@ namespace Chatle.test.Controllers
 			var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
 			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
-			var manageViewModel = new ManageUserViewModel()
+			var manageViewModel = new UpdatePasswordViewModel()
 			{
 				ConfirmPassword = "test",
 				NewPassword = "test",
@@ -285,12 +285,12 @@ namespace Chatle.test.Controllers
 				var mockHttpContext = new Mock<HttpContext>();
 				mockHttpContext.SetupGet(h => h.User).Returns(new Mock<ClaimsPrincipal>().Object);
 				controller.ControllerContext.HttpContext = mockHttpContext.Object;
-				var result = await controller.Manage(manageViewModel);
+				var result = await controller.UpdatePassword(manageViewModel);
 				Assert.IsType<RedirectToActionResult>(result);
 
 				userManager.Setup(u => u.ChangePasswordAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Failed());
 
-				result = await controller.Manage(manageViewModel);
+				result = await controller.UpdatePassword(manageViewModel);
 				Assert.IsType<ViewResult>(result);
 			}
 		}
