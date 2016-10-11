@@ -472,8 +472,7 @@ namespace ChatLe.Controllers
 			{
                 var hub = signalRConnectionManager.GetHubContext<ChatHub>();
                 hub.Clients.All.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
-                var info = await SignInManager.GetExternalLoginInfoAsync();
-				if (user.IsGuess && info == null)
+				if (user.IsGuess)
 				{
 					await ChatManager.RemoveUserAsync(user);
 				}
@@ -489,7 +488,7 @@ namespace ChatLe.Controllers
 
         private async Task<ChatLeUser> GetCurrentUserAsync()
         {
-            return await UserManager.GetUserAsync(HttpContext.User);
+            return await ChatManager.Store.FindUserByNameAsync(HttpContext.User.Identity.Name);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
