@@ -245,13 +245,13 @@ namespace Chatle.test.Controllers
 		}
 
 		[Fact]
-		public void GetManageTest()
+		public async Task GetManageTest()
 		{
 			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 			using (var controller = new AccountController(null, null, null) { ViewData = viewData })
 			{
 				controller.Url = new Mock<IUrlHelper>().Object;
-				var result = controller.Manage();
+				var result = await controller.Manage();
 				Assert.IsType<ViewResult>(result);
 			}
 		}
@@ -269,8 +269,12 @@ namespace Chatle.test.Controllers
 			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
 			var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
-			var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
-			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
+            var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            chatManagerMock.SetupGet(c => c.Store)
+                .Returns(storeMock.Object);
+
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
 			var manageViewModel = new UpdatePasswordViewModel()
 			{
@@ -279,7 +283,7 @@ namespace Chatle.test.Controllers
 				OldPassword = "test"
 			};
 
-			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = viewData })
+			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object) { ViewData = viewData })
 			{
 				controller.Url = new Mock<IUrlHelper>().Object;
 				var mockHttpContext = new Mock<HttpContext>();
@@ -309,8 +313,12 @@ namespace Chatle.test.Controllers
 
 			var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
 
-			var chatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
-			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
+			var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            chatManagerMock.SetupGet(c => c.Store)
+                .Returns(storeMock.Object);
+
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 			var mockConnectionManager = new Mock<IConnectionManager>();
 			var mockHubContext = new Mock<IHubContext>();
 			var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
@@ -319,7 +327,7 @@ namespace Chatle.test.Controllers
 			mockHubConnectionContext.SetupGet(h => h.All).Returns((ExpandoObject)all);
 			mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 			mockConnectionManager.Setup(c => c.GetHubContext<ChatHub>()).Returns(mockHubContext.Object);
-			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager) { ViewData = viewData })
+			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object) { ViewData = viewData })
 			{
 				controller.Url = new Mock<IUrlHelper>().Object;
 				var mockHttpContext = new Mock<HttpContext>();
