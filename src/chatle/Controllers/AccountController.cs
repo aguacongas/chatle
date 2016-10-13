@@ -256,21 +256,22 @@ namespace ChatLe.Controllers
             var info = await SignInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return new RedirectResult($"{returnUrl}?r=noInfo");
+                return new RedirectResult($"{returnUrl}");
             }
 
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
             // Sign in the user with this external login provider if the user already has a login.
             var result = await SignInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
                 // Update any authentication tokens if login succeeded
                 await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
-
-                return new RedirectResult($"{returnUrl}?r=signed");
+                
+                return new RedirectResult($"{returnUrl}?u={name}");
             }
 
             // If the user does not have an account, then ask the user to create an account.
-            return new RedirectResult($"{returnUrl}?r=confirm&p={info.LoginProvider}");
+            return new RedirectResult($"{returnUrl}?p={info.LoginProvider}&u={name}");
         }
 
         //
