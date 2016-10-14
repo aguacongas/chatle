@@ -311,6 +311,47 @@ namespace ChatLe.Controllers
             return View(model);
         }
 
+
+        //
+        // POST: /Account/SpaExternalLoginConfirmation
+        [HttpPut]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> SpaExternalLoginConfirmation([FromBody] ExternalLoginConfirmationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Get the information about the user from the external login provider
+                var info = await SignInManager.GetExternalLoginInfoAsync();
+                if (info == null)
+                {
+                    ModelState.AddModelError("NullInfo", "External login info is null");
+                }
+                else
+                {
+                    var user = new ChatLeUser { UserName = model.UserName };
+                    var result = await UserManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        result = await UserManager.AddLoginAsync(user, info);
+                        if (result.Succeeded)
+                        {
+                            await SignInManager.SignInAsync(user, isPersistent: false);
+
+                            // Update any authentication tokens as well
+                            await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+                            return new JsonResult("OK");
+                        }
+                    }
+
+                    AddErrors(result);
+                }
+            }
+
+            return ReturnSpaError();
+        }
+
         [HttpGet]
         [ValidateAntiForgeryToken]
         public async Task<bool> Exists(string userName)

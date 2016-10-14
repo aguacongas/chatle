@@ -146,6 +146,15 @@ namespace ChatLe
                     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
                     await context.Response.WriteAsync(tokens.RequestToken);
                 }))
+                .Map("/cls", a => a.Run(async context => 
+                {
+                    var response = context.Response;
+                    foreach(var cookie in context.Request.Cookies) 
+                    {
+                        response.Cookies.Delete(cookie.Key);
+                    }
+                    await context.Response.WriteAsync(string.Empty);
+                }))
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
