@@ -11,6 +11,7 @@ using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Linq;
+using System;
 
 namespace ChatLe.Controllers
 {
@@ -211,11 +212,17 @@ namespace ChatLe.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
+            if (returnUrl != null)
+            {
+                return await SpaExternalLogin(returnUrl, remoteError);
+            }
+
             if (remoteError != null)
             {
                 ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
                 return View(nameof(Login));
             }
+
             var info = await SignInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -233,11 +240,37 @@ namespace ChatLe.Controllers
             }
 
             // If the user does not have an account, then ask the user to create an account.
-            ViewData["ReturnUrl"] = returnUrl;
             ViewData["LoginProvider"] = info.LoginProvider;
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
             return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = name });
+        }
+
+        private async Task<IActionResult> SpaExternalLogin(string returnUrl, string remoteError)
+        {
+            if (remoteError != null)
+            {
+                return new RedirectResult($"{returnUrl}?e={remoteError}");
+            }
+
+            var info = await SignInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return new RedirectResult($"{returnUrl}?r=noInfo");
+            }
+
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await SignInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                // Update any authentication tokens if login succeeded
+                await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+                return new RedirectResult($"{returnUrl}?r=signed");
+            }
+
+            // If the user does not have an account, then ask the user to create an account.
+            return new RedirectResult($"{returnUrl}?r=confirm&p={info.LoginProvider}");
         }
 
         //
@@ -425,6 +458,7 @@ namespace ChatLe.Controllers
         }
 
         #region Helpers
+
         private void DeleteExternalCookie()
         {
             Response.Cookies.Delete("Identity.External");
