@@ -23,6 +23,8 @@ using System.Dynamic;
 using ChatLe.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using ChatLe.Repository.Identity;
+using System.Security.Principal;
+using Microsoft.AspNetCore.Http.Authentication;
 
 namespace Chatle.test.Controllers
 {
@@ -166,10 +168,20 @@ namespace Chatle.test.Controllers
 		[Fact]
 		public void IndexTest()
 		{
+            var mockCookies = new Mock<IResponseCookies>();
+            var mockHttpResponse = new Mock<HttpResponse>();            
+            mockHttpResponse.SetupGet(r => r.Cookies)
+                .Returns(mockCookies.Object);
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.SetupGet(c => c.Response)
+                .Returns(mockHttpResponse.Object);
+
 			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 			using (var controller = new AccountController(null, null, null) { ViewData = viewData })
 			{
-				var result = controller.Index();
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                var result = controller.Index();
 				Assert.IsType<ViewResult>(result);
 			}
 		}
@@ -247,10 +259,42 @@ namespace Chatle.test.Controllers
 		[Fact]
 		public async Task GetManageTest()
 		{
-			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-			using (var controller = new AccountController(null, null, null) { ViewData = viewData })
+            var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ChatLeUser());
+
+            var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            chatManagerMock.SetupGet(c => c.Store)
+                .Returns(storeMock.Object);
+
+            var mockCookies = new Mock<IResponseCookies>();
+            var mockHttpResponse = new Mock<HttpResponse>();
+            mockHttpResponse.SetupGet(r => r.Cookies)
+                .Returns(mockCookies.Object);
+
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.SetupGet(c => c.User)
+                .Returns(new ClaimsPrincipal(new Mock<IIdentity>().Object));
+            mockHttpContext.SetupGet(c => c.Response)
+                .Returns(mockHttpResponse.Object);
+
+            var userValidators = new List<IUserValidator<ChatLeUser>>();
+            var validator = new Mock<IUserValidator<ChatLeUser>>();
+            userValidators.Add(validator.Object);
+            var userManager = MockUserManager<ChatLeUser>(userValidators);
+            userManager.Setup(u => u.GetLoginsAsync(It.IsAny<ChatLeUser>()))
+                .ReturnsAsync(new List<UserLoginInfo>());
+
+            var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
+            signinManager.Setup(s => s.GetExternalAuthenticationSchemes())
+                .Returns(new List<AuthenticationDescription>());
+
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
+			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object) { ViewData = viewData })
 			{
-				controller.Url = new Mock<IUrlHelper>().Object;
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                controller.Url = new Mock<IUrlHelper>().Object;
 				var result = await controller.Manage();
 				Assert.IsType<ViewResult>(result);
 			}
@@ -263,16 +307,22 @@ namespace Chatle.test.Controllers
 			var validator = new Mock<IUserValidator<ChatLeUser>>();
 			userValidators.Add(validator.Object);
 			var userManager = MockUserManager<ChatLeUser>(userValidators);
-			userManager.Setup(u => u.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
 			userManager.Setup(u => u.ChangePasswordAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 			validator.Setup(v => v.ValidateAsync(userManager.Object, It.IsAny<ChatLeUser>()))
 			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
 			var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
-            var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
             var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new ChatLeUser());
+
+            var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
             chatManagerMock.SetupGet(c => c.Store)
                 .Returns(storeMock.Object);
+
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.SetupGet(c => c.User)
+                .Returns(new ClaimsPrincipal(new Mock<IIdentity>().Object));
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
@@ -286,10 +336,9 @@ namespace Chatle.test.Controllers
 			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object) { ViewData = viewData })
 			{
 				controller.Url = new Mock<IUrlHelper>().Object;
-				var mockHttpContext = new Mock<HttpContext>();
-				mockHttpContext.SetupGet(h => h.User).Returns(new Mock<ClaimsPrincipal>().Object);
 				controller.ControllerContext.HttpContext = mockHttpContext.Object;
-				var result = await controller.UpdatePassword(manageViewModel);
+
+                var result = await controller.UpdatePassword(manageViewModel);
 				Assert.IsType<RedirectToActionResult>(result);
 
 				userManager.Setup(u => u.ChangePasswordAsync(It.IsAny<ChatLeUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Failed());
@@ -307,44 +356,50 @@ namespace Chatle.test.Controllers
 			var validator = new Mock<IUserValidator<ChatLeUser>>();
 			userValidators.Add(validator.Object);
 			var userManager = MockUserManager<ChatLeUser>(userValidators);
-			userManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
-			validator.Setup(v => v.ValidateAsync(userManager.Object, It.IsAny<ChatLeUser>()))
-			   .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
-
+			
 			var signinManager = MockSigninManager<ChatLeUser>(userManager.Object);
 
-			var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
             var storeMock = new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
+            storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ChatLeUser());
+
+            var chatManagerMock = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
             chatManagerMock.SetupGet(c => c.Store)
                 .Returns(storeMock.Object);
+
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.SetupGet(c => c.User)
+                .Returns(new ClaimsPrincipal(new Mock<IIdentity>().Object));
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 			var mockConnectionManager = new Mock<IConnectionManager>();
 			var mockHubContext = new Mock<IHubContext>();
 			var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
 			dynamic all = new ExpandoObject();
-			all.userDisconnected = new Action<string>(s => { });
+			all.userDisconnected = new Action<object>(o => { });
 			mockHubConnectionContext.SetupGet(h => h.All).Returns((ExpandoObject)all);
 			mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
 			mockConnectionManager.Setup(c => c.GetHubContext<ChatHub>()).Returns(mockHubContext.Object);
+
 			using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object) { ViewData = viewData })
 			{
 				controller.Url = new Mock<IUrlHelper>().Object;
-				var mockHttpContext = new Mock<HttpContext>();
-				var claimsMock = new Mock<ClaimsPrincipal>();
-				claimsMock.Setup(c => c.FindFirst(It.IsAny<string>())).Returns(new Claim("test", "test"));
-				mockHttpContext.SetupGet(h => h.User).Returns(claimsMock.Object);
-				controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
 				var result = await controller.LogOff(mockConnectionManager.Object);
 				Assert.IsType<RedirectToActionResult>(result);
 
-				userManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser() { PasswordHash = "test" });
-				result = await controller.LogOff(mockConnectionManager.Object);
+                storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(new ChatLeUser { PasswordHash = "test" });
+
+                result = await controller.LogOff(mockConnectionManager.Object);
 				Assert.IsType<RedirectToActionResult>(result);
 
-				userManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(null);
+                storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(null);
 
-				result = await controller.LogOff(mockConnectionManager.Object);
+                result = await controller.LogOff(mockConnectionManager.Object);
 				Assert.IsType<RedirectToActionResult>(result);
 			}
 		}
