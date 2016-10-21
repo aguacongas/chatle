@@ -353,6 +353,7 @@ namespace ChatLe.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<bool> Exists(string userName)
         {
