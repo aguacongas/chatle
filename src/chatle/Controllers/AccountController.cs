@@ -472,10 +472,10 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin(string provider)
+        public IActionResult LinkLogin([FromBody] string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
-            var redirectUrl = Url.Action("LinkLoginCallback", "Account");
+            var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
             var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
             return Challenge(properties, provider);
         }
@@ -483,9 +483,15 @@ namespace ChatLe.Controllers
         //
         // GET: /Manage/LinkLoginCallback
         [HttpGet]
-        public async Task<ActionResult> LinkLoginCallback()
+        public async Task<ActionResult> LinkLoginCallback(string returnUrl = null)
         {
             var user = await GetCurrentUserAsync();
+
+            if (returnUrl != null)
+            {
+                return await SpaLinkLogin(user, returnUrl);
+            }
+
             if (user == null)
             {
                 return View("Error");
@@ -501,6 +507,23 @@ namespace ChatLe.Controllers
         }
 
         #region Helpers
+        private async Task<ActionResult> SpaLinkLogin(ChatLeUser user, string returnUrl)
+        {
+            if (user == null)
+            {
+                return new RedirectResult($"{returnUrl}?r=no-user");
+            }
+
+            var info = await SignInManager.GetExternalLoginInfoAsync(await UserManager.GetUserIdAsync(user));
+            if (info == null)
+            {
+                return new RedirectResult($"{returnUrl}?r=no-info");
+            }
+
+            var result = await UserManager.AddLoginAsync(user, info);
+            var message = result.Succeeded ? "succeed" : "error";
+            return new RedirectResult($"{returnUrl}?r={message}");
+        }
 
         private void DeleteExternalCookie()
         {
