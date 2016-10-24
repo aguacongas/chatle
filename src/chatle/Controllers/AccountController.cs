@@ -511,18 +511,18 @@ namespace ChatLe.Controllers
         {
             if (user == null)
             {
-                return new RedirectResult($"{returnUrl}?r=no-user");
+                return new RedirectResult($"{returnUrl}&r=no-user");
             }
 
             var info = await SignInManager.GetExternalLoginInfoAsync(await UserManager.GetUserIdAsync(user));
             if (info == null)
             {
-                return new RedirectResult($"{returnUrl}?r=no-info");
+                return new RedirectResult($"{returnUrl}&r=no-info");
             }
 
             var result = await UserManager.AddLoginAsync(user, info);
             var message = result.Succeeded ? "succeed" : "error";
-            return new RedirectResult($"{returnUrl}?r={message}");
+            return new RedirectResult($"{returnUrl}&r={message}");
         }
 
         private void DeleteExternalCookie()
