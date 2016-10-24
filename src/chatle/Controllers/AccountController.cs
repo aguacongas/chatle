@@ -472,7 +472,7 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin([FromBody] string provider, string returnUrl = null)
+        public IActionResult LinkLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
