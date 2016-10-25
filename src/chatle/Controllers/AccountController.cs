@@ -267,7 +267,9 @@ namespace ChatLe.Controllers
                 // Update any authentication tokens if login succeeded
                 await SignInManager.UpdateExternalAuthenticationTokensAsync(info);
                 
-                return new RedirectResult($"{returnUrl}?u={name}");
+                var user = await UserManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                
+                return new RedirectResult($"{returnUrl}?u={user.UserName}");
             }
 
             // If the user does not have an account, then ask the user to create an account.
