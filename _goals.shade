@@ -50,10 +50,10 @@ default SAMPLES_PROJECT_GLOB = "samples/*/project.json"
     Configuration = "Debug";
     E("Configuration", Configuration);
   }
-  if (string.IsNullOrEmpty(E("KOREBUILD_DOTNET_RESTORE_OPTIONS")))
-  {
-	E("KOREBUILD_DOTNET_RESTORE_OPTIONS", "--infer-runtimes");
-  }
+  //if (string.IsNullOrEmpty(E("KOREBUILD_DOTNET_RESTORE_OPTIONS")))
+  //{
+	//E("KOREBUILD_DOTNET_RESTORE_OPTIONS", "--infer-runtimes");
+  //}
 }
 
 #--for-ci
