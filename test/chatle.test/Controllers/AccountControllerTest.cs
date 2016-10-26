@@ -170,7 +170,13 @@ namespace Chatle.test.Controllers
         public void GetRegisterTest()
         {
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-            using (var controller = new AccountController(null, null, null, null) { ViewData = viewData })
+
+			var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(null, null, null, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 var result = controller.Register();
                 Assert.IsType<ViewResult>(result);
@@ -189,7 +195,13 @@ namespace Chatle.test.Controllers
                 .Returns(mockHttpResponse.Object);
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-            using (var controller = new AccountController(null, null, null, null) { ViewData = viewData })
+
+			var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(null, null, null, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
@@ -221,7 +233,12 @@ namespace Chatle.test.Controllers
                 UserName = "test"
             };
 
-            using (var controller = new AccountController(userManager, signinManager.Object, chatManager, null) { ViewData = viewData })
+            var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(userManager, signinManager.Object, chatManager, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 controller.Url = new Mock<IUrlHelper>().Object;
                 var result = await controller.Login(loginViewModel, null);
@@ -256,7 +273,11 @@ namespace Chatle.test.Controllers
                 UserName = "test"
             };
 
-            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager, null) { ViewData = viewData })
+            var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManager, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 var result = await controller.Guess(guessViewModel);
                 Assert.IsType<RedirectToActionResult>(result);
@@ -302,7 +323,13 @@ namespace Chatle.test.Controllers
                 .Returns(new List<AuthenticationDescription>());
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, null) { ViewData = viewData })
+
+			var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 controller.ControllerContext.HttpContext = mockHttpContext.Object;
 
@@ -345,7 +372,12 @@ namespace Chatle.test.Controllers
                 OldPassword = "test"
             };
 
-            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, null) { ViewData = viewData })
+			var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 controller.Url = new Mock<IUrlHelper>().Object;
                 controller.ControllerContext.HttpContext = mockHttpContext.Object;
@@ -393,7 +425,12 @@ namespace Chatle.test.Controllers
             mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
             mockConnectionManager.Setup(c => c.GetHubContext<ChatHub>()).Returns(mockHubContext.Object);
 
-            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, null) { ViewData = viewData })
+			var mockLogger = new Mock<ILogger>();
+            var mockLoggerFactory = new Mock<ILoggerFactory>();
+            mockLoggerFactory.Setup(m => m.CreateLogger(It.IsAny<string>()))
+                .Returns(mockLogger.Object);
+
+            using (var controller = new AccountController(userManager.Object, signinManager.Object, chatManagerMock.Object, mockLoggerFactory.Object) { ViewData = viewData })
             {
                 controller.Url = new Mock<IUrlHelper>().Object;
 
