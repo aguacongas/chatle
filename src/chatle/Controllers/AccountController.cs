@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ChatLe.Controllers
 {
@@ -198,11 +200,12 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        public IActionResult ExternalLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            var properties = GetAuthenticationPropertiesForEnv(env, provider, redirectUrl);
+            
             return Challenge(properties, provider);
         }
 
@@ -474,11 +477,11 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin(string provider, string returnUrl = null)
+        public IActionResult LinkLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
+            var properties = GetAuthenticationPropertiesForEnv(env, provider, redirectUrl, UserManager.GetUserId(User));
             return Challenge(properties, provider);
         }
 
@@ -509,6 +512,26 @@ namespace ChatLe.Controllers
         }
 
         #region Helpers
+
+        private AuthenticationProperties GetAuthenticationPropertiesForEnv(IHostingEnvironment env, string provider, string redirectUrl = null, string userId = null)
+        {
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, userId);
+            if (provider.ToLower() == "microsoft" && !env.IsDevelopment())
+            {
+                var uri = properties.RedirectUri;
+                if (uri.StartsWith("http"))
+                {
+                    properties.RedirectUri = uri.Replace("http://", "https://");
+                }
+                else
+                {
+                    properties.RedirectUri = $"https://{HttpContext.Request.Host}{uri}";
+                }
+            }
+
+            return properties;
+        }
+
         private async Task<ActionResult> SpaLinkLogin(ChatLeUser user, string returnUrl)
         {
             if (user == null)
