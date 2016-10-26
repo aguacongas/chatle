@@ -54,15 +54,15 @@ nuget="mono $buildFolder/nuget.exe"
 
 $nuget install GitVersion.CommandLine -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
 
-cliversion="1.0.0-preview3-003206"
-clifile="$buildFolder/cli.version"
-if [ -f "$clifile" ]; then
-    rm $clifile
-fi
-
-echo $cliversion >> $clifile
-cp $clifile "$buildFolder/cli.version.darwin"
-cp $clifile "$buildFolder/cli.version.unix"
+# cliversion="1.0.0-preview3-003206"
+# clifile="$buildFolder/cli.version"
+# if [ -f "$clifile" ]; then
+#     rm $clifile
+# fi
+# 
+# echo $cliversion >> $clifile
+# cp $clifile "$buildFolder/cli.version.darwin"
+# cp $clifile "$buildFolder/cli.version.unix"
 
 
 $buildFile -r $repoFolder "$@"
