@@ -136,10 +136,10 @@ namespace ChatLe
                     ClientId = Configuration["Authentication:Google:ClientId"],
                     ClientSecret = Configuration["Authentication:Google:ClientSecret"]
                 })
-                .UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
-                    ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
-                    ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"]
-                })
+                // .UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
+                //     ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
+                //     ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"]
+                // })
                 .Map("/xhrf", a => a.Run(async context => 
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
