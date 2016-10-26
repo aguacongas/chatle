@@ -204,8 +204,7 @@ namespace ChatLe.Controllers
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = GetAuthenticationPropertiesForEnv(env, provider, redirectUrl);
-            
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
             return Challenge(properties, provider);
         }
 
@@ -481,7 +480,7 @@ namespace ChatLe.Controllers
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = GetAuthenticationPropertiesForEnv(env, provider, redirectUrl, UserManager.GetUserId(User));
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));            
             return Challenge(properties, provider);
         }
 
@@ -512,29 +511,6 @@ namespace ChatLe.Controllers
         }
 
         #region Helpers
-
-        private AuthenticationProperties GetAuthenticationPropertiesForEnv(IHostingEnvironment env, string provider, string redirectUrl = null, string userId = null)
-        {
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, userId);
-            Logger.LogInformation($"GetAuthenticationPropertiesForEnv for env {env.EnvironmentName} provider {provider}, redirec uri : {properties.RedirectUri}");
-            if (provider.ToLower() == "microsoft" && !env.IsDevelopment())
-            {
-                var uri = properties.RedirectUri;
-                if (uri.StartsWith("http"))
-                {
-                    properties.RedirectUri = uri.Replace("http://", "https://");
-                }
-                else
-                {
-                    properties.RedirectUri = $"https://{HttpContext.Request.Host}{uri}";
-                }
-            }
-
-            Logger.LogInformation($"GetAuthenticationPropertiesForEnv for provider {provider} return redirec uri : {properties.RedirectUri}");
-            
-
-            return properties;
-        }
 
         private async Task<ActionResult> SpaLinkLogin(ChatLeUser user, string returnUrl)
         {
