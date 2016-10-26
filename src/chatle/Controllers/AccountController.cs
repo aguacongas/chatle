@@ -14,24 +14,22 @@ using System.Linq;
 using System;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers
 {
-    public class Role
-    {
-        public string Name { get; set; }
-    }
-
     [Authorize]
     public class AccountController : Controller
     {
         public AccountController(UserManager<ChatLeUser> userManager, 
             SignInManager signInManager,
-            IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
+            IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager,
+            ILoggerFactory loggerFactory)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             ChatManager = chatManager;
+            Logger = loggerFactory.CreateLogger<AccountController>();
         }
 
         public UserManager<ChatLeUser> UserManager { get; private set; }
@@ -39,6 +37,8 @@ namespace ChatLe.Controllers
         public SignInManager<ChatLeUser> SignInManager { get; private set; }
 
         public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> ChatManager { get; private set; }
+
+        public ILogger Logger { get; private set; }
 
         // GET: /Account/Index
         [HttpGet]
@@ -516,6 +516,7 @@ namespace ChatLe.Controllers
         private AuthenticationProperties GetAuthenticationPropertiesForEnv(IHostingEnvironment env, string provider, string redirectUrl = null, string userId = null)
         {
             var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, userId);
+            Logger.LogInformation($"GetAuthenticationPropertiesForEnv for env {env.EnvironmentName} provider {provider}, redirec uri : {properties.RedirectUri}");
             if (provider.ToLower() == "microsoft" && !env.IsDevelopment())
             {
                 var uri = properties.RedirectUri;
@@ -528,6 +529,9 @@ namespace ChatLe.Controllers
                     properties.RedirectUri = $"https://{HttpContext.Request.Host}{uri}";
                 }
             }
+
+            Logger.LogInformation($"GetAuthenticationPropertiesForEnv for provider {provider} return redirec uri : {properties.RedirectUri}");
+            
 
             return properties;
         }
