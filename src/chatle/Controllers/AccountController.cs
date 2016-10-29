@@ -240,7 +240,7 @@ namespace ChatLe.Controllers
             var info = await SignInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction(nameof(Index));
             }
 
             // Sign in the user with this external login provider if the user already has a login.

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using ChatLe.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Newtonsoft.Json.Linq;
 
 namespace ChatLe
 {
@@ -29,7 +34,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
-				.SetBasePath(env.ContentRootPath)
+                .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -47,7 +52,7 @@ namespace ChatLe
             _environment = env;
             LoggerFactory = loggerFactory;
 
-            loggerFactory.AddConsole();            
+            loggerFactory.AddConsole();
         }
 
         public IConfiguration Configuration { get; private set; }
@@ -77,7 +82,7 @@ namespace ChatLe
             {
                 if (_environment.IsDevelopment())
                     options.EnableSensitiveDataLogging();
-                
+
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
@@ -92,15 +97,15 @@ namespace ChatLe
                     case DBEngine.MySql:
                         options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
                         break;
-                    //case DBEngine.Redis:
-                    //    int port;
-                    //    int database;
-                    //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
-                    //        port = 6379;
-                    //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
-                        
-                    //    //options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
-                    //    break;
+                        //case DBEngine.Redis:
+                        //    int port;
+                        //    int database;
+                        //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
+                        //        port = 6379;
+                        //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
+
+                        //    //options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
+                        //    break;
                 }
             });
 
@@ -114,46 +119,121 @@ namespace ChatLe
 
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
-            
+
             ConfigureErrors(app);
-            
+
             var logger = LoggerFactory.CreateLogger("request");
             app.UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials())
-                .UseStaticFiles()                             
+                .UseStaticFiles()
                 .UseWebSockets()
                 .UseIdentity()
                 .UseFacebookAuthentication(new FacebookOptions()
                 {
                     AppId = Configuration["Authentication:Facebook:AppId"],
-                    AppSecret = Configuration["Authentication:Facebook:AppSecret"]
+                    AppSecret = Configuration["Authentication:Facebook:AppSecret"],
+                    SaveTokens = true
                 })
-                .UseTwitterAuthentication(new TwitterOptions {
+                .UseTwitterAuthentication(new TwitterOptions
+                {
                     ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
-                    ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
+                    ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"],
+                    SaveTokens = true
                 })
                 .UseGoogleAuthentication(new GoogleOptions
                 {
                     ClientId = Configuration["Authentication:Google:ClientId"],
-                    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
+                    ClientSecret = Configuration["Authentication:Google:ClientSecret"],
+                    SaveTokens = true
                 })
-                .UseChatleMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
+                .UseChatleMicrosoftAccountAuthentication(new MicrosoftAccountOptions
+                {
                     ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
-                    ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"]
+                    ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"],
+                    SaveTokens = true
                 })
-                .Map("/xhrf", a => a.Run(async context => 
+                .UseOAuthAuthentication(new OAuthOptions
+                {
+                    AuthenticationScheme = "Github",
+                    DisplayName = "Github",
+                    ClientId = Configuration["Authentication:Github:ClientId"],
+                    ClientSecret = Configuration["Authentication:Github:ClientSecret"],
+                    CallbackPath = new PathString("/signin-github"),
+                    AuthorizationEndpoint = "https://github.com/login/oauth/authorize",
+                    TokenEndpoint = "https://github.com/login/oauth/access_token",
+                    UserInformationEndpoint = "https://api.github.com/user",
+                    ClaimsIssuer = "OAuth2-Github",
+                    SaveTokens = true,
+                    // Retrieving user information is unique to each provider.
+                    Events = new OAuthEvents
+                    {
+                        OnCreatingTicket = async context =>
+                        {
+                        // Get the GitHub user
+                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                            var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                            response.EnsureSuccessStatusCode();
+
+                            var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                            var identifier = user.Value<string>("id");
+                            if (!string.IsNullOrEmpty(identifier))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.NameIdentifier, identifier,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var userName = user.Value<string>("login");
+                            if (!string.IsNullOrEmpty(userName))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimsIdentity.DefaultNameClaimType, userName,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var name = user.Value<string>("name");
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    "urn:github:name", name,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var email = user.Value<string>("email");
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.Email, email,
+                                    ClaimValueTypes.Email, context.Options.ClaimsIssuer));
+                            }
+
+                            var link = user.Value<string>("url");
+                            if (!string.IsNullOrEmpty(link))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    "urn:github:url", link,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+                        }
+                    }
+                })
+                .Map("/xhrf", a => a.Run(async context =>
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
                     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
                     await context.Response.WriteAsync(tokens.RequestToken);
                 }))
-                .Map("/cls", a => a.Run(async context => 
+                .Map("/cls", a => a.Run(async context =>
                 {
                     var response = context.Response;
-                    foreach(var cookie in context.Request.Cookies) 
+                    foreach (var cookie in context.Request.Cookies)
                     {
                         response.Cookies.Delete(cookie.Key);
                     }
@@ -176,18 +256,18 @@ namespace ChatLe
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-				app.UseDatabaseErrorPage();
-			}
+                app.UseDatabaseErrorPage();
+            }
             else
             {
                 // Add Error handling middleware which catches all application specific errors and
                 // send the request to the following path or controller action.
                 app.UseExceptionHandler("/Home/Error");
-            }            
+            }
         }
 
-		public static void Main(string[] args)
-		{
+        public static void Main(string[] args)
+        {
             var config = new ConfigurationBuilder()
                 .AddCommandLine(args)
                 .Build();
@@ -196,15 +276,15 @@ namespace ChatLe
             if (args.Length == 1)
                 rootPath += '/' + args[0];
 
-			var host = new WebHostBuilder()				
-				.UseContentRoot(rootPath)
+            var host = new WebHostBuilder()
+                .UseContentRoot(rootPath)
                 .UseConfiguration(config)
                 .UseStartup<Startup>()
                 .UseIISIntegration()
                 .UseKestrel()
-				.Build();
+                .Build();
 
-			host.Run();
-		}
-	}
+            host.Run();
+        }
+    }
 }
