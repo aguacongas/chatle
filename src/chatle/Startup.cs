@@ -20,7 +20,8 @@ namespace ChatLe
             SqlServer,
             InMemory,
             Redis,
-            SQLite
+            SQLite,
+            MySql
         }
 
         readonly IHostingEnvironment _environment;
@@ -87,6 +88,9 @@ namespace ChatLe
                         break;
                     case DBEngine.SQLite:
                         options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
+                        break;
+                    case DBEngine.MySql:
+                        options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
                         break;
                     //case DBEngine.Redis:
                     //    int port;
