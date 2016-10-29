@@ -12,24 +12,24 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers
 {
-    public class Role
-    {
-        public string Name { get; set; }
-    }
-
     [Authorize]
     public class AccountController : Controller
     {
         public AccountController(UserManager<ChatLeUser> userManager, 
             SignInManager signInManager,
-            IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager)
+            IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager,
+            ILoggerFactory loggerFactory)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             ChatManager = chatManager;
+            Logger = loggerFactory.CreateLogger<AccountController>();
         }
 
         public UserManager<ChatLeUser> UserManager { get; private set; }
@@ -37,6 +37,8 @@ namespace ChatLe.Controllers
         public SignInManager<ChatLeUser> SignInManager { get; private set; }
 
         public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> ChatManager { get; private set; }
+
+        public ILogger Logger { get; private set; }
 
         // GET: /Account/Index
         [HttpGet]
@@ -198,11 +200,11 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        public IActionResult ExternalLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
             return Challenge(properties, provider);
         }
 
@@ -474,11 +476,11 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin(string provider, string returnUrl = null)
+        public IActionResult LinkLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));            
             return Challenge(properties, provider);
         }
 
@@ -509,6 +511,7 @@ namespace ChatLe.Controllers
         }
 
         #region Helpers
+
         private async Task<ActionResult> SpaLinkLogin(ChatLeUser user, string returnUrl)
         {
             if (user == null)
