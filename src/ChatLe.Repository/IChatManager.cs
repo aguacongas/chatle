@@ -26,10 +26,12 @@ namespace ChatLe.Models
         /// Gets the store
         /// </summary>
         IChatStore<TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection> Store { get; }
+        
         /// <summary>
         /// Gets the options
         /// </summary>
         ChatOptions Options { get; }
+        
         /// <summary>
         /// Adds a notification connection assotiate to a user
         /// </summary>
@@ -39,14 +41,16 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a Task</returns>
         Task AddConnectionIdAsync (string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
-		/// <summary>
+		
+        /// <summary>
 		/// Removes a notification connection assotiate to a user
 		/// </summary>
 		/// <param name="connectionId">The connection id</param>
 		/// <param name="notificationType">the type of notification</param>
 		/// <param name="cancellationToken">an optional cancellation token</param>
 		/// <returns>A <see cref="Task{TUser} with the disconnected user or null if the user has an other connection or no user found</returns>
-		Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken));
+		Task<TUser> RemoveConnectionIdAsync(string connectionId, string notificationType, bool inactif, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Gets or creates a conversation
         /// </summary>
@@ -56,6 +60,7 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a Task</returns>
         Task<TConversation> GetOrCreateConversationAsync(string from, string to, string inialMessage = null, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Adds a message to a conversation
         /// </summary>
@@ -65,6 +70,7 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an  optional cancellation token</param>
         /// <returns>a Task</returns>
         Task<TConversation> AddMessageAsync(string fromName, TKey toConversationId, TMessage message, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Gets a page of connected users
         /// </summary>
@@ -72,6 +78,7 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
         Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Gets the messages list for a conversation
         /// </summary>
@@ -79,6 +86,7 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
         Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Gets the list of conversation for a user
         /// </summary>
@@ -86,6 +94,7 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
         Task<IEnumerable<TConversation>> GetConversationsAsync(string userName, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Removes a user
         /// </summary>

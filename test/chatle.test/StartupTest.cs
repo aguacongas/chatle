@@ -1,4 +1,5 @@
 ﻿using ChatLe;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http.Features;
@@ -24,7 +25,7 @@ namespace chatle.test
 			var serviceCollection = new ServiceCollection();
 			startup.ConfigureServices(serviceCollection);
 			var factory = new ApplicationBuilderFactory(serviceCollection.BuildServiceProvider());
-			startup.Configure(factory.CreateBuilder(new Mock<IFeatureCollection>().Object));
+			startup.Configure(factory.CreateBuilder(new Mock<IFeatureCollection>().Object), new Mock<IAntiforgery>().Object);
 		}
 	}
 }

@@ -5,6 +5,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ChatLe.Repository.Test
 {
@@ -15,7 +21,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<UserTest>(context);
+                var store = new ChatStore<UserTest>(context, null);
             }
         }
 
@@ -23,7 +29,12 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void Construtor_should_throw_argumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(null));
+            Assert.Throws<ArgumentNullException>(() => GetStore(null, null));
+        }
+
+        ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> GetStore(DbContext context, IHostingEnvironment env)
+        {
+            return new ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, env);
         }
 
         class FakeContextTest : DbContext
@@ -40,6 +51,9 @@ namespace ChatLe.Repository.Test
             public DbSet<Attendee> Attendee { get; set; }
             public DbSet<Conversation> Conversations { get; set; }
             public DbSet<NotificationConnection> NotificationConnections { get; set; }
+            public DbSet<IdentityUserLogin<string>> Logins { get; set; }
+
+            public DbSet<IdentityUserRole<string>> Roles { get; set; }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
@@ -48,6 +62,12 @@ namespace ChatLe.Repository.Test
                 
                 modelBuilder.Entity<NotificationConnection<string>>()
                     .HasKey(nc => new { nc.ConnectionId, nc.UserId, nc.NotificationType });
+
+                modelBuilder.Entity<IdentityUserLogin<string>>()
+                    .HasKey(l => new { l.LoginProvider, l.ProviderKey });
+
+                modelBuilder.Entity<IdentityUserRole<string>>()
+                    .HasKey(r => new { r.UserId, r.RoleId });
             }
         }
 
@@ -56,7 +76,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = GetStore(context, null);
                 var conversations = store.Conversations;
                 Assert.NotNull(conversations);
                 Assert.IsAssignableFrom<DbSet<Conversation>>(conversations);
@@ -68,7 +88,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = GetStore(context, null);
                 var messages = store.Messages;
                 Assert.NotNull(messages);
                 Assert.IsAssignableFrom<DbSet<Message>>(messages);
@@ -80,7 +100,7 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new FakeContextTest(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, FakeContextTest, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = GetStore(context, null);
                 var users = store.Users;
                 Assert.NotNull(users);
                 Assert.IsAssignableFrom<DbSet<UserTest>>(users);
@@ -92,22 +112,38 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new ChatDbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<string, UserTest, ChatDbContext, Conversation, Attendee, Message, NotificationConnection>(context);
+                var store = GetStore(context, null);
                 await Assert.ThrowsAsync<ArgumentNullException>(() => store.CreateMessageAsync(null));
             }
         }
 
-        static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>, Task> action)
+        static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>, Task> action)
         {  
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase();            
+            builder.UseInMemoryDatabase();
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
                       
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
-            {
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection>(context);
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Error);
+
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, null);
                 await action(store);
             }
         }
+
 
         [Fact]
         public async Task CreateMessageAsyncTest()
@@ -249,6 +285,111 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
+        public async Task CreateNotificationConnectionAsynctwice_should_not_throw()
+        {
+            var connection = new NotificationConnection
+            {
+                ConnectionId = "test",
+                NotificationType = "test",
+                UserId = "test",
+                ConnectionDate = DateTime.Now
+            };
+
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("Filename=./test.db");
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
+                      
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = GetStore(context, null);
+                
+                await store.CreateNotificationConnectionAsync(connection);
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = GetStore(context, null);
+                
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                await store.DeleteNotificationConnectionAsync(c);     
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = GetStore(context, null);
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                if (c == null)
+                    await store.CreateNotificationConnectionAsync(connection);     
+            }
+        }
+
+        [Fact]
+        public async Task CreateNotificationConnectionAsynctwice_should_not_throw_in_same_context()
+        {
+            var connection = new NotificationConnection
+            {
+                ConnectionId = "test",
+                NotificationType = "test",
+                UserId = "test",
+                ConnectionDate = DateTime.Now
+            };
+
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("Filename=./test.db");
+            builder.EnableSensitiveDataLogging();
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureDeletedAsync();
+            }
+
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                await context.Database.EnsureCreatedAsync();
+            }            
+                      
+            using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
+            {            
+                var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
+                var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
+                loggerFactory.AddConsole(LogLevel.Debug);
+
+                var store = GetStore(context, null);
+                
+                await store.CreateNotificationConnectionAsync(connection);
+                
+                var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                await store.DeleteNotificationConnectionAsync(c);     
+
+                c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
+                if (c == null)
+                    await store.CreateNotificationConnectionAsync(connection);     
+            }
+        }
+
+        [Fact]
         public async Task GetConversationsAsyncTest()
         {
             await ExecuteTest(async (store) =>
@@ -303,10 +444,10 @@ namespace ChatLe.Repository.Test
         [Fact]
         public async Task InitTest()
         {
-            await ExecuteTest(async store =>
+            await ExecuteTest(store =>
             {
-                await store.Context.Database.EnsureCreatedAsync();
                 store.Init();
+                return Task.FromResult(0);
             });
         }
 
@@ -366,7 +507,7 @@ namespace ChatLe.Repository.Test
             });
         }
 
-        private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection> store)
+        private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> store)
         {
             var context = store.Context;
             var conv = new Conversation();
@@ -440,25 +581,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetNotificationConnectionsAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var context = store.Context;
-
-                context.NotificationConnections.Add(new NotificationConnection()
-                {
-                    ConnectionDate = DateTime.Now,
-                    ConnectionId = "test",
-                    NotificationType = "test",
-                    UserId = "test"
-                });
-
-                Assert.NotNull(await store.GetNotificationConnectionsAsync("test", "test"));
-            });
-        }
-
-        [Fact]
         public async Task UserHasConnectionAsyncTest()
         {
             await ExecuteTest(async store =>
@@ -478,18 +600,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task GetAttendeesAsyncTest()
-        {
-            await ExecuteTest(async store =>
-            {
-                var conv = AddConv(store);
-                var attendees = await store.GetAttendeesAsync(conv);
-                Assert.NotNull(attendees);
-                Assert.NotNull(attendees.FirstOrDefault());
-            });
-        }
-
-        [Fact]
         public async Task DeleteUserAsyncTest()
         {
             await ExecuteTest(async store =>
@@ -502,7 +612,7 @@ namespace ChatLe.Repository.Test
                 context.Add(new Attendee()
                 {
                     ConversationId = conv.Id,
-                    UserId = "test"
+                    UserId = user.Id,
                 });
 
                 context.Add(user);
@@ -511,7 +621,7 @@ namespace ChatLe.Repository.Test
                     ConnectionDate = DateTime.Now,
                     ConnectionId = "test",
                     NotificationType = "test",
-                    UserId = "test"
+                    UserId = user.Id
                 });
 
                 context.SaveChanges();
@@ -519,9 +629,51 @@ namespace ChatLe.Repository.Test
                 await store.DeleteUserAsync(user);
 
                 Assert.Empty(context.NotificationConnections);
-                Assert.Empty(context.Users);
+                Assert.Empty(context.Users); 
 
-                Assert.NotEmpty(context.Conversations);
+                Assert.Empty(context.Conversations);
+            });
+        }
+
+        [Fact]
+        public async Task DeleteUserAsyncTest_all_attendees_disconnected()
+        {
+            await ExecuteTest(async store =>
+            {
+                var conv = AddConv(store);
+                var user = new ChatLeUser() { Id = "test" };
+
+                var context = store.Context;
+                
+                foreach(var attendee in conv.Attendees)
+                {
+                    attendee.IsConnected = false;
+                }
+
+                context.Add(user);
+                
+                context.Add(new Attendee()
+                {
+                    ConversationId = conv.Id,
+                    UserId = user.Id,
+                });
+
+                context.NotificationConnections.Add(new NotificationConnection()
+                {
+                    ConnectionDate = DateTime.Now,
+                    ConnectionId = "test",
+                    NotificationType = "test",
+                    UserId = user.Id
+                });
+
+                context.SaveChanges();
+
+                await store.DeleteUserAsync(user);
+
+                Assert.Empty(context.NotificationConnections);
+                Assert.Empty(context.Users); // Delete notification connection shoul not remove user
+
+                Assert.Empty(context.Conversations);
             });
         }
     }

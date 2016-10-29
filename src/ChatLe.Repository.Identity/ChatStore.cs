@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Models
 {
@@ -17,22 +20,26 @@ namespace ChatLe.Models
         /// </summary>
         /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context) : base(context) { }
+        public ChatStore(ChatLeIdentityDbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
+    
     /// <summary>
     /// Chat store for TUser
     /// </summary>
     /// <typeparam name="TUser">type of user, must a class and implement <see cref="IChatUser{string}"/></typeparam>
-    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection>
-        where TUser : class, IChatUser<string>
+    public class ChatStore<TUser> : ChatStore<string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>
+        where TUser : IdentityUser<string>, IChatUser<string>
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context) : base(context) { }
+        public ChatStore(DbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
     }
+    
     /// <summary>
     /// Chat store, implement <see cref="IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}"/>
     /// </summary>
@@ -42,97 +49,124 @@ namespace ChatLe.Models
     /// <typeparam name="TConversation">type of conversation, must be a <see cref="Conversation{TKey}"/></typeparam>
     /// <typeparam name="TAttendee">type of attendee, must be a <see cref="Attendee{TKey}"/></typeparam>
     /// <typeparam name="TMessage">type of message, must be a <see cref="Message{TKey}"/></typeparam>
-    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam>
-    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
+    /// <typeparam name="TNotificationConnection">type of notifciation connection, must be a <see cref="NotificationConnection{TKey}"/></typeparam> <summary>
+    /// <typeparam name="TUserLogin">type of the user login object.</typeparam>
+    /// </summary>
+    public class ChatStore<TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, TUserLogin> :IChatStore<TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TKey : IEquatable<TKey>
-        where TUser : class, IChatUser<TKey>
+        where TUser : IdentityUser<TKey>, IChatUser<TKey>
         where TContext : DbContext
         where TConversation : Conversation<TKey>
         where TAttendee : Attendee<TKey>
         where TMessage : Message<TKey>
         where TNotificationConnection : NotificationConnection<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
     {
+        readonly IHostingEnvironment _env;
         /// <summary>
         /// Construtor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context)
+        public ChatStore(TContext context, IHostingEnvironment env)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
+
             Context = context;
-        }
+            _env = env;
+        }        
+        
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
         public virtual TContext Context { get; private set; }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TUser}"/>
         /// </summary>
         public virtual DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TConversation}"/>
         /// </summary>
         public DbSet<TConversation> Conversations { get { return Context.Set<TConversation>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TMessage}"/>
         /// </summary>
         public DbSet<TMessage> Messages { get { return Context.Set<TMessage>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TAttendee}"/>
         /// </summary>
         public virtual DbSet<TAttendee> Attendees { get { return Context.Set<TAttendee>(); } }
+        
         /// <summary>
         /// Gets the <see cref="DbSet{TNotificationConnection}"/>
         /// </summary>
         public virtual DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
+        
+        /// <summary>
+        /// Gets the <see cref="DbSet{TUserLogin}"/>
+        /// </summary>
+        public virtual DbSet<TUserLogin> Logins { get { return Context.Set<TUserLogin>(); } }
+        
         /// <summary>
         /// Create a message on the database
         /// </summary>
         /// <param name="message">The message to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(message == null)
                 throw new ArgumentNullException("message");
 
-            Context.Add(message);
-            await Context.SaveChangesAsync(cancellationToken);
+            Messages.Add(message);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
+
         /// <summary>
         /// Create an attendee on the database
         /// </summary>
         /// <param name="attendee">The attendee to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(attendee == null)
             {
                 throw new ArgumentNullException("attendee");
             }
-            Context.Add(attendee);
-            await Context.SaveChangesAsync(cancellationToken);
+            Attendees.Add(attendee);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
+
         /// <summary>
         /// Create a conversation on the database
         /// </summary>
         /// <param name="conversation">The conversation to create</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (conversation == null)
                 throw new ArgumentNullException("conversation");
 
-            Context.Add(conversation);
-            await Context.SaveChangesAsync(cancellationToken);
+            Conversations.Add(conversation);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
+
         /// <summary>
         /// Find a user by her name
         /// </summary>
@@ -142,23 +176,29 @@ namespace ChatLe.Models
         public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            return await Users
+                .Include(u => u.Logins)
+                .SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
+
         /// <summary>
         /// Update the user on the database
         /// </summary>
         /// <param name="user">The user to update</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null)
                 throw new ArgumentNullException("user");
-            
-            Context.Update(user);
-            await Context.SaveChangesAsync(cancellationToken);
+
+            Users.Update(user);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
         }
+
         /// <summary>
         /// Gets a conversation for 2 attendees
         /// </summary>
@@ -174,17 +214,20 @@ namespace ChatLe.Models
             if (attendee2 == null)
                 throw new ArgumentNullException("attendee2");
 
-            var convs = from c in Conversations
+            var convs = (from c in Conversations
                        join a1 in Attendees
                             on c.Id equals a1.ConversationId
                        join a2 in Attendees
                             on c.Id equals a2.ConversationId
                        where a1.UserId.Equals(attendee1.Id)
                             && a2.UserId.Equals(attendee2.Id)
-                       select c;
+                            && c.Attendees.Count.Equals(2)
+                       select c)
+                       .Include(c => c.Attendees);
 
-            return await convs.FirstOrDefaultAsync(c => c.Attendees.Count == 2);
+            return await convs.FirstOrDefaultAsync();
         }
+
         /// <summary>
         /// Gets a conversation by her id
         /// </summary>
@@ -193,8 +236,11 @@ namespace ChatLe.Models
         public virtual async Task<TConversation> GetConversationAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await Conversations.FirstOrDefaultAsync(c => c.Id.Equals(convId));
+            return await Conversations
+                .Include(c => c.Attendees)
+                .FirstOrDefaultAsync(c => c.Id.Equals(convId));
         }
+
         /// <summary>
         /// Gets messages in a conversation
         /// </summary>
@@ -207,6 +253,7 @@ namespace ChatLe.Models
             cancellationToken.ThrowIfCancellationRequested();
             return await Messages.Where(m => m.ConversationId.Equals(convId)).OrderByDescending(m=>m.Date).Take(max).ToListAsync();
         }
+
         /// <summary>
         /// Gets connected users
         /// </summary>
@@ -239,36 +286,86 @@ namespace ChatLe.Models
 
             return await Task.FromResult(new Page<TUser>(query.ToList(), pageIndex, pageCount));
         }
+
         /// <summary>
         /// Create a notification connection on the database
         /// </summary>
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Add(connection);
-            await Context.SaveChangesAsync(cancellationToken);
+            NotificationConnections.Add(connection);
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection<TKey>;
+                    if (entry.Entity != null)
+                    {
+                        entry.State = EntityState.Added;
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var connectionId = connection.ConnectionId;
+                        var type = connection.NotificationType;
+
+                        var databaseEntity = NotificationConnections
+                            .AsNoTracking()
+                            .FirstOrDefault(nc => nc.ConnectionId == connectionId && nc.NotificationType == type);
+
+                        if (databaseEntity == null)
+                        {
+                            var databaseEntry = Context.Entry(connection);
+                            ResetDbEntry<TNotificationConnection>(databaseEntry);
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+                    }
+                }
+
+                // Retry the save operation
+                Context.SaveChanges();
+            }
+
+            return Task.FromResult(0);
         }
+
         /// <summary>
         /// Delete a notification connection on the database
         /// </summary>
         /// <param name="connection">the notification connection</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task"/></returns>
-        public virtual async Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Context.Remove(connection);
-            await Context.SaveChangesAsync(cancellationToken);
+            NotificationConnections.Remove(connection);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                RetryDeleteNotificationConnection(ex);
+            }
+
+            return Task.FromResult(0);
         }
+        
         /// <summary>
         /// Gets a notification connection by her id and her type
         /// </summary>
@@ -284,13 +381,18 @@ namespace ChatLe.Models
             if (notificationType == null)
                 throw new ArgumentNullException("notificationType");
 
-            return await NotificationConnections.FirstOrDefaultAsync(c => c.ConnectionId.Equals(connectionId) && c.NotificationType.Equals(notificationType));
+            return await NotificationConnections
+                .FirstOrDefaultAsync(c => c.ConnectionId == connectionId && c.NotificationType == notificationType);
         }
+        
         /// <summary>
         /// Initialise the database
         /// </summary>
         public virtual void Init()
         {
+            if (_env!= null &&  _env.IsDevelopment())
+                Context.Database.EnsureDeletedAsync();
+
             Context.Database.EnsureCreated();
             NotificationConnections.RemoveRange(NotificationConnections.ToArray());
             Context.SaveChanges();
@@ -300,21 +402,10 @@ namespace ChatLe.Models
             Context.SaveChanges();
             Conversations.RemoveRange(Conversations.ToArray());
             Context.SaveChanges();
-            Users.RemoveRange(Users.Where(u => u.PasswordHash == null).ToArray());
+            Users.RemoveRange(Users.Where(u => u.IsGuess).ToArray());
             Context.SaveChanges();
         }
-        /// <summary>
-        /// Gets notification connections for a user id and notification type
-        /// </summary>
-        /// <param name="userId">the user id</param>
-        /// <param name="notificationType">the notification type</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{IEnumerable{TNotificationConnection}}"/></returns>
-        public virtual async Task<IEnumerable<TNotificationConnection>> GetNotificationConnectionsAsync(TKey userId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await NotificationConnections.Where(n => n.UserId.Equals(userId) && n.NotificationType == notificationType).ToListAsync();
-        }
+        
         /// <summary>
         /// Check if a user has connection
         /// </summary>
@@ -324,23 +415,7 @@ namespace ChatLe.Models
         {
             return await NotificationConnections.AnyAsync(n => n.UserId.Equals(userId));
         }
-        /// <summary>
-        /// Gets attendees in a conversation
-        /// </summary>
-        /// <param name="conv">the conversation</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{IEnumerable{TAttendee}}"/></returns>
-        public virtual async Task<IEnumerable<TAttendee>> GetAttendeesAsync(TConversation conv, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var attendees = await Attendees.Where(a => a.ConversationId.Equals(conv.Id)).ToListAsync();
-            var atts = conv.Attendees;
-            foreach(var attendee in attendees)
-                if (!atts.Any(a => a.UserId.Equals(attendee.UserId)))
-                    atts.Add(attendee);
-
-            return attendees;
-        }
+        
         /// <summary>
         /// Gets conversations for a user id
         /// </summary>
@@ -357,8 +432,9 @@ namespace ChatLe.Models
                               on c.Id equals m.ConversationId
                           where a.UserId.Equals(userId)
                           orderby m.Date descending                          
-                          select c).Distinct().ToListAsync();
+                          select c).Include(c => c.Attendees).Distinct().ToListAsync();
         }
+
         /// <summary>
         /// Deletes a user 
         /// </summary>
@@ -371,18 +447,125 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            Messages.RemoveRange(await Messages.Where(m => m.UserId.Equals(user.Id)).ToArrayAsync());
-            Attendees.RemoveRange(await Attendees.Where(a => a.UserId.Equals(user.Id)).ToArrayAsync());
-            Conversations.RemoveRange(await Conversations.Where(c => c.Attendees.Count < 2).ToArrayAsync());
-            NotificationConnections.RemoveRange(await NotificationConnections.Where(n => n.UserId.Equals(user.Id)).ToArrayAsync());
+            // Remove all conversations the user attends
+            var conversations = await GetConversationsAsync(user.Id, cancellationToken);
+            foreach (var conversation in conversations)
+            {
+                Messages.RemoveRange(Messages.Where(m => m.ConversationId.Equals(conversation.Id)));
+                Attendees.RemoveRange(Attendees.Where(a => a.ConversationId.Equals(conversation.Id)));
+                Conversations.Remove(conversation);
+            }
+                            
+            var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
+            NotificationConnections.RemoveRange(userConnections);
+            
             Users.Remove(user);
-            await Context.SaveChangesAsync(cancellationToken);
+            
+            try
+            {
+                Context.SaveChanges();            
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                RetryDeleteUser(ex);
+            }
         }
 
 		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			return await Users.Include(u => u.NotificationConnections).FirstOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+            var user = await Users.SingleOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
+            return user;
 		}
+
+        void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
+        {
+            foreach (var property in entry.Metadata.GetProperties())
+            {
+                if (property.IsKey())
+                    continue;
+
+                entry.Property(property.Name).IsModified = false;
+            }
+        }
+
+        void RetryDeleteNotificationConnection(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                RetryDeleteNotificationConnection(entry);
+            }
+        }
+
+        void RetryDeleteNotificationConnection(EntityEntry entry)
+        {
+            var notification = entry.Entity as NotificationConnection<TKey>;
+            if (notification != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = NotificationConnections.AsNoTracking().SingleOrDefault(nc => nc.ConnectionId == notification.ConnectionId && nc.NotificationType == notification.NotificationType);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+            }
+        }
+
+
+        void RetryDeleteUser(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                if (entry.Entity is TNotificationConnection)
+                {
+                    RetryDeleteNotificationConnection(entry);
+                }
+                if (entry.Entity is TMessage)
+                {
+                    RetryDeleteEntity<TMessage>(entry, Messages);
+                }
+                if (entry.Entity is TAttendee)
+                {
+                    RetryDeleteEntity<TAttendee>(entry,  entity => Attendees.AsNoTracking().SingleOrDefault(a => a.ConversationId.Equals(entity.ConversationId) && a.UserId.Equals(entity.UserId)));
+                }
+                if (entry.Entity is TUser)
+                {
+                    RetryDeleteEntity<TUser>(entry, Users);
+                }
+            }
+        }
+
+        void RetryDeleteEntity<TIdentifiable>(EntityEntry entry, DbSet<TIdentifiable> dbSet) where TIdentifiable: class, IIdentifiable<TKey>
+        {
+            RetryDeleteEntity<TIdentifiable>(entry, entity => dbSet.AsNoTracking().SingleOrDefault(m => m.Id.Equals(entity as TIdentifiable)));
+        }
+
+        void RetryDeleteEntity<TEntity>(EntityEntry entry, Func<TEntity, TEntity> getEntity) where TEntity: class
+        {
+            var entity = entry.Entity as TEntity;
+            if (entity != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = getEntity(entity);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException("Don't know how to handle concurrency conflicts for " + entry.Metadata.Name);
+            }
+        }
 	}
 }

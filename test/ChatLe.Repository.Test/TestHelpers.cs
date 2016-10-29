@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Repository.Test
 {
@@ -15,16 +16,17 @@ namespace ChatLe.Repository.Test
         }
     }
 
-    public class UserTest<TKey> : IChatUser<TKey> where TKey: IEquatable<TKey>
+    public class UserTest<TKey> : IdentityUser<TKey>, IChatUser<TKey> where TKey: IEquatable<TKey>
     {
-        public TKey Id { get; set; }
+        public override TKey Id { get; set; }
 
         public ICollection<NotificationConnection<TKey>> NotificationConnections { get; set; } = new List<NotificationConnection<TKey>>();
 
-        public string UserName { get; set; } = "test";
+        public bool IsGuess { get; set; } = true;
 
-        public string PasswordHash { get; set; } = null;
+        public override string UserName { get; set;} = "test";
 
+        public DateTime LastLoginDate { get; set; } = DateTime.Now;
     }
 
     public class ChatDbContext:ChatDbContext<string, UserTest, Message, Attendee, Conversation, NotificationConnection>

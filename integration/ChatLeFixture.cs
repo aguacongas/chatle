@@ -16,9 +16,9 @@ namespace IntegrationTest
 		{
 			var processStartInfo = new ProcessStartInfo()
 			{
-				Arguments = "-p " + TestUtils.GetPathPrefix() + "src/chatle web",
+				Arguments = "run " + TestUtils.GetPathPrefix() + "src/chatle",
 				CreateNoWindow = true,
-				FileName = "dnx",
+				FileName = "dotnet",
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false

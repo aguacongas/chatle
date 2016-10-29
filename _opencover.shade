@@ -46,25 +46,28 @@ configuration='Debug'
 		, "OpenCover")
 		, "tools")
 		, "OpenCover.Console.exe");
-
-    var projectText = File.ReadAllText(projectFile);
-    var project = (JsonObject)Json.Deserialize(projectText);
-
+        
 	var projectFolder = Path.GetDirectoryName(projectFile);
 	Log.Info("projectFolder: " + projectFolder);
 	var projectPath  = Path.Combine(projectFolder, "project.json");
 	var results = Path.Combine(projectFolder, "xunit-results.xml");
 
-	var dnxLocation = @"C:\Program Files\dotnet\dotnet.exe";
-	
+	var dnxLocation = @"C:\Program Files\dotnet\dotnet.exe";	
 	var target = '-target:"' + dnxLocation +  '" ';
-	var targetArgs = '-targetargs:" test ""' + projectFile + '"" -xml ""' + results + '"" -nologo -parallel none" ';
-	var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
-	
-	if (File.Exists(coverageFile))
-	{
-		args += " -mergeoutput";
-	}
 
-	Exec(openCoverLocation, args);
+	var projectText = File.ReadAllText(projectFile);
+	var project = (JsonObject)Json.Deserialize(projectText);
+	var targetFrameworks = project.ValueAsJsonObject("frameworks");
+	foreach(var targetFramework in targetFrameworks.Keys)
+	{		
+		var targetArgs = '-targetargs:" test ""' + projectFile + '"" -f ' + targetFramework + ' -xml ""' + results + '"" -nologo -parallel none" ';
+		var args = target + targetArgs + '-output:"' + coverageFile + '" -register:user -filter:"+[*]* -[xunit*]* -[*]*Migrations.*" -returntargetcode';
+	
+		if (File.Exists(coverageFile))
+		{
+			args += " -mergeoutput";
+		}
+
+		Exec(openCoverLocation, args);
+	}
 }

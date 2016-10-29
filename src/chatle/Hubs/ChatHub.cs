@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Hubs;
-using System;
-using ChatLe.Models;
 using Microsoft.Extensions.Logging;
+using ChatLe.Models;
 
 namespace ChatLe.Hubs
 {
@@ -13,34 +16,42 @@ namespace ChatLe.Hubs
 	[HubName("chat")]
 	public class ChatHub : Hub
 	{
+		readonly IServiceProvider _provider;
 		/// <summary>
 		/// The chat repository manager
 		/// </summary>
 		public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> Manager
 		{
-			get;
-			private set;
+			get
+			{
+				return _provider.GetService(typeof(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>)) as IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>;
+			}
 		}
+
 		/// <summary>
 		/// Logger
 		/// </summary>
 		public ILogger Logger { get; private set; }
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="manager">The chat repository manager</param>
-		public ChatHub(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> manager, ILoggerFactory loggerFactory) : base()
+		/// <param name="loggerFactory">The logger factory</param>
+		public ChatHub(IServiceProvider provider,
+			ILoggerFactory loggerFactory) : base()
 		{
-			if (manager == null)
-				throw new ArgumentNullException("manager");
+			if (provider == null)
+				throw new ArgumentNullException("provider");
 			if (loggerFactory == null)
 				throw new ArgumentNullException("loggerFactory");
 
 			Logger = loggerFactory.CreateLogger<ChatHub>();
 			Logger.LogInformation("constructor");
-			Manager = manager;
+			_provider = provider;
 		}
-		/// <summary>
+		
+        /// <summary>
 		/// Called when the connection connects to this hub instance.
 		/// <para>Create a signalR group for the connected user with is name</para>
 		/// </summary>
@@ -49,12 +60,15 @@ namespace ChatLe.Hubs
 		{
 			string name = Context.User.Identity.Name;
 			Logger.LogInformation("OnConnected " + name);
+
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
-			await Groups.Add(this.Context.ConnectionId, name);
-			Clients.Others.userConnected(new { Id = name });
+			
+			await Groups.Add(Context.ConnectionId, name);
+			Clients.Others.userConnected(new { id = name });
 			await base.OnConnected();
 		}
-		/// <summary>
+		
+        /// <summary>
 		/// Called when the connection reconnects to this hub instance.
 		/// <para>Create a signalR group for the connected user with is name</para>
 		/// </summary>
@@ -63,11 +77,14 @@ namespace ChatLe.Hubs
 		{
 			string name = Context.User.Identity.Name;
 			Logger.LogInformation("OnReconnected " + name);
+
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
+				
 			await Groups.Add(this.Context.ConnectionId, name);
-			Clients.Others.userConnected(new { Id = name });
+			Clients.Others.userConnected(new { id = name });
 			await base.OnReconnected();
 		}
+
 		/// <summary>
 		/// Called when a connection disconnects from this hub gracefully or due to a timeout.
 		/// <para>Remove the signalR group for the user</para>
@@ -80,9 +97,9 @@ namespace ChatLe.Hubs
 		public override async Task OnDisconnected(bool stopCalled)
 		{
 			Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
-			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR");
+			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
 			if (user != null)
-				Clients.Others.userDisconnected(user.UserName);
+				Clients.Others.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
 			await base.OnDisconnected(stopCalled);
 		}
 	}

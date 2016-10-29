@@ -3,15 +3,12 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace IntegrationTest
 {
-	[Collection(ChatLeCollectionFixture.Definition)]
+    [Collection(ChatLeCollectionFixture.Definition)]
     public class LoginTest
     {
 		public IWebDriver GetDriver(string browser)

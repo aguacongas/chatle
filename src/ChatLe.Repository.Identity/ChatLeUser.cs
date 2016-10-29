@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ChatLe.Models
@@ -16,6 +15,11 @@ namespace ChatLe.Models
             UserName = userName;
         }
 
-        public virtual ICollection<NotificationConnection<string>> NotificationConnections { get; set; } = new List<NotificationConnection<string>>();
+        public bool IsGuess
+        {
+            get { return PasswordHash == null && Logins.Count == 0; }
+        }
+
+        public DateTime LastLoginDate { get; set; }
     }
 }

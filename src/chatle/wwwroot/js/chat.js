@@ -39,7 +39,7 @@
 					if (attendees.length === 2) {
 						for (var i = 0; i < attendees.length; i++) {
 							var a = attendees[i];
-							if (a.UserId === user.Id) {
+							if (a.userId === user.id) {
 								conv = c;
 								return false;
 							}
@@ -51,9 +51,9 @@
 				} else {
 					conv = new ConversationVM(
 						{
-							Id: null,
-							Attendees: [{ ConversattionId: null, UserId: user.Id }, { ConversattionId: null, UserId: settings.userName }],
-							Messages: null
+							id: null,
+							attendees: [{ conversattionId: null, userId: user.id }, { conversattionId: null, userId: settings.userName }],
+							messages: null
 						})
 					this.conversations.unshift(conv);
 				}
@@ -69,7 +69,7 @@
 				}
 				var conv;
 				$.each(this.conversations(), function (index, c) {
-					if (c.id === data.ConversationId) {
+					if (c.id === data.conversationId) {
 						conv = c;
 						return false;
 					}
@@ -88,7 +88,7 @@
 					return;
 				}
 				this.conversations.remove(function (conv) {
-					return conv.id === data.Id;
+					return conv.id === data.id;
 				});
 				this.conversations.unshift(new ConversationVM(data));
 			};
@@ -128,11 +128,11 @@
 				var self = this;
 				if (!self.id) {
 					$.ajax(settings.convAPI, {
-						data: { to: self.attendees()[0].UserId, text: message },
+						data: { to: self.attendees()[0].userId, text: message },
 						type: "POST"
 					}).done(function (data) {
 						self.id = data;
-						self.messages.unshift({ From: settings.userName, Text: message });
+						self.messages.unshift({ from: settings.userName, text: message });
 					}).fail(function (data) {
 						logout(data);
 					});;
@@ -141,7 +141,7 @@
 						data: { to: self.id, text: message },
 						type: "POST"
 					}).done(function () {
-						self.messages.unshift({ From: settings.userName, Text: message });
+						self.messages.unshift({ from: settings.userName, text: message });
 					}).fail(function (data) {
 						logout(data);
 					});;
@@ -161,20 +161,20 @@
 			};
 
 			var title = '';
-			var attendees = conv.Attendees;
+			var attendees = conv.attendees;
 
 			for (var i = 0; i < attendees.length; i++) {
 				var attendee = attendees[i];
-				if (attendee.UserId !== settings.userName) {
-					title += attendee.UserId + ' ';
+				if (attendee.userId !== settings.userName) {
+					title += attendee.userId + ' ';
 				}
 			}
 
 			return {
-				id: conv.Id,
+				id: conv.id,
 				title: ko.observable(title),
-				attendees: ko.observableArray(conv.Attendees),
-				messages: ko.observableArray(conv.Messages),
+				attendees: ko.observableArray(conv.attendees),
+				messages: ko.observableArray(conv.messages),
 				sendMessage: sendMessage,
 				getMessages: getMessages
 			};
@@ -195,10 +195,10 @@
 			  * @param User user, the connected user
 			*/
 			chatHub.client.userConnected = function (user) {
-				console.log("Chat Hub newUserConnected " + user.Id);
+				console.log("Chat Hub newUserConnected " + user.id);
 				var users = viewModel.users;
 				users.remove(function (u) {
-					return u.Id === user.Id;
+					return u.id === user.id;
 				});
 				users.unshift(user);
 			};
@@ -209,7 +209,7 @@
 			chatHub.client.userDisconnected = function (id) {
 				console.log("Chat Hub userDisconnected " + id);
 				viewModel.users.remove(function (u) {
-					return u.Id === id;
+					return u.id === id;
 				});
 			};
 			/**
@@ -268,7 +268,9 @@
 					// get connected users
 					$.getJSON(settings.userAPI)
 						.done(function (data) {
-							viewModel.users(data.Users);
+							if (data && data.users) {
+								viewModel.users(data.users);
+							}							
 						}).fail(function (data) {
 							logout(data);
 						});

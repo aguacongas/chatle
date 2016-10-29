@@ -11,23 +11,19 @@ addons:
     - libunwind8
     - zlib1g
 before_install:
-  - chmod +x build.sh
-  - if test "$TRAVIS_OS_NAME" == "osx"; then brew update; brew install icu4c; brew install openssl; brew link --force openssl; fi
-env:
-  - KOREBUILD_DNU_RESTORE_CORECLR=true KOREBUILD_TEST_DNXCORE=true
-install:
-  - curl -sSL https://github.com/libuv/libuv/archive/v1.4.2.tar.gz | tar zxfv - -C /tmp && cd /tmp/libuv-1.4.2/
-  - sh autogen.sh
-  - ./configure --prefix=$HOME/libuvinstall
-  - make
-  - make install
-  - export LD_LIBRARY_PATH="$HOME/libuvinstall/lib"
-  - cd $OLDPWD
+  - if test "$TRAVIS_OS_NAME" == "osx"; then brew update; brew install icu4c; brew install openssl; ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/; ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/; fi
 mono:
-  - latest
+  - 4.2.2
 os:
   - linux
   - osx
 osx_image: xcode7.1
+branches:
+  only:
+    - master
+    - /^release\/.*$/
+    - develop
 script:
   - ./build.sh --quiet verify
+env:
+  - KOREBUILD_TEST_SKIPMONO=1

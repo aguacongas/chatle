@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatLe
 {
@@ -26,7 +28,7 @@ namespace ChatLe
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetCurrentDirectory())
+				.SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
 
@@ -44,24 +46,7 @@ namespace ChatLe
             _environment = env;
             LoggerFactory = loggerFactory;
 
-            loggerFactory.AddConsole();
-            
-#if DNX451
-            int io, worker;
-            ThreadPool.GetMinThreads(out worker, out io);
-            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
-            ThreadPool.GetMaxThreads(out worker, out io);
-            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
-            ThreadPool.SetMaxThreads(32767, 1000);
-            ThreadPool.SetMinThreads(50, 50);
-            ThreadPool.GetMinThreads(out worker, out io);
-            Console.WriteLine("Startup min worker thread {0}, min io thread {1}", worker, io);
-            ThreadPool.GetMaxThreads(out worker, out io);
-            Console.WriteLine("Startup max worker thread {0}, max io thread {1}", worker, io);
-
-            var sourceSwitch = new SourceSwitch("chatle");
-            loggerFactory.AddTraceSource(sourceSwitch, new ConsoleTraceListener());
-#endif
+            loggerFactory.AddConsole();            
         }
 
         public IConfiguration Configuration { get; private set; }
@@ -70,6 +55,10 @@ namespace ChatLe
         {
 
             ConfigureEntity(services);
+
+            services.AddCors();
+
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
             services.AddMvc();
 
@@ -85,17 +74,20 @@ namespace ChatLe
 
             services.AddDbContext<ChatLeIdentityDbContext>(options =>
             {
+                if (_environment.IsDevelopment())
+                    options.EnableSensitiveDataLogging();
+                
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
                         options.UseInMemoryDatabase();
                         break;
                     case DBEngine.SqlServer:
-                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
+                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.SqlServer"));
                         break;
-                    //case DBEngine.SQLite:
-                    //    options.UseSQLite(Configuration.Get("Data:DefaultConnection:ConnectionString"));
-                    //    break;
+                    case DBEngine.SQLite:
+                        options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
+                        break;
                     //case DBEngine.Redis:
                     //    int port;
                     //    int database;
@@ -111,16 +103,58 @@ namespace ChatLe
             services.AddIdentity<ChatLeUser, IdentityRole>(options =>
             {
                 options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
+                var userOptions = options.User;
+                userOptions.AllowedUserNameCharacters += " ";
             }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
         }
 
-        public virtual void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
+            
             ConfigureErrors(app);
-
-            app.UseStaticFiles()             
+            
+            var logger = LoggerFactory.CreateLogger("request");
+            app.UseCors(
+                builder => builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials())
+                .UseStaticFiles()                             
                 .UseWebSockets()
                 .UseIdentity()
+                .UseFacebookAuthentication(new FacebookOptions()
+                {
+                    AppId = Configuration["Authentication:Facebook:AppId"],
+                    AppSecret = Configuration["Authentication:Facebook:AppSecret"]
+                })
+                .UseTwitterAuthentication(new TwitterOptions {
+                    ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
+                    ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
+                })
+                .UseGoogleAuthentication(new GoogleOptions
+                {
+                    ClientId = Configuration["Authentication:Google:ClientId"],
+                    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
+                })
+                // .UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions {
+                //     ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
+                //     ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"]
+                // })
+                .Map("/xhrf", a => a.Run(async context => 
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+                    await context.Response.WriteAsync(tokens.RequestToken);
+                }))
+                .Map("/cls", a => a.Run(async context => 
+                {
+                    var response = context.Response;
+                    foreach(var cookie in context.Request.Cookies) 
+                    {
+                        response.Cookies.Delete(cookie.Key);
+                    }
+                    await context.Response.WriteAsync(string.Empty);
+                }))
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
@@ -150,11 +184,20 @@ namespace ChatLe
 
 		public static void Main(string[] args)
 		{
-			var host = new WebHostBuilder()
-				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
-				.UseIISIntegration()
-				.UseStartup<Startup>()
+            var config = new ConfigurationBuilder()
+                .AddCommandLine(args)
+                .Build();
+
+            string rootPath = Directory.GetCurrentDirectory();
+            if (args.Length == 1)
+                rootPath += '/' + args[0];
+
+			var host = new WebHostBuilder()				
+				.UseContentRoot(rootPath)
+                .UseConfiguration(config)
+                .UseStartup<Startup>()
+                .UseIISIntegration()
+                .UseKestrel()
 				.Build();
 
 			host.Run();

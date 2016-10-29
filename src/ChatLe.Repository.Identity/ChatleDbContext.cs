@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace ChatLe.Models
 {
@@ -24,7 +23,8 @@ namespace ChatLe.Models
         where TNotificationConnection : NotificationConnection<TKey>
     {
         public ChatLeIdentityDbContext(DbContextOptions options):base(options)
-        { }
+        {             
+        }
 
         protected ChatLeIdentityDbContext()
         { }
@@ -73,7 +73,6 @@ namespace ChatLe.Models
                 b.HasKey(c => c.Id);
                 b.ToTable("Conversations");
             });
-
         }
     }
 }
