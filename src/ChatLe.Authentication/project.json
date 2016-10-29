@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0-*",
+  "authors": [ "Olivier Lefebvre" ],
+  "description": "ChatLe authentication middleware to override MicrosoftAccountMiddleware",
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG", "TRACE" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.AspNetCore.Hosting.Abstractions": "1.1.0-*",
+    "Microsoft.AspNetCore.Authentication": "1.1.0-*",
+    "Microsoft.AspNetCore.Authentication.MicrosoftAccount": "1.1.0-*"
+  },
+  "frameworks": {
+    "net451": {},
+    "netstandard1.3": {}
+  }
+}

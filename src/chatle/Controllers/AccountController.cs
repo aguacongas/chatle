@@ -13,8 +13,8 @@ using System.Security.Claims;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace ChatLe.Controllers
 {
@@ -196,11 +196,23 @@ namespace ChatLe.Controllers
         }
 
         //
+        // GET: /Account/ExternalLoginCallback
+        [HttpGet]
+        [AllowAnonymous]
+        public IEnumerable<ExternalLoginProvider> GetExternalProviders(){
+            return SignInManager.GetExternalAuthenticationSchemes().Select(p => new ExternalLoginProvider
+                { 
+                    DisplayName = p.DisplayName,
+                    AuthenticationScheme = p.AuthenticationScheme  
+                });
+        }
+
+        //
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult ExternalLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
@@ -476,7 +488,7 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
+        public IActionResult LinkLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
