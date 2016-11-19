@@ -11,8 +11,6 @@ using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Linq;
-using System;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 

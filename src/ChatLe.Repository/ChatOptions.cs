@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatLe.Models
+﻿namespace ChatLe.Models
 {
     public class ChatOptions
     {

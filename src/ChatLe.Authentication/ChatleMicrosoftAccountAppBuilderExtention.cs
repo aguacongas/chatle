@@ -1,6 +1,5 @@
 using System;
 using Chatle.Authentication;
-using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.Builder

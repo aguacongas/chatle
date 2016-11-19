@@ -5,10 +5,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Moq;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 
