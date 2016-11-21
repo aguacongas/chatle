@@ -35,6 +35,7 @@
     "ChatLe.Repository.Identity.Sqlite": "1.0.0-*",
     "ChatLe.Repository.Identity.SqlServer": "1.0.0-*",
     "ChatLe.Repository.Identity.MySql": "1.0.0-*",
+    "Chatle.EntityFrameworkCore.Redis": "0.1.0-*",
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.1",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
     "Microsoft.EntityFrameworkCore.Sqlite": "1.0.1",
@@ -65,7 +66,7 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
     "Microsoft.AspNetCore.SignalR.Server": "0.2.0-*",
     "Microsoft.AspNetCore.WebSockets": "0.2.0-*",
-	"Microsoft.AspNetCore.Cors": "1.0.0"
+    "Microsoft.AspNetCore.Cors": "1.0.0"
   },
   "frameworks": {
     "netcoreapp1.0": {
