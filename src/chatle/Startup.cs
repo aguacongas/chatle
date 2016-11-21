@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using ChatLe.Models;
-using Chatle.EntityFrameworkCore.Redis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -98,17 +97,15 @@ namespace ChatLe
                     case DBEngine.MySql:
                         options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
                         break;
-                    case DBEngine.Redis:
-                        int port;
-                        int database;
-                        string hostName = Configuration["Data:Redis:HostName"] ?? "127.0.0.1";
+                        //case DBEngine.Redis:
+                        //    int port;
+                        //    int database;
+                        //    if (!int.TryParse(Configuration.Get("Data:Redis:Port"), out port))
+                        //        port = 6379;
+                        //    int.TryParse(Configuration.Get("Data:Redis:Database"), out database);
 
-                        if (!int.TryParse(Configuration["Data:Redis:Port"], out port))
-                            port = 6379;
-                        int.TryParse(Configuration["Data:Redis:Database"], out database);
-
-                        options.UseRedisDatabase(hostName: hostName, port: port, database: database);            
-                        break;
+                        //    //options.UseRedis(Configuration.Get("Data:Redis:Hostname"), port, database);
+                        //    break;
                 }
             });
 
