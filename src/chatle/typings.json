@@ -1,9 +1,6 @@
 {
   "globalDependencies": {
-    "core-js": "registry:dt/core-js",
-    "node": "registry:dt/node",
     "jquery": "registry:dt/jquery",
     "signalr": "registry:dt/signalr",
-    "jasmine": "registry:dt/jasmine"
   }
 }
