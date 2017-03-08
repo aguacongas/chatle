@@ -446,7 +446,7 @@ namespace Chatle.test.Controllers
                 Assert.IsType<RedirectToActionResult>(result);
 
                 storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(null);
+                    .ReturnsAsync(() => null);
 
                 result = await controller.LogOff(mockConnectionManager.Object);
                 Assert.IsType<RedirectToActionResult>(result);
