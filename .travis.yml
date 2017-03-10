@@ -24,6 +24,6 @@ branches:
     - /^release\/.*$/
     - develop
 script:
-  - ./build.sh --quiet verify
+  - ./build.sh
 env:
   - KOREBUILD_TEST_SKIPMONO=1
