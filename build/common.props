@@ -1,0 +1,12 @@
+<Project>
+  <Import Project="..\version.props" />
+
+  <PropertyGroup>
+    <Product>Chatle</Product>
+    <RepositoryUrl>https://github.com/aguacongas/chatle</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <SignAssembly>false</SignAssembly>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">false</PublicSign>
+    <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
+  </PropertyGroup>
+</Project>
