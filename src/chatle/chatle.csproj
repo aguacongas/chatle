@@ -3,7 +3,6 @@
 
   <PropertyGroup>
     <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
-    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Olivier Lefebvre</Authors>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

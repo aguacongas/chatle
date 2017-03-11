@@ -2,7 +2,6 @@
   <Import Project="..\..\build\common.props" />
 
   <PropertyGroup>
-    <VersionPrefix>1.1.0</VersionPrefix>
     <TargetFrameworks>net451;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>ChatLe.Repository.Identity.Sqlite</AssemblyName>
     <PackageId>ChatLe.Repository.Identity.Sqlite</PackageId>

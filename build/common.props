@@ -3,8 +3,12 @@
 
   <PropertyGroup>
     <Product>Chatle</Product>
+    <Copyright>Olivier Lefebve 2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/aguacongas/chatle</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aguacongas/chatle</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageTags>sample asp.net-core</PackageTags>
     <SignAssembly>false</SignAssembly>
     <PublicSign Condition="'$(OS)' != 'Windows_NT'">false</PublicSign>
     <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>

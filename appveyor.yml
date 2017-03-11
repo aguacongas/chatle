@@ -1,0 +1,31 @@
+version: 1.0.0-{build}
+image: Visual Studio 2015
+init:
+- cmd: git config --global core.autocrlf true
+environment:
+  ASPNETCORE_ENVIRONMENT: Staging
+build_script:
+- cmd: build.cmd
+test_script:
+- ps: >-
+    # packaging
+
+    dotnet publish .\src\chatle --configuration Release -o artifacts\chatle
+
+    7z a artifacts\chatle.zip artifacts\chatle\ > null
+artifacts:
+- path: artifacts\build\ChatLe.Repository\*.nupkg
+  name: Release
+- path: artifacts\chatle.zip
+  name: Website
+- path: artifacts\build\ChatLe.Repository.Identity\*.nupkg
+  name: Release
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/chatle/api/v2/package
+  api_key:
+    secure: 8/9mgBd8wf7Q79WKp7wGgkEUDCLky31xyCOSlbkvb8JPcqm6SRuBvphxevUkVbLE
+  symbol_server: https://www.myget.org/F/chatle/api/v2/package
+  on:
+    branch: master
+    appveyor_repo_tag: true

@@ -2,7 +2,6 @@
   <Import Project="..\..\build\common.props" />
 
   <PropertyGroup>
-    <VersionPrefix>1.1.0</VersionPrefix>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>chatle.test</AssemblyName>
     <PackageId>chatle.test</PackageId>
@@ -27,6 +26,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,6 @@
 
   <PropertyGroup>
     <Description>ChatLe authentication middleware to override MicrosoftAccountMiddleware</Description>
-    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Olivier Lefebvre</Authors>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
