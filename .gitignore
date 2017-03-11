@@ -2,6 +2,7 @@
 .DS_STORE
 /.build
 /.vs
+/.vscode
 /artifacts
 /packages
 *.lock.json
