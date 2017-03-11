@@ -1,5 +1,4 @@
 version: 1.0.0-{build}
-os: Visual Studio 2017 RC
 init:
 - cmd: git config --global core.autocrlf true
 environment:
