@@ -1,0 +1,37 @@
+<Project>
+  <Import Project="..\version.props" />
+
+  <PropertyGroup>
+    <GitVersionLocation Condition="'$(OS)' == 'Windows_NT'">$(UserProfile)\.nuget\packages\GitVersion.CommandLine\3.6.5\tools\GitVersion.exe</GitVersionLocation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.CommandLine" Version="3.6.5" />
+    <PackageReference Include="JsonPoke.Core.MSBuild" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <Target Name="GitVersion" BeforeTargets="Build" Condition="'$(GitVersionLocation)' != ''">
+    <Exec Command="$(GitVersionLocation)" Condition="$(GitVersionLocation) != ''" >
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitVersionResult" />
+    </Exec>
+    <JsonPeek JsonContent="$(GitVersionResult)" JPath="Major" >
+      <Output TaskParameter="Result" PropertyName="Major" />
+    </JsonPeek>
+    <JsonPeek JsonContent="$(GitVersionResult)" JPath="Minor" >
+      <Output TaskParameter="Result" PropertyName="Minor" />
+    </JsonPeek>
+    <JsonPeek JsonContent="$(GitVersionResult)" JPath="Patch" >
+      <Output TaskParameter="Result" PropertyName="Patch" />
+    </JsonPeek>
+    <JsonPeek JsonContent="$(GitVersionResult)" JPath="PreReleaseLabel" >
+      <Output TaskParameter="Result" PropertyName="PreReleaseLabel" />
+    </JsonPeek>
+    <JsonPeek JsonContent="$(GitVersionResult)" JPath="PreReleaseNumber" >
+      <Output TaskParameter="Result" PropertyName="PreReleaseNumber" />
+    </JsonPeek>
+
+    <Message Text="verion fron GitVersion $(Major).$(Minor).$(Patch)-$(PreReleaseLabel)-$(PreReleaseNumber)" />
+  </Target>
+  
+</Project>
