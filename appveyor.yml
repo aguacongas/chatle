@@ -7,6 +7,7 @@ init:
 - cmd: git config --global core.autocrlf true
 environment:
   ASPNETCORE_ENVIRONMENT: Staging
+  BuildNumber: {APPVEYOR_BUILD_NUMBER}
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
 build_script:
@@ -25,5 +26,7 @@ deploy:
     secure: 8/9mgBd8wf7Q79WKp7wGgkEUDCLky31xyCOSlbkvb8JPcqm6SRuBvphxevUkVbLE
   symbol_server: https://www.myget.org/F/chatle/api/v2/package
   on:
-    branch: master
-    appveyor_repo_tag: true
+    branch: 
+        - master
+        - release/*
+    
