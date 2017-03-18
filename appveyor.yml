@@ -1,6 +1,7 @@
 version: 1.0.0-{build}
 install:
   - choco install gitversion.portable -pre -y
+  - ps: Install-Product node 6.9.4
 init:
 - cmd: git config --global core.autocrlf true
 environment:
