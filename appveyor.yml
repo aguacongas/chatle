@@ -28,5 +28,5 @@ deploy:
   on:
     branch: 
         - master
-        - release/*
+        - /release*/
     
