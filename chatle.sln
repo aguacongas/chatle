@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build\common.props = build\common.props
 		GitVersion.yml = GitVersion.yml
 		NuGet.Config = NuGet.Config
+		publish.cmd = publish.cmd
+		publish.ps1 = publish.ps1
 		README.md = README.md
 		version.props = version.props
 	EndProjectSection
@@ -48,6 +50,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Authentication", "src\ChatLe.Authentication\ChatLe.Authentication.csproj", "{8B940D10-64A7-463A-BE19-E3F3D4E739E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Repository.Identity.MySql", "src\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj", "{A39713E8-C2AF-42DF-B13E-17CF381AA56B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{8B992375-EDEC-4700-AEF7-595AC82E25D7}"
+	ProjectSection(SolutionItems) = preProject
+		build\build.csproj = build\build.csproj
+		build\common.props = build\common.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
