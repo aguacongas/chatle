@@ -1,8 +1,12 @@
 version: 1.0.0-{build}
+install:
+  - choco install gitversion.portable -pre -y
 init:
 - cmd: git config --global core.autocrlf true
 environment:
   ASPNETCORE_ENVIRONMENT: Staging
+before_build:
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
 build_script:
 - cmd: build.cmd
 test_script:
