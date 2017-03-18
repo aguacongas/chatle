@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Description>ChatLe repository implementation for Identity framework</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFrameworks>netstandard1.6;net451;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;net46;netcoreapp1.1</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository.Identity</AssemblyName>
     <PackageId>ChatLe.Repository.Identity</PackageId>
@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

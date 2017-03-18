@@ -28,6 +28,12 @@ function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $ret
     }
 }
 
+function exec($cmd) {
+    $cmdName = [IO.Path]::GetFileName($cmd)
+    Write-Host -ForegroundColor Cyan "> $cmdName $args"
+    & $cmd @args
+}
+
 cd $PSScriptRoot
 
 $repoFolder = $PSScriptRoot
@@ -64,4 +70,14 @@ if (!(Test-Path $buildFolder)) {
     }
 }
 
+$makeFileProj = "build/build.csproj"
+$preflightClpOption='/clp:DisableConsoleColor'
+if ("${env:CI}${env:APPVEYOR}${env:TEAMCITY_VERSION}${env:TRAVIS}" -eq "")
+{
+    # Not on any of the CI machines. Fine to use colors.
+    $preflightClpOption=''
+}
+
+exec dotnet restore "$makeFileProj"
+exec dotnet build "$makeFileProj" -f netcoreapp1.1
 &"$buildFile" @args

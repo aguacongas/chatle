@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GitVersionLocation>$(UserProfile)\.nuget\packages\GitVersion.CommandLine\3.6.5\tools\GitVersion.exe</GitVersionLocation>
+    <GitVersionOutputLocation>$(Temp)/chatle-version.json</GitVersionOutputLocation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.CommandLine" Version="3.6.5" />
+    <PackageReference Include="JsonPoke.Core.MSBuild" Version="1.0.0" />
+  </ItemGroup>
+
+  <Target Name="GitVersion" BeforeTargets="Build">
+    <Exec Command="$(GitVersionLocation) > &quot;$(GitVersionOutputLocation)&quot;" />
+    <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="Major" >
+      <Output TaskParameter="Result" PropertyName="Major" />
+    </JsonPeek>
+    <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="Minor" >
+      <Output TaskParameter="Result" PropertyName="Minor" />
+    </JsonPeek>
+    <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="Patch" >
+      <Output TaskParameter="Result" PropertyName="Patch" />
+    </JsonPeek>
+    <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="PreReleaseLabel" >
+      <Output TaskParameter="Result" PropertyName="PreReleaseLabel" />
+    </JsonPeek>
+    <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="PreReleaseNumber" >
+      <Output TaskParameter="Result" PropertyName="PreReleaseNumber" />
+    </JsonPeek>
+
+    <CreateProperty
+            Value="$(Major).$(Minor).$(Patch)-$(PreReleaseLabel)-$(PreReleaseNumber)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="GitVersionResult" />
+    </CreateProperty>
+
+    <Message Text="verion fron GitVersion $(GitVersionResult)" Importance="high" />
+
+    <CreateProperty
+            Value="$(Major).$(Minor).$(Patch)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="VersionPrefix" />
+    </CreateProperty>
+
+    <Message Text="VersionPrefix from GitVersion $(VersionPrefix)" Importance="high" />
+    
+    <CreateProperty
+            Value="$(PreReleaseLabel)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="VersionSuffix" />
+    </CreateProperty>
+
+    <Message Text="VersionSuffix from GitVersion $(VersionSuffix)" Importance="high" />
+    
+    <CreateProperty
+            Value="$(PreReleaseNumber)">
+      <Output
+          TaskParameter="Value"
+          PropertyName="BuildNumber" />
+    </CreateProperty>
+
+    <Message Text="BuildNumber from GitVersion $(BuildNumber)" Importance="high" />
+    
+    <WriteLinesToFile File="..\version.props" Lines="&lt;Project&gt;&lt;PropertyGroup&gt;&lt;VersionPrefix&gt;$(VersionPrefix)&lt;/VersionPrefix&gt;&lt;VersionSuffix&gt;$(VersionSuffix)&lt;/VersionSuffix&gt;&lt;BuildNumber>$(BuildNumber)&lt;/BuildNumber&gt;&lt;/PropertyGroup&gt;&lt;/Project&gt;" Overwrite="true" />
+  </Target>
+
+</Project>
