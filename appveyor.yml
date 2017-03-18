@@ -7,9 +7,9 @@ init:
 - cmd: git config --global core.autocrlf true
 environment:
   ASPNETCORE_ENVIRONMENT: Staging
-  BuildNumber: '{APPVEYOR_BUILD_NUMBER}'
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - ps: $env:BuildNumber=$env:APPVEYOR_BUILD_NUMBER
 build_script:
 - cmd: build.cmd
 test_script:
