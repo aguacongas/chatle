@@ -192,7 +192,6 @@ if [ ! -f $nugetPath ]; then
 fi
 
 makeFileProj="build/build.csproj"
-chmod a+w "common.props"
 __exec dotnet restore "$makeFileProj"
 __exec dotnet build "$makeFileProj" -f netcoreapp1.1
 $buildFile -r $repoFolder "$@"
