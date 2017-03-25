@@ -5,7 +5,7 @@
 
   <PropertyGroup>
     <GitVersionLocation Condition="'$(OS)' == 'Windows_NT'">$(UserProfile)\.nuget\packages\GitVersion.CommandLine\3.6.5\tools\GitVersion.exe</GitVersionLocation>
-    <GitVersionLocation Condition="'$(OS)' != 'Windows_NT'">$(HOME)\.nuget\packages\GitVersion.CommandLine\3.6.5\tools\GitVersion.exe</GitVersionLocation>
+    <GitVersionLocation Condition="'$(OS)' != 'Windows_NT'">$(HOME)\.nuget\packages\gitversion.commandLine\3.6.5\tools\GitVersion.exe</GitVersionLocation>
     <GitVersionOutputLocation>$(MSBuildThisFileDirectory)/chatle-version.json</GitVersionOutputLocation>
   </PropertyGroup>
 
