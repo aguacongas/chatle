@@ -28,4 +28,4 @@ branches:
     - /^release\/.*$/
     - develop
 script:
-  - sudo ./build.sh
+  - ./build.sh

@@ -194,5 +194,5 @@ fi
 makeFileProj="build/build.csproj"
 
 __exec dotnet restore "$makeFileProj"
-__exec dotnet build "$makeFileProj" -f netcoreapp1.1
+__exec sudo dotnet build "$makeFileProj" -f netcoreapp1.1
 $buildFile -r $repoFolder "$@"
