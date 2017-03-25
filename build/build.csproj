@@ -14,7 +14,7 @@
     <PackageReference Include="JsonPoke.Core.MSBuild" Version="1.0.1" />
   </ItemGroup>
 
-  <Target Name="GitVersion" BeforeTargets="Build">
+  <Target Name="GitVersion" BeforeTargets="Build" Condition="Exists($(GitVersionLocation))">
     <Exec Command="$(GitVersionLocation) > &quot;$(GitVersionOutputLocation)&quot;" Condition="'$(OS)' == 'Windows_NT'"/>
     <Exec Command="mono $(GitVersionLocation) > &quot;$(GitVersionOutputLocation)&quot;" Condition="'$(OS)' != 'Windows_NT'"/>
     <JsonPeek JsonInputPath="$(GitVersionOutputLocation)" JPath="Major" >
