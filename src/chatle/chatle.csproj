@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>chatle</AssemblyName>
@@ -12,7 +12,6 @@
     <PackageId>chatle</PackageId>
     <UserSecretsId>aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27</UserSecretsId>
     <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.12-x64;osx.10.11-x64;osx.10.10-x64;ubuntu.14.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64</RuntimeIdentifiers>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,32 +33,32 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Server" Version="0.2.0-*" />
-    <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="1.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="1.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Http" Version="1.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.0.0-*" />
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
