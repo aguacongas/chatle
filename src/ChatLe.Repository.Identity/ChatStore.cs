@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatLe.Models
 {
@@ -177,7 +178,6 @@ namespace ChatLe.Models
         {
             cancellationToken.ThrowIfCancellationRequested();
             return await Users
-                .Include(u => u.Logins)
                 .SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
         }
 
@@ -402,10 +402,14 @@ namespace ChatLe.Models
             Context.SaveChanges();
             Conversations.RemoveRange(Conversations.ToArray());
             Context.SaveChanges();
-            Users.RemoveRange(Users.Where(u => u.IsGuess).ToArray());
+            Users.RemoveRange(Users.Where(u => IsGuess(u.Id, default(CancellationToken)).Result).ToArray());
             Context.SaveChanges();
         }
         
+        public virtual async Task<bool> IsGuess(TKey userId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await Logins.AnyAsync(l => l.UserId.Equals(userId), cancellationToken) == false;
+        }
         /// <summary>
         /// Check if a user has connection
         /// </summary>

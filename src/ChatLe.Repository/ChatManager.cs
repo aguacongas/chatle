@@ -117,7 +117,7 @@ namespace ChatLe.Models
 				var user = await Store.FindUserByIdAsync(nc.UserId);
 				if (user != null)
                 {
-                    if (inactif && user.IsGuess)
+                    if (inactif && await IsGuess(user))
                     {
                         await RemoveUserAsync(user, cancellationToken);
                     }
@@ -283,12 +283,20 @@ namespace ChatLe.Models
             return conversations;
         }
 
-        public async Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual async Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (user == null)
                 throw new ArgumentNullException("user");
 
             await Store.DeleteUserAsync(user, cancellationToken);
+        }
+
+        public virtual async Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (user == null)
+                throw new ArgumentNullException("user");
+
+            return await Store.IsGuess(user.Id, cancellationToken);
         }
     }
 }

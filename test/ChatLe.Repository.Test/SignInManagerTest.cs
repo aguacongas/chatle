@@ -65,7 +65,7 @@ namespace ChatLe.Repository.Test
 			var contextAccessor = new Mock<IHttpContextAccessor>();
 			contextAccessor.Setup(a => a.HttpContext).Returns(context.Object);
 
-			var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object, new RoleValidator<TestRole>[] { new RoleValidator<TestRole>() }, null, null, null, null);
+			var roleManager = new RoleManager<TestRole>(new Mock<IRoleStore<TestRole>>().Object, new RoleValidator<TestRole>[] { new RoleValidator<TestRole>() }, null, null, null);
 			var identityOptions = new IdentityOptions();
 			var options = new Mock<IOptions<IdentityOptions>>();
 			options.Setup(a => a.Value).Returns(identityOptions);
@@ -77,7 +77,7 @@ namespace ChatLe.Repository.Test
             claimsFactoryMock.Setup(f => f.CreateAsync(It.IsAny<ChatLeUser>()))
                 .ReturnsAsync(new ClaimsPrincipal());
 
-            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, null);
+            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, null, null);
 
             var user = new ChatLeUser { Id = "test", UserName = "test" };
             await manager.SignInAsync(user, isPersistent: false);

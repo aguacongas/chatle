@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatLe.Repository.Test
 {
@@ -41,7 +42,7 @@ namespace ChatLe.Repository.Test
             
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
-                optionsBuilder.UseInMemoryDatabase();
+                optionsBuilder.UseInMemoryDatabase("test");
             }
 
             public DbSet<UserTest> Users { get; set; }
@@ -118,7 +119,7 @@ namespace ChatLe.Repository.Test
         static async Task ExecuteTest(Func<ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>, Task> action)
         {  
             var builder = new DbContextOptionsBuilder();
-            builder.UseInMemoryDatabase();
+            builder.UseInMemoryDatabase("chatStoreTest");
             builder.EnableSensitiveDataLogging();
 
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))

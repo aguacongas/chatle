@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Hubs;
 using Microsoft.Extensions.Logging;
 using ChatLe.Models;
 
@@ -10,9 +9,8 @@ namespace ChatLe.Hubs
 	/// <summary>
 	/// Chat Hub
 	/// </summary>
-	[HubName("chat")]
 	public class ChatHub : Hub
-	{
+    {
 		readonly IServiceProvider _provider;
 		/// <summary>
 		/// The chat repository manager
@@ -53,35 +51,18 @@ namespace ChatLe.Hubs
 		/// <para>Create a signalR group for the connected user with is name</para>
 		/// </summary>
 		/// <returns>a <see cref="Task"/></returns>
-		public override async Task OnConnected()
+		public override async Task OnConnectedAsync()
 		{
 			string name = Context.User.Identity.Name;
 			Logger.LogInformation("OnConnected " + name);
 
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			
-			await Groups.Add(Context.ConnectionId, name);
-			Clients.Others.userConnected(new { id = name });
-			await base.OnConnected();
+			await Groups.AddAsync(Context.ConnectionId, name);
+			await Clients.All.InvokeAsync("userConnected", new { id = name });
+			await base.OnConnectedAsync();
 		}
 		
-        /// <summary>
-		/// Called when the connection reconnects to this hub instance.
-		/// <para>Create a signalR group for the connected user with is name</para>
-		/// </summary>
-		/// <returns>a <see cref="Task"/></returns>
-		public override async Task OnReconnected()
-		{
-			string name = Context.User.Identity.Name;
-			Logger.LogInformation("OnReconnected " + name);
-
-			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
-				
-			await Groups.Add(this.Context.ConnectionId, name);
-			Clients.Others.userConnected(new { id = name });
-			await base.OnReconnected();
-		}
-
 		/// <summary>
 		/// Called when a connection disconnects from this hub gracefully or due to a timeout.
 		/// <para>Remove the signalR group for the user</para>
@@ -91,13 +72,15 @@ namespace ChatLe.Hubs
 		/// <para>Timeouts can be caused by clients reconnecting to another SignalR server in scaleout.</para>
 		/// </param>
 		/// <returns>a <see cref="Task"/></returns>
-		public override async Task OnDisconnected(bool stopCalled)
+		public override async Task OnDisconnectedAsync(Exception ex)
 		{
-			Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
+            bool stopCalled = ex != null;
+
+            Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
 			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
 			if (user != null)
-				Clients.Others.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
-			await base.OnDisconnected(stopCalled);
+				await Clients.All.InvokeAsync("userDisconnected", new { id = user.UserName, isRemoved = Manager.IsGuess(user) });
+			await base.OnDisconnectedAsync(ex);
 		}
 	}
 }

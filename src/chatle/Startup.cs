@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using ChatLe.Hubs;
 
 namespace ChatLe
 {
@@ -68,10 +71,115 @@ namespace ChatLe
 
             services.AddMvc();
 
-            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = _environment.EnvironmentName == "Development");
+            services.AddSignalR();
 
             services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]));
 
+            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
+            {
+                var userOptions = options.User;
+                userOptions.AllowedUserNameCharacters += " ";
+            }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(configureOptions =>
+            {
+                configureOptions.LoginPath = new PathString("/account/login");
+                configureOptions.LogoutPath = new PathString("/account/logout");
+                configureOptions.SlidingExpiration = true;
+                configureOptions.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+            }).AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                facebookOptions.SaveTokens = true;
+            }).AddTwitter(twitterOptions =>
+            {
+                twitterOptions.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
+                twitterOptions.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
+                twitterOptions.SaveTokens = true;
+
+            }).AddGoogle(googleOption =>
+            {
+                googleOption.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOption.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                googleOption.SaveTokens = true;
+            }).AddMicrosoftAccount(microsoftAccountOptions =>
+            {
+                microsoftAccountOptions.ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"];
+                microsoftAccountOptions.ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"];
+                microsoftAccountOptions.SaveTokens = true;
+            }).AddOAuth("Github", options =>
+            {
+                options.ClientId = Configuration["Authentication:Github:ClientId"];
+                options.ClientSecret = Configuration["Authentication:Github:ClientSecret"];
+                options.CallbackPath = new PathString("/signin-github");
+                options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
+                options.TokenEndpoint = "https://github.com/login/oauth/access_token";
+                options.UserInformationEndpoint = "https://api.github.com/user";
+                options.ClaimsIssuer = "OAuth2-Github";
+                options.SaveTokens = true;
+                // Retrieving user information is unique to each provider.
+                options.Events = new OAuthEvents
+                {
+                    OnCreatingTicket = async context =>
+                    {
+                        // Get the GitHub user
+                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                        response.EnsureSuccessStatusCode();
+
+                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                        var identifier = user.Value<string>("id");
+                        if (!string.IsNullOrEmpty(identifier))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                ClaimTypes.NameIdentifier, identifier,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var userName = user.Value<string>("login");
+                        if (!string.IsNullOrEmpty(userName))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                ClaimsIdentity.DefaultNameClaimType, userName,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var name = user.Value<string>("name");
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                "urn:github:name", name,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var email = user.Value<string>("email");
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                ClaimTypes.Email, email,
+                                ClaimValueTypes.Email, context.Options.ClaimsIssuer));
+                        }
+
+                        var link = user.Value<string>("url");
+                        if (!string.IsNullOrEmpty(link))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                "urn:github:url", link,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+                    }
+                };
+            });
         }
 
         private void ConfigureEntity(IServiceCollection services)
@@ -86,7 +194,7 @@ namespace ChatLe
                 switch (dbEngine)
                 {
                     case DBEngine.InMemory:
-                        options.UseInMemoryDatabase();
+                        options.UseInMemoryDatabase("chatle");
                         break;
                     case DBEngine.SqlServer:
                         options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.SqlServer"));
@@ -97,24 +205,21 @@ namespace ChatLe
                     case DBEngine.MySql:
                         options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
                         break;
-                    //case DBEngine.Redis:
-                    //    int port;
-                    //    int database;
-                    //    if (!int.TryParse(Configuration["Data:Redis:Port"], out port))
-                    //        port = 6379;
-                    //    int.TryParse(Configuration["Data:Redis:Database"], out database);
+                        //case DBEngine.Redis:
+                        //    int port;
+                        //    int database;
+                        //    if (!int.TryParse(Configuration["Data:Redis:Port"], out port))
+                        //        port = 6379;
+                        //    int.TryParse(Configuration["Data:Redis:Database"], out database);
 
-                    //    options.UseRedisDatabase(Configuration["Data:Redis:Hostname"], port, database);
-                    //    break;
+                        //    options.UseRedisDatabase(Configuration["Data:Redis:Hostname"], port, database);
+                        //    break;
                 }
             });
 
-            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
-            {
-                options.SecurityStampValidationInterval = TimeSpan.FromMinutes(20);
-                var userOptions = options.User;
-                userOptions.AllowedUserNameCharacters += " ";
-            }).AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+            services.AddIdentity<ChatLeUser, IdentityRole>()
+                .AddEntityFrameworkStores<ChatLeIdentityDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
@@ -130,100 +235,6 @@ namespace ChatLe
                     .AllowCredentials())
                 .UseStaticFiles()
                 .UseWebSockets()
-                .UseIdentity()
-                .UseFacebookAuthentication(new FacebookOptions()
-                {
-                    AppId = Configuration["Authentication:Facebook:AppId"],
-                    AppSecret = Configuration["Authentication:Facebook:AppSecret"],
-                    SaveTokens = true
-                })
-                .UseTwitterAuthentication(new TwitterOptions
-                {
-                    ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
-                    ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"],
-                    SaveTokens = true
-                })
-                .UseGoogleAuthentication(new GoogleOptions
-                {
-                    ClientId = Configuration["Authentication:Google:ClientId"],
-                    ClientSecret = Configuration["Authentication:Google:ClientSecret"],
-                    SaveTokens = true
-                })
-                .UseChatleMicrosoftAccountAuthentication(new MicrosoftAccountOptions
-                {
-                    ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"],
-                    ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"],
-                    SaveTokens = true
-                })
-                .UseOAuthAuthentication(new OAuthOptions
-                {
-                    AuthenticationScheme = "Github",
-                    DisplayName = "Github",
-                    ClientId = Configuration["Authentication:Github:ClientId"],
-                    ClientSecret = Configuration["Authentication:Github:ClientSecret"],
-                    CallbackPath = new PathString("/signin-github"),
-                    AuthorizationEndpoint = "https://github.com/login/oauth/authorize",
-                    TokenEndpoint = "https://github.com/login/oauth/access_token",
-                    UserInformationEndpoint = "https://api.github.com/user",
-                    ClaimsIssuer = "OAuth2-Github",
-                    SaveTokens = true,
-                    // Retrieving user information is unique to each provider.
-                    Events = new OAuthEvents
-                    {
-                        OnCreatingTicket = async context =>
-                        {
-                        // Get the GitHub user
-                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                            var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
-                            response.EnsureSuccessStatusCode();
-
-                            var user = JObject.Parse(await response.Content.ReadAsStringAsync());
-
-                            var identifier = user.Value<string>("id");
-                            if (!string.IsNullOrEmpty(identifier))
-                            {
-                                context.Identity.AddClaim(new Claim(
-                                    ClaimTypes.NameIdentifier, identifier,
-                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
-                            }
-
-                            var userName = user.Value<string>("login");
-                            if (!string.IsNullOrEmpty(userName))
-                            {
-                                context.Identity.AddClaim(new Claim(
-                                    ClaimsIdentity.DefaultNameClaimType, userName,
-                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
-                            }
-
-                            var name = user.Value<string>("name");
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                context.Identity.AddClaim(new Claim(
-                                    "urn:github:name", name,
-                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
-                            }
-
-                            var email = user.Value<string>("email");
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                context.Identity.AddClaim(new Claim(
-                                    ClaimTypes.Email, email,
-                                    ClaimValueTypes.Email, context.Options.ClaimsIssuer));
-                            }
-
-                            var link = user.Value<string>("url");
-                            if (!string.IsNullOrEmpty(link))
-                            {
-                                context.Identity.AddClaim(new Claim(
-                                    "urn:github:url", link,
-                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
-                            }
-                        }
-                    }
-                })
                 .Map("/xhrf", a => a.Run(async context =>
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
@@ -246,7 +257,10 @@ namespace ChatLe
                     template: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" });
                 })
-                .UseSignalR()
+                .UseSignalR(configure =>
+                {
+                    configure.MapHub<ChatHub>("chat");
+                })
                 .UseChatLe();
         }
 

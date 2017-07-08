@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ChatLe.Repository.Identity
 {
@@ -16,8 +16,9 @@ namespace ChatLe.Repository.Identity
             IHttpContextAccessor contextAccessor, 
             IUserClaimsPrincipalFactory<ChatLeUser> claimsFactory, 
             IOptions<IdentityOptions> optionsAccessor, 
-            ILogger<SignInManager<ChatLeUser>> logger) 
-            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger)
+            ILogger<SignInManager<ChatLeUser>> logger,
+            IAuthenticationSchemeProvider schemes) 
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes)
         {
         }
 

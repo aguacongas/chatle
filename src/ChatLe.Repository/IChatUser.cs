@@ -10,12 +10,6 @@ namespace ChatLe.Models
         string UserName { get; set; }
 
         /// <summary>
-        /// Gets a flag indicating if this user is a guess.
-        /// </summary>
-        /// <remarks>A user without password is a guess</remarks>
-        bool IsGuess { get; }
-
-        /// <summary>
         /// Gets or sets the last login date for this user.
         /// </summary>
         DateTime LastLoginDate { get; set; }

@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Hubs;
-using Microsoft.AspNetCore.SignalR.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -31,19 +29,17 @@ namespace chatle.test.Controllers
     {
         public static void ExecuteAction(Action<ChatController
             , Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>
-            , Mock<IHubContext>
+            , Mock<IHubContext<ChatHub>>
             , Mock<UserManager<ChatLeUser>>> a)
         {
             var mockChatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
-            var mockConnectioManager = new Mock<IConnectionManager>();
-            var mockHubContext = new Mock<IHubContext>();
-            mockConnectioManager.Setup(c => c.GetHubContext<ChatHub>()).Returns(mockHubContext.Object);
+            var mockHubContext = new Mock<IHubContext<ChatHub>>();
             var userValidators = new List<IUserValidator<ChatLeUser>>();
             var validator = new Mock<IUserValidator<ChatLeUser>>();
             userValidators.Add(validator.Object);
             var mockUserManager = MockUserManager(userValidators);
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-            var controller = new ChatController(mockChatManager.Object, mockConnectioManager.Object, mockUserManager.Object) { ViewData = viewData };
+            var controller = new ChatController(mockChatManager.Object, mockHubContext.Object, mockUserManager.Object) { ViewData = viewData };
             using (controller)
             {
                 a.Invoke(controller, mockChatManager, mockHubContext, mockUserManager);
@@ -262,11 +258,9 @@ namespace chatle.test.Controllers
                     });
 
                 mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
-                var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
                 dynamic all = new ExpandoObject();
                 all.messageReceived = new Action<object>(m => { });
-                mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
-                mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
+                mockHubContext.SetupGet(h => h.Clients).Returns(all);
 
                 var message = new MessageToSend
                 {
@@ -338,11 +332,9 @@ namespace chatle.test.Controllers
                     });
 
                 mockUserManager.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ChatLeUser());
-                var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
                 dynamic group = new ExpandoObject();
                 group.joinConversation = new Action<object>(m => { });
-                mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)group);
-                mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
+                mockHubContext.SetupGet(h => h.Clients).Returns(group);
 
                 var message = new MessageToSend
                 {
@@ -434,11 +426,9 @@ namespace chatle.test.Controllers
                 mockUserManager.Setup(u => u.FindByIdAsync("test1")).ReturnsAsync(new ChatLeUser("test1"));
                 mockUserManager.Setup(u => u.FindByIdAsync("test2")).ReturnsAsync(() => null);
 
-                var mockHubConnectionContext = new Mock<IHubConnectionContext<dynamic>>();
                 dynamic all = new ExpandoObject();
                 all.joinConversation = new Action<object>(m => { });
-                mockHubConnectionContext.Setup(h => h.Group(It.IsAny<string>())).Returns((ExpandoObject)all);
-                mockHubContext.SetupGet(h => h.Clients).Returns(mockHubConnectionContext.Object);
+                mockHubContext.SetupGet(h => h.Clients).Returns(all);
 
                 var message = new MessageToSend
                 {

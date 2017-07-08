@@ -157,5 +157,13 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
         Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Gets a flag indicating if the user is guess
+        /// </summary>
+        /// <param name="userId">the user id</param>
+        /// <param name="cancellationToken">an optional cancellation token</param>
+        /// <returns>true if the user is guess, otherwise false</returns>
+        Task<bool> IsGuess(TKey userId, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
