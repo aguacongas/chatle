@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage" Version="1.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-*" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0-*" />
@@ -29,16 +29,6 @@
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <PackageReference Include="xunit" Version="2.3.0-*" />
     <PackageReference Include="Moq" Version="4.7.63" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

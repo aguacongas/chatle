@@ -37,7 +37,7 @@ namespace chatle.test.Controllers
 			});
 		}
 
-		public static void ExecuteAction(Action<HomeController> a)
+        internal static void ExecuteAction(Action<HomeController> a)
 		{
 			var mockLoggerFactory = new Mock<ILoggerFactory>();
 			mockLoggerFactory.Setup(f => f.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger>().Object);

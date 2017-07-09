@@ -27,7 +27,7 @@ namespace chatle.test.Controllers
 {
     public class ChatControllerTest
     {
-        public static void ExecuteAction(Action<ChatController
+        internal static void ExecuteAction(Action<ChatController
             , Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>
             , Mock<IHubContext<ChatHub>>
             , Mock<UserManager<ChatLeUser>>> a)

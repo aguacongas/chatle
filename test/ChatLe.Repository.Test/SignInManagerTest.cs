@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ChatLe.Repository.Test
 {
@@ -55,13 +56,13 @@ namespace ChatLe.Repository.Test
         [Fact]
         public async Task SignInAsync_should_update_the_last_login_date()
         {
-            var authenticationManagerMock = new Mock<AuthenticationManager>();
-            authenticationManagerMock.Setup(a => a.SignInAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()))
-                .Returns(Task.FromResult(0));
-                
+            var authServiceMock = new Mock<IAuthenticationService>();
+            var serviceProviderMock = new Mock<IServiceProvider>();
+
+            serviceProviderMock.Setup(s => s.GetService(It.IsAny<Type>())).Returns(authServiceMock.Object);
             var context = new Mock<HttpContext>();
-            context.SetupGet(c => c.Authentication)
-                .Returns(authenticationManagerMock.Object);
+            context.SetupGet(c => c.RequestServices)
+                .Returns(serviceProviderMock.Object);
 			var contextAccessor = new Mock<IHttpContextAccessor>();
 			contextAccessor.Setup(a => a.HttpContext).Returns(context.Object);
 
@@ -77,7 +78,9 @@ namespace ChatLe.Repository.Test
             claimsFactoryMock.Setup(f => f.CreateAsync(It.IsAny<ChatLeUser>()))
                 .ReturnsAsync(new ClaimsPrincipal());
 
-            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, null, null);
+            var loggerMock = new Mock<ILogger<SignInManager<ChatLeUser>>>();
+            var authSchemeProvider = new Mock<IAuthenticationSchemeProvider>();
+            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, loggerMock.Object, authSchemeProvider.Object);
 
             var user = new ChatLeUser { Id = "test", UserName = "test" };
             await manager.SignInAsync(user, isPersistent: false);

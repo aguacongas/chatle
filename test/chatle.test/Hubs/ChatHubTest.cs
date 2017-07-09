@@ -43,7 +43,7 @@ namespace chatle.test.Hubs
 			return userManager;
 		}
 
-		public static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>> a)
+        internal static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>> a)
 		{
 			var mockHttpRequest = new Mock<HttpRequest>();
 			var mockHttpContext = new Mock<HttpContext>();
