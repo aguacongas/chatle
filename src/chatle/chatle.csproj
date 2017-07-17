@@ -62,13 +62,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.0.0-*" />
   </ItemGroup>
 
-  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
-    <Exec Command="npm install" />
-    <Exec Command="npm install typescript -g" />
-    <Exec Command="tsc" />
-    <Exec Command="npm run gulp publish" />
-  </Target>
-
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
   </ItemGroup>

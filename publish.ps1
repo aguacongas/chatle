@@ -21,6 +21,14 @@ if (!($env:Path.Split(';') -icontains $dotnetLocalInstallFolder))
     $env:Path = "$newPath"
 }
 
+cd .\src\chatle.angular
+
+exec npm install signalr-client --registry https://dotnet.myget.org/f/aspnetcore-ci-dev/npm/ --save
+exec npm i
+exec npm run publish
+
+cd $PSScriptRoot
+
 exec dotnet publish .\src\chatle --configuration Release -o ..\..\artifacts\chatle
 
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
