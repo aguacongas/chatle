@@ -1,0 +1,9 @@
+﻿<div class="col-xs-3">
+    <h6>CONNECTED</h6>
+    <span *ngIf="!users">loading...</span>
+    <ul>
+        <li *ngFor="let user of users">
+            <chatle-contact [user]="user"></chatle-contact>
+        </li>
+    </ul>
+</div>

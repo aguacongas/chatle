@@ -27,6 +27,8 @@ paths.concatCssDest = paths.webroot + "css/site.min.css";
 paths.lib = paths.webroot + "lib/";
 
 paths.angular = paths.node_modules + "@angular/**/*.js"
+paths.signalR = paths.node_modules + "signalr-client/dist/browser/*.js"
+paths.angularSignalR = paths.node_modules + "angular-signalr-client/*.js"
 paths.angularWebApi = paths.node_modules + "angular2-in-memory-web-api/*.js"
 paths.corejs = paths.node_modules + "core-js/client/shim*.js";
 paths.zonejs = paths.node_modules + "zone.js/dist/zone*.js";
@@ -104,6 +106,18 @@ gulp.task("copy:rxjs", function () {
 			.pipe(gulp.dest(paths.lib));
 });
 
+gulp.task("copy:signalR", function () {
+    return gulp.src(paths.signalR,
+        { base: paths.node_modules })
+        .pipe(gulp.dest(paths.lib));
+});
+
+gulp.task("copy:angular-signalR", function () {
+    return gulp.src(paths.angularSignalR,
+        { base: paths.node_modules })
+        .pipe(gulp.dest(paths.lib));
+});
+
 gulp.task("copy:app", function () {
     return gulp.src(paths.app)
 			.pipe(gulp.dest(paths.appDest));
@@ -122,7 +136,9 @@ gulp.task("dependencies", ["copy:angular",
 					"copy:reflectjs",
 					"copy:systemjs",
 					"copy:rxjs",
-					"copy:jasmine",
+                    "copy:jasmine",
+					"copy:signalR",
+					"copy:angular-signalR",
 					"copy:app"]);
 
 gulp.task("watch", function () {

@@ -12,6 +12,7 @@
     <PackageId>chatle</PackageId>
     <UserSecretsId>aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27</UserSecretsId>
     <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.12-x64;osx.10.11-x64;osx.10.10-x64;ubuntu.14.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64</RuntimeIdentifiers>
+    <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
