@@ -23,7 +23,7 @@ if (!($env:Path.Split(';') -icontains $dotnetLocalInstallFolder))
 
 cd .\src\chatle.angular
 
-exec npm install signalr-client --registry https://dotnet.myget.org/f/aspnetcore-ci-dev/npm/ --save
+exec npm install signalr-client@latest --registry https://dotnet.myget.org/f/aspnetcore-ci-dev/npm/ --save
 exec npm i
 exec npm run publish
 
