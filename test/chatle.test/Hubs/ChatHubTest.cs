@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Chatle.test.Controllers;
 using System.Threading.Tasks.Channels;
 using Microsoft.AspNetCore.Sockets;
+using Microsoft.AspNetCore.SignalR.Internal.Protocol;
 
 namespace chatle.test.Hubs
 {
@@ -56,7 +57,7 @@ namespace chatle.test.Hubs
 			var provideMock = new Mock<IServiceProvider>();
 			provideMock.Setup(p => p.GetService(It.IsAny<Type>()))
 				.Returns(mockChatManager.Object);
-            var mockWritableChannel = new Mock<WritableChannel<byte[]>>();
+            var mockWritableChannel = new Mock<WritableChannel<HubMessage>>();
             var mockConnectionContext = new Mock<ConnectionContext>();
             var hubConnectionContextMock = new Mock<HubConnectionContext>(mockWritableChannel.Object, mockConnectionContext.Object);
             var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
