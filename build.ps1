@@ -1,8 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "Powershell version: " $PSVersionTable.PSVersion
-
-function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $retries) 
+function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $retries)
 {
     while($true)
     {
@@ -21,13 +19,19 @@ function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $ret
                 Start-Sleep -Seconds 10
 
             }
-            else 
+            else
             {
                 $exception = $_.Exception
                 throw $exception
             }
         }
     }
+}
+
+function exec($cmd) {
+    $cmdName = [IO.Path]::GetFileName($cmd)
+    Write-Host -ForegroundColor Cyan "> $cmdName $args"
+    & $cmd @args
 }
 
 cd $PSScriptRoot
@@ -45,18 +49,18 @@ $buildFolder = ".build"
 $buildFile="$buildFolder\KoreBuild.ps1"
 
 if (!(Test-Path $buildFolder)) {
-    Write-Host "Downloading KoreBuild from $koreBuildZip"    
-    
+    Write-Host "Downloading KoreBuild from $koreBuildZip"
+
     $tempFolder=$env:TEMP + "\KoreBuild-" + [guid]::NewGuid()
     New-Item -Path "$tempFolder" -Type directory | Out-Null
 
     $localZipFile="$tempFolder\korebuild.zip"
-    
+
     DownloadWithRetry -url $koreBuildZip -downloadLocation $localZipFile -retries 6
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory($localZipFile, $tempFolder)
-    
+
     New-Item -Path "$buildFolder" -Type directory | Out-Null
     copy-item "$tempFolder\**\build\*" $buildFolder -Recurse
 
@@ -66,14 +70,64 @@ if (!(Test-Path $buildFolder)) {
     }
 }
 
-# We still nuget because dotnet doesn't have support for pushing packages
-Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v3.5.0-beta2/NuGet.exe" -OutFile "$buildFolder/nuget.exe"
+$makeFileProj = "build/build.csproj"
+$preflightClpOption='/clp:DisableConsoleColor'
+if ("${env:CI}${env:APPVEYOR}${env:TEAMCITY_VERSION}${env:TRAVIS}" -eq "")
+{
+    # Not on any of the CI machines. Fine to use colors.
+    $preflightClpOption=''
+}
 
-&"$buildFolder\NuGet.exe" install GitVersion.CommandLine -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-&"$buildFolder\NuGet.exe" install OpenCover -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Version 4.6.166 -Out packages
-&"$buildFolder\NuGet.exe" install coveralls.io -ExcludeVersion -Source https://www.nuget.org/api/v2/  -Out packages
-&"$buildFolder\NuGet.exe" install ReportGenerator -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
-&"$buildFolder\NuGet.exe" install Chutzpah -ExcludeVersion -Source https://www.nuget.org/api/v2/ -Out packages
+$dotnetVersionFile = ".build\cli.version"
+$dotnetChannel = "preview"
+$dotnetVersion = Get-Content $dotnetVersionFile
+$sharedRuntimeVersionFile = ".build\shared-runtime.version"
+$sharedRuntimeVersion = Get-Content $sharedRuntimeVersionFile
 
+if ($env:KOREBUILD_DOTNET_CHANNEL)
+{
+    $dotnetChannel = $env:KOREBUILD_DOTNET_CHANNEL
+}
+if ($env:KOREBUILD_DOTNET_VERSION)
+{
+    $dotnetVersion = $env:KOREBUILD_DOTNET_VERSION
+}
 
-&"$buildFile" $args
+$dotnetLocalInstallFolder = $env:DOTNET_INSTALL_DIR
+if (!$dotnetLocalInstallFolder)
+{
+    $dotnetLocalInstallFolder = "$env:LOCALAPPDATA\Microsoft\dotnet\"
+}
+
+function InstallSharedRuntime([string] $version, [string] $channel)
+{
+    $sharedRuntimePath = [IO.Path]::Combine($dotnetLocalInstallFolder, 'shared', 'Microsoft.NETCore.App', $version)
+    # Avoid redownloading the CLI if it's already installed.
+    if (!(Test-Path $sharedRuntimePath))
+    {
+        & "$PSScriptRoot\dotnet\dotnet-install.ps1" -Channel $channel -SharedRuntime -Version $version -Architecture x64
+    }
+}
+
+$newPath = "$dotnetLocalInstallFolder;$env:PATH"
+if ($env:KOREBUILD_SKIP_RUNTIME_INSTALL -eq "1")
+{
+    Write-Host "Skipping runtime installation because KOREBUILD_SKIP_RUNTIME_INSTALL = 1"
+    # Add to the _end_ of the path in case preferred .NET CLI is not in the default location.
+    $newPath = "$env:PATH;$dotnetLocalInstallFolder"
+}
+else
+{
+    # Install the version of dotnet-cli used to compile
+    & "$PSScriptRoot\.build\dotnet\dotnet-install.ps1" -Channel $dotnetChannel -Version $dotnetVersion -Architecture x64
+}
+
+if (!($env:Path.Split(';') -icontains $dotnetLocalInstallFolder))
+{
+    Write-Host "Adding $dotnetLocalInstallFolder to PATH"
+    $env:Path = "$newPath"
+}
+
+exec dotnet restore "$makeFileProj"
+exec dotnet build "$makeFileProj" -f netcoreapp1.1
+&"$buildFile" @args

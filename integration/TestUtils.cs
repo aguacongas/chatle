@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace IntegrationTest
 {
@@ -9,10 +7,10 @@ namespace IntegrationTest
     {
 		public static string GetPathPrefix()
 		{
-			var path = Environment.CurrentDirectory;
-			if (Environment.CurrentDirectory.EndsWith("integration", StringComparison.InvariantCultureIgnoreCase))
+			var path = Directory.GetCurrentDirectory();
+			if (path.EndsWith("integration", StringComparison.CurrentCultureIgnoreCase))
 				path = "..";
-			else if (string.IsNullOrEmpty(path))				
+			else if (string.IsNullOrEmpty(path))
 				path = ".";
 			return path + "/";
 		}

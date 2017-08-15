@@ -3,7 +3,6 @@ using Moq;
 using Xunit;
 using ChatLe.Models;
 using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 
 namespace ChatLe.Repository.Test

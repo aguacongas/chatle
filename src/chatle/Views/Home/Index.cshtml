@@ -7,31 +7,6 @@
 
 @section scripts
 {
-	<environment names="Development">
-		<script src="~/lib/signalr/jquery.signalR.js"></script>
-
-        <script src="~/lib/core-js/client/shim.js"></script>
-        <script src="~/lib/zone.js/dist/zone.js"></script>
-        <script src="~/lib/reflect-metadata/Reflect.js"></script>
-        <script src="~/lib/systemjs/dist/system.src.js"></script>
-    </environment>
-	<environment names="Staging,Production">
-		<script src="//ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.min.js"
-				asp-fallback.src="~/lib/signalr/jquery.signalR.min.js"
-				asp-fallback-test="window.jQuery && window.jQuery.connection">
-		</script>
-        <script src="~/lib/core-js/client/shim.min.js"></script>        
-        <script src="~/lib/reflect-metadata/Reflect.js"></script>
-        <script src="~/lib/systemjs/dist/system.js"></script>
-        <script src="~/lib/zone.js/dist/zone.min.js"></script>
-	</environment>
-    
-	<script src="/signalr/js"></script>
-    <script src="~/js/systemjs.config.js"></script>
-    <script>
-      System.import('app').catch(function(err){ console.error(err); });
-    </script>
-
 	<script>
         window['chatleSetting'] = {
             userName: '@User.Identity.Name',
@@ -41,4 +16,9 @@
             debug: true
         };
 	</script>
+    <script type="text/javascript" src="~/lib/inline.bundle.js"></script>
+    <script type="text/javascript" src="~/lib/polyfills.bundle.js"></script>
+    <script type="text/javascript" src="~/lib/styles.bundle.js"></script>
+    <script type="text/javascript" src="~/lib/vendor.bundle.js"></script>
+    <script type="text/javascript" src="~/lib/main.bundle.js"></script>
 }

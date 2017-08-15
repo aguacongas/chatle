@@ -2,6 +2,12 @@
 
 namespace ChatLe.ViewModels
 {
+    public class ExternalLoginProvider
+    {
+        public string DisplayName { get; set; }
+        public string AuthenticationScheme { get; set; }
+    }
+
     public class ExternalLoginConfirmationViewModel
     {
         [Required]

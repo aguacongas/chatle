@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <Import Project="..\..\build\common.props" />
+
+  <PropertyGroup>
+    <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
+    <Authors>Olivier Lefebvre</Authors>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <AssemblyName>chatle</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>chatle</PackageId>
+    <UserSecretsId>aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27</UserSecretsId>
+    <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.12-x64;osx.10.11-x64;osx.10.10-x64;ubuntu.14.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64</RuntimeIdentifiers>
+    <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="node_modules" />
+    <None Update="wwwroot\css\site.min.css;wwwroot\app\**\*.js;wwwroot\app\**\*.html;wwwroot\js\**\*;wwwroot\lib\angular\**\*.min.js;wwwroot\lib\angular2-in-memory-web-api\*.js;wwwroot\lib\core-js\client\shim.min.js;wwwroot\lib\rxjs\**\*.js;wwwroot\lib\reflect-metadata\Reflect.js;wwwroot\lib\systemjs\dist\system.js;wwwroot\lib\zone.js\dist\zone.min.js;Views\**\*">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="**.user;**.vspscc;wwwroot\js\app\**\*.spec.min.js;wwwroot\lib\rxjs\src;wwwroot\lib\rxjs\testing;wwwroot\lib\rxjs\bundles">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
+    <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
+    <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
+    <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Http" Version="1.0.0-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

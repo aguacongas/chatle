@@ -13,9 +13,11 @@ namespace chatle.test
 {
     public class StartupTest
     {
-		
-		[Fact(Skip = "Skipped for the moment")]
-		public void ConfigureTest()
+
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Skipped for the moment")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
+        public void ConfigureTest()
 		{
 			var mockHostingEnvironment = new Mock<IHostingEnvironment>();
 			mockHostingEnvironment.SetupGet(h => h.EnvironmentName).Returns("Development");

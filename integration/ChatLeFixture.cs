@@ -69,7 +69,7 @@ namespace IntegrationTest
 				if(_serverProcess != null)
 				{
 					_serverProcess.Kill();
-					_serverProcess.Close();
+                    _serverProcess.Dispose();
 					_serverProcess = null;
 				}
 			}

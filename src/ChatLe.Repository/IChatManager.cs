@@ -102,5 +102,13 @@ namespace ChatLe.Models
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
         Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Gets a flag indicating if the user is guess
+        /// </summary>
+        /// <param name="user">the user</param>
+        /// <param name="cancellationToken">an optional concellation token</param>
+        /// <returns>true if the user is guess, otherwise false</returns>
+        Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

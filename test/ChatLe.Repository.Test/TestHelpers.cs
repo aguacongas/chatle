@@ -1,10 +1,9 @@
 ﻿using ChatLe.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatLe.Repository.Test
 {
@@ -52,7 +51,7 @@ namespace ChatLe.Repository.Test
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase();
+            optionsBuilder.UseInMemoryDatabase("test");
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

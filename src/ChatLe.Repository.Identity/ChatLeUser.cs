@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatLe.Models
 {
@@ -13,11 +14,6 @@ namespace ChatLe.Models
         public ChatLeUser(string userName) :this()
         {
             UserName = userName;
-        }
-
-        public bool IsGuess
-        {
-            get { return PasswordHash == null && Logins.Count == 0; }
         }
 
         public DateTime LastLoginDate { get; set; }

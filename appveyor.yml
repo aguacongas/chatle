@@ -1,0 +1,32 @@
+version: 1.0.0-{build}
+install:
+  - choco install gitversion.portable -pre -y
+  - ps: Install-Product node 6.9.4
+  - set path=%programfiles(x86)%\\Microsoft SDKs\TypeScript\2.2;%path%
+init:
+- cmd: git config --global core.autocrlf true
+environment:
+  ASPNETCORE_ENVIRONMENT: Staging
+before_build:
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - ps: $env:BuildNumber=$env:APPVEYOR_BUILD_NUMBER
+build_script:
+- cmd: build.cmd
+test_script:
+- cmd: publish.cmd
+artifacts:
+- path: artifacts\build\*.nupkg
+  name: Release
+- path: artifacts\chatle.zip
+  name: Website
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/chatle/api/v2/package
+  api_key:
+    secure: 8/9mgBd8wf7Q79WKp7wGgkEUDCLky31xyCOSlbkvb8JPcqm6SRuBvphxevUkVbLE
+  symbol_server: https://www.myget.org/F/chatle/api/v2/package
+  on:
+    branch: 
+        - master
+        - /release*/
+    

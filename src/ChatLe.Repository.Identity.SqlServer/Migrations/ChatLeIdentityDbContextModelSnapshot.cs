@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using ChatLe.Repository.Identity.SqlServer;
 
 namespace ChatLe.Repository.Identity.SqlServer.Migrations
 {

@@ -1,6 +1,4 @@
 ﻿using ChatLe.Controllers;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +7,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace chatle.test.Controllers
@@ -42,7 +37,7 @@ namespace chatle.test.Controllers
 			});
 		}
 
-		public static void ExecuteAction(Action<HomeController> a)
+        internal static void ExecuteAction(Action<HomeController> a)
 		{
 			var mockLoggerFactory = new Mock<ILoggerFactory>();
 			mockLoggerFactory.Setup(f => f.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger>().Object);

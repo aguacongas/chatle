@@ -1,10 +1,9 @@
 ﻿using ChatLe.Hubs;
 using ChatLe.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +20,7 @@ namespace ChatLe.Controllers
     public class ChatController : Controller
     {
         private readonly IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> _chatManager;
-        private readonly IHubContext _hub;
+        private readonly IHubContext<ChatHub> _hub;
         private readonly UserManager<ChatLeUser> _userManager;
         /// <summary>
         /// Constructor
@@ -29,10 +28,10 @@ namespace ChatLe.Controllers
         /// <param name="chatManager">the chat repository manager</param>
         /// <param name="signalRConnectionManager">the SignalR connection manager</param>
         /// <param name="userManager">the Identity user manager</param>
-        public ChatController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager, IConnectionManager signalRConnectionManager, UserManager<ChatLeUser> userManager)
+        public ChatController(IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager, IHubContext<ChatHub> hubContext, UserManager<ChatLeUser> userManager)
         {
             _chatManager = chatManager;
-            _hub = signalRConnectionManager.GetHubContext<ChatHub>();
+            _hub = hubContext;
             _userManager = userManager;
         }
         /// <summary>
@@ -134,7 +133,7 @@ namespace ChatLe.Controllers
             {
                 var user = await _userManager.FindByIdAsync(attendee.UserId);
                 if (user != null && user.UserName != userName)
-                    _hub.Clients.Group(user.UserName).messageReceived(new { conversationId = to, date = message.Date, from = HttpContext.User.Identity.Name, text = text });
+                    await _hub.Clients.Group(user.UserName).InvokeAsync("messageReceived", new { conversationId = to, date = message.Date, from = HttpContext.User.Identity.Name, text = text });
             }            
         }
 
@@ -177,7 +176,7 @@ namespace ChatLe.Controllers
                 messages.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
             }
 
-            _hub.Clients.Group(to).joinConversation(new 
+            await _hub.Clients.Group(to).InvokeAsync("joinConversation", new 
             { 
                 id = conversation.Id,
                 attendees = attendees.Select(a => new { userId = a.UserId }),

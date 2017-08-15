@@ -3,7 +3,6 @@ using ChatLe.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Hubs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -16,6 +15,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Chatle.test.Controllers;
+using System.Threading.Tasks.Channels;
+using Microsoft.AspNetCore.Sockets;
+using Microsoft.AspNetCore.SignalR.Internal.Protocol;
 
 namespace chatle.test.Hubs
 {
@@ -42,11 +44,8 @@ namespace chatle.test.Hubs
 			return userManager;
 		}
 
-		public static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HttpContext>> a)
+        internal static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HubConnectionContext>> a)
 		{
-			var mockHttpRequest = new Mock<HttpRequest>();
-			var mockHttpContext = new Mock<HttpContext>();
-			mockHttpRequest.SetupGet(h => h.HttpContext).Returns(mockHttpContext.Object);
 			var mockChatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
 			var mockLoggerFactory = new Mock<ILoggerFactory>();
 			mockLoggerFactory.Setup(f => f.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger>().Object);
@@ -58,44 +57,46 @@ namespace chatle.test.Hubs
 			var provideMock = new Mock<IServiceProvider>();
 			provideMock.Setup(p => p.GetService(It.IsAny<Type>()))
 				.Returns(mockChatManager.Object);
+            var mockWritableChannel = new Mock<WritableChannel<HubMessage>>();
+            var mockConnectionContext = new Mock<ConnectionContext>();
+            var hubConnectionContextMock = new Mock<HubConnectionContext>(mockWritableChannel.Object, mockConnectionContext.Object);
+            var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
 
-			var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
-			using (hub)
+            using (hub)
 			{
-				hub.Context = new HubCallerContext(mockHttpRequest.Object, "test");
-				a.Invoke(hub, mockChatManager, mockHttpContext);
+				hub.Context = new HubCallerContext(hubConnectionContextMock.Object);
+				a.Invoke(hub, mockChatManager, hubConnectionContextMock);
 			}
 		}
 
 		[Fact]
 		public void OnConnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
 				var identity = new ClaimsIdentity("test");
 
 				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
 				mockClaims.SetupGet(c => c.Identity).Returns(identity);
-				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
+				mockHubConnectionContext.SetupGet(h => h.User).Returns(mockClaims.Object);
 
 				var mockGroups = new Mock<IGroupManager>();
 				hub.Groups = mockGroups.Object;
-				
-				var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-				dynamic others = new ExpandoObject();
-				others.userConnected = new Action<object>(o => { });
-				mockClients.SetupGet(c => c.Others).Returns((ExpandoObject)others);
-				hub.Clients = mockClients.Object;
 
-				await hub.OnConnected();
-			});
+                var mockClients = new Mock<IHubClients>();
+                var clientProxyMock = new Mock<IClientProxy>();
+                mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
+
+                await hub.OnConnectedAsync();
+            });
 		}
 
 		[Fact]
 		public void OnGuessConnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =>
 			{
 				var mockClaims = new Mock<ClaimsPrincipal>();
 				var identity = new ClaimsIdentity("test");
@@ -103,59 +104,31 @@ namespace chatle.test.Hubs
 
 				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
 				mockClaims.SetupGet(c => c.Identity).Returns(identity);
-				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
+				mockHubConnectionContext.SetupGet(h => h.User).Returns(mockClaims.Object);
 
 				var mockGroups = new Mock<IGroupManager>();
 				hub.Groups = mockGroups.Object;
 				
-				var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-				dynamic others = new ExpandoObject();
-				others.userConnected = new Action<object>(o => { });
-				mockClients.SetupGet(c => c.Others).Returns((ExpandoObject)others);
-				hub.Clients = mockClients.Object;
+				var mockClients = new Mock<IHubClients>();
+                var clientProxyMock = new Mock<IClientProxy>();
+                mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
 
-				await hub.OnConnected();
+                await hub.OnConnectedAsync();
 			});
 		}
-
-		[Fact]
-		public void OnReconnectedTest()
-		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
-			{
-				var mockClaims = new Mock<ClaimsPrincipal>();
-				var identity = new ClaimsIdentity("test");
-				
-				mockClaims.SetupGet(c => c.Claims).Returns(identity.Claims);				
-				mockClaims.SetupGet(c => c.Identity).Returns(identity);
-				mockHttpContext.SetupGet(h => h.User).Returns(mockClaims.Object);
-
-				var mockGroups = new Mock<IGroupManager>();
-				hub.Groups = mockGroups.Object;
-
-				var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-				dynamic others = new ExpandoObject();
-				others.userConnected = new Action<object>(o => { });
-				mockClients.SetupGet(c => c.Others).Returns((ExpandoObject)others);
-				hub.Clients = mockClients.Object;
-
-				await hub.OnReconnected();
-			});
-		}
-
 		[Fact]
 		public void OnDisconnectedTest()
 		{
-			ExecuteAction(async (hub, mockChatManager, mockHttpContext) =>
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =>
 			{
 				mockChatManager.Setup(c => c.RemoveConnectionIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ChatLeUser());
-				var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-				dynamic others = new ExpandoObject();
-				others.userDisconnected = new Action<object>(o => { });
-				mockClients.SetupGet(c => c.Others).Returns((ExpandoObject)others);
-				hub.Clients = mockClients.Object;
+                var mockClients = new Mock<IHubClients>();
+                var clientProxyMock = new Mock<IClientProxy>();
+                mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
 
-				await hub.OnDisconnected(false);
+                await hub.OnDisconnectedAsync(null);
 			});
 		}
 	}

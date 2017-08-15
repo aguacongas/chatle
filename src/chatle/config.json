@@ -2,14 +2,11 @@
 	"ChatConfig": {
 		"UserPerPage": 25
 	},
-	"DatabaseEngine": "SQLite",
+	"DatabaseEngine": "InMemory",
 	"CreateDatabase": "false",
 	"Data": {
 		"DefaultConnection": {
 			"ConnectionString": "Filename=./ChatLeDbContext.db"
-		},
-		"Redis": {
-			"Hostname": "127.0.0.1"
 		}
 	},
 	"Identity": {

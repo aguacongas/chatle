@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR.Infrastructure;
 using ChatLe.Hubs;
 using ChatLe.Models;
 using ChatLe.ViewModels;
@@ -11,10 +10,11 @@ using ChatLe.Repository.Identity;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Linq;
-using System;
-using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ChatLe.Controllers
 {
@@ -24,12 +24,14 @@ namespace ChatLe.Controllers
         public AccountController(UserManager<ChatLeUser> userManager, 
             SignInManager signInManager,
             IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> chatManager,
+            IHubContext<ChatHub> hubContext,
             ILoggerFactory loggerFactory)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             ChatManager = chatManager;
             Logger = loggerFactory.CreateLogger<AccountController>();
+            HubContext = hubContext;
         }
 
         public UserManager<ChatLeUser> UserManager { get; private set; }
@@ -39,6 +41,8 @@ namespace ChatLe.Controllers
         public IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> ChatManager { get; private set; }
 
         public ILogger Logger { get; private set; }
+
+        public IHubContext<ChatHub> HubContext { get; private set; }
 
         // GET: /Account/Index
         [HttpGet]
@@ -180,9 +184,9 @@ namespace ChatLe.Controllers
         // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
+        public async Task<IActionResult> LogOff(string reason = null)
         {
-            await SignOut(signalRConnectionManager);
+            await SignOut();
 			return RedirectToAction("Index", routeValues: new { Reason = reason });
         }
 
@@ -190,9 +194,21 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaLogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task SpaLogOff([FromServices] IConnectionManager signalRConnectionManager, string reason = null)
+        public async Task SpaLogOff(string reason = null)
         {
-            await SignOut(signalRConnectionManager);        
+            await SignOut();        
+        }
+
+        //
+        // GET: /Account/ExternalLoginCallback
+        [HttpGet]
+        [AllowAnonymous]
+        public IEnumerable<ExternalLoginProvider> GetExternalProviders(){
+            return SignInManager.GetExternalAuthenticationSchemesAsync().Result.Select(p => new ExternalLoginProvider
+                { 
+                    DisplayName = p.DisplayName,
+                    AuthenticationScheme = p.Name  
+                });
         }
 
         //
@@ -200,7 +216,7 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult ExternalLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
@@ -228,7 +244,7 @@ namespace ChatLe.Controllers
             var info = await SignInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction(nameof(Index));
             }
 
             // Sign in the user with this external login provider if the user already has a login.
@@ -476,7 +492,7 @@ namespace ChatLe.Controllers
         // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin([FromServices] IHostingEnvironment env, string provider, string returnUrl = null)
+        public IActionResult LinkLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action("LinkLoginCallback", "Account", new { ReturnUrl = returnUrl });
@@ -538,7 +554,10 @@ namespace ChatLe.Controllers
         private async Task<ManageLoginsViewModel> GetLogins(ChatLeUser user)
         {
             var userLogins = await UserManager.GetLoginsAsync(user);
-            var otherLogins = SignInManager.GetExternalAuthenticationSchemes().Where(auth => userLogins.All(ul => auth.AuthenticationScheme != ul.LoginProvider)).ToList();
+            var otherLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync())
+                .Where(auth => userLogins.All(ul => auth.Name != ul.LoginProvider))
+                .Select(auth => new AuthenticationDescription { AuthenticationScheme = auth.Name, DisplayName = auth.DisplayName })
+                .ToList();
 
             return new ManageLoginsViewModel
             {
@@ -570,14 +589,14 @@ namespace ChatLe.Controllers
             return new JsonResult(ModelState.Root.Children);            
         }
 
-        private async Task SignOut(IConnectionManager signalRConnectionManager)
+        private async Task SignOut()
         {
             var user = await GetCurrentUserAsync();
 			if (user != null)
 			{
-                var hub = signalRConnectionManager.GetHubContext<ChatHub>();
-                hub.Clients.All.userDisconnected(new { id = user.UserName, isRemoved = user.IsGuess });
-				if (user.IsGuess)
+                var isGuess = await ChatManager.IsGuess(user);
+                await HubContext.Clients.All.InvokeAsync("userDisconnected", new { id = user.UserName, isRemoved = isGuess });
+				if (isGuess)
 				{
 					await ChatManager.RemoveUserAsync(user);
 				}

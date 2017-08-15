@@ -19,7 +19,7 @@ namespace IntegrationTest
 				case "ie":
 					return new InternetExplorerDriver(Path.Combine(path, "packages/Selenium.WebDriver.IEDriver/driver"));
 				case "firefox":
-					return new FirefoxDriver(new FirefoxBinary(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe"), new FirefoxProfile());
+					return new FirefoxDriver(new FirefoxOptions { BrowserExecutableLocation = @"C:\Program Files (x86)\Mozilla Firefox\firefox.exe", Profile = new FirefoxProfile() });
 				case "chrome":
 					return new ChromeDriver(Path.Combine(path, "packages/Selenium.WebDriver.ChromeDriver/driver"));
 			}

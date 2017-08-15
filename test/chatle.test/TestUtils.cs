@@ -1,4 +1,5 @@
 ﻿using ChatLe.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ namespace Chatle.test
 		{
 			var services = new ServiceCollection();
 			services.AddMvc();
-			services.AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase());
+			services.AddDbContext<ChatLeIdentityDbContext>(options => options.UseInMemoryDatabase("test"));
 			services.AddTransient<ILoggerFactory, LoggerFactory>();
 			services.AddIdentity<ChatLeUser, IdentityRole>();
 			services.AddChatLe();
