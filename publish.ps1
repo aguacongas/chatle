@@ -23,6 +23,7 @@ if (!($env:Path.Split(';') -icontains $dotnetLocalInstallFolder))
 
 cd .\src\chatle.angular
 
+exec npm i
 exec npm run publish
 
 cd $PSScriptRoot
