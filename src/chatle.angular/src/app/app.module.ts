@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { SignalrModule, HubSettings } from 'angular-signalr-client';
+import { SignalrModule, HubSettings } from './shared/signalr-client';
 
 import { AppComponent } from './app.component';
 import { ContactComponent } from './contacts/contact.component';

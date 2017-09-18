@@ -2,7 +2,7 @@ import { Injector } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpModule, Http, XHRBackend } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
-import { SignalrModule, SignalrService } from 'angular-signalr-client';
+import { SignalrModule, SignalrService } from './signalr-client';
 
 import { ChatService, ConnectionState } from './chat.service';
 
