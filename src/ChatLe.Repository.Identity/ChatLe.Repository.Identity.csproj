@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Description>ChatLe repository implementation for Identity framework</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository.Identity</AssemblyName>
     <PackageId>ChatLe.Repository.Identity</PackageId>

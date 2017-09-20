@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <VersionPrefix>1.1.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <!--<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp1.1</TargetFrameworks>-->
     <AssemblyName>ChatLe.Repository.Test</AssemblyName>
     <PackageId>ChatLe.Repository.Test</PackageId>

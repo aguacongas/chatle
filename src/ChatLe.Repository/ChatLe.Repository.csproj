@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Description>ChatLe repository</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository</AssemblyName>
     <PackageId>ChatLe.Repository</PackageId>
