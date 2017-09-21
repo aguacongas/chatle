@@ -52,6 +52,7 @@ namespace ChatLe
 
             _environment = env;
             LoggerFactory = loggerFactory;
+            loggerFactory.AddAzureWebAppDiagnostics();
 
             loggerFactory.AddConsole();
         }
@@ -73,30 +74,48 @@ namespace ChatLe
 
             services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]));
 
-            services
-                .AddAuthentication()
-                .AddFacebook(facebookOptions =>
+            var authServices = services.AddAuthentication();
+            if (Configuration["Authentication:Facebook:AppId"] != null)
+            { 
+                authServices.AddFacebook(facebookOptions =>
                 {
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                     facebookOptions.SaveTokens = true;
-                }).AddTwitter(twitterOptions =>
+                });
+            }
+
+            if (Configuration["Authentication:Twitter:ConsumerKey"] != null)
+            {
+                authServices.AddTwitter(twitterOptions =>
                 {
                     twitterOptions.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
                     twitterOptions.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
                     twitterOptions.SaveTokens = true;
 
-                }).AddGoogle(googleOption =>
+                });
+            }
+            if (Configuration["Authentication:Google:ClientId"] != null)
+            {
+                authServices.AddGoogle(googleOption =>
                 {
                     googleOption.ClientId = Configuration["Authentication:Google:ClientId"];
                     googleOption.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
                     googleOption.SaveTokens = true;
-                }).AddMicrosoftAccount(microsoftAccountOptions =>
+                });
+            }
+            if (Configuration["Authentication:MicrosoftAccount:ClientId"] != null)
+            {
+                authServices.AddMicrosoftAccount(microsoftAccountOptions =>
                 {
                     microsoftAccountOptions.ClientId = Configuration["Authentication:MicrosoftAccount:ClientId"];
                     microsoftAccountOptions.ClientSecret = Configuration["Authentication:MicrosoftAccount:ClientSecret"];
                     microsoftAccountOptions.SaveTokens = true;
-                }).AddOAuth("Github", options =>
+                });
+            }
+            if (Configuration["Authentication:Github:ClientId"] != null)
+            {
+                authServices.AddOAuth("Github", options =>
                 {
                     options.ClientId = Configuration["Authentication:Github:ClientId"];
                     options.ClientSecret = Configuration["Authentication:Github:ClientSecret"];
@@ -163,6 +182,7 @@ namespace ChatLe
                         }
                     };
                 });
+            }
         }
 
         private void ConfigureEntity(IServiceCollection services)

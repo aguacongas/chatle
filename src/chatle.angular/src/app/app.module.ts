@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { SignalrModule, HubSettings } from './shared/signalr-client';
 
+import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { ContactComponent } from './contacts/contact.component';
 import { ContactsComponent } from './contacts/contacts.component';
@@ -13,7 +14,7 @@ import { ConversationsComponent } from './conversations/conversations.component'
 import { Settings } from './shared/settings';
 
 const hubSettings = {
-  url: 'http://localhost:5000/chat'
+  url: environment.production ?  '/chat' : 'http://localhost:5000/chat'
 };
 
 @NgModule({
