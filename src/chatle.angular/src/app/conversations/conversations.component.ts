@@ -27,13 +27,6 @@ export class ConversationsComponent implements OnInit {
         this.service.joinConversation
             .subscribe(
                 conversation => {
-                    let title = '';
-                    conversation.attendees.forEach(attendee => {
-                        if (attendee && attendee.userId && attendee.userId !== this.settings.userName) {
-                            title += attendee.userId + ' ';
-                        }
-                    });
-                    conversation.title = title.trim();
                     this.conversations.unshift(conversation);
                 },
                 error => this.error = error);

@@ -9,7 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "publish": "ng build --aot --output-path ../chatle/wwwroot/lib --environment prod"
+    "publish": "ng build --aot --output-path ../chatle/wwwroot/lib --environment prod",
+    "dev": "ng build --output-path ../chatle/wwwroot/lib --watch"
   },
   "private": true,
   "dependencies": {

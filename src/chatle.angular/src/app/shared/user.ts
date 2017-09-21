@@ -5,3 +5,4 @@ export class User {
     name: string;
     conversation: Conversation;
 }
+

@@ -133,12 +133,24 @@ export class ChatService {
                 response => {
                     const data = response.json();
                     if (data) {
-                        subject.next(data as Conversation[]);
+                        const conversations = data as Conversation[];
+                        conversations.forEach(value => this.setConversationTitle(value));
+                        subject.next(conversations);
                     }
                 },
                 error => subject.error(error));
 
         return subject.asObservable();
+    }
+
+    private setConversationTitle(conversation: Conversation) {
+      let title = '';
+      conversation.attendees.forEach(attendee => {
+          if (attendee && attendee.userId && attendee.userId !== this.settings.userName) {
+              title += attendee.userId + ' ';
+          }
+      });
+      conversation.title = title.trim();
     }
 
     private setConnectionState(connectionState: ConnectionState) {
@@ -176,6 +188,7 @@ export class ChatService {
     }
 
     private onJoinConversation(conversation: Conversation) {
+      this.setConversationTitle(conversation);
         this.joinConversationSubject.next(conversation);
     }
 }

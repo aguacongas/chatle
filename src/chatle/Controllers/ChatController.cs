@@ -104,7 +104,7 @@ namespace ChatLe.Controllers
                         if (user == null)
                             continue;
                     }
-                    messagesVM.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
+                    messagesVM.Add(new MessageViewModel() { ConversationId = conv.Id, Date = message.Date, From = user.UserName, Text = message.Text });
                 }
 
                 conversationsVM.Add(new ConversationViewModel() { Id = conv.Id, Attendees = attendeesVM, Messages = messagesVM });
