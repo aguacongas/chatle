@@ -100,6 +100,7 @@ export class ChatService {
                 .subscribe(
                     response => {
                         conversation.id = response.text();
+                        this.setConversationTitle(conversation);
                         this.joinConversationSubject.next(conversation);
                         messageSubject.next(m);
                     },
