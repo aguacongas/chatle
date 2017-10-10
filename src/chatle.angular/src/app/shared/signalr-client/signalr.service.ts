@@ -52,10 +52,10 @@ export class SignalrService {
     this.serverMethods.forEach(callback => {
       this.connection.on(callback.methodName, callback.method);
     });
-    this.connection.onClosed = e => {
+    this.connection.onclose(e => {
       this.isConnected = false;
       this.connectionCloseSubject.next(e);
-    };
+    });
 
     return Observable.fromPromise(this.connection.start())
       .map(() => {
