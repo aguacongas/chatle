@@ -113,7 +113,7 @@ namespace ChatLe.Repository.Test
 
         [Theory,
             InlineData("1","2")
-            ,InlineData("1", "2")]
+            ,InlineData("2", "1")]
         public async Task GetOrCreateConversationAsyncTest(string userId1, string userId2)
         {
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();

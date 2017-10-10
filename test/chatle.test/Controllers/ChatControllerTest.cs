@@ -146,7 +146,7 @@ namespace chatle.test.Controllers
                 var result = await controller.Get();
                 Assert.NotNull(result);
                 Assert.NotEmpty(result);
-                Assert.Equal(1, result.Count());
+                Assert.Single(result);
                 var conversation = result.First();
                 Assert.NotNull(conversation.Messages);
                 Assert.NotEmpty(conversation.Messages);
@@ -225,7 +225,7 @@ namespace chatle.test.Controllers
                 var result = await controller.Get();
                 Assert.NotNull(result);
                 Assert.NotEmpty(result);
-                Assert.Equal(1, result.Count());
+                Assert.Single(result);
                 var conversation = result.First();
                 Assert.NotNull(conversation.Messages);
                 Assert.Empty(conversation.Messages);
