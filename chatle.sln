@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		run.cmd = run.cmd
 		run.ps1 = run.ps1
+		run.sh = run.sh
 		version.props = version.props
 	EndProjectSection
 	ProjectSection(FolderGlobals) = preProject
@@ -54,26 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{8B992375
 		build\common.props = build\common.props
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "chatle.angular", "src\chatle.angular\", "{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_50466"
-		Debug.AspNetCompiler.PhysicalPath = "src\chatle.angular\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50466\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_50466"
-		Release.AspNetCompiler.PhysicalPath = "src\chatle.angular\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50466\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "50466"
-		SlnRelativePath = "src\chatle.angular\"
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "chatle.angular", "src\chatle.angular\chatle.angular.csproj", "{1D65E280-7675-4150-9833-4EE0F3BCA3FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,18 +163,18 @@ Global
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B}.Verbose|Any CPU.ActiveCfg = Debug|Any CPU
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B}.Verbose|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.k10|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.k10|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Log Output|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Log Output|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.net45|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.net45|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Verbose|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2}.Verbose|Any CPU.Build.0 = Debug|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.k10|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.k10|Any CPU.Build.0 = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Log Output|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Log Output|Any CPU.Build.0 = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.net45|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.net45|Any CPU.Build.0 = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Verbose|Any CPU.ActiveCfg = Release|Any CPU
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Verbose|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -206,7 +188,7 @@ Global
 		{6E97ADF2-44D2-4905-85D5-936AC92EBBA1} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
 		{22573857-8F40-4DE3-8277-F6E05151B61F} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
-		{0E0D26CF-C9DB-446E-AF26-47E290C2F6B2} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
+		{1D65E280-7675-4150-9833-4EE0F3BCA3FA} = {9BDC16D7-7C2E-4387-82D9-0043C630D5FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64ED5504-EFB7-4D9D-AA6F-252C90D283B9}
