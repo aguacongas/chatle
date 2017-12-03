@@ -31,3 +31,13 @@ cd $PSScriptRoot
 dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:Version=$env:GitVersion_NuGetVersion -p:OutputPath=..\..\artifacts\chatle
 
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
+
+gci -Path src -rec `
+| ? { $_.Name -like "*.csproj" `
+     } `
+| % { 
+    dotnet msbuild $_.FullName -t:Build -p:Configuration=Release -p:Version=$env:GitVersion_NuGetVersion -p:OutputPath=..\..\artifacts\build -p:GeneratePackageOnBuild=true
+    if ($LASTEXITCODE -ne 0) {
+            throw "build failed" + $d.FullName
+    }
+  }
