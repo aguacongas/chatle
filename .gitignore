@@ -33,3 +33,6 @@ npm-shrinkwrap.json
 *.ngfactory.ts
 typings
 config.development.json
+/test
+/TestResults
+/build
