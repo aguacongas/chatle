@@ -33,10 +33,10 @@ dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:Version=$env:
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
 
 gci -Path src -rec `
-| ? { $_.Name -like "*.csproj" `
+| ? { $_.Name -like "*.csproj" -and $_.Name -ne "chatle.angular.csproj" `
      } `
 | % { 
-    dotnet msbuild $_.FullName -t:Build -p:Configuration=Release -p:Version=$env:GitVersion_NuGetVersion -p:OutputPath=..\..\artifacts\build -p:GeneratePackageOnBuild=true
+    dotnet msbuild $_.FullName -t:Build -p:Configuration=Release -p:OutputPath=..\..\artifacts\build -p:GeneratePackageOnBuild=true
     if ($LASTEXITCODE -ne 0) {
             throw "build failed" + $d.FullName
     }
