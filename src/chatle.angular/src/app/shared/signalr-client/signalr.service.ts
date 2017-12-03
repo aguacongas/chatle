@@ -1,6 +1,9 @@
 import { Injectable, Inject, InjectionToken } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr-client';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/map';
 
 /**
  * Hub connection factory type

@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { SignalrModule, HubSettings } from './shared/signalr-client';
 
 import { environment } from '../environments/environment';
@@ -19,7 +19,7 @@ const hubSettings = {
 };
 
 @NgModule({
-  imports: [ BrowserModule, FormsModule, HttpModule, SignalrModule ],
+  imports: [ BrowserModule, FormsModule, HttpClientModule, SignalrModule ],
   declarations: [
     AppComponent,
     ContactComponent,
