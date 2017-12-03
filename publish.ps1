@@ -28,6 +28,6 @@ exec npm run publish
 
 cd $PSScriptRoot
 
-dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:Version=$env.GitVersion.NuGetVersion -o ..\..\artifacts\chatle
+dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:Version=$env.GitVersion.NuGetVersion -p:OutputPath=..\..\artifacts\chatle
 
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
