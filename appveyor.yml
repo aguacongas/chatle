@@ -21,8 +21,8 @@ artifacts:
   name: Website
 deploy:
 - provider: NuGet
-      api_key:
-        secure: 23wPDdRicGt2vZuJ8vd9TRBKmqjHkx5WjzZmKvyxd5j0fNPedjUScRTj/rT0ObJa
+  api_key:
+    secure: 23wPDdRicGt2vZuJ8vd9TRBKmqjHkx5WjzZmKvyxd5j0fNPedjUScRTj/rT0ObJa
   on:
     branch: 
         - master
