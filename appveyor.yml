@@ -21,10 +21,8 @@ artifacts:
   name: Website
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/chatle/api/v2/package
   api_key:
-    secure: 8/9mgBd8wf7Q79WKp7wGgkEUDCLky31xyCOSlbkvb8JPcqm6SRuBvphxevUkVbLE
-  symbol_server: https://www.myget.org/F/chatle/api/v2/package
+    secure: 23wPDdRicGt2vZuJ8vd9TRBKmqjHkx5WjzZmKvyxd5j0fNPedjUScRTj/rT0ObJa
   on:
     branch: 
         - master
