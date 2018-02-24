@@ -211,9 +211,9 @@ namespace ChatLe.Repository.Identity.Firebase
                     }
                 }
             };
-            indexes[NotificationConnectionsTableName] = new FirebaseIndex
+            indexes[NotificationConnectionsTableName] = new FirebaseIndexes
             {
-                On = "ConnectionDate"
+                On = new string[] { "ConnectionDate", "UserId" }
             };
 
             _client.PutAsync(RulePath, rules).GetAwaiter().GetResult();
@@ -222,9 +222,10 @@ namespace ChatLe.Repository.Identity.Firebase
         public virtual async Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken)) 
             => (await GetLoginStore().GetLoginsAsync(user, cancellationToken)).Any();
        
-        public virtual Task<bool> UserHasConnectionAsync(TUser user)
+        public async virtual Task<bool> UserHasConnectionAsync(TUser user)
         {
-            throw new NotImplementedException();
+            var result = await _client.GetAsync<Dictionary<string, TNotificationConnection>>(GetFirebasePath(NotificationConnectionsTableName), default(CancellationToken), false, $"orderBy=\"UserId\"&equalTo=\"{user.Id}\"");
+            return result.Data != null && result.Data.Count > 0;
         }
 
         protected virtual IUserLoginStore<TUser> GetLoginStore()
@@ -232,7 +233,7 @@ namespace ChatLe.Repository.Identity.Firebase
 
         private string GetFirebasePath(params string[] segments)
         {
-            throw new NotImplementedException();
+            return string.Join("/", segments);
         }
     }
 }
