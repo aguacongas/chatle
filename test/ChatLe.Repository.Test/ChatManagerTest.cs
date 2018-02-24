@@ -96,9 +96,9 @@ namespace ChatLe.Repository.Test
             storeMock.Setup(s => s.GetNotificationConnectionAsync("test", "test", CancellationToken.None)).ReturnsAsync(new NotificationConnection() { UserId = "test" });
 			Assert.Null(await manager.RemoveConnectionIdAsync("test", "test", false));
             storeMock.Setup(s => s.FindUserByIdAsync("test", CancellationToken.None)).ReturnsAsync(new UserTest());
-			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(true);
+			storeMock.Setup(s => s.UserHasConnectionAsync(It.IsAny<UserTest>())).ReturnsAsync(true);
 			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test", true));
-			storeMock.Setup(s => s.UserHasConnectionAsync("test")).ReturnsAsync(false);
+			storeMock.Setup(s => s.UserHasConnectionAsync(It.IsAny<UserTest>())).ReturnsAsync(false);
 			Assert.NotNull(await manager.RemoveConnectionIdAsync("test", "test", true));
         }
 
@@ -179,7 +179,7 @@ namespace ChatLe.Repository.Test
             var storeMock = new Mock<IChatStore<string, UserTest, Conversation, Attendee, Message, NotificationConnection>>();
             var manager = new ChatManager<string, UserTest, Conversation, Attendee, Message, NotificationConnection>(storeMock.Object, new OptionsAccessor());
             storeMock.Setup(s => s.FindUserByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new UserTest() { Id = "test" });
-            storeMock.Setup(s => s.GetConversationsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Conversation>()
+            storeMock.Setup(s => s.GetConversationsAsync(It.IsAny<UserTest>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<Conversation>()
             {
                 new Conversation()
                 {

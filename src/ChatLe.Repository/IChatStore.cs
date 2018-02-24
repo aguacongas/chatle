@@ -71,15 +71,6 @@ namespace ChatLe.Models
         Task<TConversation> GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
-        /// Gets a conversation for 2 attendees
-        /// </summary>
-        /// <param name="attendee1">the 1st attendee</param>
-        /// <param name="attendee2">the 2dn attendee</param>
-        /// <param name="cancellationToken">an optional cancellation token</param>
-        /// <returns>a <see cref="Task{TConversation}"/></returns>
-        Task UpdateUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
-        
-        /// <summary>
         /// Gets a conversation by her id
         /// </summary>
         /// <param name="convId">the conversation id</param>
@@ -116,9 +107,9 @@ namespace ChatLe.Models
         /// <summary>
         /// Check if a user has connection
         /// </summary>
-        /// <param name="userId">the <see cref="TKey"/> user id</param>
+        /// <param name="user">the user</param>
         /// <returns>true if user has connection</returns>
-        Task<bool> UserHasConnectionAsync(TKey userId);
+        Task<bool> UserHasConnectionAsync(TUser user);
 
         /// <summary>
         /// Create a notification connection on the database
@@ -151,19 +142,19 @@ namespace ChatLe.Models
         void Init();
         
         /// <summary>
-        /// Gets conversations for a user id
+        /// Gets conversations for a user
         /// </summary>
-        /// <param name="userId">the user id</param>
+        /// <param name="user">the user</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{IEnumerable{TConversation}}"/></returns>
-        Task<IEnumerable<TConversation>> GetConversationsAsync(TKey userId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TConversation>> GetConversationsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets a flag indicating if the user is guess
         /// </summary>
-        /// <param name="userId">the user id</param>
+        /// <param name="user">the user</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>true if the user is guess, otherwise false</returns>
-        Task<bool> IsGuess(TKey userId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

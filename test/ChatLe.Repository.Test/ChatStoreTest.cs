@@ -161,32 +161,6 @@ namespace ChatLe.Repository.Test
         }
 
         [Fact]
-        public async Task UpdateUserAsync_should_throw_ArgumentNullException()
-        {
-            await ExecuteTest(async (store) =>
-            {
-                await Assert.ThrowsAsync<ArgumentNullException>(() => store.UpdateUserAsync(null));
-            });
-        }
-
-        [Fact]
-        public async Task UpdateUserAsyncTest()
-        {
-            await ExecuteTest(async (store) =>
-            {
-                var user = new ChatLeUser()
-                {
-                    Id = "test",
-                    UserName = "test"
-                };
-                store.Context.Add(user);
-                await store.Context.SaveChangesAsync();
-
-                await store.UpdateUserAsync(user);
-            });
-        }
-
-        [Fact]
         public async Task GetUsersConnectedAsyncTest()
         {
             await ExecuteTest(async (store) =>
@@ -414,7 +388,10 @@ namespace ChatLe.Repository.Test
                 context.Messages.Add(message);
                 context.SaveChanges();
 
-                var convs = await store.GetConversationsAsync("test");
+                var convs = await store.GetConversationsAsync(new ChatLeUser
+                {
+                    Id = "test"
+                });
                 Assert.NotNull(convs);
                 Assert.True(convs.Count() == 1);
                 Assert.NotNull(convs.FirstOrDefault());
@@ -594,7 +571,10 @@ namespace ChatLe.Repository.Test
                     UserId = "test1"
                 });
 
-                Assert.False(await store.UserHasConnectionAsync("test"));
+                Assert.False(await store.UserHasConnectionAsync(new ChatLeUser
+                {
+                    Id = "test"
+                }));
             });
         }
 

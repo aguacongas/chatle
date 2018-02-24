@@ -36,3 +36,4 @@ config.development.json
 /test
 /TestResults
 /build
+/src/chatle.angular/package-lock.json

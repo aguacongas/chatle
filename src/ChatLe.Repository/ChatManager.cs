@@ -271,7 +271,7 @@ namespace ChatLe.Models
             if (user == null)
                 return null;
 
-            var conversations = await Store.GetConversationsAsync(user.Id, cancellationToken);
+            var conversations = await Store.GetConversationsAsync(user, cancellationToken);
             
             foreach (var conv in conversations)
             {
@@ -296,7 +296,7 @@ namespace ChatLe.Models
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            return await Store.IsGuess(user.Id, cancellationToken);
+            return await Store.IsGuess(user, cancellationToken);
         }
     }
 }
