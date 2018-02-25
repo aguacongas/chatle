@@ -39,3 +39,5 @@ config.development.json
 *.trx
 /test/privatekey.json
 /secure-file
+/JetBrains.dotCover.CommandLineTools
+*.snapshot

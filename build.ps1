@@ -1,3 +1,5 @@
+$result = 0
+$merge = ""
 gci -rec `
 | ? { $_.Name -like "*.IntegrationTests.csproj" `
        -Or $_.Name -like "*.IntegrationTest.csproj" `
@@ -5,8 +7,21 @@ gci -rec `
        -Or $_.Name -like "*.Tests.csproj" `
      } `
 | % { 
-    dotnet test $_.FullName -l trx`;logfilename=Test_Results.trx 
+    $testArgs = "test " + $_.FullName
+    Write-Host "testargs" $testArgs
+    Write-Host "coveragefile" $coveragefile
+    JetBrains.dotCover.CommandLineTools\tools\dotCover.exe cover /TargetExecutable="C:\Program Files\dotnet\dotnet.exe" /TargetArguments="$testArgs" /Filters="-:*.Test;-:xunit.*;-:MSBuild;-:Moq" /Output="$_.snapshot"
+    
     if ($LASTEXITCODE -ne 0) {
-            throw "test failed" + $d.FullName
+        $result = $LASTEXITCODE
     }
+
+    $merge = $merge + $_.Name + ".snapshot;"
   }
+
+  Write-Host "merge " $merge
+  JetBrains.dotCover.CommandLineTools\tools\dotCover.exe merge /Source="$merge" /Output="coverage\coverage.snapshot"
+  JetBrains.dotCover.CommandLineTools\tools\dotCover.exe report /Source="coverage\coverage.snapshot" /Output="coverage\docs\index.html" /ReportType="HTML"
+
+  exit $result
+  

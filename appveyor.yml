@@ -25,6 +25,17 @@ artifacts:
   name: Release
 - path: artifacts\chatle.zip
   name: Website
+on_success:
+  - git config --global credential.helper store
+  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - git config --global user.email "aguacongas@gmail.com"
+  - git config --global user.name "Aguacongas"
+  - git checkout master
+  - rmdir /S /Q docs\latest
+  - move coverage\docs docs\latest
+  - git add docs\latest
+  - git commit docs\latest -m "Appveyor build succed %APPVEYOR_BUILD_NUMBER%"
+  - git push
 deploy:
 - provider: NuGet
   api_key:
