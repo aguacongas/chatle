@@ -33,7 +33,9 @@ npm-shrinkwrap.json
 *.ngfactory.ts
 typings
 config.development.json
-/test
 /TestResults
 /build
 /src/chatle.angular/package-lock.json
+*.trx
+/test/privatekey.json
+/secure-file

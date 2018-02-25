@@ -27,7 +27,10 @@ exports.connectedUsersCount = functions.database
     .ref('/connections-count').onWrite(event => {
     if (!event.data.exists()) {
         const counterRef = event.data.ref;
-        const collectionRef = counterRef.parent;
+        const collectionRef = counterRef.parent.child('connections');
+        if (!collectionRef) {
+            return 0;
+        }
         // Return the promise from counterRef.set() so our function
         // waits for this async event to complete before it exits.
         return collectionRef.once('value')

@@ -3,10 +3,16 @@ install:
   - choco install gitversion.portable -pre -y
   - ps: Install-Product node 6.9.4
   - set path=%programfiles(x86)%\\Microsoft SDKs\TypeScript\2.2;%path%
+  - nuget install secure-file -ExcludeVersion
+  - secure-file\tools\secure-file -decrypt test\privatekey.json.enc -secret %decrypt_secret%
 init:
 - cmd: git config --global core.autocrlf true
 environment:
   ASPNETCORE_ENVIRONMENT: Staging
+  decrypt_secret:
+    secure: I4cwOQ4JlCkdD23TgTvRdkAKOm8AueV0TwqLWAd9lnY=
+  FirebaseOptions:DatabaseUrl:
+    secure: NgkUvSOeZv8qeLIX5tW1qdVJWOuGa1idsXrexYrHVEO4+PgORX4Qk0wkMJg2I6mp
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
   - ps: $env:BuildNumber=$env:APPVEYOR_BUILD_NUMBER

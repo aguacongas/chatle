@@ -12,7 +12,7 @@ namespace ChatLe.Repository.Identity.Firebase
 {
     public class FirebaseChatStore<TUser, TConversation, TAttendee, TMessage, TNotificationConnection> : IChatStore<string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection>
         where TUser : IdentityUser<string>, IChatUser<string>
-        where TConversation : Conversation<string>
+        where TConversation : Conversation<string>, new()
         where TAttendee : Attendee<string>
         where TMessage : Message<string>
         where TNotificationConnection : NotificationConnection<string>
@@ -58,7 +58,7 @@ namespace ChatLe.Repository.Identity.Firebase
         public virtual Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
         {
             connection = connection ?? throw new ArgumentNullException(nameof(connection));
-            return _client.PutAsync(GetFirebasePath(NotificationConnectionsTableName, connection.ConnectionId), cancellationToken);
+            return _client.PutAsync(GetFirebasePath(NotificationConnectionsTableName, connection.ConnectionId), connection, cancellationToken);
         }
 
         public virtual Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
@@ -85,30 +85,25 @@ namespace ChatLe.Repository.Identity.Firebase
             attendee1 = attendee1 ?? throw new ArgumentNullException(nameof(attendee1));
             attendee2 = attendee2 ?? throw new ArgumentNullException(nameof(attendee2));
 
-            var results = await Task.WhenAll(_client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), 
+            var startAt = attendee1.Id;
+            var endAt = attendee2.Id;
+            if (startAt.CompareTo(endAt) < 0)
+            {
+                startAt = attendee2.Id;
+                endAt = attendee1.Id;
+            }
+            var result = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), 
                 cancellationToken, 
                 false, 
-                $"orderBy=\"UserId\"&equalTo=\"{attendee1.Id}\""),
-                _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName),
-                cancellationToken,
-                false,
-                $"orderBy=\"UserId\"&equalTo=\"{attendee2.Id}\""));
+                $"orderBy=\"UserId\"&startAt=\"{startAt}\"&endAt=\"{endAt}\"");
 
-            var match = from id1 in results[0].Data.Values.Select(a => a.ConversationId)
-                        join id2 in results[1].Data.Values.Select(a => a.ConversationId)
-                            on id1 equals id2
-                        select id1;
+            var match = result.Data.Values.GroupBy(a => a.ConversationId);
 
-            foreach(var conversationId in match)
+            foreach(var conversation in match)
             {
-                var result = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName),
-                    cancellationToken,
-                    false,
-                    $"orderBy=\"ConverationId\"&equalTo=\"{conversationId}\"&shallow=true");
-
-                if (result.Data.Count == 2)
+                if (conversation.Count() == 2)
                 {
-                    return (await _client.GetAsync<TConversation>(GetFirebasePath(ConversationTableName, conversationId))).Data;
+                    return await GetConversationAsync(conversation.Key, cancellationToken);
                 }
             }
 
@@ -122,7 +117,14 @@ namespace ChatLe.Repository.Identity.Firebase
                 throw new ArgumentNullException(nameof(toConversationId));
             }
 
-            return (await _client.GetAsync<TConversation>(GetFirebasePath(ConversationTableName, toConversationId))).Data;
+            if ((await _client.GetAsync<object>(GetFirebasePath(ConversationTableName, toConversationId))).Data != null)
+            {
+                var c = new TConversation();
+                c.Id = toConversationId;
+                return c;
+            }
+
+            return null;
         }
 
         public async virtual Task<IEnumerable<TConversation>> GetConversationsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -134,15 +136,15 @@ namespace ChatLe.Repository.Identity.Firebase
                 false,
                 $"orderBy=\"UserId\"&equalTo=\"{user.Id}\"")).Data.Values.Select(a => a.ConversationId);
 
-            var taskList = new List<Task<FirebaseResponse<TConversation>>>(conversationIds.Count());
+            var taskList = new List<Task<TConversation>>(conversationIds.Count());
             foreach(var id in conversationIds)
             {
-                taskList.Add(_client.GetAsync<TConversation>(GetFirebasePath(ConversationTableName, id)));
+                taskList.Add(GetConversationAsync(id, cancellationToken));
             }
 
             var results = await Task.WhenAll(taskList);
 
-            return results.Select(r => r.Data);
+            return results.Where(c => c!= null).Select(c => c);
         }
 
         public async virtual Task<IEnumerable<TMessage>> GetMessagesAsync(string convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
@@ -174,15 +176,30 @@ namespace ChatLe.Repository.Identity.Firebase
 
         public async virtual Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await _client.GetAsync<int>(GetFirebasePath(UserCountTableName), cancellationToken, false, "orderBy=\"ConnectionDate\"");
-            var count = result.Data;
+            var countResult = await _client.GetAsync<int>(GetFirebasePath(UserCountTableName), cancellationToken);
+            var count = countResult.Data;
+
+            if (count == 0)
+            {
+                return new Page<TUser>(new List<TUser>(0), pageIndex, 0);
+            }
 
             var limitBottom = count - (pageIndex * pageLength);
-            var limitTop = limitBottom - pageIndex;
-            var userIds = (await _client.GetAsync<Dictionary<string, TNotificationConnection>>(GetFirebasePath(NotificationConnectionsTableName),
+
+            var result = (await _client.GetAsync<Dictionary<string, TNotificationConnection>>(GetFirebasePath(NotificationConnectionsTableName),
                 cancellationToken,
                 false,
-                $"orderBy=\"ConnectionDate\"&limitToFirst={limitTop}&limitToLast={limitBottom}")).Data.Values.OrderByDescending(n => n.ConnectionDate).Select(n => n.UserId);
+                $"orderBy=\"ConnectionDate\"&limitToLast={limitBottom}")).Data;
+
+            if (result == null)
+            {
+                return new Page<TUser>(new List<TUser>(0), pageIndex, 0);
+            }
+
+            var userIds = result.Values
+                .OrderByDescending(n => n.ConnectionDate)
+                .Take(pageLength)
+                .Select(n => n.UserId);
 
             var taskList = new List<Task<TUser>>(userIds.Count());
             foreach(var id in userIds)
@@ -224,6 +241,8 @@ namespace ChatLe.Repository.Identity.Firebase
        
         public async virtual Task<bool> UserHasConnectionAsync(TUser user)
         {
+            user = user ?? throw new ArgumentNullException(nameof(user));
+
             var result = await _client.GetAsync<Dictionary<string, TNotificationConnection>>(GetFirebasePath(NotificationConnectionsTableName), default(CancellationToken), false, $"orderBy=\"UserId\"&equalTo=\"{user.Id}\"");
             return result.Data != null && result.Data.Count > 0;
         }
@@ -231,7 +250,7 @@ namespace ChatLe.Repository.Identity.Firebase
         protected virtual IUserLoginStore<TUser> GetLoginStore()
             => _userStore is IUserLoginStore<TUser> ? _userStore as IUserLoginStore<TUser> : throw new InvalidOperationException("User store doesn't implement IUserLoginStore<TUser>");
 
-        private string GetFirebasePath(params string[] segments)
+        protected virtual string GetFirebasePath(params string[] segments)
         {
             return string.Join("/", segments);
         }
