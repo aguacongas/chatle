@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -77,11 +78,17 @@ namespace ChatLe.Repository.Firebase.Test
             await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test1", "test");
             await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
 
+            Thread.Sleep(500); // wait for connection count computed
+
             var result = await manager.GetUsersConnectedAsync();
+
+            Thread.Sleep(500); // wait for connection count computed
 
             Assert.Equal(2, result.Count());
 
             await manager.RemoveConnectionIdAsync("test2", "test", false);
+
+            Thread.Sleep(500); // wait for connection count computed
 
             result = await manager.GetUsersConnectedAsync();
 
