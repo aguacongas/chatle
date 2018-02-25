@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="FirebaseFunctions\**" />
+    <EmbeddedResource Remove="FirebaseFunctions\**" />
+    <None Remove="FirebaseFunctions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aguacongas.Firebase" Version="1.0.0" />
     <PackageReference Include="Aguacongas.Identity.Firebase" Version="1.0.0" />
   </ItemGroup>
