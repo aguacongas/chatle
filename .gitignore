@@ -42,3 +42,4 @@ config.development.json
 /JetBrains.dotCover.CommandLineTools
 *.snapshot
 /src/ChatLe.Repository.Identity.Firebase/FirebaseFunctions/functions/lib
+/coverage/docs
