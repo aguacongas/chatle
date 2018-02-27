@@ -20,7 +20,7 @@ environment:
   access_token:
     secure: FQHQqH6cYqJP4NJ+2KvrqCykj7h3t8IThRC0LY8/Lrs+FIAfRTi4Jam9tkike5KW
 before_build:
-  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - ps: gitversion /l console /output buildserver
   - ps: $env:BuildNumber=$env:APPVEYOR_BUILD_NUMBER
 build_script:
 - cmd: build.cmd
