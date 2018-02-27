@@ -1,9 +1,11 @@
+using Aguacongas.Firebase;
 using ChatLe.Models;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,32 +77,63 @@ namespace ChatLe.Repository.Firebase.Test
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
+            var client = provider.GetRequiredService<IFirebaseClient>();
+            await client.DeleteAsync("connections");
+
+            int? count;
+            do
+            {
+                count = (await client.GetAsync<int?>("connections-count")).Data;
+            }
+            while (!count.HasValue || count != 0);
+
             await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test1", "test");
             await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
 
-            Thread.Sleep(500); // wait for connection count computed
-
+            while((await client.GetAsync<int>("connections-count")).Data != 2);
             var result = await manager.GetUsersConnectedAsync();
-
-            Thread.Sleep(500); // wait for connection count computed
 
             Assert.Equal(2, result.Count());
 
             await manager.RemoveConnectionIdAsync("test2", "test", false);
-
-            Thread.Sleep(500); // wait for connection count computed
+            while ((await client.GetAsync<int>("connections-count")).Data != 1);
 
             result = await manager.GetUsersConnectedAsync();
 
             Assert.Single(result);
 
             await manager.RemoveConnectionIdAsync("test1", "test", false);
+            do
+            {
+                count = (await client.GetAsync<int?>("connections-count")).Data;
+            }
+            while (!count.HasValue || count != 0);
 
             result = await manager.GetUsersConnectedAsync();
 
             Assert.Empty(result);
         }
 
+        [Fact]
+        public async Task RemoveConnectionIdAsyncTest()
+        {
+            var provider = Initialize();
+            var sut = GetStore(provider);
+            sut.Init();
+            var manager = GetChatManager(provider);
+            var userManager = provider.GetRequiredService<UserManager<ChatLeUser>>();
+
+            var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName = "TEST1" };
+            var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
+
+            await userManager.CreateAsync(user1);
+            await userManager.CreateAsync(user2);
+
+            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test1", "test");
+            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
+
+            await manager.RemoveConnectionIdAsync("test2", "test", true);
+        }
 
         private IServiceProvider Initialize()
         {

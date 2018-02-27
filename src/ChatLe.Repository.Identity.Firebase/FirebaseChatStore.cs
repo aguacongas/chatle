@@ -67,11 +67,43 @@ namespace ChatLe.Repository.Identity.Firebase
             return _client.DeleteAsync(GetFirebasePath(NotificationConnectionsTableName, connection.ConnectionId), cancellationToken);
         }
 
-        public virtual Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public async virtual Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             user = user ?? throw new ArgumentNullException(nameof(user));
 
-            return _userStore.DeleteAsync(user, cancellationToken);
+            var conversations = await GetConversationsAsync(user, cancellationToken);
+            var taskList = new List<Task>();
+            foreach (var conversation in conversations)
+            {
+                taskList.Add(_client.DeleteAsync(GetFirebasePath(ConversationTableName, conversation.Id), cancellationToken));
+                taskList.Add(Task.Run(async () =>
+                {
+                    var attendees = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), cancellationToken, false, $"orderBy=\"ConversationId\"&equalTo=\"{conversation.Id}\"");
+                    var deleteAttendeeTasks = new List<Task>(attendees.Data.Count);
+                    foreach(var attendee in attendees.Data)
+                    {
+                        deleteAttendeeTasks.Add(_client.DeleteAsync(GetFirebasePath(AttendeeTableName, attendee.Key), cancellationToken));
+                    }
+
+                    await Task.WhenAll(deleteAttendeeTasks);
+                }));
+            }
+
+            taskList.Add(Task.Run(async () =>
+            {
+                var connections = await _client.GetAsync<Dictionary<string, TNotificationConnection>>(GetFirebasePath(NotificationConnectionsTableName), cancellationToken, false, $"orderBy=\"UserId\"&equalTo=\"{user.Id}\"");
+                var deleteConnectionTasks = new List<Task>(connections.Data.Count);
+                foreach (var connection in connections.Data)
+                {
+                    deleteConnectionTasks.Add(_client.DeleteAsync(GetFirebasePath(NotificationConnectionsTableName, connection.Key), cancellationToken));
+                }
+
+                await Task.WhenAll(deleteConnectionTasks);
+            }));
+
+           taskList.Add(_userStore.DeleteAsync(user, cancellationToken));
+
+            await Task.WhenAll(taskList);
         }
 
         public virtual Task<TUser> FindUserByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
@@ -85,25 +117,31 @@ namespace ChatLe.Repository.Identity.Firebase
             attendee1 = attendee1 ?? throw new ArgumentNullException(nameof(attendee1));
             attendee2 = attendee2 ?? throw new ArgumentNullException(nameof(attendee2));
 
-            var startAt = attendee1.Id;
-            var endAt = attendee2.Id;
-            if (startAt.CompareTo(endAt) < 0)
-            {
-                startAt = attendee2.Id;
-                endAt = attendee1.Id;
-            }
-            var result = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), 
-                cancellationToken, 
-                false, 
-                $"orderBy=\"UserId\"&startAt=\"{startAt}\"&endAt=\"{endAt}\"");
+            
+            var results = await Task.WhenAll(_client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), 
+                    cancellationToken, 
+                    false, 
+                    $"orderBy=\"UserId\"&equalTo=\"{attendee1.Id}\""),
+                _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName),
+                    cancellationToken,
+                    false,
+                    $"orderBy=\"UserId\"&equalTo=\"{attendee2.Id}\""));
 
-            var match = result.Data.Values.GroupBy(a => a.ConversationId);
+            var match = from id1 in results[0].Data.Values.Select(a => a.ConversationId)
+                        join id2 in results[1].Data.Values.Select(a => a.ConversationId)
+                            on id1 equals id2
+                        select id1;
 
-            foreach(var conversation in match)
+            foreach (var conversationId in match)
             {
-                if (conversation.Count() == 2)
+                var result = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName),
+                    cancellationToken,
+                    false,
+                    $"orderBy=\"ConversationId\"&equalTo=\"{conversationId}\"");
+
+                if (result.Data.Count == 2)
                 {
-                    return await GetConversationAsync(conversation.Key, cancellationToken);
+                    return await GetConversationAsync(conversationId);
                 }
             }
 
@@ -237,7 +275,7 @@ namespace ChatLe.Repository.Identity.Firebase
         }
 
         public virtual async Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken)) 
-            => (await GetLoginStore().GetLoginsAsync(user, cancellationToken)).Any();
+            => (await GetLoginStore().GetLoginsAsync(user, cancellationToken)).Any() == false;
        
         public async virtual Task<bool> UserHasConnectionAsync(TUser user)
         {

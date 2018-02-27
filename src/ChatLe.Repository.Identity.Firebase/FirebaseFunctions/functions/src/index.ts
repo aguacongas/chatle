@@ -7,7 +7,8 @@ export const countUsers = functions.database
     .ref('/connections/{connectionId}').onWrite(event => {
         const collectionRef = event.data.ref.parent;
         const countRef = collectionRef.parent.child('connections-count');
-      
+        const timeStamp = admin.database.ServerValue.TIMESTAMP * -1;
+                
         let increment;
         if (event.data.exists() && !event.data.previous.exists()) {
           increment = 1;
@@ -21,11 +22,11 @@ export const countUsers = functions.database
         // waits for this async event to complete before it exits.
         return countRef.transaction((current) => {
           return (current || 0) + increment;
-        }).then(value => console.log(`Counter updated. ${value}`));
-});
+        }).then(() => console.log(`Counter updated.`));
+  });
 
 export const connectedUsersCount = functions.database
-    .ref('/connections-count').onWrite(event => {
+    .ref('/connections-count').onDelete(event => {
         if (!event.data.exists()) {
             const counterRef = event.data.ref;
             const collectionRef = counterRef.parent.child('connections');
@@ -39,6 +40,8 @@ export const connectedUsersCount = functions.database
             return collectionRef.once('value')
               .then((messagesData) => counterRef.set(messagesData.numChildren()));
           }
-          return null;
+        return null;
 });
+
+
 
