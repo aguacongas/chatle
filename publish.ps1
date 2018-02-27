@@ -6,21 +6,6 @@ function exec($cmd) {
     & $cmd @args
 }
 
-cd $PSScriptRoot
-
-$dotnetLocalInstallFolder = $env:DOTNET_INSTALL_DIR
-if (!$dotnetLocalInstallFolder)
-{
-    $dotnetLocalInstallFolder = "$env:LOCALAPPDATA\Microsoft\dotnet\"
-}
-
-$newPath = "$dotnetLocalInstallFolder;$env:PATH"
-if (!($env:Path.Split(';') -icontains $dotnetLocalInstallFolder))
-{
-    Write-Host "Adding $dotnetLocalInstallFolder to PATH"
-    $env:Path = "$newPath"
-}
-
 cd .\src\chatle.angular
 
 exec npm i
@@ -28,7 +13,7 @@ exec npm run publish
 
 cd $PSScriptRoot
 
-dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:Version=$env:GitVersion_NuGetVersion -p:OutputPath=..\..\artifacts\chatle
+dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:OutputPath=..\..\artifacts\chatle -p:Version=$env:GitVersion_NuGetVersion -p:FileVersion=$env:GitVersion_AssemblySemVer -p:FileVersion=$env:GitVersion_AssemblySemVer
 
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
 
@@ -36,7 +21,7 @@ gci -Path src -rec `
 | ? { $_.Name -like "*.csproj" -and $_.Name -ne "chatle.angular.csproj" `
      } `
 | % { 
-    dotnet msbuild $_.FullName -t:Build -p:Configuration=Release -p:OutputPath=..\..\artifacts\build -p:GeneratePackageOnBuild=true
+    dotnet msbuild $_.FullName -t:Build -p:Configuration=Release -p:OutputPath=..\..\artifacts\build -p:GeneratePackageOnBuild=true -p:Version=$env:GitVersion_NuGetVersion -p:FileVersion=$env:GitVersion_AssemblySemVer -p:FileVersion=$env:GitVersion_AssemblySemVer
     if ($LASTEXITCODE -ne 0) {
             throw "build failed" + $d.FullName
     }
