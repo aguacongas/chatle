@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\test\chatle.test\Controllers\ChatControllerTest.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using Chatle.test.Controllers;
+using ChatLe.Controllers;
+using ChatLe.Hubs;
+using ChatLe.Models;
+using ChatLe.ViewModels;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
+
+namespace chatle.test.Controllers
+{
+    public class ChatControllerTest
+    {
+        internal static void ExecuteAction(Action&lt;ChatController
+            , Mock&lt;IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;
+            , Mock&lt;IHubContext&lt;ChatHub&gt;&gt;
+            , Mock&lt;UserManager&lt;ChatLeUser&gt;&gt;&gt; a)
+        {
+            var mockChatManager = new Mock&lt;IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;();
+            var mockHubContext = new Mock&lt;IHubContext&lt;ChatHub&gt;&gt;();
+            var userValidators = new List&lt;IUserValidator&lt;ChatLeUser&gt;&gt;();
+            var validator = new Mock&lt;IUserValidator&lt;ChatLeUser&gt;&gt;();
+            userValidators.Add(validator.Object);
+            var mockUserManager = MockUserManager(userValidators);
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
+            var controller = new ChatController(mockChatManager.Object, mockHubContext.Object, mockUserManager.Object) { ViewData = viewData };
+            using (controller)
+            {
+                a.Invoke(controller, mockChatManager, mockHubContext, mockUserManager);
+            }
+        }
+
+        private static Mock&lt;UserManager&lt;TUser&gt;&gt; MockUserManager&lt;TUser&gt;(List&lt;IUserValidator&lt;TUser&gt;&gt; userValidators) where TUser : class
+        {
+            var store = new Mock&lt;ITestUserStore&lt;TUser&gt;&gt;();
+            var options = new Mock&lt;IOptions&lt;IdentityOptions&gt;&gt;();
+            var idOptions = new IdentityOptions();
+            idOptions.Lockout.AllowedForNewUsers = false;
+            options.Setup(o =&gt; o.Value).Returns(idOptions);
+            var pwdValidators = new List&lt;PasswordValidator&lt;TUser&gt;&gt;();
+            pwdValidators.Add(new PasswordValidator&lt;TUser&gt;());
+
+            var services = new ServiceCollection();
+            services.AddEntityFrameworkInMemoryDatabase();
+
+            var userManager = new Mock&lt;UserManager&lt;TUser&gt;&gt;(store.Object, options.Object, new PasswordHasher&lt;TUser&gt;(),
+                userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
+                new IdentityErrorDescriber(), services.BuildServiceProvider(),
+                new Mock&lt;ILogger&lt;UserManager&lt;TUser&gt;&gt;&gt;().Object);
+
+            return userManager;
+        }
+
+
+        [Fact]
+        public void GetConversationTest()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                mockChatManager.Setup(c =&gt; c.GetMessagesAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new List&lt;Message&gt;()
+                        {
+                            new Message(),
+                            new Message()
+                        });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(new ChatLeUser());
+                var result = await controller.Get(&quot;test&quot;);
+                Assert.NotNull(result);
+                Assert.NotEmpty(result);
+                Assert.Equal(2, result.Count());
+                var message = result.First();
+                Assert.Null(message.From);
+                Assert.Null(message.Text);
+                Assert.Equal(DateTime.MinValue, message.Date);
+            });
+        }
+
+        [Fact]
+        public void GetConversationTest_WithNoUser()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                mockChatManager.Setup(c =&gt; c.GetMessagesAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new List&lt;Message&gt;()
+                        {
+                            new Message(),
+                            new Message()
+                        });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(() =&gt; null);
+                var result = await controller.Get(&quot;test&quot;);
+                Assert.NotNull(result);
+                Assert.Empty(result);
+            });
+        }
+
+        [Fact]
+        public void GetConversationsTest()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetConversationsAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new List&lt;Conversation&gt;()
+                        {
+                            new Conversation()
+                            {
+                                Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message() { UserId = &quot;test&quot; }
+                                },
+                                Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test&quot; }
+                                }
+                            }
+                        });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test&quot;)).ReturnsAsync(new ChatLeUser(&quot;test&quot;));
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test1&quot;)).ReturnsAsync(new ChatLeUser(&quot;test1&quot;));
+                var result = await controller.Get();
+                Assert.NotNull(result);
+                Assert.NotEmpty(result);
+                Assert.Single(result);
+                var conversation = result.First();
+                Assert.NotNull(conversation.Messages);
+                Assert.NotEmpty(conversation.Messages);
+            });
+        }
+
+        [Fact]
+        public void GetConversationsTest_WithNoUser()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetConversationsAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new List&lt;Conversation&gt;()
+                        {
+                            new Conversation()
+                            {
+                                Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message()
+                                },
+                                Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test2&quot; }
+                                }
+                            },
+                        });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(() =&gt; null);
+                var result = await controller.Get();
+                Assert.NotNull(result);
+                Assert.Empty(result);
+            });
+        }
+
+        [Fact]
+        public void GetConversationsTest_WithDisconnectedUser()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetConversationsAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new List&lt;Conversation&gt;()
+                        {
+                            new Conversation()
+                            {
+                                Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message() { UserId = &quot;test2&quot; }
+                                },
+                                Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test&quot; }
+                                }
+                            }
+                        });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test1&quot;)).ReturnsAsync(new ChatLeUser());
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test&quot;)).ReturnsAsync(new ChatLeUser());
+                var result = await controller.Get();
+                Assert.NotNull(result);
+                Assert.NotEmpty(result);
+                Assert.Single(result);
+                var conversation = result.First();
+                Assert.NotNull(conversation.Messages);
+                Assert.Empty(conversation.Messages);
+            });
+        }
+
+        [Fact]
+        public void SendMessageTest()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.AddMessageAsync(It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;Message&gt;()
+                        , It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new Conversation()
+                    {
+                        Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                        {
+                            new Attendee()
+                        }
+                    });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(new ChatLeUser());
+                var clientsMock = new Mock&lt;IHubClients&gt;();
+                clientsMock.Setup(c =&gt; c.Group(It.IsAny&lt;string&gt;())).Returns(new Mock&lt;IClientProxy&gt;().Object);
+                mockHubContext.SetupGet(h =&gt; h.Clients).Returns(clientsMock.Object);
+
+                var message = new MessageToSend
+                {
+                    To = &quot;test1&quot;,
+                    Text = &quot;test&quot;
+                };
+
+                await controller.SendMessage(message);
+            });
+        }
+
+        [Fact]
+        public void SendMessageTest_NoConversation()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.AddMessageAsync(It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;Message&gt;()
+                        , It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(() =&gt; null);
+
+                var message = new MessageToSend
+                {
+                    To = &quot;test1&quot;,
+                    Text = &quot;test&quot;
+                };
+
+                await controller.SendMessage(message);
+            });
+        }
+
+        [Fact]
+        public void CreateConversationTest()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetOrCreateConversationAsync(It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new Conversation()
+                    {
+                        Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message() { UserId = &quot;test2&quot; }
+                                },
+                        Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test&quot; }
+                                }
+                    });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(new ChatLeUser());
+                var clientsMock = new Mock&lt;IHubClients&gt;();
+                clientsMock.Setup(c =&gt; c.Group(It.IsAny&lt;string&gt;())).Returns(new Mock&lt;IClientProxy&gt;().Object);
+                mockHubContext.SetupGet(h =&gt; h.Clients).Returns(clientsMock.Object);
+
+                var message = new MessageToSend
+                {
+                    To = &quot;test1&quot;,
+                    Text = &quot;test&quot;
+                };
+
+                var result = await controller.CreateConversation(message);
+                Assert.NotNull(result);
+
+            });
+        }
+
+        [Fact]
+        public void CreateConversationTest_WithNoUser()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetOrCreateConversationAsync(It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new Conversation()
+                    {
+                        Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message() { UserId = &quot;test2&quot; }
+                                },
+                        Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test&quot; }
+                                }
+                    });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(It.IsAny&lt;string&gt;())).ReturnsAsync(() =&gt; null);
+
+                var message = new MessageToSend
+                {
+                    To = &quot;test1&quot;,
+                    Text = &quot;test&quot;
+                };
+
+                var result = await controller.CreateConversation(message);
+                Assert.Null(result);
+            });
+
+        }
+
+        [Fact]
+        public void CreateConversationTest_DisconnectedUser()
+        {
+            ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =&gt;
+            {
+                var mockHttpContext = new Mock&lt;HttpContext&gt;();
+                var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+                var mockIndentity = new Mock&lt;IIdentity&gt;();
+                mockIndentity.SetupGet(i =&gt; i.Name).Returns(&quot;test&quot;);
+                mockClaims.SetupGet(c =&gt; c.Identity).Returns(mockIndentity.Object);
+                mockHttpContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+                controller.ControllerContext.HttpContext = mockHttpContext.Object;
+
+                mockChatManager.Setup(c =&gt; c.GetOrCreateConversationAsync(It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;string&gt;()
+                        , It.IsAny&lt;CancellationToken&gt;()))
+                    .ReturnsAsync(new Conversation()
+                    {
+                        Messages = new List&lt;Message&lt;string&gt;&gt;()
+                                {
+                                    new Message() { UserId = &quot;test2&quot; }
+                                },
+                        Attendees = new List&lt;Attendee&lt;string&gt;&gt;()
+                                {
+                                    new Attendee() { UserId = &quot;test1&quot; },
+                                    new Attendee() { UserId = &quot;test&quot; }
+                                }
+                    });
+
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test&quot;)).ReturnsAsync(new ChatLeUser(&quot;test&quot;));
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test1&quot;)).ReturnsAsync(new ChatLeUser(&quot;test1&quot;));
+                mockUserManager.Setup(u =&gt; u.FindByIdAsync(&quot;test2&quot;)).ReturnsAsync(() =&gt; null);
+
+                var clientsMock = new Mock&lt;IHubClients&gt;();
+                clientsMock.Setup(c =&gt; c.Group(It.IsAny&lt;string&gt;())).Returns(new Mock&lt;IClientProxy&gt;().Object);
+                mockHubContext.SetupGet(h =&gt; h.Clients).Returns(clientsMock.Object);
+
+                var message = new MessageToSend
+                {
+                    To = &quot;test1&quot;,
+                    Text = &quot;test&quot;
+                };
+
+                var result = await controller.CreateConversation(message);
+                Assert.NotNull(result);
+            });
+
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[34,9,34,10,1],[35,13,35,137,1],[36,13,36,67,1],[37,13,37,73,1],[38,13,38,68,1],[39,13,39,50,1],[40,13,40,67,1],[41,13,41,113,1],[42,13,42,144,1],[43,13,43,31,1],[44,13,44,14,1],[45,17,45,88,1],[46,13,46,14,1],[47,9,47,10,1],[50,9,50,10,1],[51,13,51,59,1],[52,13,52,65,1],[53,13,53,51,1],[54,13,54,58,1],[55,13,55,60,1],[56,13,56,70,1],[57,13,57,63,1],[59,13,59,52,1],[60,13,60,59,1],[62,13,65,65,1],[67,13,67,32,1],[68,9,68,10,1],[73,9,73,10,1],[74,13,75,13,1],[75,13,75,14,1],[75,14,76,17,1],[76,17,81,28,1],[81,28,83,17,1],[83,17,83,112,1],[83,112,84,17,1],[84,17,84,59,1],[84,59,85,17,1],[85,17,85,40,1],[85,40,86,17,1],[86,17,86,41,1],[86,41,87,17,1],[87,17,87,49,1],[87,49,88,17,1],[88,17,88,46,1],[88,46,89,17,1],[89,17,89,43,1],[89,43,90,17,1],[90,17,90,43,1],[90,43,91,17,1],[91,17,91,63,1],[91,63,92,13,1],[92,13,92,14,1],[92,14,92,16,1],[74,13,92,16,1],[93,9,93,10,1],[97,9,97,10,1],[98,13,99,13,1],[99,13,99,14,1],[99,14,100,17,1],[100,17,105,28,1],[105,28,107,17,1],[107,17,107,100,1],[107,100,107,104,1],[107,104,107,106,1],[107,17,107,106,1],[107,106,108,17,1],[108,17,108,59,1],[108,59,109,17,1],[109,17,109,40,1],[109,40,110,17,1],[110,17,110,38,1],[110,38,111,13,1],[111,13,111,14,1],[111,14,111,16,1],[98,13,111,16,1],[112,9,112,10,1],[116,9,116,10,1],[117,13,118,13,1],[118,13,118,14,1],[118,14,119,17,1],[119,17,119,63,1],[119,63,120,17,1],[120,17,120,62,1],[120,62,121,17,1],[121,17,121,59,1],[121,59,122,17,1],[122,17,122,69,1],[122,69,123,17,1],[123,17,123,84,1],[123,84,124,17,1],[124,17,124,82,1],[124,82,125,17,1],[125,17,125,83,1],[125,83,127,17,1],[127,17,142,28,1],[142,28,144,17,1],[144,17,144,106,1],[144,106,145,17,1],[145,17,145,108,1],[145,108,146,17,1],[146,17,146,53,1],[146,53,147,17,1],[147,17,147,40,1],[147,40,148,17,1],[148,17,148,41,1],[148,41,149,17,1],[149,17,149,39,1],[149,39,150,17,1],[150,17,150,51,1],[150,51,151,17,1],[151,17,151,55,1],[151,55,152,17,1],[152,17,152,56,1],[152,56,153,13,1],[153,13,153,14,1],[153,14,153,16,1],[117,13,153,16,1],[154,9,154,10,1],[158,9,158,10,1],[159,13,160,13,1],[160,13,160,14,1],[160,14,161,17,1],[161,17,161,63,1],[161,63,162,17,1],[162,17,162,62,1],[162,62,163,17,1],[163,17,163,59,1],[163,59,164,17,1],[164,17,164,69,1],[164,69,165,17,1],[165,17,165,84,1],[165,84,166,17,1],[166,17,166,82,1],[166,82,167,17,1],[167,17,167,83,1],[167,83,169,17,1],[169,17,184,28,1],[184,28,186,17,1],[186,17,186,100,1],[186,100,186,104,1],[186,104,186,106,1],[186,17,186,106,1],[186,106,187,17,1],[187,17,187,53,1],[187,53,188,17,1],[188,17,188,40,1],[188,40,189,17,1],[189,17,189,38,1],[189,38,190,13,1],[190,13,190,14,1],[190,14,190,16,1],[159,13,190,16,1],[191,9,191,10,1],[195,9,195,10,1],[196,13,197,13,1],[197,13,197,14,1],[197,14,198,17,1],[198,17,198,63,1],[198,63,199,17,1],[199,17,199,62,1],[199,62,200,17,1],[200,17,200,59,1],[200,59,201,17,1],[201,17,201,69,1],[201,69,202,17,1],[202,17,202,84,1],[202,84,203,17,1],[203,17,203,82,1],[203,82,204,17,1],[204,17,204,83,1],[204,83,206,17,1],[206,17,221,28,1],[221,28,223,17,1],[223,17,223,101,1],[223,101,224,17,1],[224,17,224,100,1],[224,100,225,17,1],[225,17,225,53,1],[225,53,226,17,1],[226,17,226,40,1],[226,40,227,17,1],[227,17,227,41,1],[227,41,228,17,1],[228,17,228,39,1],[228,39,229,17,1],[229,17,229,51,1],[229,51,230,17,1],[230,17,230,55,1],[230,55,231,17,1],[231,17,231,53,1],[231,53,232,13,1],[232,13,232,14,1],[232,14,232,16,1],[196,13,232,16,1],[233,9,233,10,1],[237,9,237,10,1],[238,13,239,13,1],[239,13,239,14,1],[239,14,240,17,1],[240,17,240,63,1],[240,63,241,17,1],[241,17,241,62,1],[241,62,242,17,1],[242,17,242,59,1],[242,59,243,17,1],[243,17,243,69,1],[243,69,244,17,1],[244,17,244,84,1],[244,84,245,17,1],[245,17,245,82,1],[245,82,246,17,1],[246,17,246,83,1],[246,83,248,17,1],[248,17,258,24,1],[258,24,260,17,1],[260,17,260,112,1],[260,112,261,17,1],[261,17,261,59,1],[261,59,262,17,1],[262,17,262,110,1],[262,110,263,17,1],[263,17,263,85,1],[263,85,265,17,1],[265,17,269,19,1],[269,19,271,17,1],[271,17,271,55,1],[271,55,272,13,1],[272,13,272,14,1],[272,14,272,16,1],[238,13,272,16,1],[273,9,273,10,1],[277,9,277,10,1],[278,13,279,13,1],[279,13,279,14,1],[279,14,280,17,1],[280,17,280,63,1],[280,63,281,17,1],[281,17,281,62,1],[281,62,282,17,1],[282,17,282,59,1],[282,59,283,17,1],[283,17,283,69,1],[283,69,284,17,1],[284,17,284,84,1],[284,84,285,17,1],[285,17,285,82,1],[285,82,286,17,1],[286,17,286,83,1],[286,83,288,17,1],[288,17,292,41,1],[292,41,292,45,1],[292,45,292,47,1],[288,17,292,47,1],[292,47,294,17,1],[294,17,298,19,1],[298,19,300,17,1],[300,17,300,55,1],[300,55,301,13,1],[301,13,301,14,1],[301,14,301,16,1],[278,13,301,16,1],[302,9,302,10,1],[306,9,306,10,1],[307,13,308,13,1],[308,13,308,14,1],[308,14,309,17,1],[309,17,309,63,1],[309,63,310,17,1],[310,17,310,62,1],[310,62,311,17,1],[311,17,311,59,1],[311,59,312,17,1],[312,17,312,69,1],[312,69,313,17,1],[313,17,313,84,1],[313,84,314,17,1],[314,17,314,82,1],[314,82,315,17,1],[315,17,315,83,1],[315,83,317,17,1],[317,17,332,24,1],[332,24,334,17,1],[334,17,334,112,1],[334,112,335,17,1],[335,17,335,59,1],[335,59,336,17,1],[336,17,336,110,1],[336,110,337,17,1],[337,17,337,85,1],[337,85,339,17,1],[339,17,343,19,1],[343,19,345,17,1],[345,17,345,75,1],[345,75,346,17,1],[346,17,346,40,1],[346,40,348,13,1],[348,13,348,14,1],[348,14,348,16,1],[307,13,348,16,1],[349,9,349,10,1],[353,9,353,10,1],[354,13,355,13,1],[355,13,355,14,1],[355,14,356,17,1],[356,17,356,63,1],[356,63,357,17,1],[357,17,357,62,1],[357,62,358,17,1],[358,17,358,59,1],[358,59,359,17,1],[359,17,359,69,1],[359,69,360,17,1],[360,17,360,84,1],[360,84,361,17,1],[361,17,361,82,1],[361,82,362,17,1],[362,17,362,83,1],[362,83,364,17,1],[364,17,379,24,1],[379,24,381,17,1],[381,17,381,100,1],[381,100,381,104,1],[381,104,381,106,1],[381,17,381,106,1],[381,106,383,17,1],[383,17,387,19,1],[387,19,389,17,1],[389,17,389,75,1],[389,75,390,17,1],[390,17,390,37,1],[390,37,391,13,1],[391,13,391,14,1],[391,14,391,16,1],[354,13,391,16,1],[393,9,393,10,1],[397,9,397,10,1],[398,13,399,13,1],[399,13,399,14,1],[399,14,400,17,1],[400,17,400,63,1],[400,63,401,17,1],[401,17,401,62,1],[401,62,402,17,1],[402,17,402,59,1],[402,59,403,17,1],[403,17,403,69,1],[403,69,404,17,1],[404,17,404,84,1],[404,84,405,17,1],[405,17,405,82,1],[405,82,406,17,1],[406,17,406,83,1],[406,83,408,17,1],[408,17,423,24,1],[423,24,425,17,1],[425,17,425,106,1],[425,106,426,17,1],[426,17,426,108,1],[426,108,427,17,1],[427,17,427,89,1],[427,89,427,93,1],[427,93,427,95,1],[427,17,427,95,1],[427,95,429,17,1],[429,17,429,59,1],[429,59,430,17,1],[430,17,430,110,1],[430,110,431,17,1],[431,17,431,85,1],[431,85,433,17,1],[433,17,437,19,1],[437,19,439,17,1],[439,17,439,75,1],[439,75,440,17,1],[440,17,440,40,1],[440,40,441,13,1],[441,13,441,14,1],[441,14,441,16,1],[398,13,441,16,1],[443,9,443,10,1]]);
+    </script>
+  </body>
+</html>

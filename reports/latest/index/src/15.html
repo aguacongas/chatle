@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Hubs\ChatHub.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using ChatLe.Models;
+
+namespace ChatLe.Hubs
+{
+	/// &lt;summary&gt;
+	/// Chat Hub
+	/// &lt;/summary&gt;
+	public class ChatHub : Hub
+    {
+		readonly IServiceProvider _provider;
+		/// &lt;summary&gt;
+		/// The chat repository manager
+		/// &lt;/summary&gt;
+		public IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; Manager
+		{
+			get
+			{
+				return _provider.GetService(typeof(IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;)) as IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;;
+			}
+		}
+
+		/// &lt;summary&gt;
+		/// Logger
+		/// &lt;/summary&gt;
+		public ILogger Logger { get; private set; }
+
+		/// &lt;summary&gt;
+		/// Constructor
+		/// &lt;/summary&gt;
+		/// &lt;param name=&quot;manager&quot;&gt;The chat repository manager&lt;/param&gt;
+		/// &lt;param name=&quot;loggerFactory&quot;&gt;The logger factory&lt;/param&gt;
+		public ChatHub(IServiceProvider provider,
+			ILoggerFactory loggerFactory) : base()
+		{
+			if (provider == null)
+				throw new ArgumentNullException(&quot;provider&quot;);
+			if (loggerFactory == null)
+				throw new ArgumentNullException(&quot;loggerFactory&quot;);
+
+			Logger = loggerFactory.CreateLogger&lt;ChatHub&gt;();
+			Logger.LogInformation(&quot;constructor&quot;);
+			_provider = provider;
+		}
+		
+        /// &lt;summary&gt;
+		/// Called when the connection connects to this hub instance.
+		/// &lt;para&gt;Create a signalR group for the connected user with is name&lt;/para&gt;
+		/// &lt;/summary&gt;
+		/// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+		public override async Task OnConnectedAsync()
+		{
+			string name = Context.User.Identity.Name;
+			Logger.LogInformation(&quot;OnConnected &quot; + name);
+
+			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, &quot;signalR&quot;);
+			
+			await Groups.AddAsync(Context.ConnectionId, name);
+			await Clients.All.InvokeAsync(&quot;userConnected&quot;, new { id = name });
+			await base.OnConnectedAsync();
+		}
+		
+		/// &lt;summary&gt;
+		/// Called when a connection disconnects from this hub gracefully or due to a timeout.
+		/// &lt;para&gt;Remove the signalR group for the user&lt;/para&gt;
+		/// &lt;/summary&gt;
+		/// &lt;param name=&quot;stopCalled&quot;&gt;true, if stop was called on the client closing the connection gracefully; false,
+		/// &lt;para&gt;if the connection has been lost for longer than the Configuration.IConfigurationManager.DisconnectTimeout.&lt;/para&gt;
+		/// &lt;para&gt;Timeouts can be caused by clients reconnecting to another SignalR server in scaleout.&lt;/para&gt;
+		/// &lt;/param&gt;
+		/// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+		public override async Task OnDisconnectedAsync(Exception ex)
+		{
+            bool stopCalled = ex != null;
+
+            Logger.LogInformation(&quot;OnDisconnected stopCalled &quot; + stopCalled);
+			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, &quot;signalR&quot;, stopCalled);
+			if (user != null)
+				await Clients.All.InvokeAsync(&quot;userDisconnected&quot;, new { id = user.UserName, isRemoved = Manager.IsGuess(user) });
+			await base.OnDisconnectedAsync(ex);
+		}
+	}
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[21,4,21,5,1],[22,5,22,225,1],[23,4,23,5,1],[29,27,29,31,1],[29,32,29,44,1],[37,36,37,42,1],[38,3,38,4,1],[39,4,39,25,1],[40,5,40,49,0],[41,4,41,30,1],[42,5,42,54,0],[44,4,44,51,1],[45,4,45,41,1],[46,4,46,25,1],[47,3,47,4,1],[55,3,55,4,1],[56,4,56,45,1],[57,4,57,49,1],[59,4,59,78,1],[61,4,61,54,1],[62,4,62,70,1],[63,4,63,34,1],[64,3,64,4,1],[76,3,76,4,1],[77,13,77,42,1],[79,13,79,78,1],[80,4,80,98,1],[81,4,81,21,1],[82,5,82,118,1],[83,4,83,39,1],[84,3,84,4,1]]);
+    </script>
+  </body>
+</html>

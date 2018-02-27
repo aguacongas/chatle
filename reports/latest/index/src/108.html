@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity.Sqlite\Migrations\20160903200302_flag-attendees.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+namespace ChatLe.Repository.Identity.Sqlite.Migrations
+{
+    public partial class flagattendees : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn&lt;bool&gt;(
+                name: &quot;IsConnected&quot;,
+                table: &quot;Attendees&quot;,
+                nullable: false,
+                defaultValue: false);
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: &quot;IsConnected&quot;,
+                table: &quot;Attendees&quot;);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[10,9,10,10,0],[11,13,15,38,0],[16,9,16,10,0],[19,9,19,10,0],[20,13,22,37,0],[23,9,23,10,0]]);
+    </script>
+  </body>
+</html>

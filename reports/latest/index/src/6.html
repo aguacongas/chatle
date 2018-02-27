@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\test\chatle.test\TestUtils.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+
+namespace Chatle.test
+{
+	public class TestUtils
+	{
+		public static IServiceProvider GetServiceProvider()
+		{
+			var services = new ServiceCollection();
+			services.AddMvc();
+			services.AddDbContext&lt;ChatLeIdentityDbContext&gt;(options =&gt; options.UseInMemoryDatabase(&quot;test&quot;));
+			services.AddTransient&lt;ILoggerFactory, LoggerFactory&gt;();
+			services.AddIdentity&lt;ChatLeUser, IdentityRole&gt;();
+			services.AddChatLe();
+			return services.BuildServiceProvider();
+		}
+	}
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[14,3,14,4,0],[15,4,15,43,0],[16,4,16,22,0],[17,4,17,62,0],[17,62,17,97,0],[17,97,17,99,0],[17,4,17,99,0],[18,4,18,59,0],[19,4,19,53,0],[20,4,20,25,0],[21,4,21,43,0],[22,3,22,4,0]]);
+    </script>
+  </body>
+</html>

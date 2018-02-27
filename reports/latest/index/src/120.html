@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity.Firebase\BuilderExtensions.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using Aguacongas.Firebase;
+using ChatLe.Repository.Identity;
+using ChatLe.Repository.Identity.Firebase;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http;
+
+namespace ChatLe.Models
+{
+    public static class BuilderExtensions
+    {
+        public static IServiceCollection AddFirebaseChatStore&lt;TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;(this IServiceCollection services)
+            where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
+            where TConversation : Conversation&lt;string&gt;, new()
+            where TAttendee : Attendee&lt;string&gt;, new()
+            where TMessage : Message&lt;string&gt;, new()
+            where TNotificationConnection : NotificationConnection&lt;string&gt;, new()
+        {
+            services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, FirebaseChatStore&lt;TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;();
+
+            return services;
+        }
+    }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[21,9,21,10,1],[22,13,22,212,1],[24,13,24,29,1],[25,9,25,10,1]]);
+    </script>
+  </body>
+</html>

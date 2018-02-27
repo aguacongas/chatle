@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity.Firebase\FirebaseChatStore.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using Aguacongas.Firebase;
+using ChatLe.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ChatLe.Repository.Identity.Firebase
+{
+    public class FirebaseChatStore&lt;TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt; : IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;
+        where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
+        where TConversation : Conversation&lt;string&gt;, new()
+        where TAttendee : Attendee&lt;string&gt;
+        where TMessage : Message&lt;string&gt;
+        where TNotificationConnection : NotificationConnection&lt;string&gt;
+    {
+        private const string ConversationTableName = &quot;conversations&quot;;
+        private const string AttendeeTableName = &quot;attendees&quot;;
+        private const string MessageSubTableName = &quot;messages&quot;;
+        private const string NotificationConnectionsTableName = &quot;connections&quot;;
+        private const string UserCountTableName = &quot;connections-count&quot;;
+        private const string RulePath = &quot;.settings/rules.json&quot;;
+
+        private readonly IFirebaseClient _client;
+        private readonly IUserStore&lt;TUser&gt; _userStore;        
+
+        public FirebaseChatStore(IFirebaseClient client, IUserStore&lt;TUser&gt; userStore)
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _userStore = userStore ?? throw new ArgumentNullException(nameof(userStore));
+        }
+        public virtual Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            attendee = attendee ?? throw new ArgumentNullException(nameof(attendee));
+
+            return _client.PostAsync(GetFirebasePath(AttendeeTableName), attendee, cancellationToken);
+        }
+        
+        public virtual async Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            conversation = conversation ?? throw new ArgumentNullException(nameof(conversation));
+
+            var result = await _client.PostAsync(GetFirebasePath(ConversationTableName), conversation, cancellationToken);
+            conversation.Id = result.Data;
+        }
+
+        public virtual async Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            message = message ?? throw new ArgumentNullException(nameof(message));
+
+            var result = await _client.PostAsync(GetFirebasePath(ConversationTableName, message.ConversationId, MessageSubTableName), message, cancellationToken);
+            message.Id = result.Data;
+        }
+
+        public virtual Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            return _client.PutAsync(GetFirebasePath(NotificationConnectionsTableName, connection.ConnectionId), connection, cancellationToken);
+        }
+
+        public virtual Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            return _client.DeleteAsync(GetFirebasePath(NotificationConnectionsTableName, connection.ConnectionId), cancellationToken);
+        }
+
+        public async virtual Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            user = user ?? throw new ArgumentNullException(nameof(user));
+
+            var conversations = await GetConversationsAsync(user, cancellationToken);
+            var taskList = new List&lt;Task&gt;();
+            foreach (var conversation in conversations)
+            {
+                taskList.Add(_client.DeleteAsync(GetFirebasePath(ConversationTableName, conversation.Id), cancellationToken));
+                taskList.Add(Task.Run(async () =&gt;
+                {
+                    var attendees = await _client.GetAsync&lt;Dictionary&lt;string, TAttendee&gt;&gt;(GetFirebasePath(AttendeeTableName), cancellationToken, false, $&quot;orderBy=\&quot;ConversationId\&quot;&amp;equalTo=\&quot;{conversation.Id}\&quot;&quot;);
+                    var deleteAttendeeTasks = new List&lt;Task&gt;(attendees.Data.Count);
+                    foreach(var attendee in attendees.Data)
+                    {
+                        deleteAttendeeTasks.Add(_client.DeleteAsync(GetFirebasePath(AttendeeTableName, attendee.Key), cancellationToken));
+                    }
+
+                    await Task.WhenAll(deleteAttendeeTasks);
+                }));
+            }
+
+            taskList.Add(Task.Run(async () =&gt;
+            {
+                var connections = await _client.GetAsync&lt;Dictionary&lt;string, TNotificationConnection&gt;&gt;(GetFirebasePath(NotificationConnectionsTableName), cancellationToken, false, $&quot;orderBy=\&quot;UserId\&quot;&amp;equalTo=\&quot;{user.Id}\&quot;&quot;);
+                var deleteConnectionTasks = new List&lt;Task&gt;(connections.Data.Count);
+                foreach (var connection in connections.Data)
+                {
+                    deleteConnectionTasks.Add(_client.DeleteAsync(GetFirebasePath(NotificationConnectionsTableName, connection.Key), cancellationToken));
+                }
+
+                await Task.WhenAll(deleteConnectionTasks);
+            }));
+
+           taskList.Add(_userStore.DeleteAsync(user, cancellationToken));
+
+            await Task.WhenAll(taskList);
+        }
+
+        public virtual Task&lt;TUser&gt; FindUserByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
+            =&gt; GetLoginStore().FindByIdAsync(id, cancellationToken);
+
+        public virtual Task&lt;TUser&gt; FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
+            =&gt; GetLoginStore().FindByNameAsync(userName, cancellationToken);
+
+        public async virtual Task&lt;TConversation&gt; GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            attendee1 = attendee1 ?? throw new ArgumentNullException(nameof(attendee1));
+            attendee2 = attendee2 ?? throw new ArgumentNullException(nameof(attendee2));
+
+            
+            var results = await Task.WhenAll(_client.GetAsync&lt;Dictionary&lt;string, TAttendee&gt;&gt;(GetFirebasePath(AttendeeTableName), 
+                    cancellationToken, 
+                    false, 
+                    $&quot;orderBy=\&quot;UserId\&quot;&amp;equalTo=\&quot;{attendee1.Id}\&quot;&quot;),
+                _client.GetAsync&lt;Dictionary&lt;string, TAttendee&gt;&gt;(GetFirebasePath(AttendeeTableName),
+                    cancellationToken,
+                    false,
+                    $&quot;orderBy=\&quot;UserId\&quot;&amp;equalTo=\&quot;{attendee2.Id}\&quot;&quot;));
+
+            var match = from id1 in results[0].Data.Values.Select(a =&gt; a.ConversationId)
+                        join id2 in results[1].Data.Values.Select(a =&gt; a.ConversationId)
+                            on id1 equals id2
+                        select id1;
+
+            foreach (var conversationId in match)
+            {
+                var result = await _client.GetAsync&lt;Dictionary&lt;string, TAttendee&gt;&gt;(GetFirebasePath(AttendeeTableName),
+                    cancellationToken,
+                    false,
+                    $&quot;orderBy=\&quot;ConversationId\&quot;&amp;equalTo=\&quot;{conversationId}\&quot;&quot;);
+
+                if (result.Data.Count == 2)
+                {
+                    return await GetConversationAsync(conversationId);
+                }
+            }
+
+            return null;
+        }
+
+        public async virtual Task&lt;TConversation&gt; GetConversationAsync(string toConversationId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(toConversationId))
+            {
+                throw new ArgumentNullException(nameof(toConversationId));
+            }
+
+            if ((await _client.GetAsync&lt;object&gt;(GetFirebasePath(ConversationTableName, toConversationId))).Data != null)
+            {
+                var c = new TConversation();
+                c.Id = toConversationId;
+                return c;
+            }
+
+            return null;
+        }
+
+        public async virtual Task&lt;IEnumerable&lt;TConversation&gt;&gt; GetConversationsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            user = user ?? throw new ArgumentNullException(nameof(user));
+
+            var conversationIds = (await _client.GetAsync&lt;Dictionary&lt;string, TAttendee&gt;&gt;(GetFirebasePath(AttendeeTableName),
+                cancellationToken,
+                false,
+                $&quot;orderBy=\&quot;UserId\&quot;&amp;equalTo=\&quot;{user.Id}\&quot;&quot;)).Data.Values.Select(a =&gt; a.ConversationId);
+
+            var taskList = new List&lt;Task&lt;TConversation&gt;&gt;(conversationIds.Count());
+            foreach(var id in conversationIds)
+            {
+                taskList.Add(GetConversationAsync(id, cancellationToken));
+            }
+
+            var results = await Task.WhenAll(taskList);
+
+            return results.Where(c =&gt; c!= null).Select(c =&gt; c);
+        }
+
+        public async virtual Task&lt;IEnumerable&lt;TMessage&gt;&gt; GetMessagesAsync(string convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(convId))
+            {
+                throw new ArgumentNullException(nameof(convId));
+            }
+
+            return (await _client.GetAsync&lt;Dictionary&lt;string, TMessage&gt;&gt;(GetFirebasePath(AttendeeTableName),
+                cancellationToken,
+                false,
+                $&quot;orderBy=\&quot;Date\&quot;&amp;limitToLast=50&quot;)).Data.Values.OrderByDescending(m =&gt; m.Date);
+        }
+
+        public async virtual Task&lt;TNotificationConnection&gt; GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(connectionId))
+            {
+                throw new ArgumentNullException(nameof(connectionId));
+            }
+            if (string.IsNullOrEmpty(notificationType))
+            {
+                throw new ArgumentNullException(nameof(notificationType));
+            }
+
+            return (await _client.GetAsync&lt;TNotificationConnection&gt;(GetFirebasePath(NotificationConnectionsTableName, connectionId), cancellationToken)).Data;
+        }
+
+        public async virtual Task&lt;Page&lt;TUser&gt;&gt; GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var countResult = await _client.GetAsync&lt;int&gt;(GetFirebasePath(UserCountTableName), cancellationToken);
+            var count = countResult.Data;
+
+            if (count == 0)
+            {
+                return new Page&lt;TUser&gt;(new List&lt;TUser&gt;(0), pageIndex, 0);
+            }
+
+            var limitBottom = count - (pageIndex * pageLength);
+
+            var result = (await _client.GetAsync&lt;Dictionary&lt;string, TNotificationConnection&gt;&gt;(GetFirebasePath(NotificationConnectionsTableName),
+                cancellationToken,
+                false,
+                $&quot;orderBy=\&quot;ConnectionDate\&quot;&amp;limitToLast={limitBottom}&quot;)).Data;
+
+            if (result == null)
+            {
+                return new Page&lt;TUser&gt;(new List&lt;TUser&gt;(0), pageIndex, 0);
+            }
+
+            var userIds = result.Values
+                .OrderByDescending(n =&gt; n.ConnectionDate)
+                .Take(pageLength)
+                .Select(n =&gt; n.UserId);
+
+            var taskList = new List&lt;Task&lt;TUser&gt;&gt;(userIds.Count());
+            foreach(var id in userIds)
+            {
+                taskList.Add(_userStore.FindByIdAsync(id, cancellationToken));
+            }
+            var users = await Task.WhenAll(taskList);
+            return new Page&lt;TUser&gt;(users, pageIndex, count / pageLength);
+        }
+
+        public virtual void Init()
+        {
+            var response = _client.GetAsync&lt;FirebaseRules&gt;(RulePath).GetAwaiter().GetResult();
+            var rules = response.Data ?? new FirebaseRules();
+            var indexes = rules.Rules ?? new Dictionary&lt;string, object&gt;();
+            indexes[AttendeeTableName] = new FirebaseIndexes
+            {
+                On = new string[] { &quot;UserId&quot;, &quot;ConversationId&quot; }
+            };
+            indexes[ConversationTableName] = new Dictionary&lt;string, object&gt;{
+                {
+                    MessageSubTableName,
+                    new FirebaseIndex
+                    {
+                        On = &quot;Date&quot;
+                    }
+                }
+            };
+            indexes[NotificationConnectionsTableName] = new FirebaseIndexes
+            {
+                On = new string[] { &quot;ConnectionDate&quot;, &quot;UserId&quot; }
+            };
+
+            _client.PutAsync(RulePath, rules).GetAwaiter().GetResult();
+        }
+
+        public virtual async Task&lt;bool&gt; IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken)) 
+            =&gt; (await GetLoginStore().GetLoginsAsync(user, cancellationToken)).Any() == false;
+       
+        public async virtual Task&lt;bool&gt; UserHasConnectionAsync(TUser user)
+        {
+            user = user ?? throw new ArgumentNullException(nameof(user));
+
+            var result = await _client.GetAsync&lt;Dictionary&lt;string, TNotificationConnection&gt;&gt;(GetFirebasePath(NotificationConnectionsTableName), default(CancellationToken), false, $&quot;orderBy=\&quot;UserId\&quot;&amp;equalTo=\&quot;{user.Id}\&quot;&quot;);
+            return result.Data != null &amp;&amp; result.Data.Count &gt; 0;
+        }
+
+        protected virtual IUserLoginStore&lt;TUser&gt; GetLoginStore()
+            =&gt; _userStore is IUserLoginStore&lt;TUser&gt; ? _userStore as IUserLoginStore&lt;TUser&gt; : throw new InvalidOperationException(&quot;User store doesn&#39;t implement IUserLoginStore&lt;TUser&gt;&quot;);
+
+        protected virtual string GetFirebasePath(params string[] segments)
+        {
+            return string.Join(&quot;/&quot;, segments);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[30,9,30,86,1],[31,9,31,10,1],[32,13,32,81,1],[33,13,33,90,1],[34,9,34,10,1],[36,9,36,10,1],[37,13,37,86,1],[39,13,39,103,1],[40,9,40,10,1],[43,9,43,10,1],[44,13,44,98,1],[46,13,46,123,1],[47,13,47,43,1],[48,9,48,10,1],[51,9,51,10,1],[52,13,52,83,1],[54,13,54,163,1],[55,13,55,38,1],[56,9,56,10,1],[59,9,59,10,1],[60,13,60,92,1],[61,13,61,144,1],[62,9,62,10,1],[65,9,65,10,1],[66,13,66,92,1],[67,13,67,135,1],[68,9,68,10,1],[71,9,71,10,1],[72,13,72,74,1],[74,13,74,86,1],[75,13,75,45,1],[76,13,76,20,1],[76,22,76,38,0],[76,39,76,41,1],[76,42,76,55,1],[77,13,77,14,0],[78,17,78,127,0],[79,17,80,17,0],[80,17,80,18,0],[80,18,81,21,0],[81,21,81,214,0],[81,214,82,21,0],[82,21,82,84,0],[82,84,83,21,0],[83,21,83,28,0],[83,28,83,29,0],[83,29,83,41,0],[83,41,83,42,0],[83,42,83,44,0],[83,44,83,45,0],[83,45,83,59,0],[83,59,84,21,0],[84,21,84,22,0],[84,22,85,25,0],[85,25,85,139,0],[85,139,86,21,0],[86,21,86,22,0],[86,22,88,21,0],[88,21,88,61,0],[88,61,89,17,0],[89,17,89,18,0],[89,18,89,21,0],[79,17,89,21,0],[90,13,90,14,0],[92,13,93,13,1],[93,13,93,14,1],[93,14,94,17,1],[94,17,94,225,1],[94,225,95,17,1],[95,17,95,84,1],[95,84,96,17,1],[96,17,96,24,1],[96,24,96,26,1],[96,26,96,40,1],[96,40,96,41,1],[96,41,96,43,1],[96,43,96,44,1],[96,44,96,60,1],[96,60,97,17,1],[97,17,97,18,1],[97,18,98,21,1],[98,21,98,154,1],[98,154,99,17,1],[99,17,99,18,1],[99,18,101,17,1],[101,17,101,59,1],[101,59,102,13,1],[102,13,102,14,1],[102,14,102,17,1],[92,13,102,17,1],[104,12,104,74,1],[106,13,106,42,1],[107,9,107,10,1],[110,16,110,68,1],[113,16,113,76,1],[116,9,116,10,1],[117,13,117,89,1],[118,13,118,89,1],[121,13,128,72,1],[130,13,130,72,1],[130,72,130,88,1],[130,88,131,72,1],[131,72,131,88,1],[131,88,132,32,1],[132,32,132,35,1],[132,35,132,43,1],[132,43,132,46,1],[132,46,133,32,1],[133,32,133,35,1],[133,35,133,36,1],[130,13,133,36,1],[135,13,135,20,1],[135,22,135,40,1],[135,41,135,43,1],[135,44,135,49,1],[136,13,136,14,1],[137,17,140,81,1],[142,17,142,44,1],[143,17,143,18,1],[144,21,144,71,1],[146,13,146,14,0],[148,13,148,25,1],[149,9,149,10,1],[152,9,152,10,1],[153,13,153,56,1],[154,13,154,14,0],[155,17,155,75,0],[158,13,158,121,1],[159,13,159,14,1],[160,17,160,45,1],[161,17,161,41,1],[162,17,162,26,1],[165,13,165,25,0],[166,9,166,10,1],[169,9,169,10,1],[170,13,170,74,1],[172,13,175,87,1],[175,87,175,103,0],[175,103,175,105,1],[172,13,175,105,1],[177,13,177,83,1],[178,13,178,20,1],[178,21,178,27,0],[178,28,178,30,1],[178,31,178,46,1],[179,13,179,14,0],[180,17,180,75,0],[181,13,181,14,0],[183,13,183,56,1],[185,13,185,39,1],[185,39,185,47,0],[185,47,185,61,1],[185,61,185,62,0],[185,62,185,64,1],[185,13,185,64,1],[186,9,186,10,1],[189,9,189,10,1],[190,13,190,46,1],[191,13,191,14,1],[192,17,192,65,1],[195,13,198,89,0],[198,89,198,95,0],[198,95,198,97,0],[195,13,198,97,0],[199,9,199,10,0],[202,9,202,10,1],[203,13,203,52,1],[204,13,204,14,1],[205,17,205,71,1],[207,13,207,56,1],[208,13,208,14,1],[209,17,209,75,1],[212,13,212,159,1],[213,9,213,10,1],[216,9,216,10,1],[217,13,217,115,1],[218,13,218,42,1],[220,13,220,28,1],[221,13,221,14,1],[222,17,222,74,1],[225,13,225,64,1],[227,13,230,80,1],[232,13,232,32,1],[233,13,233,14,0],[234,17,234,74,0],[237,13,238,41,1],[238,41,238,57,1],[238,57,240,30,1],[240,30,240,38,1],[240,38,240,40,1],[237,13,240,40,1],[242,13,242,67,1],[243,13,243,20,1],[243,21,243,27,1],[243,28,243,30,1],[243,31,243,38,1],[244,13,244,14,1],[245,17,245,79,1],[246,13,246,14,1],[247,13,247,54,1],[248,13,248,74,1],[249,9,249,10,1],[252,9,252,10,1],[253,13,253,95,1],[254,13,254,62,1],[255,13,255,75,1],[256,13,259,15,1],[260,13,268,15,1],[269,13,272,15,1],[274,13,274,72,1],[275,9,275,10,1],[278,16,278,94,1],[281,9,281,10,1],[282,13,282,74,1],[284,13,284,225,0],[285,13,285,65,0],[286,9,286,10,0],[289,16,289,184,1],[292,9,292,10,1],[293,13,293,47,1],[294,9,294,10,1]]);
+    </script>
+  </body>
+</html>

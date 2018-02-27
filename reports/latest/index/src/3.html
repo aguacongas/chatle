@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\test\chatle.test\Hubs\ChatHubTest.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe.Hubs;
+using ChatLe.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Security.Claims;
+using System.Threading;
+using Xunit;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Chatle.test.Controllers;
+using System.Threading.Tasks.Channels;
+using Microsoft.AspNetCore.Sockets;
+using Microsoft.AspNetCore.SignalR.Internal.Protocol;
+
+namespace chatle.test.Hubs
+{
+    public class ChatHubTest
+    {
+		private static Mock&lt;UserManager&lt;TUser&gt;&gt; MockUserManager&lt;TUser&gt;(List&lt;IUserValidator&lt;TUser&gt;&gt; userValidators) where TUser : class
+		{
+			var store = new Mock&lt;ITestUserStore&lt;TUser&gt;&gt;();
+			var options = new Mock&lt;IOptions&lt;IdentityOptions&gt;&gt;();
+			var idOptions = new IdentityOptions();
+			idOptions.Lockout.AllowedForNewUsers = false;
+			options.Setup(o =&gt; o.Value).Returns(idOptions);
+			var pwdValidators = new List&lt;PasswordValidator&lt;TUser&gt;&gt;();
+			pwdValidators.Add(new PasswordValidator&lt;TUser&gt;());
+
+			var services = new ServiceCollection();
+			services.AddEntityFrameworkInMemoryDatabase();
+
+			var userManager = new Mock&lt;UserManager&lt;TUser&gt;&gt;(store.Object, options.Object, new PasswordHasher&lt;TUser&gt;(),
+				userValidators, pwdValidators, new UpperInvariantLookupNormalizer(),
+				new IdentityErrorDescriber(), services.BuildServiceProvider(),
+				new Mock&lt;ILogger&lt;UserManager&lt;TUser&gt;&gt;&gt;().Object);
+
+			return userManager;
+		}
+
+        internal static void ExecuteAction(Action&lt;ChatHub, Mock&lt;IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;, Mock&lt;HubConnectionContext&gt;&gt; a)
+		{
+			var mockChatManager = new Mock&lt;IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;();
+			var mockLoggerFactory = new Mock&lt;ILoggerFactory&gt;();
+			mockLoggerFactory.Setup(f =&gt; f.CreateLogger(It.IsAny&lt;string&gt;())).Returns(new Mock&lt;ILogger&gt;().Object);
+			
+			var userValidators = new List&lt;IUserValidator&lt;ChatLeUser&gt;&gt;();
+			var validator = new Mock&lt;IUserValidator&lt;ChatLeUser&gt;&gt;();
+			userValidators.Add(validator.Object);
+
+			var provideMock = new Mock&lt;IServiceProvider&gt;();
+			provideMock.Setup(p =&gt; p.GetService(It.IsAny&lt;Type&gt;()))
+				.Returns(mockChatManager.Object);
+            var mockWritableChannel = new Mock&lt;WritableChannel&lt;HubMessage&gt;&gt;();
+            var mockConnectionContext = new Mock&lt;ConnectionContext&gt;();
+            var hubConnectionContextMock = new Mock&lt;HubConnectionContext&gt;(mockWritableChannel.Object, mockConnectionContext.Object);
+            var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
+
+            using (hub)
+			{
+				hub.Context = new HubCallerContext(hubConnectionContextMock.Object);
+				a.Invoke(hub, mockChatManager, hubConnectionContextMock);
+			}
+		}
+
+		[Fact]
+		public void OnConnectedTest()
+		{
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =&gt;
+			{
+				var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+				var identity = new ClaimsIdentity(&quot;test&quot;);
+
+				mockClaims.SetupGet(c =&gt; c.Claims).Returns(identity.Claims);				
+				mockClaims.SetupGet(c =&gt; c.Identity).Returns(identity);
+				mockHubConnectionContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+
+				var mockGroups = new Mock&lt;IGroupManager&gt;();
+				hub.Groups = mockGroups.Object;
+
+                var mockClients = new Mock&lt;IHubClients&gt;();
+                var clientProxyMock = new Mock&lt;IClientProxy&gt;();
+                mockClients.SetupGet(c =&gt; c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
+
+                await hub.OnConnectedAsync();
+            });
+		}
+
+		[Fact]
+		public void OnGuessConnectedTest()
+		{
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =&gt;
+			{
+				var mockClaims = new Mock&lt;ClaimsPrincipal&gt;();
+				var identity = new ClaimsIdentity(&quot;test&quot;);
+				identity.AddClaim(new Claim(&quot;guess&quot;, &quot;true&quot;));
+
+				mockClaims.SetupGet(c =&gt; c.Claims).Returns(identity.Claims);				
+				mockClaims.SetupGet(c =&gt; c.Identity).Returns(identity);
+				mockHubConnectionContext.SetupGet(h =&gt; h.User).Returns(mockClaims.Object);
+
+				var mockGroups = new Mock&lt;IGroupManager&gt;();
+				hub.Groups = mockGroups.Object;
+				
+				var mockClients = new Mock&lt;IHubClients&gt;();
+                var clientProxyMock = new Mock&lt;IClientProxy&gt;();
+                mockClients.SetupGet(c =&gt; c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
+
+                await hub.OnConnectedAsync();
+			});
+		}
+		[Fact]
+		public void OnDisconnectedTest()
+		{
+			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =&gt;
+			{
+				mockChatManager.Setup(c =&gt; c.RemoveConnectionIdAsync(It.IsAny&lt;string&gt;(), It.IsAny&lt;string&gt;(), It.IsAny&lt;bool&gt;(), It.IsAny&lt;CancellationToken&gt;())).ReturnsAsync(new ChatLeUser());
+                var mockClients = new Mock&lt;IHubClients&gt;();
+                var clientProxyMock = new Mock&lt;IClientProxy&gt;();
+                mockClients.SetupGet(c =&gt; c.All).Returns(clientProxyMock.Object);
+                hub.Clients = mockClients.Object;
+
+                await hub.OnDisconnectedAsync(null);
+			});
+		}
+	}
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[27,3,27,4,0],[28,4,28,50,0],[29,4,29,56,0],[30,4,30,42,0],[31,4,31,49,0],[32,4,32,51,0],[33,4,33,61,0],[34,4,34,54,0],[36,4,36,43,0],[37,4,37,50,0],[39,4,42,53,0],[44,4,44,23,0],[45,3,45,4,0],[48,3,48,4,1],[49,4,49,128,1],[50,4,50,55,1],[51,4,51,105,1],[53,4,53,64,1],[54,4,54,59,1],[55,4,55,41,1],[57,4,57,51,1],[58,4,59,38,1],[60,13,60,79,1],[61,13,61,71,1],[62,13,62,133,1],[63,13,63,81,1],[65,13,65,24,1],[66,4,66,5,1],[67,5,67,73,1],[68,5,68,62,1],[69,4,69,5,1],[70,3,70,4,1],[74,3,74,4,1],[75,4,76,4,1],[76,4,76,5,1],[76,5,77,5,1],[77,5,77,50,1],[77,50,78,5,1],[78,5,78,47,1],[78,47,80,5,1],[80,5,80,65,1],[80,65,81,5,1],[81,5,81,60,1],[81,60,82,5,1],[82,5,82,79,1],[82,79,84,5,1],[84,5,84,48,1],[84,48,85,5,1],[85,5,85,36,1],[85,36,87,17,1],[87,17,87,59,1],[87,59,88,17,1],[88,17,88,64,1],[88,64,89,17,1],[89,17,89,82,1],[89,82,90,17,1],[90,17,90,50,1],[90,50,92,17,1],[92,17,92,46,1],[92,46,93,13,1],[93,13,93,14,1],[93,14,93,16,1],[75,4,93,16,1],[94,3,94,4,1],[98,3,98,4,1],[99,4,100,4,1],[100,4,100,5,1],[100,5,101,5,1],[101,5,101,50,1],[101,50,102,5,1],[102,5,102,47,1],[102,47,103,5,1],[103,5,103,51,1],[103,51,105,5,1],[105,5,105,65,1],[105,65,106,5,1],[106,5,106,60,1],[106,60,107,5,1],[107,5,107,79,1],[107,79,109,5,1],[109,5,109,48,1],[109,48,110,5,1],[110,5,110,36,1],[110,36,112,5,1],[112,5,112,47,1],[112,47,113,17,1],[113,17,113,64,1],[113,64,114,17,1],[114,17,114,82,1],[114,82,115,17,1],[115,17,115,50,1],[115,50,117,17,1],[117,17,117,46,1],[117,46,118,4,1],[118,4,118,5,1],[118,5,118,7,1],[99,4,118,7,1],[119,3,119,4,1],[122,3,122,4,1],[123,4,124,4,1],[124,4,124,5,1],[124,5,125,5,1],[125,5,125,179,1],[125,179,126,17,1],[126,17,126,59,1],[126,59,127,17,1],[127,17,127,64,1],[127,64,128,17,1],[128,17,128,82,1],[128,82,129,17,1],[129,17,129,50,1],[129,50,131,17,1],[131,17,131,53,1],[131,53,132,4,1],[132,4,132,5,1],[132,5,132,7,1],[123,4,132,7,1],[133,3,133,4,1]]);
+    </script>
+  </body>
+</html>

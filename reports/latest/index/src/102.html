@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity.MySql\Migrations\20161029150842_login-activity.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+namespace ChatLe.Repository.Identity.MySql.Migrations
+{
+    public partial class loginactivity : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetUsers&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;string&gt;(nullable: false),
+                    AccessFailedCount = table.Column&lt;int&gt;(nullable: false),
+                    ConcurrencyStamp = table.Column&lt;string&gt;(nullable: true),
+                    Email = table.Column&lt;string&gt;(maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column&lt;bool&gt;(nullable: false),
+                    LastLoginDate = table.Column&lt;DateTime&gt;(nullable: false),
+                    LockoutEnabled = table.Column&lt;bool&gt;(nullable: false),
+                    LockoutEnd = table.Column&lt;DateTimeOffset&gt;(nullable: true),
+                    NormalizedEmail = table.Column&lt;string&gt;(maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column&lt;string&gt;(maxLength: 256, nullable: true),
+                    PasswordHash = table.Column&lt;string&gt;(nullable: true),
+                    PhoneNumber = table.Column&lt;string&gt;(nullable: true),
+                    PhoneNumberConfirmed = table.Column&lt;bool&gt;(nullable: false),
+                    SecurityStamp = table.Column&lt;string&gt;(nullable: true),
+                    TwoFactorEnabled = table.Column&lt;bool&gt;(nullable: false),
+                    UserName = table.Column&lt;string&gt;(maxLength: 256, nullable: true)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetUsers&quot;, x =&gt; x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;Conversations&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;string&gt;(nullable: false),
+                    Discriminator = table.Column&lt;string&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_Conversations&quot;, x =&gt; x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;NotificationConnections&quot;,
+                columns: table =&gt; new
+                {
+                    ConnectionId = table.Column&lt;string&gt;(nullable: false),
+                    NotificationType = table.Column&lt;string&gt;(nullable: false),
+                    ConnectionDate = table.Column&lt;DateTime&gt;(nullable: false),
+                    Discriminator = table.Column&lt;string&gt;(nullable: false),
+                    UserId = table.Column&lt;string&gt;(nullable: true)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_NotificationConnections&quot;, x =&gt; new { x.ConnectionId, x.NotificationType });
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetRoles&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;string&gt;(nullable: false),
+                    ConcurrencyStamp = table.Column&lt;string&gt;(nullable: true),
+                    Name = table.Column&lt;string&gt;(maxLength: 256, nullable: true),
+                    NormalizedName = table.Column&lt;string&gt;(maxLength: 256, nullable: true)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetRoles&quot;, x =&gt; x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetUserTokens&quot;,
+                columns: table =&gt; new
+                {
+                    UserId = table.Column&lt;string&gt;(nullable: false),
+                    LoginProvider = table.Column&lt;string&gt;(nullable: false),
+                    Name = table.Column&lt;string&gt;(nullable: false),
+                    Value = table.Column&lt;string&gt;(nullable: true)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetUserTokens&quot;, x =&gt; new { x.UserId, x.LoginProvider, x.Name });
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetUserClaims&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;int&gt;(nullable: false)
+                        .Annotation(&quot;MySql:ValueGeneratedOnAdd&quot;, true),
+                    ClaimType = table.Column&lt;string&gt;(nullable: true),
+                    ClaimValue = table.Column&lt;string&gt;(nullable: true),
+                    UserId = table.Column&lt;string&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetUserClaims&quot;, x =&gt; x.Id);
+                    table.ForeignKey(
+                        name: &quot;FK_AspNetUserClaims_AspNetUsers_UserId&quot;,
+                        column: x =&gt; x.UserId,
+                        principalTable: &quot;AspNetUsers&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetUserLogins&quot;,
+                columns: table =&gt; new
+                {
+                    LoginProvider = table.Column&lt;string&gt;(nullable: false),
+                    ProviderKey = table.Column&lt;string&gt;(nullable: false),
+                    ProviderDisplayName = table.Column&lt;string&gt;(nullable: true),
+                    UserId = table.Column&lt;string&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetUserLogins&quot;, x =&gt; new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: &quot;FK_AspNetUserLogins_AspNetUsers_UserId&quot;,
+                        column: x =&gt; x.UserId,
+                        principalTable: &quot;AspNetUsers&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;Attendees&quot;,
+                columns: table =&gt; new
+                {
+                    ConversationId = table.Column&lt;string&gt;(nullable: false),
+                    UserId = table.Column&lt;string&gt;(nullable: false),
+                    Discriminator = table.Column&lt;string&gt;(nullable: false),
+                    IsConnected = table.Column&lt;bool&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_Attendees&quot;, x =&gt; new { x.ConversationId, x.UserId });
+                    table.ForeignKey(
+                        name: &quot;FK_Attendees_Conversations_ConversationId&quot;,
+                        column: x =&gt; x.ConversationId,
+                        principalTable: &quot;Conversations&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;Messages&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;string&gt;(nullable: false),
+                    ConversationId = table.Column&lt;string&gt;(nullable: true),
+                    Date = table.Column&lt;DateTime&gt;(nullable: false),
+                    Discriminator = table.Column&lt;string&gt;(nullable: false),
+                    Text = table.Column&lt;string&gt;(nullable: true),
+                    UserId = table.Column&lt;string&gt;(nullable: true)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_Messages&quot;, x =&gt; x.Id);
+                    table.ForeignKey(
+                        name: &quot;FK_Messages_Conversations_ConversationId&quot;,
+                        column: x =&gt; x.ConversationId,
+                        principalTable: &quot;Conversations&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetRoleClaims&quot;,
+                columns: table =&gt; new
+                {
+                    Id = table.Column&lt;int&gt;(nullable: false)
+                        .Annotation(&quot;MySql:ValueGeneratedOnAdd&quot;, true),
+                    ClaimType = table.Column&lt;string&gt;(nullable: true),
+                    ClaimValue = table.Column&lt;string&gt;(nullable: true),
+                    RoleId = table.Column&lt;string&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetRoleClaims&quot;, x =&gt; x.Id);
+                    table.ForeignKey(
+                        name: &quot;FK_AspNetRoleClaims_AspNetRoles_RoleId&quot;,
+                        column: x =&gt; x.RoleId,
+                        principalTable: &quot;AspNetRoles&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: &quot;AspNetUserRoles&quot;,
+                columns: table =&gt; new
+                {
+                    UserId = table.Column&lt;string&gt;(nullable: false),
+                    RoleId = table.Column&lt;string&gt;(nullable: false)
+                },
+                constraints: table =&gt;
+                {
+                    table.PrimaryKey(&quot;PK_AspNetUserRoles&quot;, x =&gt; new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: &quot;FK_AspNetUserRoles_AspNetRoles_RoleId&quot;,
+                        column: x =&gt; x.RoleId,
+                        principalTable: &quot;AspNetRoles&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: &quot;FK_AspNetUserRoles_AspNetUsers_UserId&quot;,
+                        column: x =&gt; x.UserId,
+                        principalTable: &quot;AspNetUsers&quot;,
+                        principalColumn: &quot;Id&quot;,
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_Attendees_ConversationId&quot;,
+                table: &quot;Attendees&quot;,
+                column: &quot;ConversationId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;EmailIndex&quot;,
+                table: &quot;AspNetUsers&quot;,
+                column: &quot;NormalizedEmail&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;UserNameIndex&quot;,
+                table: &quot;AspNetUsers&quot;,
+                column: &quot;NormalizedUserName&quot;,
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_Messages_ConversationId&quot;,
+                table: &quot;Messages&quot;,
+                column: &quot;ConversationId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;RoleNameIndex&quot;,
+                table: &quot;AspNetRoles&quot;,
+                column: &quot;NormalizedName&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_AspNetRoleClaims_RoleId&quot;,
+                table: &quot;AspNetRoleClaims&quot;,
+                column: &quot;RoleId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_AspNetUserClaims_UserId&quot;,
+                table: &quot;AspNetUserClaims&quot;,
+                column: &quot;UserId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_AspNetUserLogins_UserId&quot;,
+                table: &quot;AspNetUserLogins&quot;,
+                column: &quot;UserId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_AspNetUserRoles_RoleId&quot;,
+                table: &quot;AspNetUserRoles&quot;,
+                column: &quot;RoleId&quot;);
+
+            migrationBuilder.CreateIndex(
+                name: &quot;IX_AspNetUserRoles_UserId&quot;,
+                table: &quot;AspNetUserRoles&quot;,
+                column: &quot;UserId&quot;);
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: &quot;Attendees&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;Messages&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;NotificationConnections&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetRoleClaims&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetUserClaims&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetUserLogins&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetUserRoles&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetUserTokens&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;Conversations&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetRoles&quot;);
+
+            migrationBuilder.DropTable(
+                name: &quot;AspNetUsers&quot;);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[10,9,10,10,0],[11,13,13,35,0],[13,35,31,18,0],[31,18,33,17,0],[33,17,33,18,0],[33,18,34,21,0],[34,21,34,67,0],[34,67,35,17,0],[35,17,35,18,0],[35,18,35,20,0],[11,13,35,20,0],[37,13,39,35,0],[39,35,43,18,0],[43,18,45,17,0],[45,17,45,18,0],[45,18,46,21,0],[46,21,46,69,0],[46,69,47,17,0],[47,17,47,18,0],[47,18,47,20,0],[37,13,47,20,0],[49,13,51,35,0],[51,35,58,18,0],[58,18,60,17,0],[60,17,60,18,0],[60,18,61,21,0],[61,21,61,117,0],[61,117,62,17,0],[62,17,62,18,0],[62,18,62,20,0],[49,13,62,20,0],[64,13,66,35,0],[66,35,72,18,0],[72,18,74,17,0],[74,17,74,18,0],[74,18,75,21,0],[75,21,75,67,0],[75,67,76,17,0],[76,17,76,18,0],[76,18,76,20,0],[64,13,76,20,0],[78,13,80,35,0],[80,35,86,18,0],[86,18,88,17,0],[88,17,88,18,0],[88,18,89,21,0],[89,21,89,109,0],[89,109,90,17,0],[90,17,90,18,0],[90,18,90,20,0],[78,13,90,20,0],[92,13,94,35,0],[94,35,101,18,0],[101,18,103,17,0],[103,17,103,18,0],[103,18,104,21,0],[104,21,104,72,0],[104,72,105,21,0],[105,21,110,62,0],[110,62,111,17,0],[111,17,111,18,0],[111,18,111,20,0],[92,13,111,20,0],[113,13,115,35,0],[115,35,121,18,0],[121,18,123,17,0],[123,17,123,18,0],[123,18,124,21,0],[124,21,124,106,0],[124,106,125,21,0],[125,21,130,62,0],[130,62,131,17,0],[131,17,131,18,0],[131,18,131,20,0],[113,13,131,20,0],[133,13,135,35,0],[135,35,141,18,0],[141,18,143,17,0],[143,17,143,18,0],[143,18,144,21,0],[144,21,144,95,0],[144,95,145,21,0],[145,21,150,62,0],[150,62,151,17,0],[151,17,151,18,0],[151,18,151,20,0],[133,13,151,20,0],[153,13,155,35,0],[155,35,163,18,0],[163,18,165,17,0],[165,17,165,18,0],[165,18,166,21,0],[166,21,166,64,0],[166,64,167,21,0],[167,21,172,63,0],[172,63,173,17,0],[173,17,173,18,0],[173,18,173,20,0],[153,13,173,20,0],[175,13,177,35,0],[177,35,184,18,0],[184,18,186,17,0],[186,17,186,18,0],[186,18,187,21,0],[187,21,187,72,0],[187,72,188,21,0],[188,21,193,62,0],[193,62,194,17,0],[194,17,194,18,0],[194,18,194,20,0],[175,13,194,20,0],[196,13,198,35,0],[198,35,202,18,0],[202,18,204,17,0],[204,17,204,18,0],[204,18,205,21,0],[205,21,205,93,0],[205,93,206,21,0],[206,21,211,62,0],[211,62,212,21,0],[212,21,217,62,0],[217,62,218,17,0],[218,17,218,18,0],[218,18,218,20,0],[196,13,218,20,0],[220,13,223,43,0],[225,13,228,44,0],[230,13,234,31,0],[236,13,239,43,0],[241,13,244,43,0],[246,13,249,35,0],[251,13,254,35,0],[256,13,259,35,0],[261,13,264,35,0],[266,13,269,35,0],[270,9,270,10,0],[273,9,273,10,0],[274,13,275,36,0],[277,13,278,35,0],[280,13,281,50,0],[283,13,284,43,0],[286,13,287,43,0],[289,13,290,43,0],[292,13,293,42,0],[295,13,296,43,0],[298,13,299,40,0],[301,13,302,38,0],[304,13,305,38,0],[306,9,306,10,0]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\test\chatle.test\Controllers\UserControllerTest.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe.Controllers;
+using ChatLe.Models;
+using Moq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
+
+namespace Chatle.test.Controllers
+{
+    public class UserControllerTest
+    {
+        [Fact]
+        public async Task GetUsersTest()
+        {
+			var mockManager = new Mock&lt;IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;();
+			mockManager.Setup(m =&gt; m.GetUsersConnectedAsync(It.IsAny&lt;int&gt;(), It.IsAny&lt;CancellationToken&gt;())).ReturnsAsync(new Page&lt;ChatLeUser&gt;(new List&lt;ChatLeUser&gt;()
+			{
+				new ChatLeUser()
+			}, 0, 1));
+
+
+			using (var controller = new UserController(mockManager.Object))
+            {
+                var users = await controller.Get();
+				Assert.NotNull(users);
+				Assert.NotEmpty(users.Users);
+				Assert.Equal(1, users.PageCount);
+				Assert.Equal(0, users.PageIndex);
+            }                
+        }
+    }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[15,9,15,10,1],[16,4,16,124,1],[17,4,20,14,1],[23,11,23,66,1],[24,13,24,14,1],[25,17,25,52,1],[26,5,26,27,1],[27,5,27,34,1],[28,5,28,38,1],[29,5,29,38,1],[30,13,30,14,1],[31,9,31,10,1]]);
+    </script>
+  </body>
+</html>

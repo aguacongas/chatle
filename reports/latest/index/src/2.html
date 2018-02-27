@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\test\chatle.test\StartupTest.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Builder;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.IO;
+using Xunit;
+
+namespace chatle.test
+{
+    public class StartupTest
+    {
+
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = &quot;Skipped for the moment&quot;)]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
+        public void ConfigureTest()
+		{
+			var mockHostingEnvironment = new Mock&lt;IHostingEnvironment&gt;();
+			mockHostingEnvironment.SetupGet(h =&gt; h.EnvironmentName).Returns(&quot;Development&quot;);
+			mockHostingEnvironment.SetupGet(h =&gt; h.ContentRootPath).Returns(Directory.GetCurrentDirectory());
+			mockHostingEnvironment.SetupGet(h =&gt; h.WebRootPath).Returns(Path.Combine(Directory.GetCurrentDirectory(), &quot;wwwroo&quot;));
+			var startup = new Startup(mockHostingEnvironment.Object, new Mock&lt;ILoggerFactory&gt;().Object);
+			var serviceCollection = new ServiceCollection();
+			startup.ConfigureServices(serviceCollection);
+			var factory = new ApplicationBuilderFactory(serviceCollection.BuildServiceProvider());
+			startup.Configure(factory.CreateBuilder(new Mock&lt;IFeatureCollection&gt;().Object), new Mock&lt;IAntiforgery&gt;().Object);
+		}
+	}
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[21,3,21,4,0],[22,4,22,65,0],[23,4,23,83,0],[24,4,24,101,0],[25,4,25,121,0],[26,4,26,96,0],[27,4,27,52,0],[28,4,28,49,0],[29,4,29,90,0],[30,4,30,117,0],[31,3,31,4,0]]);
+    </script>
+  </body>
+</html>

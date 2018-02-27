@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\ChatStore.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
+namespace ChatLe.Models
+{
+    /// &lt;summary&gt;
+    /// Chat store for &lt;see cref=&quot;ChatLeUser&quot;/&gt;
+    /// &lt;/summary&gt;
+    public class ChatStore : ChatStore&lt;ChatLeUser&gt;
+    {
+        /// &lt;summary&gt;
+        /// Constructor
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;context&quot;&gt;The &lt;see cref=&quot;ChatLeIdentityDbContext&quot;/&gt; to use&lt;/param&gt;
+        /// &lt;param name=&quot;loggerFactory&quot;&gt;&lt;/param&gt;
+        public ChatStore(ChatLeIdentityDbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
+    }
+    
+    /// &lt;summary&gt;
+    /// Chat store for TUser
+    /// &lt;/summary&gt;
+    /// &lt;typeparam name=&quot;TUser&quot;&gt;type of user, must a class and implement &lt;see cref=&quot;IChatUser{string}&quot;/&gt;&lt;/typeparam&gt;
+    public class ChatStore&lt;TUser&gt; : ChatStore&lt;string, TUser, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin&lt;string&gt;&gt;
+        where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
+    {
+        /// &lt;summary&gt;
+        /// Constructor
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;context&quot;&gt;The &lt;see cref=&quot;DbContext&quot; to use/&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;loggerFactory&quot;&gt;&lt;/param&gt;
+        public ChatStore(DbContext context, IHostingEnvironment env) 
+            : base(context, env) { }
+    }
+    
+    /// &lt;summary&gt;
+    /// Chat store, implement &lt;see cref=&quot;IChatStore{TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection}&quot;/&gt;
+    /// &lt;/summary&gt;
+    /// &lt;typeparam name=&quot;TKey&quot;&gt;type of primary key&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TUser&quot;&gt;type of user, must be a class and implement &lt;see cref=&quot;IChatUser{TKey}&quot;/&gt;&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TContext&quot;&gt;type of context, must be a &lt;see cref=&quot;DbContext&quot;/&gt;&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TConversation&quot;&gt;type of conversation, must be a &lt;see cref=&quot;Conversation{TKey}&quot;/&gt;&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TAttendee&quot;&gt;type of attendee, must be a &lt;see cref=&quot;Attendee{TKey}&quot;/&gt;&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TMessage&quot;&gt;type of message, must be a &lt;see cref=&quot;Message{TKey}&quot;/&gt;&lt;/typeparam&gt;
+    /// &lt;typeparam name=&quot;TNotificationConnection&quot;&gt;type of notifciation connection, must be a &lt;see cref=&quot;NotificationConnection{TKey}&quot;/&gt;&lt;/typeparam&gt; &lt;summary&gt;
+    /// &lt;typeparam name=&quot;TUserLogin&quot;&gt;type of the user login object.&lt;/typeparam&gt;
+    /// &lt;/summary&gt;
+    public class ChatStore&lt;TKey, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, TUserLogin&gt; :IChatStore&lt;TKey,TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;
+        where TKey : IEquatable&lt;TKey&gt;
+        where TUser : IdentityUser&lt;TKey&gt;, IChatUser&lt;TKey&gt;
+        where TContext : DbContext
+        where TConversation : Conversation&lt;TKey&gt;
+        where TAttendee : Attendee&lt;TKey&gt;
+        where TMessage : Message&lt;TKey&gt;
+        where TNotificationConnection : NotificationConnection&lt;TKey&gt;
+        where TUserLogin : IdentityUserLogin&lt;TKey&gt;
+    {
+        readonly IHostingEnvironment _env;
+        /// &lt;summary&gt;
+        /// Construtor
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;context&quot;&gt;The &lt;see cref=&quot;DbContext&quot; to use/&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;loggerFactory&quot;&gt;&lt;/param&gt;
+        public ChatStore(TContext context, IHostingEnvironment env)
+        {
+            if (context == null)
+                throw new ArgumentNullException(&quot;context&quot;);
+
+            Context = context;
+            _env = env;
+        }        
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbContext&quot;/&gt;
+        /// &lt;/summary&gt;
+        public virtual TContext Context { get; private set; }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TUser}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public virtual DbSet&lt;TUser&gt; Users { get { return Context.Set&lt;TUser&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TConversation}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public DbSet&lt;TConversation&gt; Conversations { get { return Context.Set&lt;TConversation&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TMessage}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public DbSet&lt;TMessage&gt; Messages { get { return Context.Set&lt;TMessage&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TAttendee}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public virtual DbSet&lt;TAttendee&gt; Attendees { get { return Context.Set&lt;TAttendee&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TNotificationConnection}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public virtual DbSet&lt;TNotificationConnection&gt; NotificationConnections { get { return Context.Set&lt;TNotificationConnection&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Gets the &lt;see cref=&quot;DbSet{TUserLogin}&quot;/&gt;
+        /// &lt;/summary&gt;
+        public virtual DbSet&lt;TUserLogin&gt; Logins { get { return Context.Set&lt;TUserLogin&gt;(); } }
+        
+        /// &lt;summary&gt;
+        /// Create a message on the database
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;message&quot;&gt;The message to create&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual Task CreateMessageAsync(TMessage message, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if(message == null)
+                throw new ArgumentNullException(&quot;message&quot;);
+
+            Messages.Add(message);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
+        }
+
+        /// &lt;summary&gt;
+        /// Create an attendee on the database
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;attendee&quot;&gt;The attendee to create&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual Task CreateAttendeeAsync(TAttendee attendee, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if(attendee == null)
+            {
+                throw new ArgumentNullException(&quot;attendee&quot;);
+            }
+            Attendees.Add(attendee);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
+        }
+
+        /// &lt;summary&gt;
+        /// Create a conversation on the database
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;conversation&quot;&gt;The conversation to create&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual Task CreateConversationAsync(TConversation conversation, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (conversation == null)
+                throw new ArgumentNullException(&quot;conversation&quot;);
+
+            Conversations.Add(conversation);
+            Context.SaveChanges();
+
+            return Task.FromResult(0);
+        }
+
+        /// &lt;summary&gt;
+        /// Find a user by her name
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;userName&quot;&gt;the user name&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{TUser}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;TUser&gt; FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await Users
+                .SingleOrDefaultAsync(u =&gt; u.UserName == userName, cancellationToken);
+        }
+
+        /// &lt;summary&gt;
+        /// Gets a conversation for 2 attendees
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;attendee1&quot;&gt;the 1st attendee&lt;/param&gt;
+        /// &lt;param name=&quot;attendee2&quot;&gt;the 2dn attendee&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{TConversation}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;TConversation&gt; GetConversationAsync(TUser attendee1, TUser attendee2, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (attendee1 == null)
+                throw new ArgumentNullException(&quot;attendee1&quot;);
+            if (attendee2 == null)
+                throw new ArgumentNullException(&quot;attendee2&quot;);
+
+            var convs = (from c in Conversations
+                       join a1 in Attendees
+                            on c.Id equals a1.ConversationId
+                       join a2 in Attendees
+                            on c.Id equals a2.ConversationId
+                       where a1.UserId.Equals(attendee1.Id)
+                            &amp;&amp; a2.UserId.Equals(attendee2.Id)
+                            &amp;&amp; c.Attendees.Count.Equals(2)
+                       select c)
+                       .Include(c =&gt; c.Attendees);
+
+            return await convs.FirstOrDefaultAsync();
+        }
+
+        /// &lt;summary&gt;
+        /// Gets a conversation by her id
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;convId&quot;&gt;the conversation id&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{TConversation}&quot;&lt;/returns&gt;
+        public virtual async Task&lt;TConversation&gt; GetConversationAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await Conversations
+                .Include(c =&gt; c.Attendees)
+                .FirstOrDefaultAsync(c =&gt; c.Id.Equals(convId));
+        }
+
+        /// &lt;summary&gt;
+        /// Gets messages in a conversation
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;convId&quot;&gt;the conversation id&lt;/param&gt;
+        /// &lt;param name=&quot;max&quot;&gt;max number of messages to get, default is 50&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{IEnumerable{TMessage}}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;IEnumerable&lt;TMessage&gt;&gt; GetMessagesAsync(TKey convId, int max = 50, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await Messages.Where(m =&gt; m.ConversationId.Equals(convId)).OrderByDescending(m=&gt;m.Date).Take(max).ToListAsync();
+        }
+
+        /// &lt;summary&gt;
+        /// Gets connected users
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;pageIndex&quot;&gt;the 0 based page index&lt;/param&gt;
+        /// &lt;param name=&quot;pageLength&quot;&gt;number of user per page&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{IEnumerable{TUser}}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;Page&lt;TUser&gt;&gt; GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var skip = pageIndex * pageLength;
+            cancellationToken.ThrowIfCancellationRequested();
+            var ids = new List&lt;TKey&gt;();
+            var q1 = (from nc in NotificationConnections
+                      group new { nc.UserId, nc.ConnectionDate } by nc.UserId into g
+                      select new { Id = g.Key, Date = g.Max(x =&gt; x.ConnectionDate) })
+                      .OrderByDescending(x =&gt; x.Date);
+
+            var count = q1.Count();
+
+            var q2 = await q1.Skip(skip)
+                     .Take(pageLength)
+                     .ToListAsync();
+
+            var query = from r in q2
+                        join u in Users
+                         on r.Id equals u.Id
+                        select u;
+
+            var pageCount = (int)Math.Floor(((double)count) / pageLength) + 1;
+
+            return await Task.FromResult(new Page&lt;TUser&gt;(query.ToList(), pageIndex, pageCount));
+        }
+
+        /// &lt;summary&gt;
+        /// Create a notification connection on the database
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;connection&quot;&gt;the notification connection&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual Task CreateNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (connection == null)
+                throw new ArgumentNullException(&quot;connection&quot;);
+
+            NotificationConnections.Add(connection);
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var notification = entry.Entity as NotificationConnection&lt;TKey&gt;;
+                    if (entry.Entity != null)
+                    {
+                        entry.State = EntityState.Added;
+                        // Using a NoTracking query means we get the entity but it is not tracked by the context
+                        // and will not be merged with existing entities in the context.
+                        var connectionId = connection.ConnectionId;
+                        var type = connection.NotificationType;
+
+                        var databaseEntity = NotificationConnections
+                            .AsNoTracking()
+                            .FirstOrDefault(nc =&gt; nc.ConnectionId == connectionId &amp;&amp; nc.NotificationType == type);
+
+                        if (databaseEntity == null)
+                        {
+                            var databaseEntry = Context.Entry(connection);
+                            ResetDbEntry&lt;TNotificationConnection&gt;(databaseEntry);
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(&quot;Don&#39;t know how to handle concurrency conflicts for &quot; + entry.Metadata.Name);
+                    }
+                }
+
+                // Retry the save operation
+                Context.SaveChanges();
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// &lt;summary&gt;
+        /// Delete a notification connection on the database
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;connection&quot;&gt;the notification connection&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual Task DeleteNotificationConnectionAsync(TNotificationConnection connection, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (connection == null)
+                throw new ArgumentNullException(&quot;connection&quot;);
+
+            NotificationConnections.Remove(connection);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                RetryDeleteNotificationConnection(ex);
+            }
+
+            return Task.FromResult(0);
+        }
+        
+        /// &lt;summary&gt;
+        /// Gets a notification connection by her id and her type
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;connectionId&quot;&gt;the notification connection id&lt;/param&gt;
+        /// &lt;param name=&quot;notificationType&quot;&gt;the type of notification&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{TNotificationConnection}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;TNotificationConnection&gt; GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (connectionId == null)
+                throw new ArgumentNullException(&quot;connectionId&quot;);
+            if (notificationType == null)
+                throw new ArgumentNullException(&quot;notificationType&quot;);
+
+            return await NotificationConnections
+                .FirstOrDefaultAsync(c =&gt; c.ConnectionId == connectionId &amp;&amp; c.NotificationType == notificationType);
+        }
+        
+        /// &lt;summary&gt;
+        /// Initialise the database
+        /// &lt;/summary&gt;
+        public virtual void Init()
+        {
+            if (_env!= null &amp;&amp;  _env.IsDevelopment())
+                Context.Database.EnsureDeletedAsync();
+
+            Context.Database.EnsureCreated();
+            NotificationConnections.RemoveRange(NotificationConnections.ToArray());
+            Context.SaveChanges();
+            Attendees.RemoveRange(Attendees.ToArray());
+            Context.SaveChanges();
+            Messages.RemoveRange(Messages.ToArray());
+            Context.SaveChanges();
+            Conversations.RemoveRange(Conversations.ToArray());
+            Context.SaveChanges();
+            Users.RemoveRange(Users.Where(u =&gt; IsGuess(u, default(CancellationToken)).Result).ToArray());
+            Context.SaveChanges();
+        }
+        
+        public virtual async Task&lt;bool&gt; IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await Logins.AnyAsync(l =&gt; l.UserId.Equals(user.Id), cancellationToken) == false;
+        }
+        /// &lt;summary&gt;
+        /// Check if a user has connection
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;user&quot;&gt;the user&lt;/param&gt;
+        /// &lt;returns&gt;true if user has connection&lt;/returns&gt;
+        public virtual async Task&lt;bool&gt; UserHasConnectionAsync(TUser user)
+        {
+            return await NotificationConnections.AnyAsync(n =&gt; n.UserId.Equals(user.Id));
+        }
+        
+        /// &lt;summary&gt;
+        /// Gets conversations for a user id
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;user&quot;&gt;the user&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{IEnumerable{TConversation}}&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task&lt;IEnumerable&lt;TConversation&gt;&gt; GetConversationsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await (from c in Conversations
+                          join a in Attendees
+                              on c.Id equals a.ConversationId
+                          join m in Messages
+                              on c.Id equals m.ConversationId
+                          where a.UserId.Equals(user.Id)
+                          orderby m.Date descending                          
+                          select c).Include(c =&gt; c.Attendees).Distinct().ToListAsync();
+        }
+
+        /// &lt;summary&gt;
+        /// Deletes a user 
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;user&quot;&gt;the user to delete&lt;/param&gt;
+        /// &lt;param name=&quot;cancellationToken&quot;an optional cancellation token&gt;&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        public virtual async Task DeleteUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null)
+                throw new ArgumentNullException(&quot;user&quot;);
+
+            // Remove all conversations the user attends
+            var conversations = await GetConversationsAsync(user, cancellationToken);
+            foreach (var conversation in conversations)
+            {
+                Messages.RemoveRange(Messages.Where(m =&gt; m.ConversationId.Equals(conversation.Id)));
+                Attendees.RemoveRange(Attendees.Where(a =&gt; a.ConversationId.Equals(conversation.Id)));
+                Conversations.Remove(conversation);
+            }
+                            
+            var userConnections = NotificationConnections.Where(n =&gt; n.UserId.Equals(user.Id));
+            NotificationConnections.RemoveRange(userConnections);
+            
+            Users.Remove(user);
+            
+            try
+            {
+                Context.SaveChanges();            
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                RetryDeleteUser(ex);
+            }
+        }
+
+		public async Task&lt;TUser&gt; FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+            var user = await Users.SingleOrDefaultAsync(u =&gt; u.Id.Equals(id), cancellationToken);
+            return user;
+		}
+
+        void ResetDbEntry&lt;TEntity&gt;(EntityEntry&lt;TEntity&gt; entry) where TEntity : class
+        {
+            foreach (var property in entry.Metadata.GetProperties())
+            {
+                if (property.IsKey())
+                    continue;
+
+                entry.Property(property.Name).IsModified = false;
+            }
+        }
+
+        void RetryDeleteNotificationConnection(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                RetryDeleteNotificationConnection(entry);
+            }
+        }
+
+        void RetryDeleteNotificationConnection(EntityEntry entry)
+        {
+            var notification = entry.Entity as NotificationConnection&lt;TKey&gt;;
+            if (notification != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = NotificationConnections.AsNoTracking().SingleOrDefault(nc =&gt; nc.ConnectionId == notification.ConnectionId &amp;&amp; nc.NotificationType == notification.NotificationType);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException(&quot;Don&#39;t know how to handle concurrency conflicts for &quot; + entry.Metadata.Name);
+            }
+        }
+
+
+        void RetryDeleteUser(DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                if (entry.Entity is TNotificationConnection)
+                {
+                    RetryDeleteNotificationConnection(entry);
+                }
+                if (entry.Entity is TMessage)
+                {
+                    RetryDeleteEntity&lt;TMessage&gt;(entry, Messages);
+                }
+                if (entry.Entity is TAttendee)
+                {
+                    RetryDeleteEntity&lt;TAttendee&gt;(entry,  entity =&gt; Attendees.AsNoTracking().SingleOrDefault(a =&gt; a.ConversationId.Equals(entity.ConversationId) &amp;&amp; a.UserId.Equals(entity.UserId)));
+                }
+                if (entry.Entity is TUser)
+                {
+                    RetryDeleteEntity&lt;TUser&gt;(entry, Users);
+                }
+            }
+        }
+
+        void RetryDeleteEntity&lt;TIdentifiable&gt;(EntityEntry entry, DbSet&lt;TIdentifiable&gt; dbSet) where TIdentifiable: class, IIdentifiable&lt;TKey&gt;
+        {
+            RetryDeleteEntity&lt;TIdentifiable&gt;(entry, entity =&gt; dbSet.AsNoTracking().SingleOrDefault(m =&gt; m.Id.Equals(entity as TIdentifiable)));
+        }
+
+        void RetryDeleteEntity&lt;TEntity&gt;(EntityEntry entry, Func&lt;TEntity, TEntity&gt; getEntity) where TEntity: class
+        {
+            var entity = entry.Entity as TEntity;
+            if (entity != null)
+            {
+                // Using a NoTracking query means we get the entity but it is not tracked by the context
+                // and will not be merged with existing entities in the context.
+                var databaseEntity = getEntity(entity);
+                if (databaseEntity == null)
+                    return;
+
+                var databaseEntry = Context.Entry(databaseEntity);
+
+                ResetDbEntry(databaseEntry);
+            }
+            else
+            {
+                throw new NotSupportedException(&quot;Don&#39;t know how to handle concurrency conflicts for &quot; + entry.Metadata.Name);
+            }
+        }
+	}
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[25,15,25,33,0],[25,34,25,35,0],[25,36,25,37,0],[41,15,41,33,1],[41,34,41,35,1],[41,36,41,37,1],[72,9,72,68,1],[73,9,73,10,1],[74,13,74,33,1],[75,17,75,60,1],[77,13,77,31,1],[78,13,78,24,1],[79,9,79,10,1],[84,43,84,47,1],[84,48,84,60,1],[89,49,89,50,1],[89,51,89,79,1],[89,80,89,81,1],[94,57,94,58,1],[94,59,94,95,1],[94,96,94,97,1],[99,47,99,48,1],[99,49,99,80,1],[99,81,99,82,1],[104,57,104,58,1],[104,59,104,91,1],[104,92,104,93,1],[109,85,109,86,1],[109,87,109,133,1],[109,134,109,135,1],[114,55,114,56,0],[114,57,114,90,0],[114,91,114,92,0],[123,9,123,10,1],[124,13,124,62,1],[125,13,125,32,1],[126,17,126,60,1],[128,13,128,35,1],[129,13,129,35,1],[131,13,131,39,1],[132,9,132,10,1],[141,9,141,10,1],[142,13,142,62,1],[143,13,143,33,1],[144,13,144,14,1],[145,17,145,61,1],[147,13,147,37,1],[148,13,148,35,1],[150,13,150,39,1],[151,9,151,10,1],[160,9,160,10,1],[161,13,161,62,1],[162,13,162,38,1],[163,17,163,65,1],[165,13,165,45,1],[166,13,166,35,1],[168,13,168,39,1],[169,9,169,10,1],[178,9,178,10,1],[179,13,179,62,1],[180,13,181,87,1],[182,9,182,10,1],[192,9,192,10,1],[193,13,193,62,1],[194,13,194,35,1],[195,17,195,62,1],[196,13,196,35,1],[197,17,197,62,1],[199,13,208,51,1],[210,13,210,54,1],[211,9,211,10,1],[219,9,219,10,1],[220,13,220,62,1],[221,13,223,64,1],[224,9,224,10,1],[234,9,234,10,1],[235,13,235,62,1],[236,13,236,132,1],[237,9,237,10,1],[247,9,247,10,1],[248,13,248,47,1],[249,13,249,62,1],[250,13,250,40,1],[251,13,254,55,1],[256,13,256,36,1],[258,13,260,37,1],[262,13,264,29,1],[264,29,264,33,1],[264,33,264,41,1],[264,41,264,45,1],[264,45,265,32,1],[265,32,265,33,1],[265,33,265,34,1],[262,13,265,34,1],[267,13,267,79,1],[269,13,269,97,1],[270,9,270,10,1],[279,9,279,10,1],[280,13,280,62,1],[281,13,281,36,1],[282,17,282,63,1],[284,13,284,53,1],[286,13,286,14,1],[287,17,287,39,1],[288,13,288,14,1],[289,13,289,52,0],[290,13,290,14,0],[291,17,291,24,0],[291,26,291,35,0],[291,36,291,38,0],[291,39,291,49,0],[292,17,292,18,0],[293,21,293,85,0],[294,21,294,46,0],[295,21,295,22,0],[296,25,296,57,0],[299,25,299,68,0],[300,25,300,64,0],[302,25,304,115,0],[306,25,306,52,0],[307,25,307,26,0],[308,29,308,75,0],[309,29,309,82,0],[310,25,310,26,0],[311,21,311,22,0],[313,21,313,22,0],[314,25,314,134,0],[316,17,316,18,0],[319,17,319,39,0],[320,13,320,14,0],[322,13,322,39,1],[323,9,323,10,1],[332,9,332,10,1],[333,13,333,62,1],[334,13,334,36,1],[335,17,335,63,1],[337,13,337,56,1],[340,13,340,14,1],[341,17,341,39,1],[342,13,342,14,1],[343,13,343,52,0],[344,13,344,14,0],[345,17,345,55,0],[346,13,346,14,0],[348,13,348,39,1],[349,9,349,10,1],[359,9,359,10,1],[360,13,360,62,1],[361,13,361,38,1],[362,17,362,65,1],[363,13,363,42,1],[364,17,364,69,1],[366,13,367,117,1],[368,9,368,10,1],[374,9,374,10,1],[375,13,375,54,1],[376,17,376,55,0],[378,13,378,46,1],[379,13,379,84,1],[380,13,380,35,1],[381,13,381,56,1],[382,13,382,35,1],[383,13,383,54,1],[384,13,384,35,1],[385,13,385,64,1],[386,13,386,35,1],[387,13,387,106,1],[388,13,388,35,1],[389,9,389,10,1],[392,9,392,10,0],[393,13,393,101,0],[394,9,394,10,0],[401,9,401,10,1],[402,13,402,90,1],[403,9,403,10,1],[412,9,412,10,1],[413,13,413,62,1],[414,13,421,88,1],[422,9,422,10,1],[431,9,431,10,1],[432,13,432,62,1],[433,13,433,30,1],[434,17,434,57,0],[437,13,437,86,1],[438,13,438,20,1],[438,22,438,38,1],[438,39,438,41,1],[438,42,438,55,1],[439,13,439,14,1],[440,17,440,101,1],[441,17,441,103,1],[442,17,442,52,1],[443,13,443,14,1],[445,13,445,96,1],[446,13,446,66,1],[448,13,448,32,1],[451,13,451,14,1],[452,17,452,39,1],[453,13,453,14,1],[454,13,454,52,0],[455,13,455,14,0],[456,17,456,37,0],[457,13,457,14,0],[458,9,458,10,1],[461,3,461,4,1],[462,4,462,53,1],[463,13,463,98,1],[464,13,464,25,1],[465,3,465,4,1],[468,9,468,10,0],[469,13,469,20,0],[469,22,469,34,0],[469,35,469,37,0],[469,38,469,68,0],[470,13,470,14,0],[471,17,471,38,0],[472,21,472,30,0],[474,17,474,66,0],[475,13,475,14,0],[476,9,476,10,0],[479,9,479,10,0],[480,13,480,20,0],[480,22,480,31,0],[480,32,480,34,0],[480,35,480,45,0],[481,13,481,14,0],[482,17,482,58,0],[483,13,483,14,0],[484,9,484,10,0],[487,9,487,10,0],[488,13,488,77,0],[489,13,489,38,0],[490,13,490,14,0],[493,17,493,201,0],[494,17,494,44,0],[495,21,495,28,0],[497,17,497,67,0],[499,17,499,45,0],[500,13,500,14,0],[502,13,502,14,0],[503,17,503,126,0],[505,9,505,10,0],[509,9,509,10,0],[510,13,510,20,0],[510,22,510,31,0],[510,32,510,34,0],[510,35,510,45,0],[511,13,511,14,0],[512,17,512,61,0],[513,17,513,18,0],[514,21,514,62,0],[515,17,515,18,0],[516,17,516,46,0],[517,17,517,18,0],[518,21,518,66,0],[519,17,519,18,0],[520,17,520,47,0],[521,17,521,18,0],[522,21,522,68,0],[522,68,522,195,0],[522,195,522,197,0],[522,21,522,197,0],[523,17,523,18,0],[524,17,524,43,0],[525,17,525,18,0],[526,21,526,60,0],[527,17,527,18,0],[528,13,528,14,0],[529,9,529,10,0],[532,9,532,10,0],[533,13,533,63,0],[533,63,533,142,0],[533,142,533,144,0],[533,13,533,144,0],[534,9,534,10,0],[537,9,537,10,0],[538,13,538,50,0],[539,13,539,32,0],[540,13,540,14,0],[543,17,543,56,0],[544,17,544,44,0],[545,21,545,28,0],[547,17,547,67,0],[549,17,549,45,0],[550,13,550,14,0],[552,13,552,14,0],[553,17,553,126,0],[555,9,555,10,0]]);
+    </script>
+  </body>
+</html>
