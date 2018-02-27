@@ -2,31 +2,63 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\ViewModels\ManageLoginsViewModel.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\BuilderExtensions.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using Microsoft.AspNetCore.Http.Authentication;
+using ChatLe.Repository.Identity;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Models
 {
-    public class ManageLoginsViewModel
+    public static class BuilderExtensions
     {
-        public IList&lt;UserLoginInfo&gt; CurrentLogins { get; set; }
+        public static IServiceCollection ConfigureChatLe(this IServiceCollection services, Action&lt;ChatOptions&gt; configure)
+        {
+            services.Configure(configure);
+            return services;
+        }
 
-        public IList&lt;AuthenticationDescription&gt; OtherLogins { get; set; }
+        public static IServiceCollection AddChatLe&lt;TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection&gt;(this IServiceCollection services, Action&lt;ChatOptions&gt; configure = null)
+            where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
+            where TContext : DbContext
+            where TConversation : Conversation&lt;string&gt;, new()
+            where TAttendee : Attendee&lt;string&gt;, new()
+            where TMessage : Message&lt;string&gt;, new()
+            where TNotificationConnection : NotificationConnection&lt;string&gt;, new()
+        {
+            if (configure != null)
+                services.ConfigureChatLe(configure);
+                        
+            services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatStore&lt;string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, IdentityUserLogin&lt;string&gt;&gt;&gt;();
+            services.AddTransient&lt;IChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;();
+            services.AddScoped&lt;SignInManager&gt;();
 
-        public UpdatePasswordViewModel Passwords { get; set; }
+            return services;
+        }
+
+        public static IServiceCollection AddChatLe(this IServiceCollection services, Action&lt;ChatOptions&gt; configure = null)
+        {            
+            return services.AddChatLe&lt;ChatLeUser, ChatLeIdentityDbContext, Conversation, Attendee, Message, NotificationConnection&gt;(configure);
+        }
+
+        public static IApplicationBuilder UseChatLe(this IApplicationBuilder app)
+        {
+            var store = app.ApplicationServices.GetRequiredService&lt;IChatStore&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;();            
+            store.Init();
+            return app;
+        }
     }
 }
-
     </pre>
     <script type="text/javascript">
-      highlightRanges([[9,53,9,57,1],[9,58,9,62,1],[11,63,11,67,0],[11,68,11,72,1],[13,52,13,56,0],[13,57,13,61,1]]);
+      highlightRanges([[13,9,13,10,1],[14,13,14,43,1],[15,13,15,29,1],[16,9,16,10,1],[25,9,25,10,1],[26,13,26,35,1],[27,17,27,53,1],[29,13,29,249,1],[30,13,30,216,1],[31,13,31,49,1],[33,13,33,29,1],[34,9,34,10,1],[37,9,37,10,1],[38,13,38,144,1],[39,9,39,10,1],[42,9,42,10,1],[43,13,43,159,1],[44,13,44,26,1],[45,13,45,24,1],[46,9,46,10,1]]);
     </script>
   </body>
 </html>

@@ -2,49 +2,307 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\test\chatle.test\StartupTest.cs</title>
+    <title>C:\projects\chatle\src\chatle\Startup.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using ChatLe;
-using Microsoft.AspNetCore.Antiforgery;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using ChatLe.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Builder;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
-using Xunit;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Identity;
+using ChatLe.Hubs;
 
-namespace chatle.test
+namespace ChatLe
 {
-    public class StartupTest
+    public class Startup
     {
+        enum DBEngine
+        {
+            SqlServer,
+            InMemory,
+            Redis,
+            SQLite,
+            MySql
+        }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-        [Fact(Skip = &quot;Skipped for the moment&quot;)]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
-        public void ConfigureTest()
-		{
-			var mockHostingEnvironment = new Mock&lt;IHostingEnvironment&gt;();
-			mockHostingEnvironment.SetupGet(h =&gt; h.EnvironmentName).Returns(&quot;Development&quot;);
-			mockHostingEnvironment.SetupGet(h =&gt; h.ContentRootPath).Returns(Directory.GetCurrentDirectory());
-			mockHostingEnvironment.SetupGet(h =&gt; h.WebRootPath).Returns(Path.Combine(Directory.GetCurrentDirectory(), &quot;wwwroo&quot;));
-			var startup = new Startup(mockHostingEnvironment.Object, new Mock&lt;ILoggerFactory&gt;().Object);
-			var serviceCollection = new ServiceCollection();
-			startup.ConfigureServices(serviceCollection);
-			var factory = new ApplicationBuilderFactory(serviceCollection.BuildServiceProvider());
-			startup.Configure(factory.CreateBuilder(new Mock&lt;IFeatureCollection&gt;().Object), new Mock&lt;IAntiforgery&gt;().Object);
-		}
-	}
+        readonly IHostingEnvironment _environment;
+        public ILoggerFactory LoggerFactory { get; private set; }
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile(&quot;config.json&quot;)
+                .AddJsonFile($&quot;config.{env.EnvironmentName}.json&quot;, optional: true);
+
+            if (env.IsDevelopment())
+            {
+                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
+                builder.AddUserSecrets&lt;Startup&gt;();
+                loggerFactory.AddDebug();
+            }
+
+            builder.AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+
+            _environment = env;
+            LoggerFactory = loggerFactory;
+            loggerFactory.AddAzureWebAppDiagnostics();
+
+            loggerFactory.AddConsole();
+        }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public virtual void ConfigureServices(IServiceCollection services)
+        {
+
+            ConfigureEntity(services);
+
+            services.AddCors();
+
+            services.AddAntiforgery(options =&gt; options.HeaderName = &quot;X-XSRF-TOKEN&quot;);
+
+            services.AddMvc();
+
+            services.AddSignalR();
+
+            services.AddChatLe(options =&gt; options.UserPerPage = int.Parse(Configuration[&quot;ChatConfig:UserPerPage&quot;]));
+
+            var authServices = services.AddAuthentication();
+            if (Configuration[&quot;Authentication:Facebook:AppId&quot;] != null)
+            { 
+                authServices.AddFacebook(facebookOptions =&gt;
+                {
+                    facebookOptions.AppId = Configuration[&quot;Authentication:Facebook:AppId&quot;];
+                    facebookOptions.AppSecret = Configuration[&quot;Authentication:Facebook:AppSecret&quot;];
+                    facebookOptions.SaveTokens = true;
+                });
+            }
+
+            if (Configuration[&quot;Authentication:Twitter:ConsumerKey&quot;] != null)
+            {
+                authServices.AddTwitter(twitterOptions =&gt;
+                {
+                    twitterOptions.ConsumerKey = Configuration[&quot;Authentication:Twitter:ConsumerKey&quot;];
+                    twitterOptions.ConsumerSecret = Configuration[&quot;Authentication:Twitter:ConsumerSecret&quot;];
+                    twitterOptions.SaveTokens = true;
+
+                });
+            }
+            if (Configuration[&quot;Authentication:Google:ClientId&quot;] != null)
+            {
+                authServices.AddGoogle(googleOption =&gt;
+                {
+                    googleOption.ClientId = Configuration[&quot;Authentication:Google:ClientId&quot;];
+                    googleOption.ClientSecret = Configuration[&quot;Authentication:Google:ClientSecret&quot;];
+                    googleOption.SaveTokens = true;
+                });
+            }
+            if (Configuration[&quot;Authentication:MicrosoftAccount:ClientId&quot;] != null)
+            {
+                authServices.AddMicrosoftAccount(microsoftAccountOptions =&gt;
+                {
+                    microsoftAccountOptions.ClientId = Configuration[&quot;Authentication:MicrosoftAccount:ClientId&quot;];
+                    microsoftAccountOptions.ClientSecret = Configuration[&quot;Authentication:MicrosoftAccount:ClientSecret&quot;];
+                    microsoftAccountOptions.SaveTokens = true;
+                });
+            }
+            if (Configuration[&quot;Authentication:Github:ClientId&quot;] != null)
+            {
+                authServices.AddOAuth(&quot;Github&quot;, options =&gt;
+                {
+                    options.ClientId = Configuration[&quot;Authentication:Github:ClientId&quot;];
+                    options.ClientSecret = Configuration[&quot;Authentication:Github:ClientSecret&quot;];
+                    options.CallbackPath = new PathString(&quot;/signin-github&quot;);
+                    options.AuthorizationEndpoint = &quot;https://github.com/login/oauth/authorize&quot;;
+                    options.TokenEndpoint = &quot;https://github.com/login/oauth/access_token&quot;;
+                    options.UserInformationEndpoint = &quot;https://api.github.com/user&quot;;
+                    options.ClaimsIssuer = &quot;OAuth2-Github&quot;;
+                    options.SaveTokens = true;
+                    // Retrieving user information is unique to each provider.
+                    options.Events = new OAuthEvents
+                    {
+                        OnCreatingTicket = async context =&gt;
+                        {
+                            // Get the GitHub user
+                            var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                            request.Headers.Authorization = new AuthenticationHeaderValue(&quot;Bearer&quot;, context.AccessToken);
+                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(&quot;application/json&quot;));
+
+                            var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                            response.EnsureSuccessStatusCode();
+
+                            var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                            var identifier = user.Value&lt;string&gt;(&quot;id&quot;);
+                            if (!string.IsNullOrEmpty(identifier))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.NameIdentifier, identifier,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var userName = user.Value&lt;string&gt;(&quot;login&quot;);
+                            if (!string.IsNullOrEmpty(userName))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimsIdentity.DefaultNameClaimType, userName,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var name = user.Value&lt;string&gt;(&quot;name&quot;);
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    &quot;urn:github:name&quot;, name,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var email = user.Value&lt;string&gt;(&quot;email&quot;);
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.Email, email,
+                                    ClaimValueTypes.Email, context.Options.ClaimsIssuer));
+                            }
+
+                            var link = user.Value&lt;string&gt;(&quot;url&quot;);
+                            if (!string.IsNullOrEmpty(link))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    &quot;urn:github:url&quot;, link,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+                        }
+                    };
+                });
+            }
+        }
+
+        private void ConfigureEntity(IServiceCollection services)
+        {
+            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration[&quot;DatabaseEngine&quot;]);
+
+            services.AddDbContext&lt;ChatLeIdentityDbContext&gt;(options =&gt;
+            {
+                if (_environment.IsDevelopment())
+                    options.EnableSensitiveDataLogging();
+
+                switch (dbEngine)
+                {
+                    case DBEngine.InMemory:
+                        options.UseInMemoryDatabase(&quot;chatle&quot;);
+                        break;
+                    case DBEngine.SqlServer:
+                        options.UseSqlServer(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.SqlServer&quot;));
+                        break;
+                    case DBEngine.SQLite:
+                        options.UseSqlite(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.Sqlite&quot;));
+                        break;
+                    case DBEngine.MySql:
+                        options.UseMySql(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.MySql&quot;));
+                        break;
+                        //case DBEngine.Redis:
+                        //    int port;
+                        //    int database;
+                        //    if (!int.TryParse(Configuration[&quot;Data:Redis:Port&quot;], out port))
+                        //        port = 6379;
+                        //    int.TryParse(Configuration[&quot;Data:Redis:Database&quot;], out database);
+
+                        //    options.UseRedisDatabase(Configuration[&quot;Data:Redis:Hostname&quot;], port, database);
+                        //    break;
+                }
+            });
+
+            services.AddIdentity&lt;ChatLeUser, IdentityRole&gt;(options =&gt;
+                {
+                    var userOptions = options.User;
+                    userOptions.AllowedUserNameCharacters += &quot; &quot;;
+                })
+                .AddEntityFrameworkStores&lt;ChatLeIdentityDbContext&gt;()
+                .AddDefaultTokenProviders();
+        }
+
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
+        {
+
+            ConfigureErrors(app);
+
+            var logger = LoggerFactory.CreateLogger(&quot;request&quot;);
+            app.UseCors(
+                builder =&gt; builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials())
+                .UseStaticFiles()
+                .UseWebSockets()
+                .UseAuthentication()
+                .Map(&quot;/xhrf&quot;, a =&gt; a.Run(async context =&gt;
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append(&quot;XSRF-TOKEN&quot;, tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+                    await context.Response.WriteAsync(tokens.RequestToken);
+                }))
+                .Map(&quot;/cls&quot;, a =&gt; a.Run(async context =&gt;
+                {
+                    var response = context.Response;
+                    foreach (var cookie in context.Request.Cookies)
+                    {
+                        response.Cookies.Delete(cookie.Key);
+                    }
+                    await context.Response.WriteAsync(string.Empty);
+                }))
+                .UseSignalR(configure =&gt;
+                {
+                    configure.MapHub&lt;ChatHub&gt;(&quot;chat&quot;);
+                })
+                .UseMvc(routes =&gt;
+                {
+                    routes.MapRoute(
+                    name: &quot;default&quot;,
+                    template: &quot;{controller}/{action}/{id?}&quot;,
+                    defaults: new { controller = &quot;Home&quot;, action = &quot;Index&quot; });
+                })
+                .UseChatLe();
+        }
+
+        protected virtual void ConfigureErrors(IApplicationBuilder app)
+        {
+            if (string.Equals(_environment.EnvironmentName, &quot;Development&quot;, StringComparison.OrdinalIgnoreCase))
+            {
+                app.UseBrowserLink();
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                // Add Error handling middleware which catches all application specific errors and
+                // send the request to the following path or controller action.
+                app.UseExceptionHandler(&quot;/Home/Error&quot;);
+            }
+        }
+    }
 }
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[21,3,21,4,0],[22,4,22,65,0],[23,4,23,83,0],[24,4,24,101,0],[25,4,25,121,0],[26,4,26,96,0],[27,4,27,52,0],[28,4,28,49,0],[29,4,29,90,0],[30,4,30,117,0],[31,3,31,4,0]]);
+      highlightRanges([[34,47,34,51,0],[34,52,34,64,0],[35,9,35,78,0],[36,9,36,10,0],[37,13,40,84,0],[42,13,42,37,0],[43,13,43,14,0],[45,17,45,51,0],[46,17,46,42,0],[47,13,47,14,0],[49,13,49,47,0],[51,13,51,45,0],[53,13,53,32,0],[54,13,54,43,0],[55,13,55,55,0],[57,13,57,40,0],[58,9,58,10,0],[60,47,60,51,0],[60,52,60,64,0],[63,9,63,10,0],[65,13,65,39,0],[67,13,67,32,0],[69,13,69,48,0],[69,48,69,83,0],[69,83,69,85,0],[69,13,69,85,0],[71,13,71,31,0],[73,13,73,35,0],[75,13,75,43,0],[75,43,75,115,0],[75,115,75,117,0],[75,13,75,117,0],[77,13,77,61,0],[78,13,78,72,0],[79,13,79,14,0],[80,17,81,17,0],[81,17,81,18,0],[81,18,82,21,0],[82,21,82,92,0],[82,92,83,21,0],[83,21,83,100,0],[83,100,84,21,0],[84,21,84,55,0],[84,55,85,17,0],[85,17,85,18,0],[85,18,85,20,0],[80,17,85,20,0],[86,13,86,14,0],[88,13,88,77,0],[89,13,89,14,0],[90,17,91,17,0],[91,17,91,18,0],[91,18,92,21,0],[92,21,92,102,0],[92,102,93,21,0],[93,21,93,108,0],[93,108,94,21,0],[94,21,94,54,0],[94,54,96,17,0],[96,17,96,18,0],[96,18,96,20,0],[90,17,96,20,0],[97,13,97,14,0],[98,13,98,73,0],[99,13,99,14,0],[100,17,101,17,0],[101,17,101,18,0],[101,18,102,21,0],[102,21,102,93,0],[102,93,103,21,0],[103,21,103,101,0],[103,101,104,21,0],[104,21,104,52,0],[104,52,105,17,0],[105,17,105,18,0],[105,18,105,20,0],[100,17,105,20,0],[106,13,106,14,0],[107,13,107,83,0],[108,13,108,14,0],[109,17,110,17,0],[110,17,110,18,0],[110,18,111,21,0],[111,21,111,114,0],[111,114,112,21,0],[112,21,112,122,0],[112,122,113,21,0],[113,21,113,63,0],[113,63,114,17,0],[114,17,114,18,0],[114,18,114,20,0],[109,17,114,20,0],[115,13,115,14,0],[116,13,116,73,0],[117,13,117,14,0],[118,17,119,17,0],[119,17,119,18,0],[119,18,120,21,0],[120,21,120,88,0],[120,88,121,21,0],[121,21,121,96,0],[121,96,122,21,0],[122,21,122,77,0],[122,77,123,21,0],[123,21,123,96,0],[123,96,124,21,0],[124,21,124,91,0],[124,91,125,21,0],[125,21,125,85,0],[125,85,126,21,0],[126,21,126,60,0],[126,60,127,21,0],[127,21,127,47,0],[127,47,129,21,0],[129,21,132,25,0],[132,25,132,26,0],[132,26,134,29,0],[134,29,134,123,0],[134,123,135,29,0],[135,29,135,122,0],[135,122,136,29,0],[136,29,136,113,0],[136,113,138,29,0],[138,29,138,125,0],[138,125,139,29,0],[139,29,139,64,0],[139,64,141,29,0],[141,29,141,98,0],[141,98,143,29,0],[143,29,143,71,0],[143,71,144,29,0],[144,29,144,67,0],[144,67,145,29,0],[145,29,145,30,0],[145,30,146,33,0],[146,33,148,92,0],[148,92,149,29,0],[149,29,149,30,0],[149,30,151,29,0],[151,29,151,72,0],[151,72,152,29,0],[152,29,152,65,0],[152,65,153,29,0],[153,29,153,30,0],[153,30,154,33,0],[154,33,156,92,0],[156,92,157,29,0],[157,29,157,30,0],[157,30,159,29,0],[159,29,159,67,0],[159,67,160,29,0],[160,29,160,61,0],[160,61,161,29,0],[161,29,161,30,0],[161,30,162,33,0],[162,33,164,92,0],[164,92,165,29,0],[165,29,165,30,0],[165,30,167,29,0],[167,29,167,69,0],[167,69,168,29,0],[168,29,168,62,0],[168,62,169,29,0],[169,29,169,30,0],[169,30,170,33,0],[170,33,172,91,0],[172,91,173,29,0],[173,29,173,30,0],[173,30,175,29,0],[175,29,175,66,0],[175,66,176,29,0],[176,29,176,61,0],[176,61,177,29,0],[177,29,177,30,0],[177,30,178,33,0],[178,33,180,92,0],[180,92,181,29,0],[181,29,181,30,0],[181,30,182,25,0],[182,25,182,26,0],[182,26,183,23,0],[129,21,183,23,0],[183,23,184,17,0],[184,17,184,18,0],[184,18,184,20,0],[118,17,184,20,0],[185,13,185,14,0],[186,9,186,10,0],[189,9,189,10,0],[190,13,190,100,0],[192,13,193,13,0],[193,13,193,14,0],[193,14,194,17,0],[194,17,194,50,0],[194,50,195,21,0],[195,21,195,58,0],[195,58,197,17,0],[197,17,197,34,0],[197,34,200,25,0],[200,25,200,63,0],[200,63,201,25,0],[201,25,201,31,0],[201,31,203,25,0],[203,25,203,109,0],[203,109,203,169,0],[203,169,203,171,0],[203,25,203,171,0],[203,171,204,25,0],[204,25,204,31,0],[204,31,206,25,0],[206,25,206,106,0],[206,106,206,163,0],[206,163,206,165,0],[206,25,206,165,0],[206,165,207,25,0],[207,25,207,31,0],[207,31,209,25,0],[209,25,209,105,0],[209,105,209,161,0],[209,161,209,163,0],[209,25,209,163,0],[209,163,210,25,0],[210,25,210,31,0],[210,31,221,13,0],[221,13,221,14,0],[221,14,221,16,0],[192,13,221,16,0],[223,13,224,17,0],[224,17,224,18,0],[224,18,225,21,0],[225,21,225,52,0],[225,52,226,21,0],[226,21,226,66,0],[226,66,227,17,0],[227,17,227,18,0],[227,18,229,45,0],[223,13,229,45,0],[230,9,230,10,0],[233,9,233,10,0],[235,13,235,34,0],[237,13,237,64,0],[238,13,239,28,0],[239,28,242,40,0],[242,40,246,36,0],[246,36,247,17,0],[247,17,247,18,0],[247,18,248,21,0],[248,21,248,73,0],[248,73,249,21,0],[249,21,249,130,0],[249,130,250,21,0],[250,21,250,76,0],[250,76,251,17,0],[251,17,251,18,0],[251,18,251,19,0],[246,36,251,19,0],[251,19,252,35,0],[252,35,253,17,0],[253,17,253,18,0],[253,18,254,21,0],[254,21,254,53,0],[254,53,255,21,0],[255,21,255,28,0],[255,28,255,30,0],[255,30,255,40,0],[255,40,255,41,0],[255,41,255,43,0],[255,43,255,44,0],[255,44,255,67,0],[255,67,256,21,0],[256,21,256,22,0],[256,22,257,25,0],[257,25,257,61,0],[257,61,258,21,0],[258,21,258,22,0],[258,22,259,21,0],[259,21,259,69,0],[259,69,260,17,0],[260,17,260,18,0],[260,18,260,19,0],[252,35,260,19,0],[260,19,262,17,0],[262,17,262,18,0],[262,18,263,21,0],[263,21,263,55,0],[263,55,264,17,0],[264,17,264,18,0],[264,18,266,17,0],[266,17,266,18,0],[266,18,267,21,0],[267,21,270,78,0],[270,78,271,17,0],[271,17,271,18,0],[271,18,272,30,0],[238,13,272,30,0],[273,9,273,10,0],[276,9,276,10,0],[277,13,277,112,0],[278,13,278,14,0],[279,17,279,38,0],[280,17,280,49,0],[281,17,281,44,0],[282,13,282,14,0],[284,13,284,14,0],[287,17,287,56,0],[288,13,288,14,0],[289,9,289,10,0]]);
     </script>
   </body>
 </html>

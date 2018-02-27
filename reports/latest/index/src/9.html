@@ -2,47 +2,211 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\Program.cs</title>
+    <title>C:\projects\chatle\src\chatle\Controllers\ChatController.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using ChatLe;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using System.IO;
+using ChatLe.Hubs;
+using ChatLe.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using ChatLe.ViewModels;
 
-namespace chatle
+// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace ChatLe.Controllers
 {
-    public class Program
+    /// &lt;summary&gt;
+    /// Chat API controller
+    /// &lt;/summary&gt;
+    [Route(&quot;api/chat&quot;)]
+    public class ChatController : Controller
     {
-        public static void Main(string[] args)
+        private readonly IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; _chatManager;
+        private readonly IHubContext&lt;ChatHub&gt; _hub;
+        private readonly UserManager&lt;ChatLeUser&gt; _userManager;
+        /// &lt;summary&gt;
+        /// Constructor
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;chatManager&quot;&gt;the chat repository manager&lt;/param&gt;
+        /// &lt;param name=&quot;signalRConnectionManager&quot;&gt;the SignalR connection manager&lt;/param&gt;
+        /// &lt;param name=&quot;userManager&quot;&gt;the Identity user manager&lt;/param&gt;
+        public ChatController(IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; chatManager, IHubContext&lt;ChatHub&gt; hubContext, UserManager&lt;ChatLeUser&gt; userManager)
         {
-            var config = new ConfigurationBuilder()
-                .AddCommandLine(args)
-                .Build();
-
-            string rootPath = Directory.GetCurrentDirectory();
-            if (args.Length == 1)
-                rootPath += &#39;/&#39; + args[0];
-
-            var host = new WebHostBuilder()
-                .UseContentRoot(rootPath)
-                .UseConfiguration(config)
-                .UseStartup&lt;Startup&gt;()
-                .UseIISIntegration()
-                .UseKestrel()
-                .Build();
-
-            host.Run();
+            _chatManager = chatManager;
+            _hub = hubContext;
+            _userManager = userManager;
         }
+        /// &lt;summary&gt;
+        /// Get messages in a conversation
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;id&quot;&gt;the conversation id&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&lt;IEnumerable&lt;MessageViewModel&gt;&gt;&quot;/&gt; with the messages list as result&lt;/returns&gt;
+        // GET: /&lt;controller&gt;/
+        [HttpGet(&quot;{id}&quot;)]
+        public async Task&lt;IEnumerable&lt;MessageViewModel&gt;&gt; Get(string id)
+        {
+            var messages = await _chatManager.GetMessagesAsync(id);
+            var users = new List&lt;ChatLeUser&gt;(2);
+            var messagesVM = new List&lt;MessageViewModel&gt;(messages.Count());
+            foreach (var message in messages)
+            {
+                var user = users.FirstOrDefault(u =&gt; u.Id == message.UserId);
+                if (user == null)
+                {
+                    user = await _userManager.FindByIdAsync(message.UserId);
+                    if (user == null)
+                        continue;
+                }
+                messagesVM.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
+            }
+
+            return messagesVM;
+        }
+
+        /// &lt;summary&gt;
+        /// Gets conversations for the current user
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&lt;IEnumerable&lt;ConversationViewModel&gt;&gt;&quot;/&gt; with the conversations list as result&lt;/returns&gt;
+        [HttpGet()]
+        public async Task&lt;IEnumerable&lt;ConversationViewModel&gt;&gt; Get()
+        {
+            var userName = HttpContext.User.Identity.Name;
+            var conversations = await _chatManager.GetConversationsAsync(userName);
+            if (conversations == null)
+                return null;
+                
+            var length = conversations.Count();
+            var users = new List&lt;ChatLeUser&gt;(length);
+            var conversationsVM = new List&lt;ConversationViewModel&gt;(length);
+            foreach (var conv in conversations)
+            {
+                var attendees = conv.Attendees;
+                var attendeesVM = new List&lt;AttendeeViewModel&gt;(attendees.Count);
+                foreach (var attendee in attendees)
+                {
+                    var u = await _userManager.FindByIdAsync(attendee.UserId);
+                    if (u == null)
+                        continue;
+
+                    users.Add(u);
+                    attendeesVM.Add(new AttendeeViewModel() { UserId = u.UserName });
+                }
+
+                if (attendeesVM.Count &lt; 2)
+                    continue;
+
+                var messages = conv.Messages;
+                var messagesVM = new List&lt;MessageViewModel&gt;(messages.Count());
+                foreach (var message in messages)
+                {
+                    var user = users.FirstOrDefault(u =&gt; u.Id == message.UserId);
+                    if (user == null)
+                    {
+                        user = await _userManager.FindByIdAsync(message.UserId);
+                        if (user == null)
+                            continue;
+                    }
+                    messagesVM.Add(new MessageViewModel() { ConversationId = conv.Id, Date = message.Date, From = user.UserName, Text = message.Text });
+                }
+
+                conversationsVM.Add(new ConversationViewModel() { Id = conv.Id, Attendees = attendeesVM, Messages = messagesVM });
+            }
+
+            return conversationsVM;
+        }
+
+        /// &lt;summary&gt;
+        /// Send a message in a conversation asyncronously
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The message to send&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&quot;/&gt;&lt;/returns&gt;
+        [HttpPost()]
+        public async Task SendMessage([FromBody] MessageToSend data)
+        {
+            var to = data.To;
+            var text = data.Text;
+            
+            var userName = HttpContext.User.Identity.Name;
+            var message = new Message() { ConversationId = to, Text  = text, Date = DateTime.Now };
+            var conv = await _chatManager.AddMessageAsync(userName, to, message);
+            if (conv == null)
+                return;
+            foreach(var attendee in conv.Attendees)
+            {
+                var user = await _userManager.FindByIdAsync(attendee.UserId);
+                if (user != null &amp;&amp; user.UserName != userName)
+                    await _hub.Clients.Group(user.UserName).InvokeAsync(&quot;messageReceived&quot;, new { conversationId = to, date = message.Date, from = HttpContext.User.Identity.Name, text = text });
+            }            
+        }
+
+        /// &lt;summary&gt;
+        /// Get or create a one to one conversation asyncronously
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;Initial message to send&lt;/param&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task&lt;string&gt;&quot;/&gt; with the conversation id as result or null if the user doesn&#39;t exist&lt;/returns&gt;
+        [HttpPost(&quot;conv&quot;)]
+        public async Task&lt;string&gt; CreateConversation([FromBody] MessageToSend data)
+        {
+            var to = data.To;
+            var text = data.Text;
+
+            var userName = HttpContext.User.Identity.Name;
+            
+            var conversation = await _chatManager.GetOrCreateConversationAsync(userName, to, text);
+
+            var users = new List&lt;ChatLeUser&gt;(conversation.Attendees.Count);
+            var attendees = new List&lt;AttendeeViewModel&gt;(conversation.Attendees.Count);
+            foreach(var attendee in conversation.Attendees)
+            {
+                var u = await _userManager.FindByIdAsync(attendee.UserId);
+                if (u == null)
+                    return null;
+
+                users.Add(u);
+                attendees.Add(new AttendeeViewModel() { UserId = u.UserName });
+            }
+            var messages = new List&lt;MessageViewModel&gt;(conversation.Messages.Count);
+            foreach(var message in conversation.Messages)
+            {
+                var user = users.FirstOrDefault(u =&gt; u.Id == message.UserId);
+                if (user == null)
+                {
+                    user = await _userManager.FindByIdAsync(message.UserId);
+                    if (user == null)
+                        continue;
+                }
+                messages.Add(new MessageViewModel() { Date = message.Date, From = user.UserName, Text = message.Text });
+            }
+
+            await _hub.Clients.Group(to).InvokeAsync(&quot;joinConversation&quot;, new 
+            { 
+                id = conversation.Id,
+                attendees = attendees.Select(a =&gt; new { userId = a.UserId }),
+                messages = messages.Select(m =&gt; new 
+                    { 
+                        date = m.Date, 
+                        from = m.From, 
+                        text = m.Text 
+                    }) 
+            });
+            
+            return conversation.Id;
+        }
+
     }
 }
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[11,9,11,10,0],[12,13,14,26,0],[16,13,16,63,0],[17,13,17,34,0],[18,17,18,43,0],[20,13,26,26,0],[28,13,28,24,0],[29,9,29,10,0]]);
+      highlightRanges([[31,9,31,203,1],[32,9,32,10,1],[33,13,33,40,1],[34,13,34,31,1],[35,13,35,40,1],[36,9,36,10,1],[45,9,45,10,1],[46,13,46,68,1],[47,13,47,49,1],[48,13,48,75,1],[49,13,49,20,1],[49,22,49,33,1],[49,34,49,36,1],[49,37,49,45,1],[50,13,50,14,1],[51,17,51,54,1],[51,54,51,76,0],[51,76,51,78,1],[51,17,51,78,1],[52,17,52,34,1],[53,17,53,18,1],[54,21,54,77,1],[55,21,55,38,1],[56,25,56,34,1],[57,17,57,18,1],[58,17,58,123,1],[59,13,59,14,1],[61,13,61,31,1],[62,9,62,10,1],[70,9,70,10,1],[71,13,71,59,1],[72,13,72,84,1],[73,13,73,39,1],[74,17,74,29,0],[76,13,76,48,1],[77,13,77,54,1],[78,13,78,75,1],[79,13,79,20,1],[79,22,79,30,1],[79,31,79,33,1],[79,34,79,47,1],[80,13,80,14,1],[81,17,81,48,1],[82,17,82,80,1],[83,17,83,24,1],[83,26,83,38,1],[83,39,83,41,1],[83,42,83,51,1],[84,17,84,18,1],[85,21,85,79,1],[86,21,86,35,1],[87,25,87,34,1],[89,21,89,34,1],[90,21,90,86,1],[91,17,91,18,1],[93,17,93,43,1],[94,21,94,30,1],[96,17,96,46,1],[97,17,97,79,1],[98,17,98,24,1],[98,26,98,37,1],[98,38,98,40,1],[98,41,98,49,1],[99,17,99,18,1],[100,21,100,58,1],[100,58,100,80,1],[100,80,100,82,1],[100,21,100,82,1],[101,21,101,38,1],[102,21,102,22,1],[103,25,103,81,1],[104,25,104,42,1],[105,29,105,38,1],[106,21,106,22,1],[107,21,107,153,1],[108,17,108,18,1],[110,17,110,131,1],[111,13,111,14,1],[113,13,113,36,1],[114,9,114,10,1],[123,9,123,10,1],[124,13,124,30,1],[125,13,125,34,1],[127,13,127,59,1],[128,13,128,100,1],[129,13,129,82,1],[130,13,130,30,1],[131,17,131,24,1],[132,13,132,20,1],[132,21,132,33,1],[132,34,132,36,1],[132,37,132,51,1],[133,13,133,14,1],[134,17,134,78,1],[135,17,135,63,1],[136,21,136,194,1],[137,13,137,14,1],[138,9,138,10,1],[147,9,147,10,1],[148,13,148,30,1],[149,13,149,34,1],[151,13,151,59,1],[153,13,153,100,1],[155,13,155,76,1],[156,13,156,87,1],[157,13,157,20,1],[157,21,157,33,1],[157,34,157,36,1],[157,37,157,59,1],[158,13,158,14,1],[159,17,159,75,1],[160,17,160,31,1],[161,21,161,33,1],[163,17,163,30,1],[164,17,164,80,1],[165,13,165,14,1],[166,13,166,84,1],[167,13,167,20,1],[167,21,167,32,1],[167,33,167,35,1],[167,36,167,57,1],[168,13,168,14,1],[169,17,169,54,1],[169,54,169,76,1],[169,76,169,78,1],[169,17,169,78,1],[170,17,170,34,1],[171,17,171,18,1],[172,21,172,77,1],[173,21,173,38,1],[174,25,174,34,1],[175,17,175,18,1],[176,17,176,121,1],[177,13,177,14,1],[179,13,182,51,1],[182,51,182,76,0],[182,76,183,49,1],[183,49,188,22,0],[188,22,189,16,1],[179,13,189,16,1],[191,13,191,36,1],[192,9,192,10,1]]);
     </script>
   </body>
 </html>
