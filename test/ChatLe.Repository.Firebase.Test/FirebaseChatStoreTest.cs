@@ -13,13 +13,19 @@ using Xunit;
 
 namespace ChatLe.Repository.Firebase.Test
 {
-    public class FirebaseChatStoreTest
+    public class FirebaseChatStoreTest: IClassFixture<FirebaseStoreFixture>
     {
+        private readonly FirebaseStoreFixture _fixture;
+
+        public FirebaseChatStoreTest(FirebaseStoreFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
         [Fact]
         public async Task FirebaseChatStoreMethodsThrowArgumentNullExceptionTest()
         {
-            var provider = Initialize();
-            var sut = GetStore(provider);
+            var sut = _fixture.GetStore();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAttendeeAsync(null));
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateConversationAsync(null));
@@ -41,11 +47,9 @@ namespace ChatLe.Repository.Firebase.Test
         [Fact]
         public async Task CreateConversationByManagerTest()
         {
-            var provider = Initialize();
-            var sut = GetStore(provider);
-            sut.Init();
-            var manager = GetChatManager(provider);
-            var userManager = provider.GetRequiredService<UserManager<ChatLeUser>>();
+            var sut = _fixture.GetStore();
+            var manager = _fixture.GetChatManager();
+            var userManager = _fixture.GetUserManager();
 
             var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName= "TEST1" };
             var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
@@ -65,11 +69,9 @@ namespace ChatLe.Repository.Firebase.Test
         [Fact]
         public async Task GetUsersConnectedTest()
         {
-            var provider = Initialize();
-            var sut = GetStore(provider);
-            sut.Init();
-            var manager = GetChatManager(provider);
-            var userManager = provider.GetRequiredService<UserManager<ChatLeUser>>();
+            var sut = _fixture.GetStore();
+            var manager = _fixture.GetChatManager();
+            var userManager = _fixture.GetUserManager();
 
             var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName = "TEST1" };
             var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
@@ -77,8 +79,7 @@ namespace ChatLe.Repository.Firebase.Test
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
-            var client = provider.GetRequiredService<IFirebaseClient>();
-            await client.DeleteAsync("connections");
+            var client = _fixture.GetClient();
 
             int? count;
             do
@@ -117,11 +118,9 @@ namespace ChatLe.Repository.Firebase.Test
         [Fact]
         public async Task RemoveConnectionIdAsyncTest()
         {
-            var provider = Initialize();
-            var sut = GetStore(provider);
-            sut.Init();
-            var manager = GetChatManager(provider);
-            var userManager = provider.GetRequiredService<UserManager<ChatLeUser>>();
+            var sut = _fixture.GetStore();
+            var manager = _fixture.GetChatManager();
+            var userManager = _fixture.GetUserManager();
 
             var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName = "TEST1" };
             var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
@@ -133,44 +132,6 @@ namespace ChatLe.Repository.Firebase.Test
             await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
 
             await manager.RemoveConnectionIdAsync("test2", "test", true);
-        }
-
-        private IServiceProvider Initialize()
-        {
-            var builder = new ConfigurationBuilder();
-            var configuration = builder.AddUserSecrets<FirebaseChatStoreTest>()
-                .AddEnvironmentVariables()
-                .Build();
-
-            var services = new ServiceCollection();
-            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
-                {
-                    var userOptions = options.User;
-                    userOptions.AllowedUserNameCharacters += " ";
-                })
-                .AddFirebaseStores(configuration["FirebaseOptions:DatabaseUrl"], p =>
-                {
-                    return GoogleCredential.FromFile(@"..\..\..\..\privatekey.json")
-                        .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
-                        .UnderlyingCredential;
-                })
-                .AddDefaultTokenProviders();
-
-            services.AddLogging()
-                .AddChatLe()
-                .AddFirebaseChatStore<ChatLeUser, Conversation, Attendee, Message, NotificationConnection>();
-
-            return services.BuildServiceProvider();
-        }
-
-        private IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> GetStore(IServiceProvider provider)
-        {
-            return provider.GetRequiredService<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
-        }
-
-        private IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection> GetChatManager(IServiceProvider provider)
-        {
-            return provider.GetRequiredService<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
         }
     }
 }

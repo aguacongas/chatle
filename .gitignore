@@ -41,3 +41,4 @@ config.development.json
 /secure-file
 /JetBrains.dotCover.CommandLineTools
 *.snapshot
+/src/ChatLe.Repository.Identity.Firebase/FirebaseFunctions/functions/lib
