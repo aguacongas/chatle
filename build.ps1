@@ -10,7 +10,7 @@ gci -rec `
     $testArgs = "test " + $_.FullName
     Write-Host "testargs" $testArgs
     Write-Host "coveragefile" $coveragefile
-    JetBrains.dotCover.CommandLineTools\tools\dotCover.exe cover /TargetExecutable="C:\Program Files\dotnet\dotnet.exe" /TargetArguments="$testArgs" /Filters="-:*.Test;-:xunit.*;-:MSBuild;-:Moq" /Output="$_.snapshot"
+    JetBrains.dotCover.CommandLineTools\tools\dotCover.exe cover /TargetExecutable="C:\Program Files\dotnet\dotnet.exe" /TargetArguments="$testArgs" /Filters="-:*.Test;-:*.test;-:xunit.*;-:MSBuild;-:Moq;-:StackExchange.*" /Output="$_.snapshot"
     
     if ($LASTEXITCODE -ne 0) {
         $result = $LASTEXITCODE
