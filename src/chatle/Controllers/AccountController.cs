@@ -595,7 +595,7 @@ namespace ChatLe.Controllers
 			if (user != null)
 			{
                 var isGuess = await ChatManager.IsGuess(user);
-                await HubContext.Clients.All.InvokeAsync("userDisconnected", new { id = user.UserName, isRemoved = isGuess });
+                //await HubContext.Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = isGuess });
 				if (isGuess)
 				{
 					await ChatManager.RemoveUserAsync(user);

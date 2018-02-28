@@ -280,7 +280,7 @@ namespace ChatLe
                 }))
                 .UseSignalR(configure =>
                 {
-                    configure.MapHub<ChatHub>("chat");
+                    configure.MapHub<ChatHub>("/chat");
                 })
                 .UseMvc(routes =>
                 {

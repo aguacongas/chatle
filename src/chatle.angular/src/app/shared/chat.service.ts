@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { HubConnection, HttpConnection } from '@aspnet/signalr-client';
+import { HubConnection, HttpConnection } from '@aspnet/signalr';
 import { SignalrService } from './signalr-client';
-import 'rxjs/add/operator/toPromise';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 import { Settings } from './settings';
 import { User } from './user';
@@ -67,6 +68,12 @@ export class ChatService {
     signalrService.on('joinConversation', conv =>
       this.onJoinConversation(conv)
     );
+    signalrService.closed.subscribe(error => {
+      this.start(true);
+    }, error => {
+      this.currentState = ConnectionState.Error;
+      this.connectionStateSubject.next(this.currentState);
+    });
   }
 
   start(debug: boolean): Observable<ConnectionState> {
@@ -91,74 +98,52 @@ export class ChatService {
     conversation: Conversation,
     message: string
   ): Observable<Message> {
-    const messageSubject = new Subject<Message>();
-
     const m = new Message();
     m.conversationId = conversation.id;
     m.from = this.settings.userName;
     m.text = message;
 
     if (conversation.id) {
-      this.http
-        .post(this.settings.chatAPI, {
+      return this.http
+        .post<Message>(this.settings.chatAPI, {
           to: conversation.id,
           text: message
-        })
-        .subscribe(
-          response => messageSubject.next(m),
-          error => messageSubject.error(error)
-        );
+        });
     } else {
       const attendee = conversation.attendees.find(
         a => a.userId !== this.settings.userName
       );
-      this.http
+      return this.http
         .post<string>(this.settings.convAPI, {
           to: attendee.userId,
           text: message
         })
-        .subscribe(
+        .map(
           response => {
             conversation.id = response;
             this.setConversationTitle(conversation);
             this.joinConversationSubject.next(conversation);
-            messageSubject.next(m);
-          },
-          error => messageSubject.error(error)
-        );
+            return m;
+          });
     }
-
-    return messageSubject.asObservable();
   }
 
   getUsers(): Observable<User[]> {
-    const subject = new Subject<User[]>();
-
-    this.http.get<any>(this.settings.userAPI).subscribe(
+    return this.http.get<any>(this.settings.userAPI).map(
       response => {
         const data = response;
         if (data && data.users) {
-          subject.next(data.users as User[]);
+          return data.users as User[];
         }
-      },
-      error => subject.error(error)
-    );
-
-    return subject.asObservable();
+      });
   }
 
   getConversations(): Observable<Conversation[]> {
-    const subject = new Subject<Conversation[]>();
-
-    this.http.get<Conversation[]>(this.settings.chatAPI).subscribe(
+    return this.http.get<Conversation[]>(this.settings.chatAPI).map(
       conversations => {
         conversations.forEach(value => this.setConversationTitle(value));
-        subject.next(conversations);
-      },
-      error => subject.error(error)
-    );
-
-    return subject.asObservable();
+        return conversations;
+      });
   }
 
   private setConversationTitle(conversation: Conversation) {

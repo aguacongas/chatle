@@ -59,7 +59,7 @@ namespace ChatLe.Hubs
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			
 			await Groups.AddAsync(Context.ConnectionId, name);
-			await Clients.All.InvokeAsync("userConnected", new { id = name });
+			await Clients.All.SendAsync("userConnected", new { id = name });
 			await base.OnConnectedAsync();
 		}
 		
@@ -79,7 +79,7 @@ namespace ChatLe.Hubs
             Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
 			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
 			if (user != null)
-				await Clients.All.InvokeAsync("userDisconnected", new { id = user.UserName, isRemoved = Manager.IsGuess(user) });
+				await Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = Manager.IsGuess(user) });
 			await base.OnDisconnectedAsync(ex);
 		}
 	}
