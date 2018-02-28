@@ -155,14 +155,35 @@ namespace ChatLe.Repository.Identity.Firebase
                 throw new ArgumentNullException(nameof(toConversationId));
             }
 
-            if ((await _client.GetAsync<object>(GetFirebasePath(ConversationTableName, toConversationId))).Data != null)
+            TConversation conversation = null;
+            IEnumerable<TAttendee> attendees = null;
+            Task.WaitAll(Task.Run(async () =>
             {
-                var c = new TConversation();
-                c.Id = toConversationId;
-                return c;
+                if ((await _client.GetAsync<object>(GetFirebasePath(ConversationTableName, toConversationId))).Data != null)
+                {
+                    conversation = new TConversation();
+                    conversation.Id = toConversationId;
+                }
+            }), Task.Run(async () =>
+            {
+                var attendeesResult = await _client.GetAsync<Dictionary<string, TAttendee>>(GetFirebasePath(AttendeeTableName), cancellationToken, false, $"orderBy=\"ConversationId\"&equalTo=\"{toConversationId}\"");
+                if (attendeesResult.Data != null)
+                {
+                    attendees = attendeesResult.Data.Values;
+                }
+            }));
+
+            if (conversation == null || attendees == null)
+            {
+                return null;
             }
 
-            return null;
+            foreach (var attendee in attendees)
+            {
+                conversation.Attendees.Add(attendee);
+            }
+
+            return conversation;
         }
 
         public async virtual Task<IEnumerable<TConversation>> GetConversationsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -214,10 +235,10 @@ namespace ChatLe.Repository.Identity.Firebase
 
         public async virtual Task<Page<TUser>> GetUsersConnectedAsync(int pageIndex = 0, int pageLength = 50, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var countResult = await _client.GetAsync<int>(GetFirebasePath(UserCountTableName), cancellationToken);
+            var countResult = await _client.GetAsync<int?>(GetFirebasePath(UserCountTableName), cancellationToken);
             var count = countResult.Data;
 
-            if (count == 0)
+            if (!count.HasValue || count == 0)
             {
                 return new Page<TUser>(new List<TUser>(0), pageIndex, 0);
             }
@@ -245,7 +266,7 @@ namespace ChatLe.Repository.Identity.Firebase
                 taskList.Add(_userStore.FindByIdAsync(id, cancellationToken));
             }
             var users = await Task.WhenAll(taskList);
-            return new Page<TUser>(users, pageIndex, count / pageLength);
+            return new Page<TUser>(users, pageIndex, count.Value / pageLength);
         }
 
         public virtual void Init()
@@ -271,7 +292,8 @@ namespace ChatLe.Repository.Identity.Firebase
                 On = new string[] { "ConnectionDate", "UserId" }
             };
 
-            _client.PutAsync(RulePath, rules).GetAwaiter().GetResult();
+            Task.WaitAll(_client.PutAsync(RulePath, rules),
+                _client.DeleteAsync(NotificationConnectionsTableName));
         }
 
         public virtual async Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken)) 

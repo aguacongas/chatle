@@ -15,7 +15,7 @@ environment:
   ASPNETCORE_ENVIRONMENT: Staging
   decrypt_secret:
     secure: I4cwOQ4JlCkdD23TgTvRdkAKOm8AueV0TwqLWAd9lnY=
-  FirebaseOptions:DatabaseUrl:
+  FirebaseOptions:TestDatabaseUrl:
     secure: NgkUvSOeZv8qeLIX5tW1qdVJWOuGa1idsXrexYrHVEO4+PgORX4Qk0wkMJg2I6mp
   access_token:
     secure: FQHQqH6cYqJP4NJ+2KvrqCykj7h3t8IThRC0LY8/Lrs+FIAfRTi4Jam9tkike5KW
