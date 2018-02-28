@@ -22,7 +22,7 @@ export class ConversationComponent implements OnInit {
         this.service.userDiscconnected
             .subscribe(
                 user => {
-                    if (user.isRemoved
+                  if (user.isRemoved && this.conversation
                         && this.conversation.attendees.some(a => a.userId === user.id)
                         && this.conversation.attendees.length < 3) {
                             delete this.conversation;
