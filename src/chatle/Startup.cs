@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Identity;
 using ChatLe.Hubs;
+using ChatLe.Cryptography;
+using Google.Apis.Auth.OAuth2;
 
 namespace ChatLe
 {
@@ -27,7 +29,8 @@ namespace ChatLe
             InMemory,
             Redis,
             SQLite,
-            MySql
+            MySql,
+            Firebase
         }
 
         readonly IHostingEnvironment _environment;
@@ -61,18 +64,15 @@ namespace ChatLe
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
+                .AddCors()
+                .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
             ConfigureEntity(services);
-
-            services.AddCors();
-
-            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
             services.AddMvc();
 
             services.AddSignalR();
-
-            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]));
 
             var authServices = services.AddAuthentication();
             if (Configuration["Authentication:Facebook:AppId"] != null)
@@ -187,27 +187,37 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
+            var identyBuilder = services.AddIdentity<ChatLeUser, IdentityRole>(options =>
+                        {
+                            var userOptions = options.User;
+                            userOptions.AllowedUserNameCharacters += " ";
+                        })
+                .AddDefaultTokenProviders();
+
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
-
-            services.AddDbContext<ChatLeIdentityDbContext>(options =>
+            if (dbEngine != DBEngine.Firebase)
             {
-                if (_environment.IsDevelopment())
-                    options.EnableSensitiveDataLogging();
+                identyBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
 
-                switch (dbEngine)
+                services.AddDbContext<ChatLeIdentityDbContext>(options =>
                 {
-                    case DBEngine.InMemory:
-                        options.UseInMemoryDatabase("chatle");
-                        break;
-                    case DBEngine.SqlServer:
-                        options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.SqlServer"));
-                        break;
-                    case DBEngine.SQLite:
-                        options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
-                        break;
-                    case DBEngine.MySql:
-                        options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
-                        break;
+                    if (_environment.IsDevelopment())
+                        options.EnableSensitiveDataLogging();
+
+                    switch (dbEngine)
+                    {
+                        case DBEngine.InMemory:
+                            options.UseInMemoryDatabase("chatle");
+                            break;
+                        case DBEngine.SqlServer:
+                            options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.SqlServer"));
+                            break;
+                        case DBEngine.SQLite:
+                            options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
+                            break;
+                        case DBEngine.MySql:
+                            options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
+                            break;
                         //case DBEngine.Redis:
                         //    int port;
                         //    int database;
@@ -218,15 +228,25 @@ namespace ChatLe
                         //    options.UseRedisDatabase(Configuration["Data:Redis:Hostname"], port, database);
                         //    break;
                 }
-            });
-
-            services.AddIdentity<ChatLeUser, IdentityRole>(options =>
+                });
+            }
+            else
+            {
+                identyBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
                 {
-                    var userOptions = options.User;
-                    userOptions.AllowedUserNameCharacters += " ";
-                })
-                .AddEntityFrameworkStores<ChatLeIdentityDbContext>()
-                .AddDefaultTokenProviders();
+                    using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
+                    {
+                        using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                        {
+                            return GoogleCredential.FromStream(stream)
+                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
+                                .UnderlyingCredential;
+                        }
+                    }
+                });
+
+                services.AddFirebaseChatStore();
+            }
         }
 
         public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)

@@ -2,13 +2,13 @@
 	"ChatConfig": {
 		"UserPerPage": 25
 	},
-	"DatabaseEngine": "InMemory",
+	"DatabaseEngine": "Firebase",
 	"CreateDatabase": "false",
-	"Data": {
-		"DefaultConnection": {
-			"ConnectionString": "Filename=./ChatLeDbContext.db"
-		}
-	},
+    "Data": {
+        "DefaultConnection": {
+            "ConnectionString": "Filename=./ChatLeDbContext.db"
+        }
+    },
 	"Identity": {
 		"Password": {
 			"RequireDigit": "false",
