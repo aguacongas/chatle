@@ -53,11 +53,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Repository.Identity.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Repository.Firebase.Test", "test\ChatLe.Repository.Firebase.Test\ChatLe.Repository.Firebase.Test.csproj", "{423148AD-F405-42F2-A8C8-2CD48628824B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatLe.Cryptography", "src\ChatLe.Cryptography\ChatLe.Cryptography.csproj", "{C03C9636-DCD1-4574-BADF-5EDF04C5FF2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Cryptography", "src\ChatLe.Cryptography\ChatLe.Cryptography.csproj", "{C03C9636-DCD1-4574-BADF-5EDF04C5FF2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatLe.Cryptography.Test", "test\ChatLe.Cryptography.Test\ChatLe.Cryptography.Test.csproj", "{ED4CCBC8-1247-49D7-9053-31F30696AEF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Cryptography.Test", "test\ChatLe.Cryptography.Test\ChatLe.Cryptography.Test.csproj", "{ED4CCBC8-1247-49D7-9053-31F30696AEF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatLe.Cryptography.Tools", "src\dotnet-encrypt\ChatLe.Cryptography.Tools.csproj", "{AF39E532-6A1F-4061-9535-4B1603288032}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatLe.Cryptography.Tools", "src\dotnet-encrypt\ChatLe.Cryptography.Tools.csproj", "{AF39E532-6A1F-4061-9535-4B1603288032}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,7 +166,6 @@ Global
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B}.Verbose|Any CPU.ActiveCfg = Debug|Any CPU
 		{A39713E8-C2AF-42DF-B13E-17CF381AA56B}.Verbose|Any CPU.Build.0 = Debug|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.k10|Any CPU.ActiveCfg = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.k10|Any CPU.Build.0 = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Log Output|Any CPU.ActiveCfg = Release|Any CPU
@@ -174,7 +173,6 @@ Global
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.net45|Any CPU.ActiveCfg = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.net45|Any CPU.Build.0 = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Verbose|Any CPU.ActiveCfg = Release|Any CPU
 		{1D65E280-7675-4150-9833-4EE0F3BCA3FA}.Verbose|Any CPU.Build.0 = Release|Any CPU
 		{83642C36-BE4F-4583-BD69-46531BC6C23A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

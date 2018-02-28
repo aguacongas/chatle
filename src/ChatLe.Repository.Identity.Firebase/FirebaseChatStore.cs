@@ -157,7 +157,7 @@ namespace ChatLe.Repository.Identity.Firebase
 
             TConversation conversation = null;
             IEnumerable<TAttendee> attendees = null;
-            Task.WaitAll(Task.Run(async () =>
+            await Task.WhenAll(Task.Run(async () =>
             {
                 if ((await _client.GetAsync<object>(GetFirebasePath(ConversationTableName, toConversationId))).Data != null)
                 {
