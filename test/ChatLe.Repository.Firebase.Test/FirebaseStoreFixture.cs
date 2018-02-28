@@ -32,11 +32,11 @@ namespace ChatLe.Repository.Firebase.Test
 
             var services = new ServiceCollection();
             services.AddIdentity<ChatLeUser, IdentityRole>(options =>
-            {
-                var userOptions = options.User;
-                userOptions.AllowedUserNameCharacters += " ";
-            })
-                .AddFirebaseStores(configuration["FirebaseOptions:DatabaseUrl"], p =>
+                {
+                    var userOptions = options.User;
+                    userOptions.AllowedUserNameCharacters += " ";
+                })
+                .AddFirebaseStores(configuration["FirebaseOptions:TestDatabaseUrl"], p =>
                 {
                     return GoogleCredential.FromFile(@"..\..\..\..\privatekey.json")
                         .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")

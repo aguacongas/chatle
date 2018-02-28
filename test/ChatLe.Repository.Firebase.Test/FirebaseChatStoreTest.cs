@@ -51,16 +51,16 @@ namespace ChatLe.Repository.Firebase.Test
             var manager = _fixture.GetChatManager();
             var userManager = _fixture.GetUserManager();
 
-            var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName= "TEST1" };
-            var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
+            var user1 = new ChatLeUser { UserName = "test1" };
+            var user2 = new ChatLeUser { UserName = "test2" };
 
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
-            var conversation1 = await manager.GetOrCreateConversationAsync(user1.NormalizedUserName, user2.NormalizedUserName, "test");
+            var conversation1 = await manager.GetOrCreateConversationAsync(user1.UserName, user2.UserName, "test");
             Assert.NotNull(conversation1);
 
-            var conversation2 = await manager.GetOrCreateConversationAsync(user2.NormalizedUserName, user1.NormalizedUserName, "test");
+            var conversation2 = await manager.GetOrCreateConversationAsync(user2.UserName, user1.UserName, "test");
 
             Assert.NotNull(conversation2);
             Assert.Equal(conversation1.Id, conversation2.Id);
@@ -73,8 +73,8 @@ namespace ChatLe.Repository.Firebase.Test
             var manager = _fixture.GetChatManager();
             var userManager = _fixture.GetUserManager();
 
-            var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName = "TEST1" };
-            var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
+            var user1 = new ChatLeUser { UserName = "test1" };
+            var user2 = new ChatLeUser { UserName = "test2" };
 
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
@@ -88,8 +88,8 @@ namespace ChatLe.Repository.Firebase.Test
             }
             while (!count.HasValue || count != 0);
 
-            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test1", "test");
-            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
+            await manager.AddConnectionIdAsync(user1.UserName, "test1", "test");
+            await manager.AddConnectionIdAsync(user1.UserName, "test2", "test");
 
             while((await client.GetAsync<int>("connections-count")).Data != 2);
             var result = await manager.GetUsersConnectedAsync();
@@ -122,16 +122,39 @@ namespace ChatLe.Repository.Firebase.Test
             var manager = _fixture.GetChatManager();
             var userManager = _fixture.GetUserManager();
 
-            var user1 = new ChatLeUser { UserName = "test1", NormalizedUserName = "TEST1" };
-            var user2 = new ChatLeUser { UserName = "test2", NormalizedUserName = "TEST2" };
+            var user1 = new ChatLeUser { UserName = "test1" };
+            var user2 = new ChatLeUser { UserName = "test2" };
 
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
-            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test1", "test");
-            await manager.AddConnectionIdAsync(user1.NormalizedUserName, "test2", "test");
+            await manager.AddConnectionIdAsync(user1.UserName, "test1", "test");
+            await manager.AddConnectionIdAsync(user1.UserName, "test2", "test");
 
             await manager.RemoveConnectionIdAsync("test2", "test", true);
+        }
+
+        [Fact]
+        public async Task AddMessageTest()
+        {
+            var sut = _fixture.GetStore();
+            var manager = _fixture.GetChatManager();
+            var userManager = _fixture.GetUserManager();
+
+            var user1 = new ChatLeUser { UserName = "test1" };
+            var user2 = new ChatLeUser { UserName = "test2" };
+
+            await userManager.CreateAsync(user1);
+            await userManager.CreateAsync(user2);
+
+            var conversation = await manager.GetOrCreateConversationAsync(user1.UserName, user2.UserName, "test");
+            Assert.NotNull(conversation);
+
+            var result = await manager.AddMessageAsync(user1.UserName, conversation.Id, new Message { Text = "test message" });
+            Assert.NotNull(result);
+            Assert.Equal(conversation.Id, result.Id);
+            Assert.Equal(2, result.Attendees.Count);
+            Assert.Single(result.Messages);
         }
     }
 }
