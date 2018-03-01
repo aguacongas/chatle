@@ -143,7 +143,7 @@ namespace ChatLe.Controllers
         /// <param name="data">Initial message to send</param>
         /// <returns>a <see cref="Task<string>"/> with the conversation id as result or null if the user doesn't exist</returns>
         [HttpPost("conv")]
-        public async Task<string> CreateConversation([FromBody] MessageToSend data)
+        public async Task<ActionResult> CreateConversation([FromBody] MessageToSend data)
         {
             var to = data.To;
             var text = data.Text;
@@ -188,7 +188,7 @@ namespace ChatLe.Controllers
                     }) 
             });
             
-            return conversation.Id;
+            return Content($"\"{conversation.Id}\"", "application/json");
         }
 
     }

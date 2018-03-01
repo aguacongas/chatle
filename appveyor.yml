@@ -11,6 +11,7 @@ install:
   - secure-file\tools\secure-file -decrypt test\privatekey.json.enc -secret %decrypt_secret%
 init:
 - cmd: git config --global core.autocrlf true
+- cmd: dotnet restore
 environment:
   ASPNETCORE_ENVIRONMENT: Staging
   decrypt_secret:

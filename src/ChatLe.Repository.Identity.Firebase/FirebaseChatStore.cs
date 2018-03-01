@@ -51,6 +51,7 @@ namespace ChatLe.Repository.Identity.Firebase
         {
             message = message ?? throw new ArgumentNullException(nameof(message));
 
+            message.Date = DateTime.UtcNow;
             var result = await _client.PostAsync(GetFirebasePath(ConversationTableName, message.ConversationId, MessageSubTableName), message, cancellationToken);
             message.Id = result.Data;
         }
@@ -213,10 +214,8 @@ namespace ChatLe.Repository.Identity.Firebase
                 throw new ArgumentNullException(nameof(convId));
             }
 
-            return (await _client.GetAsync<Dictionary<string, TMessage>>(GetFirebasePath(AttendeeTableName),
-                cancellationToken,
-                false,
-                $"orderBy=\"Date\"&limitToLast=50")).Data.Values.OrderByDescending(m => m.Date);
+            return (await _client.GetAsync<Dictionary<string, TMessage>>(GetFirebasePath(ConversationTableName, convId, MessageSubTableName),
+                cancellationToken, false, $"orderBy\"$priority\"&limiteToFirst=\"{max}\"")).Data.Values.OrderByDescending(m => m.Date).Take(max);
         }
 
         public async virtual Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
@@ -277,15 +276,6 @@ namespace ChatLe.Repository.Identity.Firebase
             indexes[AttendeeTableName] = new FirebaseIndexes
             {
                 On = new string[] { "UserId", "ConversationId" }
-            };
-            indexes[ConversationTableName] = new Dictionary<string, object>{
-                {
-                    MessageSubTableName,
-                    new FirebaseIndex
-                    {
-                        On = "Date"
-                    }
-                }
             };
             indexes[NotificationConnectionsTableName] = new FirebaseIndexes
             {

@@ -73,7 +73,7 @@ namespace chatle.test.Controllers
         {
             ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =>
             {
-                mockChatManager.Setup(c => c.GetMessagesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                mockChatManager.Setup(c => c.GetMessagesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<int>()))
                     .ReturnsAsync(new List<Message>()
                         {
                             new Message(),
@@ -97,7 +97,7 @@ namespace chatle.test.Controllers
         {
             ExecuteAction(async (controller, mockChatManager, mockHubContext, mockUserManager) =>
             {
-                mockChatManager.Setup(c => c.GetMessagesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                mockChatManager.Setup(c => c.GetMessagesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<int>()))
                     .ReturnsAsync(new List<Message>()
                         {
                             new Message(),

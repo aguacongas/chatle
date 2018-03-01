@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using ChatLe.Hubs;
 using ChatLe.Cryptography;
 using Google.Apis.Auth.OAuth2;
+using Newtonsoft.Json;
 
 namespace ChatLe
 {
@@ -70,7 +71,11 @@ namespace ChatLe
 
             ConfigureEntity(services);
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
             services.AddSignalR();
 

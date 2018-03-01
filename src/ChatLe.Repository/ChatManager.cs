@@ -241,9 +241,9 @@ namespace ChatLe.Models
         /// <param name="id">the conversation id</param>
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
-        public virtual Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<IEnumerable<TMessage>> GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken), int max = 50)
         {
-            return Store.GetMessagesAsync(convId, cancellationToken: cancellationToken);
+            return Store.GetMessagesAsync(convId, max, cancellationToken);
         }
         /// <summary>
         /// Gets a page of connected users

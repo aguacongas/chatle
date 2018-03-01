@@ -85,7 +85,7 @@ namespace ChatLe.Models
         /// <param name="id">the conversation id</param>
         /// <param name="cancellationToken">an optional concellation token</param>
         /// <returns>a Task</returns>
-        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TMessage>> GetMessagesAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken), int max = 50);
         
         /// <summary>
         /// Gets the list of conversation for a user

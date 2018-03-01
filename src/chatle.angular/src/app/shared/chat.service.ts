@@ -114,13 +114,13 @@ export class ChatService {
         a => a.userId !== this.settings.userName
       );
       return this.http
-        .post<string>(this.settings.convAPI, {
+        .post(this.settings.convAPI, {
           to: attendee.userId,
           text: message
         })
         .map(
           response => {
-            conversation.id = response;
+            conversation.id = response as string;
             this.setConversationTitle(conversation);
             this.joinConversationSubject.next(conversation);
             return m;

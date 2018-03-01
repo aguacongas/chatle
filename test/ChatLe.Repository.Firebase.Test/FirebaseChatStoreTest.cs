@@ -146,11 +146,16 @@ namespace ChatLe.Repository.Firebase.Test
             var conversation = await manager.GetOrCreateConversationAsync(user1.UserName, user2.UserName, "test");
             Assert.NotNull(conversation);
 
-            var result = await manager.AddMessageAsync(user1.UserName, conversation.Id, new Message { Text = "test message" });
+            var message = new Message { Text = Guid.NewGuid().ToString() };
+            var result = await manager.AddMessageAsync(user1.UserName, conversation.Id, message);
             Assert.NotNull(result);
             Assert.Equal(conversation.Id, result.Id);
             Assert.Equal(2, result.Attendees.Count);
             Assert.Single(result.Messages);
+
+            var messages = await manager.GetMessagesAsync(conversation.Id, max: 1);
+            Assert.Single(messages);
+            Assert.Equal(message.Text, messages.First().Text);
         }
     }
 }
