@@ -117,7 +117,8 @@ namespace ChatLe.Models
 				var user = await Store.FindUserByIdAsync(nc.UserId);
 				if (user != null)
                 {
-                    if (inactif && await IsGuess(user))
+                    user.IsGuess = await IsGuess(user);
+                    if (inactif && user.IsGuess)
                     {
                         await RemoveUserAsync(user, cancellationToken);
                     }

@@ -69,7 +69,9 @@ export class ChatService {
       this.onJoinConversation(conv)
     );
     signalrService.closed.subscribe(error => {
-      this.start(true);
+      if (error) {
+        this.start(true);
+      }
     }, error => {
       this.currentState = ConnectionState.Error;
       this.connectionStateSubject.next(this.currentState);

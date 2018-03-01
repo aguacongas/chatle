@@ -17,5 +17,7 @@ namespace ChatLe.Models
         }
 
         public DateTime LastLoginDate { get; set; }
+
+        public bool IsGuess { get; set; }
     }
 }

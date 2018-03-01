@@ -215,7 +215,8 @@ namespace ChatLe.Repository.Identity.Firebase
             }
 
             return (await _client.GetAsync<Dictionary<string, TMessage>>(GetFirebasePath(ConversationTableName, convId, MessageSubTableName),
-                cancellationToken, false, $"orderBy\"$priority\"&limiteToFirst=\"{max}\"")).Data.Values.OrderByDescending(m => m.Date).Take(max);
+                cancellationToken, false, $"orderBy\"$priority\"&limiteToFirst=\"{max}\""))
+                .Data?.Values.OrderByDescending(m => m.Date).Take(max);
         }
 
         public async virtual Task<TNotificationConnection> GetNotificationConnectionAsync(string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))

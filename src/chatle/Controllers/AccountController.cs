@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Authentication;
+using System;
 
 namespace ChatLe.Controllers
 {
@@ -594,13 +595,20 @@ namespace ChatLe.Controllers
             var user = await GetCurrentUserAsync();
 			if (user != null)
 			{
-                var isGuess = await ChatManager.IsGuess(user);
-                //await HubContext.Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = isGuess });
-				if (isGuess)
-				{
-					await ChatManager.RemoveUserAsync(user);
-				}
-			}
+                try
+                {
+                    user.IsGuess = await ChatManager.IsGuess(user);
+                    await HubContext.Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = user.IsGuess });
+                    if (user.IsGuess)
+                    {
+                        await ChatManager.RemoveUserAsync(user);
+                    }
+                }
+                catch(Exception e)
+                {
+                    Logger.LogError(e, "AccountController Signout error . {0}", e.Message);
+                }
+            }
             await SignInManager.SignOutAsync();
         }
 

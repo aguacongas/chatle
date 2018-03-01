@@ -54,6 +54,11 @@ namespace ChatLe.Hubs
 		public override async Task OnConnectedAsync()
 		{
 			string name = Context.User.Identity.Name;
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
 			Logger.LogInformation("OnConnected " + name);
 
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
@@ -77,10 +82,17 @@ namespace ChatLe.Hubs
             bool stopCalled = ex != null;
 
             Logger.LogInformation("OnDisconnected stopCalled " + stopCalled);
-			var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
-			if (user != null)
-				await Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = Manager.IsGuess(user) });
-			await base.OnDisconnectedAsync(ex);
+            try
+            {
+                var user = await Manager.RemoveConnectionIdAsync(Context.ConnectionId, "signalR", stopCalled);
+                if (user != null)
+                    await Clients.All.SendAsync("userDisconnected", new { id = user.UserName, isRemoved = user.IsGuess });
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "ChatHub OnDisconnecteAssync error : {0}", e.Message);
+            }
+            await base.OnDisconnectedAsync(ex);
 		}
 	}
 }

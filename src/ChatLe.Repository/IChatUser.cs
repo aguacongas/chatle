@@ -13,5 +13,10 @@ namespace ChatLe.Models
         /// Gets or sets the last login date for this user.
         /// </summary>
         DateTime LastLoginDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a flag indecating that user is guess.
+        /// </summary>
+        bool IsGuess { get; set; }
     }
 }

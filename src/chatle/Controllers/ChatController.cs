@@ -69,10 +69,15 @@ namespace ChatLe.Controllers
         public async Task<IEnumerable<ConversationViewModel>> Get()
         {
             var userName = HttpContext.User.Identity.Name;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return null;
+            }
+
             var conversations = await _chatManager.GetConversationsAsync(userName);
             if (conversations == null)
                 return null;
-                
+
             var length = conversations.Count();
             var users = new List<ChatLeUser>(length);
             var conversationsVM = new List<ConversationViewModel>(length);
@@ -123,18 +128,18 @@ namespace ChatLe.Controllers
         {
             var to = data.To;
             var text = data.Text;
-            
+
             var userName = HttpContext.User.Identity.Name;
-            var message = new Message() { ConversationId = to, Text  = text, Date = DateTime.Now };
+            var message = new Message() { ConversationId = to, Text = text, Date = DateTime.Now };
             var conv = await _chatManager.AddMessageAsync(userName, to, message);
             if (conv == null)
                 return;
-            foreach(var attendee in conv.Attendees)
+            foreach (var attendee in conv.Attendees)
             {
                 var user = await _userManager.FindByIdAsync(attendee.UserId);
                 if (user != null && user.UserName != userName)
                     await _hub.Clients.Group(user.UserName).SendAsync("messageReceived", new { conversationId = to, date = message.Date, from = HttpContext.User.Identity.Name, text = text });
-            }            
+            }
         }
 
         /// <summary>
@@ -143,7 +148,8 @@ namespace ChatLe.Controllers
         /// <param name="data">Initial message to send</param>
         /// <returns>a <see cref="Task<string>"/> with the conversation id as result or null if the user doesn't exist</returns>
         [HttpPost("conv")]
-        public async Task<ActionResult> CreateConversation([FromBody] MessageToSend data)
+        [Produces("application/json")]
+        public async Task<string> CreateConversation([FromBody] MessageToSend data)
         {
             var to = data.To;
             var text = data.Text;
@@ -188,7 +194,7 @@ namespace ChatLe.Controllers
                     }) 
             });
             
-            return Content($"\"{conversation.Id}\"", "application/json");
+            return conversation.Id;
         }
 
     }
