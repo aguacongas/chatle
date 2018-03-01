@@ -223,15 +223,6 @@ namespace ChatLe
                         case DBEngine.MySql:
                             options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
                             break;
-                        //case DBEngine.Redis:
-                        //    int port;
-                        //    int database;
-                        //    if (!int.TryParse(Configuration["Data:Redis:Port"], out port))
-                        //        port = 6379;
-                        //    int.TryParse(Configuration["Data:Redis:Database"], out database);
-
-                        //    options.UseRedisDatabase(Configuration["Data:Redis:Hostname"], port, database);
-                        //    break;
                 }
                 });
             }

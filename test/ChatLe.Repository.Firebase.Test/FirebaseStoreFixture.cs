@@ -1,4 +1,5 @@
 ﻿using Aguacongas.Firebase;
+using ChatLe.Cryptography;
 using ChatLe.Models;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Identity;
@@ -38,9 +39,15 @@ namespace ChatLe.Repository.Firebase.Test
                 })
                 .AddFirebaseStores(configuration["FirebaseOptions:TestDatabaseUrl"], p =>
                 {
-                    return GoogleCredential.FromFile(@"..\..\..\..\privatekey.json")
-                        .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
-                        .UnderlyingCredential;
+                    using (var utility = new Utility(configuration["FirebaseOptions:SecureKey"]))
+                    {
+                        using (var stream = utility.DecryptFile(@"..\..\..\..\privatekey.json.enc").GetAwaiter().GetResult())
+                        {
+                            return GoogleCredential.FromStream(stream)
+                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
+                                .UnderlyingCredential;
+                        }
+                    }
                 })
                 .AddDefaultTokenProviders();
 

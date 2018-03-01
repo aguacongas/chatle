@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Olivier Lefebvre</Authors>
+    <Company>Olivier Lefebvre</Company>
+    <Copyright>Olivier Lefebvre @2018</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/aguacongas/chatle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aguacongas/chatle</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>
