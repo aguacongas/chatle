@@ -35,10 +35,11 @@ namespace ChatLe.Models
         {
             if (configure != null)
                 services.ConfigureChatLe(configure);
-                        
-            services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatStore&lt;string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, IdentityUserLogin&lt;string&gt;&gt;&gt;();
-            services.AddTransient&lt;IChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;();
-            services.AddScoped&lt;SignInManager&gt;();
+
+            services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatStore&lt;string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, IdentityUserLogin&lt;string&gt;&gt;&gt;()
+                .AddTransient&lt;IChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;()
+                .AddSingleton&lt;ILookupNormalizer, LookupNormalizer&gt;()
+                .AddScoped&lt;SignInManager&gt;();            
 
             return services;
         }
@@ -58,7 +59,7 @@ namespace ChatLe.Models
 }
     </pre>
     <script type="text/javascript">
-      highlightRanges([[13,9,13,10,1],[14,13,14,43,1],[15,13,15,29,1],[16,9,16,10,1],[25,9,25,10,1],[26,13,26,35,1],[27,17,27,53,1],[29,13,29,249,1],[30,13,30,216,1],[31,13,31,49,1],[33,13,33,29,1],[34,9,34,10,1],[37,9,37,10,1],[38,13,38,144,1],[39,9,39,10,1],[42,9,42,10,1],[43,13,43,159,1],[44,13,44,26,1],[45,13,45,24,1],[46,9,46,10,1]]);
+      highlightRanges([[13,9,13,10,1],[14,13,14,43,1],[15,13,15,29,1],[16,9,16,10,1],[25,9,25,10,1],[26,13,26,35,1],[27,17,27,53,1],[29,13,32,45,1],[34,13,34,29,1],[35,9,35,10,1],[38,9,38,10,1],[39,13,39,144,1],[40,9,40,10,1],[43,9,43,10,1],[44,13,44,159,1],[45,13,45,26,1],[46,13,46,24,1],[47,9,47,10,1]]);
     </script>
   </body>
 </html>

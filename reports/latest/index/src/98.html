@@ -22,6 +22,11 @@ namespace ChatLe.Models
 {
     public static class BuilderExtensions
     {
+        public static IServiceCollection AddFirebaseChatStore(this IServiceCollection services)
+        {
+            return AddFirebaseChatStore&lt;ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;(services);
+        }
+
         public static IServiceCollection AddFirebaseChatStore&lt;TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;(this IServiceCollection services)
             where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
             where TConversation : Conversation&lt;string&gt;, new()
@@ -30,6 +35,7 @@ namespace ChatLe.Models
             where TNotificationConnection : NotificationConnection&lt;string&gt;, new()
         {
             services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, FirebaseChatStore&lt;TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;();
+            services.AddTransient&lt;HttpClient&gt;();
 
             return services;
         }
@@ -37,7 +43,7 @@ namespace ChatLe.Models
 }
     </pre>
     <script type="text/javascript">
-      highlightRanges([[21,9,21,10,1],[22,13,22,212,1],[24,13,24,29,1],[25,9,25,10,1]]);
+      highlightRanges([[16,9,16,10,0],[17,13,17,120,0],[18,9,18,10,0],[26,9,26,10,1],[27,13,27,212,1],[28,13,28,49,1],[30,13,30,29,1],[31,9,31,10,1]]);
     </script>
   </body>
 </html>
