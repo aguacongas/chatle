@@ -1,13 +1,6 @@
-using Aguacongas.Firebase;
 using ChatLe.Models;
-using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -80,6 +73,9 @@ namespace ChatLe.Repository.Firebase.Test
             await userManager.CreateAsync(user2);
 
             var client = _fixture.GetClient();
+
+            await client.DeleteAsync("connections");
+            await client.DeleteAsync("connections-count");
 
             int? count;
             do

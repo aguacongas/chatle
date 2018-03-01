@@ -105,10 +105,10 @@ export class ChatService {
 
     if (conversation.id) {
       return this.http
-        .post<Message>(this.settings.chatAPI, {
+        .post(this.settings.chatAPI, {
           to: conversation.id,
           text: message
-        });
+        }).map(value => m);
     } else {
       const attendee = conversation.attendees.find(
         a => a.userId !== this.settings.userName

@@ -1,23 +1,18 @@
-﻿using ChatLe.Hubs;
+﻿using Chatle.test.Controllers;
+using ChatLe.Hubs;
 using ChatLe.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Sockets;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Security.Claims;
 using System.Threading;
 using Xunit;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Chatle.test.Controllers;
-using System.Threading.Tasks.Channels;
-using Microsoft.AspNetCore.Sockets;
-using Microsoft.AspNetCore.SignalR.Internal.Protocol;
 
 namespace chatle.test.Hubs
 {
@@ -57,9 +52,8 @@ namespace chatle.test.Hubs
 			var provideMock = new Mock<IServiceProvider>();
 			provideMock.Setup(p => p.GetService(It.IsAny<Type>()))
 				.Returns(mockChatManager.Object);
-            var mockWritableChannel = new Mock<WritableChannel<HubMessage>>();
             var mockConnectionContext = new Mock<ConnectionContext>();
-            var hubConnectionContextMock = new Mock<HubConnectionContext>(mockWritableChannel.Object, mockConnectionContext.Object);
+            var hubConnectionContextMock = new Mock<HubConnectionContext>(mockConnectionContext.Object, TimeSpan.FromSeconds(1), mockLoggerFactory.Object);
             var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
 
             using (hub)
@@ -84,7 +78,7 @@ namespace chatle.test.Hubs
 				var mockGroups = new Mock<IGroupManager>();
 				hub.Groups = mockGroups.Object;
 
-                var mockClients = new Mock<IHubClients>();
+                var mockClients = new Mock<IHubCallerClients>();
                 var clientProxyMock = new Mock<IClientProxy>();
                 mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
                 hub.Clients = mockClients.Object;
@@ -109,7 +103,7 @@ namespace chatle.test.Hubs
 				var mockGroups = new Mock<IGroupManager>();
 				hub.Groups = mockGroups.Object;
 				
-				var mockClients = new Mock<IHubClients>();
+				var mockClients = new Mock<IHubCallerClients>();
                 var clientProxyMock = new Mock<IClientProxy>();
                 mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
                 hub.Clients = mockClients.Object;
@@ -123,7 +117,7 @@ namespace chatle.test.Hubs
 			ExecuteAction(async (hub, mockChatManager, mockHubConnectionContext) =>
 			{
 				mockChatManager.Setup(c => c.RemoveConnectionIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ChatLeUser());
-                var mockClients = new Mock<IHubClients>();
+                var mockClients = new Mock<IHubCallerClients>();
                 var clientProxyMock = new Mock<IClientProxy>();
                 mockClients.SetupGet(c => c.All).Returns(clientProxyMock.Object);
                 hub.Clients = mockClients.Object;
