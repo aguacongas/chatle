@@ -15,6 +15,8 @@ environment:
     secure: I4cwOQ4JlCkdD23TgTvRdkAKOm8AueV0TwqLWAd9lnY=
   FirebaseOptions:TestDatabaseUrl:
     secure: NgkUvSOeZv8qeLIX5tW1qdVJWOuGa1idsXrexYrHVEO4+PgORX4Qk0wkMJg2I6mp
+  FirebaseOptions:SecureKey:
+    secure: e5dYA2oWrZi1pzu3ovn3J62gNNfxvKYM/QQORHSFFeg=
   access_token:
     secure: FQHQqH6cYqJP4NJ+2KvrqCykj7h3t8IThRC0LY8/Lrs+FIAfRTi4Jam9tkike5KW
 before_build:
