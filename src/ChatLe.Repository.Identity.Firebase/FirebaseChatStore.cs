@@ -25,7 +25,7 @@ namespace ChatLe.Repository.Identity.Firebase
         private const string RulePath = ".settings/rules.json";
 
         private readonly IFirebaseClient _client;
-        private readonly IUserStore<TUser> _userStore;        
+        private readonly IUserStore<TUser> _userStore;
 
         public FirebaseChatStore(IFirebaseClient client, IUserStore<TUser> userStore)
         {

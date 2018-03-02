@@ -1,23 +1,24 @@
 ﻿{
-	"ChatConfig": {
-		"UserPerPage": 25
-	},
-	"DatabaseEngine": "Firebase",
-	"CreateDatabase": "false",
+    "ChatConfig": {
+        "UserPerPage": 25
+    },
+    "IdentityDatabase": "Firebase",
+    "DatabaseEngine": "InMemory",
+    "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {
             "ConnectionString": "Filename=./ChatLeDbContext.db"
         }
     },
-	"Identity": {
-		"Password": {
-			"RequireDigit": "false",
-			"RequireLowercase": "false",
-			"RequireUppercase": "false",
-			"RequireNonLetterOrDigit": "false"
-		}
-	},
-	"RemoveResponseHeader": {
-		"Values": "Server, ETag"
-	}
+    "Identity": {
+        "Password": {
+            "RequireDigit": "false",
+            "RequireLowercase": "false",
+            "RequireUppercase": "false",
+            "RequireNonLetterOrDigit": "false"
+        }
+    },
+    "RemoveResponseHeader": {
+        "Values": "Server, ETag"
+    }
 }

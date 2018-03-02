@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Moq;
 
 namespace ChatLe.Repository.Test
 {
@@ -20,7 +21,8 @@ namespace ChatLe.Repository.Test
         {
             using (var context = new DbContext(new DbContextOptionsBuilder().Options))
             {
-                var store = new ChatStore<UserTest>(context, null);
+                var userStore = (IUserStore<UserTest>)new UserStore<UserTest, IdentityRole, DbContext>(context);
+                var store = new ChatStore<UserTest>(context, userStore, null);
             }
         }
 
@@ -31,9 +33,24 @@ namespace ChatLe.Repository.Test
             Assert.Throws<ArgumentNullException>(() => GetStore(null, null));
         }
 
-        ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> GetStore(DbContext context, IHostingEnvironment env)
+        ChatStore<string, 
+            UserTest, 
+            DbContext, 
+            Conversation, 
+            Attendee, 
+            Message, 
+            NotificationConnection, 
+            IdentityUserLogin<string>> GetStore(DbContext context, IHostingEnvironment env)
         {
-            return new ChatStore<string, UserTest, DbContext, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, env);
+            var userStore = (IUserStore<UserTest>)new UserStore<UserTest, IdentityRole, DbContext>(context);
+            return new ChatStore<string, 
+                UserTest, 
+                DbContext, 
+                Conversation, 
+                Attendee, 
+                Message, 
+                NotificationConnection, 
+                IdentityUserLogin<string>>(context, userStore, env);
         }
 
         class FakeContextTest : DbContext
@@ -137,8 +154,8 @@ namespace ChatLe.Repository.Test
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
                 var loggerFactory = contextServices.GetRequiredService<ILoggerFactory>();
                 loggerFactory.AddConsole(LogLevel.Error);
-
-                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, null);
+                var userStore = (IUserStore<ChatLeUser>)new UserStore<ChatLeUser, IdentityRole, DbContext>(context);
+                var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, userStore, null);
                 await action(store);
             }
         }
@@ -483,6 +500,14 @@ namespace ChatLe.Repository.Test
             });
         }
 
+        [Fact]
+        public void Constructor_should_throw_argument_exception()
+        {
+            var context = new ChatLeIdentityDbContext(new DbContextOptionsBuilder().Options);
+            var mockStore = new Mock<IUserStore<ChatLeUser>>();
+
+            Assert.Throws<ArgumentException>(() => new ChatStore(context, mockStore.Object, null));
+        }
         private static Conversation AddConv(ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>> store)
         {
             var context = store.Context;

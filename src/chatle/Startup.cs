@@ -199,11 +199,31 @@ namespace ChatLe
                         })
                 .AddDefaultTokenProviders();
 
-            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
-            if (dbEngine != DBEngine.Firebase)
+            var identityEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["IdentityDatabase"]);
+            if (identityEngine != DBEngine.Firebase)
             {
                 identyBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+            }
+            else
+            {
+                identyBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
+                {
+                    using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
+                    {
+                        using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                        {
+                            return GoogleCredential.FromStream(stream)
+                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
+                                .UnderlyingCredential;
+                        }
+                    }
+                });
+            }
 
+            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
+            
+            if (dbEngine != DBEngine.Firebase)
+            {
                 services.AddDbContext<ChatLeIdentityDbContext>(options =>
                 {
                     if (_environment.IsDevelopment())
@@ -228,19 +248,6 @@ namespace ChatLe
             }
             else
             {
-                identyBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
-                {
-                    using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
-                    {
-                        using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
-                        {
-                            return GoogleCredential.FromStream(stream)
-                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
-                                .UnderlyingCredential;
-                        }
-                    }
-                });
-
                 services.AddFirebaseChatStore();
             }
         }

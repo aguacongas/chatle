@@ -18,10 +18,11 @@ namespace ChatLe.Models
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="context">The <see cref="ChatLeIdentityDbContext"/> to use</param>
-        /// <param name="loggerFactory"></param>
-        public ChatStore(ChatLeIdentityDbContext context, IHostingEnvironment env) 
-            : base(context, env) { }
+        /// <param name="context">The <see cref="DbContext" to use/></param>
+        /// <param name="userStore"></param>
+        /// <param name="env"></param>
+        public ChatStore(ChatLeIdentityDbContext context, IUserStore<ChatLeUser> userStore, IHostingEnvironment env) 
+            : base(context, userStore, env) { }
     }
     
     /// <summary>
@@ -35,9 +36,10 @@ namespace ChatLe.Models
         /// Constructor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
-        /// <param name="loggerFactory"></param>
-        public ChatStore(DbContext context, IHostingEnvironment env) 
-            : base(context, env) { }
+        /// <param name="userStore"></param>
+        /// <param name="env"></param>
+        public ChatStore(DbContext context, IUserStore<TUser> userStore, IHostingEnvironment env) 
+            : base(context, userStore, env) { }
     }
     
     /// <summary>
@@ -63,29 +65,31 @@ namespace ChatLe.Models
         where TUserLogin : IdentityUserLogin<TKey>
     {
         readonly IHostingEnvironment _env;
+        private readonly IUserStore<TUser> _userStore;
+
+        public IQueryable<TUser> Users { get => ((IQueryableUserStore<TUser>)_userStore).Users; }
+
         /// <summary>
         /// Construtor
         /// </summary>
         /// <param name="context">The <see cref="DbContext" to use/></param>
-        /// <param name="loggerFactory"></param>
-        public ChatStore(TContext context, IHostingEnvironment env)
+        /// <param name="userStore"></param>
+        /// <param name="env"></param>
+        public ChatStore(TContext context, IUserStore<TUser> userStore, IHostingEnvironment env)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
-
-            Context = context;
+            Context = context ?? throw new ArgumentNullException("context");
+            _userStore = userStore ?? throw new ArgumentNullException("userStore");
+            if (!(_userStore is IQueryableUserStore<TUser>))
+            {
+                throw new ArgumentException($"{nameof(userStore)} must implements IQueryableUserStore<{typeof(TUser).Name}>");
+            }
             _env = env;
-        }        
-        
+        }
+
         /// <summary>
         /// Gets the <see cref="DbContext"/>
         /// </summary>
         public virtual TContext Context { get; private set; }
-        
-        /// <summary>
-        /// Gets the <see cref="DbSet{TUser}"/>
-        /// </summary>
-        public virtual DbSet<TUser> Users { get { return Context.Set<TUser>(); } }
         
         /// <summary>
         /// Gets the <see cref="DbSet{TConversation}"/>
@@ -173,12 +177,8 @@ namespace ChatLe.Models
         /// <param name="userName">the user name</param>
         /// <param name="cancellationToken">an optional cancellation token</param>
         /// <returns>a <see cref="Task{TUser}"/></returns>
-        public virtual async Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await Users
-                .SingleOrDefaultAsync(u => u.UserName == userName, cancellationToken);
-        }
+        public virtual Task<TUser> FindUserByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
+            => GetLoginStore().FindByNameAsync(userName, cancellationToken);
 
         /// <summary>
         /// Gets a conversation for 2 attendees
@@ -383,7 +383,13 @@ namespace ChatLe.Models
             Context.SaveChanges();
             Conversations.RemoveRange(Conversations.ToArray());
             Context.SaveChanges();
-            Users.RemoveRange(Users.Where(u => IsGuess(u, default(CancellationToken)).Result).ToArray());
+
+            var guess = Users.Where(u => IsGuess(u, default(CancellationToken)).Result).ToList();
+            foreach(var g in guess)
+            {
+                _userStore.DeleteAsync(g, default(CancellationToken)).GetAwaiter().GetResult();
+            }
+
             Context.SaveChanges();
         }
         
@@ -444,10 +450,9 @@ namespace ChatLe.Models
             var userConnections = NotificationConnections.Where(n => n.UserId.Equals(user.Id));
             NotificationConnections.RemoveRange(userConnections);
             
-            Users.Remove(user);
-            
             try
             {
+                await _userStore.DeleteAsync(user, cancellationToken);
                 Context.SaveChanges();            
             }
             catch (DbUpdateConcurrencyException ex)
@@ -456,12 +461,11 @@ namespace ChatLe.Models
             }
         }
 
-		public async Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-            var user = await Users.SingleOrDefaultAsync(u => u.Id.Equals(id), cancellationToken);
-            return user;
-		}
+		public Task<TUser> FindUserByIdAsync(TKey id, CancellationToken cancellationToken = default(CancellationToken))
+            => GetLoginStore().FindByIdAsync(id.ToString(), cancellationToken);
+
+        protected virtual IUserLoginStore<TUser> GetLoginStore()
+            => _userStore is IUserLoginStore<TUser> ? _userStore as IUserLoginStore<TUser> : throw new InvalidOperationException("User store doesn't implement IUserLoginStore<TUser>");
 
         void ResetDbEntry<TEntity>(EntityEntry<TEntity> entry) where TEntity : class
         {
@@ -522,7 +526,7 @@ namespace ChatLe.Models
                 }
                 if (entry.Entity is TUser)
                 {
-                    RetryDeleteEntity<TUser>(entry, Users);
+                    _userStore.DeleteAsync(entry as TUser, default(CancellationToken)).GetAwaiter().GetResult();
                 }
             }
         }
