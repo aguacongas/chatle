@@ -44,3 +44,4 @@ config.development.json
 /src/ChatLe.Repository.Identity.Firebase/FirebaseFunctions/functions/lib
 /coverage/docs
 /src/chatle/firebase-key.json
+/test/ChatLe.Cryptography.Test/UtilityTest.cs.enc
