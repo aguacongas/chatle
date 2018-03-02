@@ -193,10 +193,12 @@ export class ChatService {
   }
 
   private onMessageReceived(message: Message) {
+    console.log('Chat Hub message received: ' + message.conversationId);
     this.messageReceivedSubject.next(message);
   }
 
   private onJoinConversation(conversation: Conversation) {
+    console.log('Chat Hub join conversation: ' + conversation.id);
     this.setConversationTitle(conversation);
     this.joinConversationSubject.next(conversation);
   }

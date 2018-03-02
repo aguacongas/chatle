@@ -56,7 +56,11 @@ export class ContactsComponent implements OnInit {
         this.service.getUsers()
             .subscribe(
                 users => {
-                    this.users = users;
+                    users.forEach(user => {
+                      if (!this.users.some(u => u.id === user.id)) {
+                        this.users.push(user);
+                      }
+                    });
                     this.detector.detectChanges();
                 },
                 error => this.error = error);
