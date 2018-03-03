@@ -54,24 +54,24 @@ deploy:
     branch: 
         - master
         - /release*/
-    - provider: GitHub
-      auth_token:
-        secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
-      draft: true
-      prerelease: true
-      release: $(GitVersion_SemVer)
-      on:
-        branch: 
-            - /release*/
-    - provider: GitHub
-      auth_token:
-        secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
-      draft: true
-      prerelease: false
-      release: $(GitVersion_SemVer)
-      on:
-        branch: 
-            - master
+- provider: GitHub
+  auth_token:
+    secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
+  draft: true
+  prerelease: true
+  release: $(GitVersion_SemVer)
+  on:
+    branch: 
+        - /release*/
+- provider: GitHub
+  auth_token:
+    secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
+  draft: true
+  prerelease: false
+  release: $(GitVersion_SemVer)
+  on:
+    branch: 
+        - master
 for:
 -
   branches:
@@ -92,4 +92,3 @@ for:
   branches:
     except:
       - master
-    
