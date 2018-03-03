@@ -4,6 +4,7 @@
     <Description>ChatLe cryptography utilities</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>chat Cryptography</PackageTags>
+    <PackageProjectUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</RepositoryUrl>
   </PropertyGroup>
-
 </Project>
