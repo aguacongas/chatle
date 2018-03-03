@@ -69,8 +69,8 @@ export class ChatService {
       this.onJoinConversation(conv)
     );
     signalrService.closed.subscribe(error => {
-      if (error) {
-        this.start(true);
+      if (location) {
+        location.href = 'Account';
       }
     }, error => {
       this.currentState = ConnectionState.Error;
