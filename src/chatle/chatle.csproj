@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <Compile Remove="node_modules" />
+    <None Remove="firebase-key.json.enc" />
+    <Content Include="firebase-key.json.enc" />
     <None Update="wwwroot\css\site.min.css;wwwroot\app\**\*.js;wwwroot\app\**\*.html;wwwroot\js\**\*;wwwroot\lib\angular\**\*.min.js;wwwroot\lib\angular2-in-memory-web-api\*.js;wwwroot\lib\core-js\client\shim.min.js;wwwroot\lib\rxjs\**\*.js;wwwroot\lib\reflect-metadata\Reflect.js;wwwroot\lib\systemjs\dist\system.js;wwwroot\lib\zone.js\dist\zone.min.js;Views\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
