@@ -13,11 +13,3 @@ branches:
     - /^feature\/.*$/
     - develop
 solution: chatle.sln
-install:
-  - nuget restore chatle.sln
-  - nuget install xunit.runner.console -OutputDirectory testrunner -ExcludeVersion
-script:
-  - xbuild /p:Configuration=Release solution-name.sln
-  - mono ./testrunner/tools/xunit.console.exe ./test/ChatLe.Cryptography.Test/bin/Release/ChatLe.Cryptography.Test.dll
-  - mono ./testrunner/tools/xunit.console.exe ./test/ChatLe.Repository.Test/bin/Release/ChatLe.Repository.Test.dll
-  - mono ./testrunner/tools/xunit.console.exe ./test/chatle.test/bin/Release/chatle.test.dll
