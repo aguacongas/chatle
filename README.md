@@ -11,8 +11,8 @@ Build status
 [AppVeyor-badge]: https://ci.appveyor.com/api/projects/status/github/aguacongas/chatle?svg=true
 [AppVeyor-build]: https://ci.appveyor.com/project/aguacongas/chatle
 
-[Travis-badge]: https://travis-ci.org/aguacongas/chatle.svg?branch=dev
-[Travis-build]: https://travis-ci.org/aguacongas/chatle
+[Travis-badge]: https://travis-ci.org/aguacongas/chatle.svg?branch=develop
+[Travis-build]: https://travis-ci.org/aguacongas/chatle/
 
 Nuget pakages 
 -------------

@@ -15,9 +15,9 @@ branches:
 solution: chatle.sln
 install:
   - nuget restore chatle.sln
-  - nuget install xunit.runners -Version 1.9.2 -OutputDirectory testrunner
+  - nuget install xunit.runners -Version 2.0.0 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release solution-name.sln
-  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./test/ChatLe.Cryptography.Test/bin/Release/ChatLe.Cryptography.Test.dll
-  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./test/ChatLe.Repository.Test/bin/Release/ChatLe.Repository.Test.dll
-  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./test/chatle.test/bin/Release/chatle.test.dll
+  - mono ./testrunner/xunit.runners.2.0.0/tools/xunit.console.clr4.exe ./test/ChatLe.Cryptography.Test/bin/Release/ChatLe.Cryptography.Test.dll
+  - mono ./testrunner/xunit.runners.2.0.0/tools/xunit.console.clr4.exe ./test/ChatLe.Repository.Test/bin/Release/ChatLe.Repository.Test.dll
+  - mono ./testrunner/xunit.runners.2.0.0/tools/xunit.console.clr4.exe ./test/chatle.test/bin/Release/chatle.test.dll
