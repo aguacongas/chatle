@@ -1,16 +1,26 @@
-<div class="col-xs-6">
-    <div *ngIf="conversation">
-        <h6>{{conversation.title}}</h6>
-        <form class="form-inline">
-            <input class="form-control" name="message" [(ngModel)]="message" placeholder="message...">
+<div class="col-xs-6 vertical-container">
+  <div *ngIf="conversation" class="vertical-container">
+    <h6>{{conversation.title}}</h6>
+    <div class="vertical-container">
+      <form class="form-inline">
+        <div class="input-group">
+          <input class="form-control" name="message" [(ngModel)]="message" placeholder="message...">
+          <span class="input-group-btn">
             <button type="submit" class="btn btn-default" (click)="send()">send</button>
-        </form>
-        <ul *ngFor="let message of conversation.messages">
-            <li>
-                <small>{{message.from}}</small><br />
-                <span>{{message.text}}</span>
-            </li>
-        </ul>
+          </span>
+        </div>
+      </form>
+      <ul class="vertical-list vertical-container messages-list">
+        <li [class.from-me]="message.from == userName" *ngFor="let message of conversation.messages; let i=index">
+          <div *ngIf="displayFrom(i)">
+            <small>{{message.from}}</small>
+          </div>
+          <span>{{message.text}}</span>
+        </li>
+      </ul>
     </div>
-    <h1 *ngIf="!conversation">WELCOME TO THIS REALLY SIMPLE CHAT</h1>
+  </div>
+  <div class="vertical-list vertical-container" *ngIf="!conversation">
+    <h1>WELCOME TO THIS REALLY SIMPLE CHAT</h1>
+  </div>
 </div>

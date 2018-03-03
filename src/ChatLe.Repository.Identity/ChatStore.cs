@@ -110,12 +110,7 @@ namespace ChatLe.Models
         /// Gets the <see cref="DbSet{TNotificationConnection}"/>
         /// </summary>
         public virtual DbSet<TNotificationConnection> NotificationConnections { get { return Context.Set<TNotificationConnection>(); } }
-        
-        /// <summary>
-        /// Gets the <see cref="DbSet{TUserLogin}"/>
-        /// </summary>
-        public virtual DbSet<TUserLogin> Logins { get { return Context.Set<TUserLogin>(); } }
-        
+                
         /// <summary>
         /// Create a message on the database
         /// </summary>
@@ -258,14 +253,15 @@ namespace ChatLe.Models
                      .Take(pageLength)
                      .ToListAsync();
 
-            var query = from r in q2
-                        join u in Users
-                         on r.Id equals u.Id
-                        select u;
+            var list = new List<TUser>();
+            foreach(var r in q2)
+            {
+                list.Add(await _userStore.FindByIdAsync(r.Id.ToString(), cancellationToken));
+            }
 
             var pageCount = (int)Math.Floor(((double)count) / pageLength) + 1;
 
-            return await Task.FromResult(new Page<TUser>(query.ToList(), pageIndex, pageCount));
+            return await Task.FromResult(new Page<TUser>(list, pageIndex, pageCount));
         }
 
         /// <summary>
@@ -394,9 +390,8 @@ namespace ChatLe.Models
         }
         
         public virtual async Task<bool> IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return await Logins.AnyAsync(l => l.UserId.Equals(user.Id), cancellationToken) == false;
-        }
+            => (await GetLoginStore().GetLoginsAsync(user, cancellationToken)).Any() == false;
+        
         /// <summary>
         /// Check if a user has connection
         /// </summary>

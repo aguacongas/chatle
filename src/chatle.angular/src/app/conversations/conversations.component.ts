@@ -6,7 +6,8 @@ import { Conversation } from '../shared/Conversation';
 
 @Component({
     selector: 'chatle-conversations',
-    templateUrl: './conversations.component.html'
+    templateUrl: './conversations.component.html',
+    styleUrls: ['./conversations.component.css']
 })
 export class ConversationsComponent implements OnInit {
     conversations: Conversation[] = [];

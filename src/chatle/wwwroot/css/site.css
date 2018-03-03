@@ -1,10 +1,12 @@
 ﻿html {
-    font-family: cursive
+    font-family: cursive;
+    height: 100%;
 }
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
     padding-top: 50px;
     padding-bottom: 20px;
+    height: 100%;
 }
 
 .console {
@@ -16,6 +18,7 @@ body {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    height: calc(100% - 61px);
 }
 
 .navbar.navbar-default {
@@ -27,6 +30,21 @@ body {
 .nav.navbar-nav > li > a:hover {
     color: #222222;
 }
+
+.footer > hr {
+    width: 100%;
+}
+
+.vertical-container {
+    height: 100%;
+}
+
+.vertical-list {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
 
 /* Set widths on the form inputs since otherwise they're 100% wide */
 input,

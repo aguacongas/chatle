@@ -1,8 +1,10 @@
-﻿<div class="col-xs-3">
-    <h6>CONV</h6>
+﻿<div class="col-xs-3 vertical-container">
+  <h6>CONV</h6>
+  <div class="vertical-list vertical-container conversations-list">
     <ul *ngFor="let conv of conversations">
-        <li>
-            <chatle-conversation-preview [conversation]="conv"></chatle-conversation-preview>
-        </li>
+      <li>
+        <chatle-conversation-preview [conversation]="conv"></chatle-conversation-preview>
+      </li>
     </ul>
+  </div>
 </div>

@@ -1,0 +1,11 @@
+ul {
+  margin-top: 10px;
+}
+
+.from-me {
+  background-color: #fafafa
+}
+
+.messages-list {
+  height: calc(100% - 71px);
+}

@@ -5,17 +5,20 @@ import { ChatService } from '../shared/chat.service';
 
 @Component({
     selector: 'chatle-conversation',
-    templateUrl: './conversation.component.html'
+    templateUrl: './conversation.component.html',
+    styleUrls: ['./conversation.component.css']
 })
 export class ConversationComponent implements OnInit {
     @Input()
     conversation: Conversation;
     message: string;
     error: any;
+    userName: string;
 
     constructor(private service: ChatService) { }
 
     ngOnInit() {
+        this.userName = this.service.settings.userName;
         this.service.openConversation
             .subscribe(
                 conversation => this.conversation = conversation);
@@ -37,5 +40,10 @@ export class ConversationComponent implements OnInit {
                 m => this.conversation.messages.unshift(m),
                 error => this.error = error);
         this.message = null;
+    }
+
+    displayFrom(i: number) {
+      const messages = this.conversation.messages;
+      return i === 0 || messages[i].from !== messages[i - 1].from;
     }
 }

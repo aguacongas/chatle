@@ -48,8 +48,8 @@ export class ChatService {
   private openConversationSubject = new Subject<Conversation>();
 
   constructor(
+    public settings: Settings,
     private http: HttpClient,
-    private settings: Settings,
     private signalrService: SignalrService
   ) {
     this.connectionState = this.connectionStateSubject.asObservable();

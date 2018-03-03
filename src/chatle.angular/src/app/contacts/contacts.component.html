@@ -1,9 +1,11 @@
-﻿<div class="col-xs-3">
-    <h6>CONNECTED</h6>
+﻿<div class="col-xs-3 vertical-container">
+  <h6>CONNECTED</h6>
+  <div class="vertical-list vertical-container contacts-list">
     <span *ngIf="!users">loading...</span>
     <ul>
-        <li *ngFor="let user of users">
-            <chatle-contact [user]="user"></chatle-contact>
-        </li>
+      <li *ngFor="let user of users">
+        <chatle-contact [user]="user"></chatle-contact>
+      </li>
     </ul>
+  </div>
 </div>
