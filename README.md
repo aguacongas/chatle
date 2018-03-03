@@ -12,10 +12,10 @@ Build status
 [AppVeyor-build]: https://ci.appveyor.com/project/aguacongas/chatle
 
 [Travis-badge]: https://travis-ci.org/aguacongas/chatle.svg?branch=dev
-[Travis-build]: httpshttps://travis-ci.org/aguacongas/chatle
+[Travis-build]: https://travis-ci.org/aguacongas/chatle
 
-Latest version on nuget 
------------------------
+Nuget pakages 
+-------------
 |ChatLe.Repository|ChatLe.Repository.Identity|ChatLe.Repository.Identity.SqlServer|ChatLe.Repository.Identity.Sqlite|ChatLe.Repository.Identity.MySql|ChatLe.Repository.Identity.Firebase|ChatLe.Cryptography|ChatLe.Cryptography.Tools|  
 |:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
 [![][ChatLe.Repository-badge]][ChatLe.Repository-nuget]|[![][ChatLe.Repository.Identity-badge]][ChatLe.Repository.Identity-nuget]|[![][ChatLe.Repository.Identity.SqlServer-badge]][ChatLe.Repository.Identity.SqlServer-nuget]|[![][ChatLe.Repository.Identity.Sqlite-badge]][ChatLe.Repository.Identity.Sqlite-nuget]|[![][ChatLe.Repository.Identity.MySql-badge]][ChatLe.Repository.Identity.MySql-nuget]|[![][ChatLe.Repository.Identity.Firebase-badge]][ChatLe.Repository.Identity.Firebase-nuget]|[![][ChatLe.Cryptography-badge]][ChatLe.Cryptography-nuget]|[![][ChatLe.Cryptography.Tools-badge]][ChatLe.Cryptography.Tools-nuget]|
