@@ -13,4 +13,4 @@ branches:
     - develop
 install:
   - dotnet restore
-solution: chatle.sln
+script: dotnet build
