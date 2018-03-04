@@ -2,7 +2,7 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "IdentityDatabase": "Firebase",
+    "IdentityDatabase": "InMemory",
     "DatabaseEngine": "InMemory",
     "CreateDatabase": "false",
     "Data": {

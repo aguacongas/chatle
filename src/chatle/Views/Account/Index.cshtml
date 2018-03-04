@@ -1,18 +1,22 @@
 ﻿@model LoginPageViewModel
 @{
-    ViewBag.Title = "Log in";
+  ViewBag.Title = "Log in";
 }
 
-<h2>@ViewBag.Title.</h2>
-<div class="row">
-    <div class="col-xs-6">
+<div class="row vertical-container">
+  <div class="col-xs-12 vertical-container vertical-list">
+    <h2>@ViewBag.Title.</h2>
+    <div class="row">
+      <div class="col-xs-6">
         <section id="loginForm">
-            @await Html.PartialAsync("_AccountLoginPartial", Model.Login)
+          @await Html.PartialAsync("_AccountLoginPartial", Model.Login)
         </section>
-    </div>
-    <div class="col-xs-6">
+      </div>
+      <div class="col-xs-6">
         <section id="guessForm">
-            @await Html.PartialAsync("_GuessPartial", Model.Guess)
+          @await Html.PartialAsync("_GuessPartial", Model.Guess)
         </section>
+      </div>
     </div>
+  </div>
 </div>
