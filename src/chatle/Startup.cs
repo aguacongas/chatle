@@ -19,6 +19,7 @@ using ChatLe.Hubs;
 using ChatLe.Cryptography;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json;
+using chatle.Hubs;
 
 namespace ChatLe
 {
@@ -65,7 +66,9 @@ namespace ChatLe
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
+            services
+                .Configure<HubSettings>(hubSettings => Configuration.GetSection("HubSettings").Bind(hubSettings))
+                .AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
                 .AddCors()
                 .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 

@@ -741,7 +741,6 @@ var ConnectionState;
 })(ConnectionState || (ConnectionState = {}));
 var ChatService = (function () {
     function ChatService(settings, http, signalrService) {
-        var _this = this;
         this.settings = settings;
         this.http = http;
         this.signalrService = signalrService;
@@ -752,30 +751,8 @@ var ChatService = (function () {
         this.messageReceivedSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
         this.joinConversationSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
         this.openConversationSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
-        this.connectionState = this.connectionStateSubject.asObservable();
-        this.messageReceived = this.messageReceivedSubject.asObservable();
-        this.userConnected = this.userConnectedSubject.asObservable();
-        this.userDiscconnected = this.userDisconnectedSubject.asObservable();
-        this.joinConversation = this.joinConversationSubject.asObservable();
-        this.openConversation = this.openConversationSubject.asObservable();
-        signalrService.on('userConnected', function (user) { return _this.onUserConnected(user); });
-        signalrService.on('userDisconnected', function (user) {
-            return _this.onUserDisconnected(user);
-        });
-        signalrService.on('messageReceived', function (message) {
-            return _this.onMessageReceived(message);
-        });
-        signalrService.on('joinConversation', function (conv) {
-            return _this.onJoinConversation(conv);
-        });
-        signalrService.closed.subscribe(function (error) {
-            if (location) {
-                location.href = 'Account';
-            }
-        }, function (error) {
-            _this.currentState = ConnectionState.Error;
-            _this.connectionStateSubject.next(_this.currentState);
-        });
+        this.initializeObservables();
+        this.initializeSignalR(signalrService);
     }
     ChatService.prototype.start = function (debug) {
         var _this = this;
@@ -832,6 +809,38 @@ var ChatService = (function () {
         return this.http.get(this.settings.chatAPI).map(function (conversations) {
             conversations.forEach(function (value) { return _this.setConversationTitle(value); });
             return conversations;
+        });
+    };
+    ChatService.prototype.initializeObservables = function () {
+        this.connectionState = this.connectionStateSubject.asObservable();
+        this.messageReceived = this.messageReceivedSubject.asObservable();
+        this.userConnected = this.userConnectedSubject.asObservable();
+        this.userDiscconnected = this.userDisconnectedSubject.asObservable();
+        this.joinConversation = this.joinConversationSubject.asObservable();
+        this.openConversation = this.openConversationSubject.asObservable();
+    };
+    ChatService.prototype.initializeSignalR = function (signalrService) {
+        var _this = this;
+        signalrService.on('userConnected', function (user) { return _this.onUserConnected(user); });
+        signalrService.on('userDisconnected', function (user) {
+            return _this.onUserDisconnected(user);
+        });
+        signalrService.on('messageReceived', function (message) {
+            return _this.onMessageReceived(message);
+        });
+        signalrService.on('joinConversation', function (conv) {
+            return _this.onJoinConversation(conv);
+        });
+        signalrService.closed.subscribe(function (error) {
+            if (error.statusCode === 0 || error.statusCode === 503) {
+                _this.start(_this.settings.debug);
+            }
+            else if (location) {
+                location.href = 'Account';
+            }
+        }, function (error) {
+            _this.currentState = ConnectionState.Error;
+            _this.connectionStateSubject.next(_this.currentState);
         });
     };
     ChatService.prototype.setConversationTitle = function (conversation) {

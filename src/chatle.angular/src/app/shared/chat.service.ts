@@ -1,6 +1,6 @@
-import { Injectable, Inject } from '@angular/core';
+﻿import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { HubConnection, HttpConnection } from '@aspnet/signalr';
+import { HubConnection, HttpConnection, HttpError } from '@aspnet/signalr';
 import { SignalrService } from './signalr-client';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -52,30 +52,8 @@ export class ChatService {
     private http: HttpClient,
     private signalrService: SignalrService
   ) {
-    this.connectionState = this.connectionStateSubject.asObservable();
-    this.messageReceived = this.messageReceivedSubject.asObservable();
-    this.userConnected = this.userConnectedSubject.asObservable();
-    this.userDiscconnected = this.userDisconnectedSubject.asObservable();
-    this.joinConversation = this.joinConversationSubject.asObservable();
-    this.openConversation = this.openConversationSubject.asObservable();
-    signalrService.on('userConnected', user => this.onUserConnected(user));
-    signalrService.on('userDisconnected', user =>
-      this.onUserDisconnected(user)
-    );
-    signalrService.on('messageReceived', message =>
-      this.onMessageReceived(message)
-    );
-    signalrService.on('joinConversation', conv =>
-      this.onJoinConversation(conv)
-    );
-    signalrService.closed.subscribe(error => {
-      if (location) {
-        location.href = 'Account';
-      }
-    }, error => {
-      this.currentState = ConnectionState.Error;
-      this.connectionStateSubject.next(this.currentState);
-    });
+    this.initializeObservables();
+    this.initializeSignalR(signalrService);
   }
 
   start(debug: boolean): Observable<ConnectionState> {
@@ -146,6 +124,38 @@ export class ChatService {
         conversations.forEach(value => this.setConversationTitle(value));
         return conversations;
       });
+  }
+
+  private initializeObservables() {
+    this.connectionState = this.connectionStateSubject.asObservable();
+    this.messageReceived = this.messageReceivedSubject.asObservable();
+    this.userConnected = this.userConnectedSubject.asObservable();
+    this.userDiscconnected = this.userDisconnectedSubject.asObservable();
+    this.joinConversation = this.joinConversationSubject.asObservable();
+    this.openConversation = this.openConversationSubject.asObservable();
+  }
+
+  private initializeSignalR(signalrService: SignalrService) {
+    signalrService.on('userConnected', user => this.onUserConnected(user));
+    signalrService.on('userDisconnected', user =>
+      this.onUserDisconnected(user)
+    );
+    signalrService.on('messageReceived', message =>
+      this.onMessageReceived(message)
+    );
+    signalrService.on('joinConversation', conv =>
+      this.onJoinConversation(conv)
+    );
+    signalrService.closed.subscribe((error: HttpError) => {
+      if (error.statusCode === 0 || error.statusCode === 503) {
+        this.start(this.settings.debug);
+      } else if (location) {
+        location.href = 'Account';
+      }
+    }, error => {
+      this.currentState = ConnectionState.Error;
+      this.connectionStateSubject.next(this.currentState);
+    });
   }
 
   private setConversationTitle(conversation: Conversation) {

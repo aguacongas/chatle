@@ -1,4 +1,7 @@
-﻿@using System.Security.Principal
+﻿@using chatle.Hubs
+@using Microsoft.Extensions.Options
+@inject IOptions<HubSettings> hubSettings
+
 @{
     ViewBag.Title = "Home Page";
 }
@@ -13,7 +16,12 @@
             chatAPI: '@Url.Action("Get", "Chat")',
             convAPI: '@Url.Action("CreateConversation", "Chat")',
             userAPI: '@Url.Action("Get", "User")',
-            debug: true
+            debug: true,
+            hubSettings: {
+              url: '@hubSettings.Value.Url',
+              transportType: @Convert.ToInt32(hubSettings.Value.TransportType),
+              logLevel: @Convert.ToInt32(hubSettings.Value.LogLevel)
+            }
         };
 	</script>
     <script type="text/javascript" src="~/lib/inline.bundle.js"></script>

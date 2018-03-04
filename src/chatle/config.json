@@ -20,5 +20,10 @@
     },
     "RemoveResponseHeader": {
         "Values": "Server, ETag"
+    },
+    "HubSettings": {
+        "Url": "http://localhost:5000/chat",
+        "TransportType": "LongPolling",
+        "LogLevel": "Trace"
     }
 }
