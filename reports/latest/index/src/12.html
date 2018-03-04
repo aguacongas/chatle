@@ -2,28 +2,53 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\LookupNormalizer.cs</title>
+    <title>C:\projects\chatle\src\chatle\Controllers\UserController.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using Microsoft.AspNetCore.Identity;
+using ChatLe.Models;
+using ChatLe.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-namespace ChatLe.Repository.Identity
+// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace ChatLe.Controllers
 {
-    public class LookupNormalizer : ILookupNormalizer
+    /// &lt;summary&gt;
+    /// User api controller
+    /// &lt;/summary&gt;
+    [Route(&quot;api/users&quot;)]
+    public class UserController : Controller
     {
-        public string Normalize(string key)
+        IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; _manager;
+        /// &lt;summary&gt;
+        /// Constructor
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;manager&quot;&gt;the chat repository manager&lt;/param&gt;
+        public UserController(IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; manager)
         {
-            return key;
+            _manager = manager;
+        }
+        /// &lt;summary&gt;
+        /// Gets the a connected users list page
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;a &lt;see cref=&quot;Task{UserCollectionViewModel}&quot;/&gt; with the connected user list as result&lt;/returns&gt;
+        // GET: /&lt;controller&gt;/
+        [HttpGet()]
+        public async Task&lt;UserCollectionViewModel&gt; Get(int pageIndex = 0)
+        {
+            var users = await _manager.GetUsersConnectedAsync(pageIndex);
+            return new UserCollectionViewModel(users);
         }
     }
 }
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[8,9,8,10,1],[9,13,9,24,1],[10,9,10,10,1]]);
+      highlightRanges([[21,9,21,129,1],[22,9,22,10,1],[23,13,23,32,1],[24,9,24,10,1],[32,9,32,10,1],[33,13,33,74,1],[34,13,34,55,1],[35,9,35,10,1]]);
     </script>
   </body>
 </html>

@@ -2,42 +2,38 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\ChatManager.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\ChatLeUser.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatLe.Models
 {
-    /// &lt;summary&gt;
-    /// Default &lt;see cref=&quot;ChatManager&lt;TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&quot;/&gt;
-    /// &lt;/summary&gt;
-    public class ChatManager : ChatManager&lt;ChatLeUser&gt;
+    public class ChatLeUser : IdentityUser, IChatUser&lt;string&gt;
     {
-        /// &lt;summary&gt;
-        /// Constructor
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;store&quot;&gt;a chat store&lt;/param&gt;
-        public ChatManager(IChatStore&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; store, IOptions&lt;ChatOptions&gt; options, ILoggerFactory loggerFactory = null) 
-            : base(store, options, loggerFactory)
-        { }
-    }
+        public ChatLeUser()
+        {
+            Id = Guid.NewGuid().ToString(&quot;N&quot;);
+        }
 
-    public class ChatManager&lt;TUser&gt; : ChatManager&lt;string, TUser, Conversation, Attendee, Message, NotificationConnection&gt;
-        where TUser : IChatUser&lt;string&gt;
-    {
-        public ChatManager(IChatStore&lt;string, TUser, Conversation, Attendee, Message, NotificationConnection&gt; store, IOptions&lt;ChatOptions&gt; options, ILoggerFactory loggerFactory = null) 
-            : base(store, options, loggerFactory)
-        { }
+        public ChatLeUser(string userName) :this()
+        {
+            UserName = userName;
+        }
+
+        public DateTime LastLoginDate { get; set; }
+
+        public bool IsGuess { get; set; }
     }
 }
     </pre>
     <script type="text/javascript">
-      highlightRanges([[16,15,16,50,1],[17,9,17,10,1],[17,11,17,12,1],[24,15,24,50,1],[25,9,25,10,1],[25,11,25,12,1]]);
+      highlightRanges([[9,9,9,28,1],[10,9,10,10,1],[11,13,11,47,1],[12,9,12,10,1],[14,45,14,51,1],[15,9,15,10,1],[16,13,16,33,1],[17,9,17,10,1],[19,41,19,45,1],[19,46,19,50,1],[21,31,21,35,1],[21,36,21,40,1]]);
     </script>
   </body>
 </html>

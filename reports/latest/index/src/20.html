@@ -2,318 +2,33 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository\ChatManager.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Repository\Attendee.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChatLe.Models
-{    
-    /// &lt;summary&gt;
-    /// Manage chat repository
-    /// &lt;/summary&gt;
-    /// &lt;typeparam name=&quot;TKey&quot;&gt;type of primary key&lt;/typeparam&gt;
-    /// &lt;typeparam name=&quot;TUser&quot;&gt;type of user, must implement &lt;see cref=&quot;IChatUser&lt;TKey&gt;&quot;/&gt;&lt;/typeparam&gt;
-    /// &lt;typeparam name=&quot;TConversation&quot;&gt;type of conversation, must be a &lt;see cref=&quot;Conversation&lt;TKey&gt;&quot;/&gt;&lt;/typeparam&gt;
-    /// &lt;typeparam name=&quot;TAttendee&quot;&gt;type of attendee, must be a &lt;see cref=&quot;Attendee&lt;TKey&gt;&quot;/&gt;&lt;/typeparam&gt;
-    /// &lt;typeparam name=&quot;TMessage&quot;&gt;type of message, must be a &lt;see cref=&quot;Message&lt;TKey&gt;&quot;/&gt;&lt;/typeparam&gt;
-    /// &lt;typeparam name=&quot;TNotificationConnection&quot;&gt;type of notification&#39;s connection, must be a &lt;see cref=&quot;NotificationConnection&lt;TKey&gt;&quot;/&gt;&lt;/typeparam&gt;
-    public class ChatManager&lt;TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt; : IChatManager&lt;TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;
-        where TKey : IEquatable&lt;TKey&gt;
-        where TUser : IChatUser&lt;TKey&gt;
-        where TConversation : Conversation&lt;TKey&gt;, new()
-        where TAttendee : Attendee&lt;TKey&gt;, new()
-        where TMessage : Message&lt;TKey&gt;, new()
-        where TNotificationConnection : NotificationConnection&lt;TKey&gt;, new()
-    {
-        private readonly ILogger _logger;
-
-        /// &lt;summary&gt;
-        /// Constructor
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;store&quot;&gt;the store&lt;/param&gt;
-        public ChatManager(IChatStore&lt;TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt; store, IOptions&lt;ChatOptions&gt; optionsAccessor, ILoggerFactory loggerFactory = null)
-        {
-            if (store == null)
-                throw new ArgumentNullException(&quot;store&quot;);
-            if (optionsAccessor == null || optionsAccessor.Value == null)
-                throw new ArgumentNullException(&quot;optionsAccessor&quot;);
-
-            Store = store;
-            Options = optionsAccessor.Value;
-            if (loggerFactory != null)
-                _logger = loggerFactory.CreateLogger(&quot;ChatLe.Models.ChatManager&quot;);
-            else
-                _logger = new FakeLogger();            
-        }
-
-        /// &lt;summary&gt;
-        /// Gets the store
-        /// &lt;/summary&gt;
-        public virtual IChatStore&lt;TKey, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt; Store { get; private set; }
-        
-        /// &lt;summary&gt;
-        /// Gets the options
-        /// &lt;/summary&gt;
-        public virtual ChatOptions Options { get; private set; }
-
-        /// &lt;summary&gt;
-        /// Adds a notification connection assotiate to a user
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;userName&quot;&gt;The user name&lt;/param&gt;
-        /// &lt;param name=&quot;connectionId&quot;&gt;The connection id&lt;/param&gt;
-        /// &lt;param name=&quot;notificationType&quot;&gt;The notification type&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual async Task AddConnectionIdAsync(string userName, string connectionId, string notificationType, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (userName == null)
-                throw new ArgumentNullException(&quot;userName&quot;);
-            if (connectionId == null)
-                throw new ArgumentNullException(&quot;connectionId&quot;);
-            if (notificationType == null)
-                throw new ArgumentNullException(&quot;notificationType&quot;);
-
-            _logger.LogInformation(&quot;AddConnectionIdAsync {0} {1} {2}&quot;, userName, connectionId, notificationType);
-
-            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
-            if (user != null)
-            {
-                var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType);
-                if (nc == null)
-                {
-                    nc = new TNotificationConnection()
-                    {
-                        UserId = user.Id,
-                        ConnectionId = connectionId,
-                        NotificationType = notificationType,
-                        ConnectionDate = DateTime.UtcNow
-                    };
-                    
-                    await Store.CreateNotificationConnectionAsync(nc, cancellationToken);
-                }
-            } else
-                throw new InvalidOperationException($&quot;The user &#39;{userName}&#39; doesn&#39;t exist&quot;);
-        }
-
-        /// &lt;summary&gt;
-        /// Removes a notification connection assotiate to a user
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;connectionId&quot;&gt;The connection id&lt;/param&gt;
-        /// &lt;param name=&quot;notificationType&quot;&gt;the type of notification&lt;/param&gt;
-        /// &lt;param name=&quot;inactif&quot;&gt;true if the user is disconnected because of inactivity&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
-        /// &lt;returns&gt;A Task&lt;/returns&gt;
-        public virtual async Task&lt;TUser&gt; RemoveConnectionIdAsync(string connectionId, string notificationType, bool inactif, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (connectionId == null)
-                throw new ArgumentNullException(&quot;connectionId&quot;);
-            if (notificationType == null)
-                throw new ArgumentNullException(&quot;notificationType&quot;);
-
-            var nc = await Store.GetNotificationConnectionAsync(connectionId, notificationType, cancellationToken);
-			if (nc != null)
-			{
-				await Store.DeleteNotificationConnectionAsync(nc, cancellationToken);   
-				var user = await Store.FindUserByIdAsync(nc.UserId);
-				if (user != null)
-                {
-                    user.IsGuess = await IsGuess(user);
-                    if (inactif &amp;&amp; user.IsGuess)
-                    {
-                        await RemoveUserAsync(user, cancellationToken);
-                    }
-                    return user;
-                }
-            }
-			return default(TUser);
-        }
-
-        /// &lt;summary&gt;
-        /// Adds a message to a conversation
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;fromName&quot;&gt;The sender name&lt;/param&gt;
-        /// &lt;param name=&quot;toConversationId&quot;&gt;The conversation id&lt;/param&gt;
-        /// &lt;param name=&quot;message&quot;&gt;The message&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an  optional cancellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual async Task&lt;TConversation&gt; AddMessageAsync(string fromName, TKey toConversationId, TMessage message, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (fromName == null)
-                throw new ArgumentNullException(&quot;fromName&quot;);
-            if (toConversationId == null)
-                throw new ArgumentNullException(&quot;toConversationId&quot;);
-
-            var user = await Store.FindUserByNameAsync(fromName, cancellationToken);
-            if (user != null)
-            {
-                var conv = await Store.GetConversationAsync(toConversationId, cancellationToken);
-                if (conv != null)
-                {                    
-                    // Add the message
-                    message.ConversationId = toConversationId;
-                    message.UserId = user.Id;
-                    await Store.CreateMessageAsync(message, cancellationToken);
-                    conv.Messages.Add(message);
-                    return conv;
-                }
-            }
-
-            return null;
-        }
-        
-        /// &lt;summary&gt;
-        /// Gets or creates a conversation
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;from&quot;&gt;The name of the 1st attendee&lt;/param&gt;
-        /// &lt;param name=&quot;to&quot;&gt;The name of the second attendee&lt;/param&gt;
-        /// &lt;param name=&quot;inialMessage&quot;&gt;The initial message if any&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional cancellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual async Task&lt;TConversation&gt; GetOrCreateConversationAsync(string from, string to, string initialMessage = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (from == null)
-                throw new ArgumentNullException(&quot;from&quot;);
-            if (to == null)
-                throw new ArgumentNullException(&quot;to&quot;);
-
-            _logger.LogInformation(&quot;GetOrCreateConversationAsync from : {0}, to : {1}, initialMessage: {2}&quot;, from, to, initialMessage);
-
-            var attendee1 = await Store.FindUserByNameAsync(from, cancellationToken);
-            var attendee2 = await Store.FindUserByNameAsync(to, cancellationToken);
-            var conv = await Store.GetConversationAsync(attendee1, attendee2, cancellationToken);
-            if (conv == null)
-            {
-                conv = new TConversation();
-                await Store.CreateConversationAsync(conv, cancellationToken);
-                await AddAttendeeAsync(conv, attendee1.Id, cancellationToken);
-                await AddAttendeeAsync(conv, attendee2.Id, cancellationToken);
-            }
-
-            if (initialMessage != null)
-                await AddMessageAsync(conv, attendee1, initialMessage, cancellationToken);
-
-            return conv;
-        }
-
-        /// &lt;summary&gt;
-        /// Add a message in a conversation
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;conv&quot;&gt;the conversation&lt;/param&gt;
-        /// &lt;param name=&quot;sender&quot;&gt;the sender&lt;/param&gt;
-        /// &lt;param name=&quot;content&quot;&gt;the message content&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;a cancellation&lt;/param&gt;
-        /// &lt;returns&gt;an async task&lt;/returns&gt;
-        protected virtual async Task AddMessageAsync(TConversation conv, TUser sender, string content, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(&quot;AddMessage to conversation : {0} content : {1}&quot;, conv.Id, content);
-            
-            var message = new TMessage();
-            message.ConversationId = conv.Id;
-            message.UserId = sender.Id;
-            message.Text = content;
-            await Store.CreateMessageAsync(message, cancellationToken);
-            var messages = conv.Messages;
-            if (!messages.Any(m =&gt; m.Id.Equals(message.Id)))
-                messages.Add(message);
-        }
-
-        /// &lt;summary&gt;
-        /// Add an attendee in a conversation by ids
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;convId&quot;&gt;the conversation id&lt;/param&gt;
-        /// &lt;param name=&quot;userId&quot;&gt;the user id&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;a cancellation token&lt;/param&gt;
-        /// &lt;returns&gt;an async task&lt;/returns&gt;
-        protected virtual async Task&lt;TAttendee&gt; AddAttendeeAsync(TConversation conv, TKey userId, CancellationToken cancellationToken)
-        {
-            var attendee = new TAttendee();
-            attendee.ConversationId = conv.Id;
-            attendee.UserId = userId;
-            await Store.CreateAttendeeAsync(attendee, cancellationToken);
-            var attendees = conv.Attendees;
-            if (!attendees.Any(a =&gt; a.UserId.Equals(attendee.UserId)))
-                attendees.Add(attendee);
-            return attendee;
-        }
-
-        /// &lt;summary&gt;
-        /// Gets the messages list for a conversation
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;id&quot;&gt;the conversation id&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional concellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual Task&lt;IEnumerable&lt;TMessage&gt;&gt; GetMessagesAsync(TKey convId, CancellationToken cancellationToken = default(CancellationToken), int max = 50)
-        {
-            return Store.GetMessagesAsync(convId, max, cancellationToken);
-        }
-        /// &lt;summary&gt;
-        /// Gets a page of connected users
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;pageIndex&quot;&gt;the page index&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional concellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual Task&lt;Page&lt;TUser&gt;&gt; GetUsersConnectedAsync(int pageIndex = 0, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Store.GetUsersConnectedAsync(pageIndex, Options.UserPerPage, cancellationToken);
-        }
-
-        /// &lt;summary&gt;
-        /// Gets the list of conversation for a user
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;userName&quot;&gt;the user name&lt;/param&gt;
-        /// &lt;param name=&quot;cancellationToken&quot;&gt;an optional concellation token&lt;/param&gt;
-        /// &lt;returns&gt;a Task&lt;/returns&gt;
-        public virtual async Task&lt;IEnumerable&lt;TConversation&gt;&gt; GetConversationsAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (userName == null)
-                throw new ArgumentNullException(&quot;userName&quot;);
-
-            var user = await Store.FindUserByNameAsync(userName, cancellationToken);
-            if (user == null)
-                return null;
-
-            var conversations = await Store.GetConversationsAsync(user, cancellationToken);
-            
-            foreach (var conv in conversations)
-            {
-                var messages = await Store.GetMessagesAsync(conv.Id, cancellationToken: cancellationToken);
-                foreach (var message in messages)
-                    if (!conv.Messages.Any(m =&gt; m.Id.Equals(message.Id)))
-                        conv.Messages.Add(message);
-            }
-            return conversations;
-        }
-
-        public virtual async Task RemoveUserAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (user == null)
-                throw new ArgumentNullException(&quot;user&quot;);
-
-            await Store.DeleteUserAsync(user, cancellationToken);
-        }
-
-        public virtual async Task&lt;bool&gt; IsGuess(TUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (user == null)
-                throw new ArgumentNullException(&quot;user&quot;);
-
-            return await Store.IsGuess(user, cancellationToken);
-        }
+{
+    public class Attendee:Attendee&lt;string&gt;
+    { 
     }
+
+    public class Attendee&lt;TKey&gt; where TKey : IEquatable&lt;TKey&gt;
+    {
+        public virtual TKey ConversationId { get; set; }
+        public virtual TKey UserId { get; set; }
+        public virtual bool IsConnected { get; set; } = true;
+
+        public virtual Conversation&lt;TKey&gt; Conversation { get; set; }
+        
+    }   
 }
     </pre>
     <script type="text/javascript">
-      highlightRanges([[34,9,34,195,1],[35,9,35,10,1],[36,13,36,31,1],[37,17,37,58,1],[38,13,38,74,1],[39,17,39,68,1],[41,13,41,27,1],[42,13,42,45,1],[43,13,43,39,1],[44,17,44,83,1],[46,17,46,44,1],[47,9,47,10,1],[52,117,52,121,1],[52,122,52,134,1],[57,46,57,50,1],[57,51,57,63,1],[68,9,68,10,1],[69,13,69,34,1],[70,17,70,61,1],[71,13,71,38,1],[72,17,72,65,1],[73,13,73,42,1],[74,17,74,69,1],[76,13,76,114,1],[78,13,78,85,1],[79,13,79,30,1],[80,13,80,14,1],[81,17,81,101,1],[82,17,82,32,1],[83,17,83,18,1],[84,21,90,23,1],[92,21,92,90,1],[93,17,93,18,1],[94,13,94,14,1],[95,17,95,93,1],[96,9,96,10,1],[107,9,107,10,1],[108,13,108,38,1],[109,17,109,65,1],[110,13,110,42,1],[111,17,111,69,1],[113,13,113,116,1],[114,4,114,19,1],[115,4,115,5,1],[116,5,116,74,1],[117,5,117,57,1],[118,5,118,22,1],[119,17,119,18,1],[120,21,120,56,1],[121,21,121,49,1],[122,21,122,22,1],[123,25,123,72,1],[124,21,124,22,1],[125,21,125,33,1],[127,13,127,14,1],[128,4,128,26,1],[129,9,129,10,1],[140,9,140,10,1],[141,13,141,34,1],[142,17,142,61,1],[143,13,143,42,1],[144,17,144,69,1],[146,13,146,85,1],[147,13,147,30,1],[148,13,148,14,1],[149,17,149,98,1],[150,17,150,34,1],[151,17,151,18,1],[153,21,153,63,1],[154,21,154,46,1],[155,21,155,80,1],[156,21,156,48,1],[157,21,157,33,1],[159,13,159,14,1],[161,13,161,25,1],[162,9,162,10,1],[173,9,173,10,1],[174,13,174,30,1],[175,17,175,57,1],[176,13,176,28,1],[177,17,177,55,1],[179,13,179,136,1],[181,13,181,86,1],[182,13,182,84,1],[183,13,183,98,1],[184,13,184,30,1],[185,13,185,14,1],[186,17,186,44,1],[187,17,187,78,1],[188,17,188,79,1],[189,17,189,79,1],[190,13,190,14,1],[192,13,192,40,1],[193,17,193,91,1],[195,13,195,25,1],[196,9,196,10,1],[207,9,207,10,1],[208,13,208,104,1],[210,13,210,42,1],[211,13,211,46,1],[212,13,212,40,1],[213,13,213,36,1],[214,13,214,72,1],[215,13,215,42,1],[216,13,216,36,1],[216,36,216,59,0],[216,59,216,61,1],[216,13,216,61,1],[217,17,217,39,1],[218,9,218,10,1],[228,9,228,10,1],[229,13,229,44,1],[230,13,230,47,1],[231,13,231,38,1],[232,13,232,74,1],[233,13,233,44,1],[234,13,234,37,1],[234,37,234,69,1],[234,69,234,71,1],[234,13,234,71,1],[235,17,235,41,1],[236,13,236,29,1],[237,9,237,10,1],[246,9,246,10,1],[247,13,247,75,1],[248,9,248,10,1],[256,9,256,10,1],[257,13,257,100,1],[258,9,258,10,1],[267,9,267,10,1],[268,13,268,34,1],[269,17,269,61,1],[271,13,271,85,1],[272,13,272,30,1],[273,17,273,29,0],[275,13,275,92,1],[277,13,277,20,1],[277,22,277,30,1],[277,31,277,33,1],[277,34,277,47,1],[278,13,278,14,1],[279,17,279,108,1],[280,17,280,24,1],[280,26,280,37,1],[280,38,280,40,1],[280,41,280,49,1],[281,21,281,49,1],[281,49,281,72,1],[281,72,281,74,1],[281,21,281,74,1],[282,25,282,52,1],[283,13,283,14,1],[284,13,284,34,1],[285,9,285,10,1],[288,9,288,10,1],[289,13,289,30,1],[290,17,290,57,1],[292,13,292,66,1],[293,9,293,10,1],[296,9,296,10,1],[297,13,297,30,1],[298,17,298,57,0],[300,13,300,65,1],[301,9,301,10,1]]);
+      highlightRanges([[11,46,11,50,1],[11,51,11,55,1],[12,38,12,42,1],[12,43,12,47,1],[13,43,13,47,1],[13,48,13,52,1],[13,57,13,61,1],[15,58,15,62,1],[15,63,15,67,1]]);
     </script>
   </body>
 </html>

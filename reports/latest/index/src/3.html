@@ -2,113 +2,333 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\ViewModels\AccountViewModels.cs</title>
+    <title>C:\projects\chatle\src\chatle\Startup.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using System.ComponentModel.DataAnnotations;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using ChatLe.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Identity;
+using ChatLe.Hubs;
+using ChatLe.Cryptography;
+using Google.Apis.Auth.OAuth2;
+using Newtonsoft.Json;
+using chatle.Hubs;
 
-namespace ChatLe.ViewModels
+namespace ChatLe
 {
-    public class ExternalLoginProvider
+    public class Startup
     {
-        public string DisplayName { get; set; }
-        public string AuthenticationScheme { get; set; }
-    }
+        enum DBEngine
+        {
+            SqlServer,
+            InMemory,
+            Redis,
+            SQLite,
+            MySql,
+            Firebase
+        }
 
-    public class ExternalLoginConfirmationViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
-    }
+        readonly IHostingEnvironment _environment;
+        public ILoggerFactory LoggerFactory { get; private set; }
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile(&quot;config.json&quot;)
+                .AddJsonFile($&quot;config.{env.EnvironmentName}.json&quot;, optional: true);
 
-    public class UpdatePasswordViewModel
-    {
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Current password&quot;)]
-        public string OldPassword { get; set; }
+            if (env.IsDevelopment())
+            {
+                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
+                builder.AddUserSecrets&lt;Startup&gt;();
+                loggerFactory.AddDebug();
+            }
 
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;New password&quot;)]
-        public string NewPassword { get; set; }
+            builder.AddEnvironmentVariables();
 
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm new password&quot;)]
-        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
-    }
+            Configuration = builder.Build();
 
-    public class CreatePasswordViewModel
-    {
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;New password&quot;)]
-        public string NewPassword { get; set; }
+            _environment = env;
+            LoggerFactory = loggerFactory;
+            loggerFactory.AddAzureWebAppDiagnostics();
 
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm new password&quot;)]
-        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
-    }
+            loggerFactory.AddConsole();
+        }
 
-    public class LoginViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
+        public IConfiguration Configuration { get; private set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Password&quot;)]
-        public string Password { get; set; }
+        public virtual void ConfigureServices(IServiceCollection services)
+        {
+            services
+                .Configure&lt;HubSettings&gt;(hubSettings =&gt; Configuration.GetSection(&quot;HubSettings&quot;).Bind(hubSettings))
+                .AddChatLe(options =&gt; options.UserPerPage = int.Parse(Configuration[&quot;ChatConfig:UserPerPage&quot;]))
+                .AddCors()
+                .AddAntiforgery(options =&gt; options.HeaderName = &quot;X-XSRF-TOKEN&quot;);
 
-        [Display(Name = &quot;Remember me?&quot;)]
-        public bool RememberMe { get; set; }
-    }
+            ConfigureEntity(services);
 
-    public class GuessViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
+            services.AddMvc()
+                .AddJsonOptions(options =&gt;
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
-    }
+            services.AddSignalR();
 
-    public class LoginPageViewModel
-    {
-        public LoginViewModel Login { get; set; } = new LoginViewModel();
-        public GuessViewModel Guess { get; set; } = new GuessViewModel();
-    }
+            var authServices = services.AddAuthentication();
+            if (Configuration[&quot;Authentication:Facebook:AppId&quot;] != null)
+            { 
+                authServices.AddFacebook(facebookOptions =&gt;
+                {
+                    facebookOptions.AppId = Configuration[&quot;Authentication:Facebook:AppId&quot;];
+                    facebookOptions.AppSecret = Configuration[&quot;Authentication:Facebook:AppSecret&quot;];
+                    facebookOptions.SaveTokens = true;
+                });
+            }
 
-    public class RegisterViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
+            if (Configuration[&quot;Authentication:Twitter:ConsumerKey&quot;] != null)
+            {
+                authServices.AddTwitter(twitterOptions =&gt;
+                {
+                    twitterOptions.ConsumerKey = Configuration[&quot;Authentication:Twitter:ConsumerKey&quot;];
+                    twitterOptions.ConsumerSecret = Configuration[&quot;Authentication:Twitter:ConsumerSecret&quot;];
+                    twitterOptions.SaveTokens = true;
 
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Password&quot;)]
-        public string Password { get; set; }
+                });
+            }
+            if (Configuration[&quot;Authentication:Google:ClientId&quot;] != null)
+            {
+                authServices.AddGoogle(googleOption =&gt;
+                {
+                    googleOption.ClientId = Configuration[&quot;Authentication:Google:ClientId&quot;];
+                    googleOption.ClientSecret = Configuration[&quot;Authentication:Google:ClientSecret&quot;];
+                    googleOption.SaveTokens = true;
+                });
+            }
+            if (Configuration[&quot;Authentication:MicrosoftAccount:ClientId&quot;] != null)
+            {
+                authServices.AddMicrosoftAccount(microsoftAccountOptions =&gt;
+                {
+                    microsoftAccountOptions.ClientId = Configuration[&quot;Authentication:MicrosoftAccount:ClientId&quot;];
+                    microsoftAccountOptions.ClientSecret = Configuration[&quot;Authentication:MicrosoftAccount:ClientSecret&quot;];
+                    microsoftAccountOptions.SaveTokens = true;
+                });
+            }
+            if (Configuration[&quot;Authentication:Github:ClientId&quot;] != null)
+            {
+                authServices.AddOAuth(&quot;Github&quot;, options =&gt;
+                {
+                    options.ClientId = Configuration[&quot;Authentication:Github:ClientId&quot;];
+                    options.ClientSecret = Configuration[&quot;Authentication:Github:ClientSecret&quot;];
+                    options.CallbackPath = new PathString(&quot;/signin-github&quot;);
+                    options.AuthorizationEndpoint = &quot;https://github.com/login/oauth/authorize&quot;;
+                    options.TokenEndpoint = &quot;https://github.com/login/oauth/access_token&quot;;
+                    options.UserInformationEndpoint = &quot;https://api.github.com/user&quot;;
+                    options.ClaimsIssuer = &quot;OAuth2-Github&quot;;
+                    options.SaveTokens = true;
+                    // Retrieving user information is unique to each provider.
+                    options.Events = new OAuthEvents
+                    {
+                        OnCreatingTicket = async context =&gt;
+                        {
+                            // Get the GitHub user
+                            var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                            request.Headers.Authorization = new AuthenticationHeaderValue(&quot;Bearer&quot;, context.AccessToken);
+                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(&quot;application/json&quot;));
 
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm password&quot;)]
-        [Compare(&quot;Password&quot;, ErrorMessage = &quot;The password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
+                            var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                            response.EnsureSuccessStatusCode();
+
+                            var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                            var identifier = user.Value&lt;string&gt;(&quot;id&quot;);
+                            if (!string.IsNullOrEmpty(identifier))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.NameIdentifier, identifier,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var userName = user.Value&lt;string&gt;(&quot;login&quot;);
+                            if (!string.IsNullOrEmpty(userName))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimsIdentity.DefaultNameClaimType, userName,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var name = user.Value&lt;string&gt;(&quot;name&quot;);
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    &quot;urn:github:name&quot;, name,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+
+                            var email = user.Value&lt;string&gt;(&quot;email&quot;);
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    ClaimTypes.Email, email,
+                                    ClaimValueTypes.Email, context.Options.ClaimsIssuer));
+                            }
+
+                            var link = user.Value&lt;string&gt;(&quot;url&quot;);
+                            if (!string.IsNullOrEmpty(link))
+                            {
+                                context.Identity.AddClaim(new Claim(
+                                    &quot;urn:github:url&quot;, link,
+                                    ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                            }
+                        }
+                    };
+                });
+            }
+        }
+
+        private void ConfigureEntity(IServiceCollection services)
+        {
+            var identyBuilder = services.AddIdentity&lt;ChatLeUser, IdentityRole&gt;(options =&gt;
+                        {
+                            var userOptions = options.User;
+                            userOptions.AllowedUserNameCharacters += &quot; &quot;;
+                        })
+                .AddDefaultTokenProviders();
+
+            var identityEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration[&quot;IdentityDatabase&quot;]);
+            if (identityEngine != DBEngine.Firebase)
+            {
+                identyBuilder.AddEntityFrameworkStores&lt;ChatLeIdentityDbContext&gt;();
+            }
+            else
+            {
+                identyBuilder.AddFirebaseStores(Configuration[&quot;FirebaseOptions:DatabaseUrl&quot;], provider =&gt;
+                {
+                    using (var utility = new Utility(Configuration[&quot;FirebaseOptions:SecureKey&quot;]))
+                    {
+                        using (var stream = utility.DecryptFile(&quot;firebase-key.json.enc&quot;).GetAwaiter().GetResult())
+                        {
+                            return GoogleCredential.FromStream(stream)
+                                .CreateScoped(&quot;https://www.googleapis.com/auth/userinfo.email&quot;, &quot;https://www.googleapis.com/auth/firebase.database&quot;)
+                                .UnderlyingCredential;
+                        }
+                    }
+                });
+            }
+
+            var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration[&quot;DatabaseEngine&quot;]);
+            
+            if (dbEngine != DBEngine.Firebase)
+            {
+                services.AddDbContext&lt;ChatLeIdentityDbContext&gt;(options =&gt;
+                {
+                    if (_environment.IsDevelopment())
+                        options.EnableSensitiveDataLogging();
+
+                    switch (dbEngine)
+                    {
+                        case DBEngine.InMemory:
+                            options.UseInMemoryDatabase(&quot;chatle&quot;);
+                            break;
+                        case DBEngine.SqlServer:
+                            options.UseSqlServer(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.SqlServer&quot;));
+                            break;
+                        case DBEngine.SQLite:
+                            options.UseSqlite(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.Sqlite&quot;));
+                            break;
+                        case DBEngine.MySql:
+                            options.UseMySql(Configuration[&quot;Data:DefaultConnection:ConnectionString&quot;], o =&gt; o.MigrationsAssembly(&quot;ChatLe.Repository.Identity.MySql&quot;));
+                            break;
+                }
+                });
+            }
+            else
+            {
+                services.AddFirebaseChatStore();
+            }
+        }
+
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
+        {
+
+            ConfigureErrors(app);
+
+            var logger = LoggerFactory.CreateLogger(&quot;request&quot;);
+            app.UseCors(
+                builder =&gt; builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials())
+                .UseStaticFiles()
+                .UseWebSockets()
+                .UseAuthentication()
+                .Map(&quot;/xhrf&quot;, a =&gt; a.Run(async context =&gt;
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append(&quot;XSRF-TOKEN&quot;, tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+                    await context.Response.WriteAsync(tokens.RequestToken);
+                }))
+                .Map(&quot;/cls&quot;, a =&gt; a.Run(async context =&gt;
+                {
+                    var response = context.Response;
+                    foreach (var cookie in context.Request.Cookies)
+                    {
+                        response.Cookies.Delete(cookie.Key);
+                    }
+                    await context.Response.WriteAsync(string.Empty);
+                }))
+                .UseSignalR(configure =&gt;
+                {
+                    configure.MapHub&lt;ChatHub&gt;(&quot;/chat&quot;);
+                })
+                .UseMvc(routes =&gt;
+                {
+                    routes.MapRoute(
+                    name: &quot;default&quot;,
+                    template: &quot;{controller}/{action}/{id?}&quot;,
+                    defaults: new { controller = &quot;Home&quot;, action = &quot;Index&quot; });
+                })
+                .UseChatLe();
+        }
+
+        protected virtual void ConfigureErrors(IApplicationBuilder app)
+        {
+            if (string.Equals(_environment.EnvironmentName, &quot;Development&quot;, StringComparison.OrdinalIgnoreCase))
+            {
+                app.UseBrowserLink();
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                // Add Error handling middleware which catches all application specific errors and
+                // send the request to the following path or controller action.
+                app.UseExceptionHandler(&quot;/Home/Error&quot;);
+            }
+        }
     }
 }
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[7,37,7,41,0],[7,42,7,46,0],[8,46,8,50,0],[8,51,8,55,0],[15,34,15,38,0],[15,39,15,43,0],[23,37,23,41,1],[23,42,23,46,1],[29,37,29,41,1],[29,42,29,46,1],[34,41,34,45,0],[34,46,34,50,1],[43,37,43,41,0],[43,42,43,46,0],[48,41,48,45,0],[48,46,48,50,0],[55,34,55,38,1],[55,39,55,43,1],[60,34,60,38,1],[60,39,60,43,1],[63,34,63,38,1],[63,39,63,43,1],[70,34,70,38,1],[70,39,70,43,1],[76,39,76,43,0],[76,44,76,48,0],[76,53,76,73,1],[77,39,77,43,0],[77,44,77,48,1],[77,53,77,73,1],[84,34,84,38,1],[84,39,84,43,1],[90,34,90,38,1],[90,39,90,43,1],[95,41,95,45,0],[95,46,95,50,1]]);
+      highlightRanges([[39,47,39,51,0],[39,52,39,64,0],[40,9,40,78,0],[41,9,41,10,0],[42,13,45,84,0],[47,13,47,37,0],[48,13,48,14,0],[50,17,50,51,0],[51,17,51,42,0],[52,13,52,14,0],[54,13,54,47,0],[56,13,56,45,0],[58,13,58,32,0],[59,13,59,43,0],[60,13,60,55,0],[62,13,62,40,0],[63,9,63,10,0],[65,47,65,51,0],[65,52,65,64,0],[68,9,68,10,0],[69,13,70,56,0],[70,56,70,113,0],[70,113,71,39,0],[71,39,71,111,0],[71,111,73,44,0],[73,44,73,79,0],[73,79,73,81,0],[69,13,73,81,0],[75,13,75,39,0],[77,13,79,17,0],[79,17,79,18,0],[79,18,80,21,0],[80,21,80,93,0],[80,93,81,17,0],[81,17,81,18,0],[81,18,81,20,0],[77,13,81,20,0],[83,13,83,35,0],[85,13,85,61,0],[86,13,86,72,0],[87,13,87,14,0],[88,17,89,17,0],[89,17,89,18,0],[89,18,90,21,0],[90,21,90,92,0],[90,92,91,21,0],[91,21,91,100,0],[91,100,92,21,0],[92,21,92,55,0],[92,55,93,17,0],[93,17,93,18,0],[93,18,93,20,0],[88,17,93,20,0],[94,13,94,14,0],[96,13,96,77,0],[97,13,97,14,0],[98,17,99,17,0],[99,17,99,18,0],[99,18,100,21,0],[100,21,100,102,0],[100,102,101,21,0],[101,21,101,108,0],[101,108,102,21,0],[102,21,102,54,0],[102,54,104,17,0],[104,17,104,18,0],[104,18,104,20,0],[98,17,104,20,0],[105,13,105,14,0],[106,13,106,73,0],[107,13,107,14,0],[108,17,109,17,0],[109,17,109,18,0],[109,18,110,21,0],[110,21,110,93,0],[110,93,111,21,0],[111,21,111,101,0],[111,101,112,21,0],[112,21,112,52,0],[112,52,113,17,0],[113,17,113,18,0],[113,18,113,20,0],[108,17,113,20,0],[114,13,114,14,0],[115,13,115,83,0],[116,13,116,14,0],[117,17,118,17,0],[118,17,118,18,0],[118,18,119,21,0],[119,21,119,114,0],[119,114,120,21,0],[120,21,120,122,0],[120,122,121,21,0],[121,21,121,63,0],[121,63,122,17,0],[122,17,122,18,0],[122,18,122,20,0],[117,17,122,20,0],[123,13,123,14,0],[124,13,124,73,0],[125,13,125,14,0],[126,17,127,17,0],[127,17,127,18,0],[127,18,128,21,0],[128,21,128,88,0],[128,88,129,21,0],[129,21,129,96,0],[129,96,130,21,0],[130,21,130,77,0],[130,77,131,21,0],[131,21,131,96,0],[131,96,132,21,0],[132,21,132,91,0],[132,91,133,21,0],[133,21,133,85,0],[133,85,134,21,0],[134,21,134,60,0],[134,60,135,21,0],[135,21,135,47,0],[135,47,137,21,0],[137,21,140,25,0],[140,25,140,26,0],[140,26,142,29,0],[142,29,142,123,0],[142,123,143,29,0],[143,29,143,122,0],[143,122,144,29,0],[144,29,144,113,0],[144,113,146,29,0],[146,29,146,125,0],[146,125,147,29,0],[147,29,147,64,0],[147,64,149,29,0],[149,29,149,98,0],[149,98,151,29,0],[151,29,151,71,0],[151,71,152,29,0],[152,29,152,67,0],[152,67,153,29,0],[153,29,153,30,0],[153,30,154,33,0],[154,33,156,92,0],[156,92,157,29,0],[157,29,157,30,0],[157,30,159,29,0],[159,29,159,72,0],[159,72,160,29,0],[160,29,160,65,0],[160,65,161,29,0],[161,29,161,30,0],[161,30,162,33,0],[162,33,164,92,0],[164,92,165,29,0],[165,29,165,30,0],[165,30,167,29,0],[167,29,167,67,0],[167,67,168,29,0],[168,29,168,61,0],[168,61,169,29,0],[169,29,169,30,0],[169,30,170,33,0],[170,33,172,92,0],[172,92,173,29,0],[173,29,173,30,0],[173,30,175,29,0],[175,29,175,69,0],[175,69,176,29,0],[176,29,176,62,0],[176,62,177,29,0],[177,29,177,30,0],[177,30,178,33,0],[178,33,180,91,0],[180,91,181,29,0],[181,29,181,30,0],[181,30,183,29,0],[183,29,183,66,0],[183,66,184,29,0],[184,29,184,61,0],[184,61,185,29,0],[185,29,185,30,0],[185,30,186,33,0],[186,33,188,92,0],[188,92,189,29,0],[189,29,189,30,0],[189,30,190,25,0],[190,25,190,26,0],[190,26,191,23,0],[137,21,191,23,0],[191,23,192,17,0],[192,17,192,18,0],[192,18,192,20,0],[126,17,192,20,0],[193,13,193,14,0],[194,9,194,10,0],[197,9,197,10,0],[198,13,199,25,0],[199,25,199,26,0],[199,26,200,29,0],[200,29,200,60,0],[200,60,201,29,0],[201,29,201,74,0],[201,74,202,25,0],[202,25,202,26,0],[202,26,203,45,0],[198,13,203,45,0],[205,13,205,108,0],[206,13,206,53,0],[207,13,207,14,0],[208,17,208,83,0],[209,13,209,14,0],[211,13,211,14,0],[212,17,213,17,0],[213,17,213,18,0],[213,18,214,28,0],[214,28,214,97,0],[214,97,215,21,0],[215,21,215,22,0],[215,22,216,32,0],[216,32,216,114,0],[216,114,217,25,0],[217,25,217,26,0],[217,26,218,29,0],[218,29,220,55,0],[220,55,223,17,0],[223,17,223,18,0],[223,18,223,20,0],[212,17,223,20,0],[224,13,224,14,0],[226,13,226,100,0],[228,13,228,47,0],[229,13,229,14,0],[230,17,231,17,0],[231,17,231,18,0],[231,18,232,21,0],[232,21,232,54,0],[232,54,233,25,0],[233,25,233,62,0],[233,62,235,21,0],[235,21,235,38,0],[235,38,238,29,0],[238,29,238,67,0],[238,67,239,29,0],[239,29,239,35,0],[239,35,241,29,0],[241,29,241,113,0],[241,113,241,173,0],[241,173,241,175,0],[241,29,241,175,0],[241,175,242,29,0],[242,29,242,35,0],[242,35,244,29,0],[244,29,244,110,0],[244,110,244,167,0],[244,167,244,169,0],[244,29,244,169,0],[244,169,245,29,0],[245,29,245,35,0],[245,35,247,29,0],[247,29,247,109,0],[247,109,247,165,0],[247,165,247,167,0],[247,29,247,167,0],[247,167,248,29,0],[248,29,248,35,0],[248,35,250,17,0],[250,17,250,18,0],[250,18,250,20,0],[230,17,250,20,0],[251,13,251,14,0],[253,13,253,14,0],[254,17,254,49,0],[255,13,255,14,0],[256,9,256,10,0],[259,9,259,10,0],[261,13,261,34,0],[263,13,263,64,0],[264,13,265,28,0],[265,28,268,40,0],[268,40,272,36,0],[272,36,273,17,0],[273,17,273,18,0],[273,18,274,21,0],[274,21,274,73,0],[274,73,275,21,0],[275,21,275,130,0],[275,130,276,21,0],[276,21,276,76,0],[276,76,277,17,0],[277,17,277,18,0],[277,18,277,19,0],[272,36,277,19,0],[277,19,278,35,0],[278,35,279,17,0],[279,17,279,18,0],[279,18,280,21,0],[280,21,280,53,0],[280,53,281,21,0],[281,21,281,28,0],[281,28,281,30,0],[281,30,281,40,0],[281,40,281,41,0],[281,41,281,43,0],[281,43,281,44,0],[281,44,281,67,0],[281,67,282,21,0],[282,21,282,22,0],[282,22,283,25,0],[283,25,283,61,0],[283,61,284,21,0],[284,21,284,22,0],[284,22,285,21,0],[285,21,285,69,0],[285,69,286,17,0],[286,17,286,18,0],[286,18,286,19,0],[278,35,286,19,0],[286,19,288,17,0],[288,17,288,18,0],[288,18,289,21,0],[289,21,289,56,0],[289,56,290,17,0],[290,17,290,18,0],[290,18,292,17,0],[292,17,292,18,0],[292,18,293,21,0],[293,21,296,78,0],[296,78,297,17,0],[297,17,297,18,0],[297,18,298,30,0],[264,13,298,30,0],[299,9,299,10,0],[302,9,302,10,0],[303,13,303,112,0],[304,13,304,14,0],[305,17,305,38,0],[306,17,306,49,0],[307,17,307,44,0],[308,13,308,14,0],[310,13,310,14,0],[313,17,313,56,0],[314,13,314,14,0],[315,9,315,10,0]]);
     </script>
   </body>
 </html>

@@ -2,53 +2,62 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\Controllers\UserController.cs</title>
+    <title>C:\projects\chatle\src\chatle\Controllers\HomeController.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using ChatLe.Models;
-using ChatLe.ViewModels;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.Extensions.Logging;
 
 namespace ChatLe.Controllers
 {
-    /// &lt;summary&gt;
-    /// User api controller
-    /// &lt;/summary&gt;
-    [Route(&quot;api/users&quot;)]
-    public class UserController : Controller
+    public class HomeController : Controller
     {
-        IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; _manager;
-        /// &lt;summary&gt;
-        /// Constructor
-        /// &lt;/summary&gt;
-        /// &lt;param name=&quot;manager&quot;&gt;the chat repository manager&lt;/param&gt;
-        public UserController(IChatManager&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt; manager)
+        static ILogger _logger;
+        public HomeController(ILoggerFactory factory)
         {
-            _manager = manager;
+            if (_logger == null)
+                _logger = factory.CreateLogger(&quot;Unhandled Error&quot;);
         }
-        /// &lt;summary&gt;
-        /// Gets the a connected users list page
-        /// &lt;/summary&gt;
-        /// &lt;returns&gt;a &lt;see cref=&quot;Task{UserCollectionViewModel}&quot;/&gt; with the connected user list as result&lt;/returns&gt;
-        // GET: /&lt;controller&gt;/
-        [HttpGet()]
-        public async Task&lt;UserCollectionViewModel&gt; Get(int pageIndex = 0)
+
+
+        public IActionResult Index()
         {
-            var users = await _manager.GetUsersConnectedAsync(pageIndex);
-            return new UserCollectionViewModel(users);
+            if (User.Identity.IsAuthenticated)
+                return View();
+
+            return RedirectToRoute(new { controller= &quot;Account&quot;, action= &quot;Index&quot; });
+        }
+
+        public IActionResult About()
+        {
+            ViewBag.Message = &quot;Your application description page.&quot;;
+
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            ViewBag.Message = &quot;Your contact page.&quot;;
+
+            return View();
+        }
+
+        public IActionResult Error()
+        {
+            var feature = this.HttpContext.Features.Get&lt;IExceptionHandlerFeature&gt;();
+            var error = feature?.Error;
+            _logger.LogError(&quot;Oops!&quot;, error);
+            return View(&quot;~/Views/Shared/Error.cshtml&quot;, error);
         }
     }
 }
-
     </pre>
     <script type="text/javascript">
-      highlightRanges([[21,9,21,129,1],[22,9,22,10,1],[23,13,23,32,1],[24,9,24,10,1],[32,9,32,10,1],[33,13,33,74,1],[34,13,34,55,1],[35,9,35,10,1]]);
+      highlightRanges([[10,9,10,54,1],[11,9,11,10,1],[12,13,12,33,1],[13,17,13,67,1],[14,9,14,10,1],[18,9,18,10,1],[19,13,19,47,1],[20,17,20,31,1],[22,13,22,84,1],[23,9,23,10,1],[26,9,26,10,1],[27,13,27,68,1],[29,13,29,27,1],[30,9,30,10,1],[33,9,33,10,1],[34,13,34,52,1],[36,13,36,27,1],[37,9,37,10,1],[40,9,40,10,1],[41,13,41,85,1],[42,13,42,40,1],[43,13,43,46,1],[44,13,44,63,1],[45,9,45,10,1]]);
     </script>
   </body>
 </html>

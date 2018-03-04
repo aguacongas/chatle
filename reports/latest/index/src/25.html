@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository\NotificationConnection.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Repository\Message.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
@@ -12,21 +12,28 @@ using System;
 
 namespace ChatLe.Models
 {
-    public class NotificationConnection :NotificationConnection&lt;string&gt;
+    public class Message : Message&lt;string&gt;
     {
+        public Message()
+        {
+            Id = Guid.NewGuid().ToString(&quot;N&quot;);
+        }
     }
 
-    public class NotificationConnection&lt;TKey&gt; where TKey : IEquatable&lt;TKey&gt;
-    {        
-        public virtual string ConnectionId { get; set; }
-        public virtual string NotificationType { get; set; }
+    public class Message&lt;TKey&gt; : IIdentifiable&lt;TKey&gt; where TKey : IEquatable&lt;TKey&gt;
+    {
+        public virtual TKey Id { get; set; }
+        public virtual TKey ConversationId { get; set; }
         public virtual TKey UserId { get; set; }
-        public virtual DateTime ConnectionDate { get; set; }
+        public virtual string Text { get; set; }
+        public virtual DateTime Date { get; set; }
+
+        public virtual Conversation&lt;TKey&gt; Conversation { get; set; }
     }
 }
     </pre>
     <script type="text/javascript">
-      highlightRanges([[11,46,11,50,1],[11,51,11,55,1],[12,50,12,54,1],[12,55,12,59,1],[13,38,13,42,1],[13,43,13,47,1],[14,50,14,54,1],[14,55,14,59,1]]);
+      highlightRanges([[7,9,7,25,1],[8,9,8,10,1],[9,13,9,47,1],[10,9,10,10,1],[15,34,15,38,1],[15,39,15,43,1],[16,46,16,50,1],[16,51,16,55,1],[17,38,17,42,1],[17,43,17,47,1],[18,38,18,42,1],[18,43,18,47,1],[19,40,19,44,1],[19,45,19,49,1],[21,58,21,62,1],[21,63,21,67,1]]);
     </script>
   </body>
 </html>
