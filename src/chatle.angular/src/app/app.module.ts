@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SignalrModule, HubSettings } from './shared/signalr-client';
+import { TransportType, LogLevel } from '@aspnet/signalr';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
@@ -13,10 +14,6 @@ import { ConversationPreviewComponent } from './conversations/conversationPrevie
 import { ConversationsComponent } from './conversations/conversations.component';
 import { Settings } from './shared/settings';
 import { ChatService, ConnectionState } from './shared/chat.service';
-
-const hubSettings = {
-  url: environment.production ?  '/chat' : 'http://localhost:5000/chat'
-};
 
 @NgModule({
   imports: [ BrowserModule, FormsModule, HttpClientModule, SignalrModule ],
@@ -31,7 +28,7 @@ const hubSettings = {
   providers: [
     ChatService,
     { provide: Settings, useFactory: getSettings },
-    { provide: HubSettings, useValue: hubSettings },
+    { provide: HubSettings, useFactory: getHubSettings, deps: [Settings] },
     {
         provide: APP_INITIALIZER,
         useFactory: boot,
@@ -46,13 +43,25 @@ export function getSettings(): Settings {
   return window['chatleSetting'] as Settings;
 }
 
+export function getHubSettings(settings: Settings): HubSettings {
+  let hubSettings = settings.hubSettings;
+  if (!hubSettings) {
+    hubSettings = {
+      url: environment.production ?  '/chat' : 'http://localhost:5000/chat',
+      transportType: TransportType.LongPolling,
+      logLevel: settings.debug ? LogLevel.Trace : LogLevel.Warning,
+    };
+  }
+  return hubSettings;
+}
+
 export function boot(service: ChatService): Function {
     return () => {
         return new Promise((resolve, reject) => {
             service.start(true).subscribe(
                 () => resolve(),
                 error => {
-                    location.assign('/Account?reason=disconnected');
+                    location.assign('Account?reason=disconnected');
                     reject();
                 });
         });
