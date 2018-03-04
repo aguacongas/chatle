@@ -1,15 +1,16 @@
 language: csharp
 sudo: required
 dist: trusty
-mono:
-  - latest
+mono: none
+dotnet: 2.1.4
 os:
   - linux
-osx_image: xcode8.2
 branches:
   only:
     - master
     - /^release\/.*$/
     - /^feature\/.*$/
     - develop
+install:
+  - dotnet restore
 solution: chatle.sln
