@@ -46,6 +46,7 @@ export class ChatService {
   private messageReceivedSubject = new Subject<Message>();
   private joinConversationSubject = new Subject<Conversation>();
   private openConversationSubject = new Subject<Conversation>();
+  private retryConnection = false;
 
   constructor(
     public settings: Settings,
@@ -59,6 +60,7 @@ export class ChatService {
   start(debug: boolean): Observable<ConnectionState> {
     this.signalrService.connect().subscribe(
       () => {
+        this.retryConnection = false;
         this.currentState = ConnectionState.Connected;
         this.connectionStateSubject.next(this.currentState);
       },
@@ -147,10 +149,16 @@ export class ChatService {
       this.onJoinConversation(conv)
     );
     signalrService.closed.subscribe((error: HttpError) => {
-      if (error.statusCode === 0 || error.statusCode === 503) {
+      if (!this.retryConnection
+        && error
+        && (error.message === 'Error: Websocket closed with status code: 1006 ()'
+        || error.statusCode === 0
+        || error.statusCode === 503)) {
+          this.retryConnection = true;
         this.start(this.settings.debug);
-      } else if (location) {
-        location.href = 'Account';
+      } else {
+        this.currentState = ConnectionState.Error;
+        this.connectionStateSubject.next(this.currentState);
       }
     }, error => {
       this.currentState = ConnectionState.Error;

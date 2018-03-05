@@ -55,7 +55,7 @@ var styles_AppComponent = [];
 var RenderType_AppComponent = __WEBPACK_IMPORTED_MODULE_0__angular_core__["_4" /* ɵcrt */]({ encapsulation: 2, styles: styles_AppComponent, data: {} });
 
 function View_AppComponent_0(_l) { return __WEBPACK_IMPORTED_MODULE_0__angular_core__["_22" /* ɵvid */](0, [(_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](0, 0, null, null, 16, "div", [["class", "row vertical-container"]], null, null, null, null, null)), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n  "])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](2, 0, null, null, 13, "div", [["class", "col-xs-12 vertical-container"]], null, null, null, null, null)), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n    "])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](4, 0, null, null, 2, "chatle-contacts", [], null, null, null, __WEBPACK_IMPORTED_MODULE_1__contacts_contacts_component_ngfactory__["b" /* View_ContactsComponent_0 */], __WEBPACK_IMPORTED_MODULE_1__contacts_contacts_component_ngfactory__["a" /* RenderType_ContactsComponent */])), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_5" /* ɵdid */](5, 114688, null, 0, __WEBPACK_IMPORTED_MODULE_2__contacts_contacts_component__["a" /* ContactsComponent */], [__WEBPACK_IMPORTED_MODULE_3__shared_chat_service__["a" /* ChatService */], __WEBPACK_IMPORTED_MODULE_0__angular_core__["g" /* ChangeDetectorRef */]], null, null), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["Loading ..."])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n    "])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](8, 0, null, null, 2, "chatle-conversation", [], null, null, null, __WEBPACK_IMPORTED_MODULE_4__conversations_conversation_component_ngfactory__["b" /* View_ConversationComponent_0 */], __WEBPACK_IMPORTED_MODULE_4__conversations_conversation_component_ngfactory__["a" /* RenderType_ConversationComponent */])), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_5" /* ɵdid */](9, 114688, null, 0, __WEBPACK_IMPORTED_MODULE_5__conversations_conversation_component__["a" /* ConversationComponent */], [__WEBPACK_IMPORTED_MODULE_3__shared_chat_service__["a" /* ChatService */]], null, null), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["Loading ..."])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n    "])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](12, 0, null, null, 2, "chatle-conversations", [], null, null, null, __WEBPACK_IMPORTED_MODULE_6__conversations_conversations_component_ngfactory__["b" /* View_ConversationsComponent_0 */], __WEBPACK_IMPORTED_MODULE_6__conversations_conversations_component_ngfactory__["a" /* RenderType_ConversationsComponent */])), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_5" /* ɵdid */](13, 114688, null, 0, __WEBPACK_IMPORTED_MODULE_7__conversations_conversations_component__["a" /* ConversationsComponent */], [__WEBPACK_IMPORTED_MODULE_3__shared_chat_service__["a" /* ChatService */], __WEBPACK_IMPORTED_MODULE_8__shared_settings__["a" /* Settings */]], null, null), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["Loading ..."])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n  "])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n"])), (_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_21" /* ɵted */](-1, null, ["\n"]))], function (_ck, _v) { _ck(_v, 5, 0); _ck(_v, 9, 0); _ck(_v, 13, 0); }, null); }
-function View_AppComponent_Host_0(_l) { return __WEBPACK_IMPORTED_MODULE_0__angular_core__["_22" /* ɵvid */](0, [(_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](0, 0, null, null, 1, "chatle", [], null, null, null, View_AppComponent_0, RenderType_AppComponent)), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_5" /* ɵdid */](1, 49152, null, 0, __WEBPACK_IMPORTED_MODULE_9__app_component__["a" /* AppComponent */], [], null, null)], null, null); }
+function View_AppComponent_Host_0(_l) { return __WEBPACK_IMPORTED_MODULE_0__angular_core__["_22" /* ɵvid */](0, [(_l()(), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_6" /* ɵeld */](0, 0, null, null, 1, "chatle", [], null, null, null, View_AppComponent_0, RenderType_AppComponent)), __WEBPACK_IMPORTED_MODULE_0__angular_core__["_5" /* ɵdid */](1, 49152, null, 0, __WEBPACK_IMPORTED_MODULE_9__app_component__["a" /* AppComponent */], [__WEBPACK_IMPORTED_MODULE_3__shared_chat_service__["a" /* ChatService */]], null, null)], null, null); }
 var AppComponentNgFactory = __WEBPACK_IMPORTED_MODULE_0__angular_core__["_2" /* ɵccf */]("chatle", __WEBPACK_IMPORTED_MODULE_9__app_component__["a" /* AppComponent */], View_AppComponent_Host_0, {}, {}, []);
 
 
@@ -67,8 +67,16 @@ var AppComponentNgFactory = __WEBPACK_IMPORTED_MODULE_0__angular_core__["_2" /* 
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_chat_service__ = __webpack_require__("../../../../../src/app/shared/chat.service.ts");
+
 var AppComponent = (function () {
-    function AppComponent() {
+    function AppComponent(service) {
+        this.service = service;
+        this.service.connectionState.subscribe(function (state) {
+            if (state === __WEBPACK_IMPORTED_MODULE_0__shared_chat_service__["b" /* ConnectionState */].Error && location) {
+                location.href = 'Account?reason="SignalR connection state on error"';
+            }
+        });
     }
     return AppComponent;
 }());
@@ -751,12 +759,14 @@ var ChatService = (function () {
         this.messageReceivedSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
         this.joinConversationSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
         this.openConversationSubject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["a" /* Subject */]();
+        this.retryConnection = false;
         this.initializeObservables();
         this.initializeSignalR(signalrService);
     }
     ChatService.prototype.start = function (debug) {
         var _this = this;
         this.signalrService.connect().subscribe(function () {
+            _this.retryConnection = false;
             _this.currentState = ConnectionState.Connected;
             _this.connectionStateSubject.next(_this.currentState);
         }, function (err) {
@@ -832,11 +842,17 @@ var ChatService = (function () {
             return _this.onJoinConversation(conv);
         });
         signalrService.closed.subscribe(function (error) {
-            if (error.statusCode === 0 || error.statusCode === 503) {
+            if (!_this.retryConnection
+                && error
+                && (error.message === 'Error: Websocket closed with status code: 1006 ()'
+                    || error.statusCode === 0
+                    || error.statusCode === 503)) {
+                _this.retryConnection = true;
                 _this.start(_this.settings.debug);
             }
-            else if (location) {
-                location.href = 'Account';
+            else {
+                _this.currentState = ConnectionState.Error;
+                _this.connectionStateSubject.next(_this.currentState);
             }
         }, function (error) {
             _this.currentState = ConnectionState.Error;
