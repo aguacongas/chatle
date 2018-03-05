@@ -46,4 +46,8 @@
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
   </ItemGroup>
 
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <Exec Command="npm i" WorkingDirectory="..\chatle.angular" />
+    <Exec Command="npm run publish" WorkingDirectory="..\chatle.angular" />
+  </Target>
 </Project>

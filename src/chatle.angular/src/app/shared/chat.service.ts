@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HubConnection, HttpConnection, HttpError } from '@aspnet/signalr';
 import { SignalrService } from './signalr-client';
@@ -151,7 +151,7 @@ export class ChatService {
     signalrService.closed.subscribe((error: HttpError) => {
       if (!this.retryConnection
         && error
-        && (error.message === 'Error: Websocket closed with status code: 1006 ()'
+        && (error.message === 'Websocket closed with status code: 1006 ()'
         || error.statusCode === 0
         || error.statusCode === 503)) {
           this.retryConnection = true;
