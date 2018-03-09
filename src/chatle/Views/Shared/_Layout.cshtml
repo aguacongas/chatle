@@ -1,59 +1,59 @@
-﻿    <!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - chatle</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ViewBag.Title - chatle</title>
 
-    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
-            asp-fallback-href="~/css/bootstrap.min.css"
-            asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-	<environment names="Development">
-		<link rel="stylesheet" href="~/css/site.css" />
-	</environment>
-	<environment names="Staging,Production">
-		<link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-	</environment>
+  <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+        asp-fallback-href="~/css/bootstrap.min.css"
+        asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+  <environment names="Development">
+    <link rel="stylesheet" href="~/css/site.css" />
+  </environment>
+  <environment names="Staging,Production">
+    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+  </environment>
 </head>
 <body class="console">
-    <div class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar menu"></span>
-                    <span class="icon-bar menu"></span>
-                    <span class="icon-bar menu"></span>
-                </button>
-                <a class="navbar-brand title" asp-controller="Home" asp-action="Index">chatle</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-controller="Account" asp-action="Manage">Manage</a></li>
-                    <li><a asp-controller="Home" asp-action="About">About</a></li>
-                </ul>
-                @await Html.PartialAsync("_LoginPartial")
-            </div>
-        </div>
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar menu"></span>
+          <span class="icon-bar menu"></span>
+          <span class="icon-bar menu"></span>
+        </button>
+        <a class="navbar-brand title" asp-controller="Home" asp-action="Index">chatle</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+          <li><a asp-controller="Account" asp-action="Manage">Manage</a></li>
+          <li><a asp-controller="Home" asp-action="About">About</a></li>
+        </ul>
+        @await Html.PartialAsync("_LoginPartial")
+      </div>
     </div>
-    <div class="container body-content">
-        @RenderBody()
-    </div>
-    <div class="container footer">
-      <hr />
-      <footer>
-        <p>&copy; @DateTime.Now.Year - chatle</p>
-      </footer>
-    </div>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-            asp-fallback-src="~/lib/jquery-3.3.1.min.js"
-            asp-fallback-test="window.jQuery">
-    </script>
-    <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-            asp-fallback-src="~/lib/bootstrap.min.js"
-            asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
-    </script>
+  </div>
+  <div class="container body-content">
+    @RenderBody()
+  </div>
+  <div class="container footer">
+    <hr />
+    <footer>
+      <p>&copy; @DateTime.Now.Year - chatle</p>
+    </footer>
+  </div>
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+          asp-fallback-src="~/lib/jquery-3.3.1.min.js"
+          asp-fallback-test="window.jQuery">
+  </script>
+  <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+          asp-fallback-src="~/lib/bootstrap.min.js"
+          asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
+  </script>
 
-    @RenderSection("scripts", required: false)
+  @RenderSection("scripts", required: false)
 </body>
 </html>
