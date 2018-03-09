@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.0-preview1-final" />
   </ItemGroup>
@@ -44,6 +45,10 @@
   <ItemGroup>
     <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.6.362" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\app\" />
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">

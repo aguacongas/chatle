@@ -2,12 +2,12 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "IdentityDatabase": "Firebase",
+    "IdentityDatabase": "Redis",
     "DatabaseEngine": "InMemory",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {
-            "ConnectionString": "Filename=./ChatLeDbContext.db"
+            "ConnectionString": "localhost"
         }
     },
     "Identity": {

@@ -1,25 +1,24 @@
-﻿using System;
+﻿using chatle.Hubs;
+using ChatLe.Cryptography;
+using ChatLe.Hubs;
+using ChatLe.Models;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using ChatLe.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Identity;
-using ChatLe.Hubs;
-using ChatLe.Cryptography;
-using Google.Apis.Auth.OAuth2;
-using Newtonsoft.Json;
-using chatle.Hubs;
 
 namespace ChatLe
 {
@@ -195,7 +194,7 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var identyBuilder = services.AddIdentity<ChatLeUser, IdentityRole>(options =>
+            var identityBuilder = services.AddIdentity<ChatLeUser, IdentityRole>(options =>
                         {
                             var userOptions = options.User;
                             userOptions.AllowedUserNameCharacters += " ";
@@ -203,24 +202,29 @@ namespace ChatLe
                 .AddDefaultTokenProviders();
 
             var identityEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["IdentityDatabase"]);
-            if (identityEngine != DBEngine.Firebase)
+
+            switch(identityEngine)
             {
-                identyBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
-            }
-            else
-            {
-                identyBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
-                {
-                    using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
+                case DBEngine.Redis:
+                    identityBuilder.AddRedisStores(Configuration["Data:DefaultConnection:ConnectionString"]);
+                    break;
+                case DBEngine.Firebase:
+                    identityBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
                     {
-                        using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                        using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
                         {
-                            return GoogleCredential.FromStream(stream)
-                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
-                                .UnderlyingCredential;
+                            using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                            {
+                                return GoogleCredential.FromStream(stream)
+                                    .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
+                                    .UnderlyingCredential;
+                            }
                         }
-                    }
-                });
+                    });
+                    break;
+                default:
+                    identityBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+                    break;
             }
 
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
