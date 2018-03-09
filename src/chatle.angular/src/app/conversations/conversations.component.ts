@@ -2,7 +2,7 @@
 
 import { ChatService, ConnectionState } from '../shared/chat.service';
 import { Settings } from '../shared/settings';
-import { Conversation } from '../shared/Conversation';
+import { Conversation } from '../shared/conversation';
 
 @Component({
     selector: 'chatle-conversations',
