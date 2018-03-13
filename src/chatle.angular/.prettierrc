@@ -1,0 +1,5 @@
+singleQuote: false
+overrides:
+- files: "*.ts"
+  options:
+    singleQuote: true
