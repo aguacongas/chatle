@@ -12,27 +12,30 @@ import { Message } from './message';
 import { Conversation } from './conversation';
 
 describe('ChatService', () => {
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpModule, SignalrModule],
-            providers: [
-                { provide: XHRBackend, useClass: MockBackend },
-                { provide: Settings, useClass: Settings }
-            ]
-        });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpModule, SignalrModule],
+      providers: [
+        { provide: XHRBackend, useClass: MockBackend },
+        { provide: Settings, useClass: Settings }
+      ]
     });
+  });
 
-    it('start should return connectionState observable',
-        inject([Http, Settings, SignalrService],
-            (http: Http, settings: Settings, signalrService: SignalrService) => {
+  it(
+    'start should return connectionState observable',
+    inject(
+      [Http, Settings, SignalrService],
+      (http: Http, settings: Settings, signalrService: SignalrService) => {
         const service = new ChatService(http, settings, signalrService);
         let connectionState: ConnectionState;
 
-        service.start(true)
-            .subscribe((response: ConnectionState) => {
-                connectionState = response;
-            });
+        service.start(true).subscribe((response: ConnectionState) => {
+          connectionState = response;
+        });
 
         expect(connectionState).toBe(ConnectionState.Connected);
-    }));
+      }
+    )
+  );
 });

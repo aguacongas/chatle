@@ -8,19 +8,21 @@ import { ChatService } from './shared/chat.service';
 import { Settings } from './shared/settings';
 
 describe('AppComponent', () => {
-
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpModule],
-            providers: [
-                { provide: XHRBackend, useClass: MockBackend },
-                { provide: Settings, useClass: Settings }
-            ]
-        });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpModule],
+      providers: [
+        { provide: XHRBackend, useClass: MockBackend },
+        { provide: Settings, useClass: Settings }
+      ]
     });
+  });
 
-    it('app component should exist', inject([ChatService], (service: ChatService) => {
-        const component = new AppComponent(service);
-        expect(component).toBeDefined();
-    }));
+  it(
+    'app component should exist',
+    inject([ChatService], (service: ChatService) => {
+      const component = new AppComponent(service);
+      expect(component).toBeDefined();
+    })
+  );
 });

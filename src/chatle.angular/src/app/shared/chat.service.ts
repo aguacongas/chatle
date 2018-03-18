@@ -90,7 +90,8 @@ export class ChatService {
         .post(this.settings.chatAPI, {
           to: conversation.id,
           text: message
-        }).map(value => m);
+        })
+        .map(value => m);
     } else {
       const attendee = conversation.attendees.find(
         a => a.userId !== this.settings.userName
@@ -100,29 +101,28 @@ export class ChatService {
           to: attendee.userId,
           text: message
         })
-        .map(
-          response => {
-            conversation.id = response as string;
-            this.setConversationTitle(conversation);
-            this.joinConversationSubject.next(conversation);
-            return m;
-          });
+        .map(response => {
+          conversation.id = response as string;
+          this.setConversationTitle(conversation);
+          this.joinConversationSubject.next(conversation);
+          return m;
+        });
     }
   }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<any>(this.settings.userAPI).map(
-      response => {
-        const data = response;
-        if (data && data.users) {
-          return data.users as User[];
-        }
-      });
+    return this.http.get<any>(this.settings.userAPI).map(response => {
+      const data = response;
+      if (data && data.users) {
+        return data.users as User[];
+      }
+    });
   }
 
   getConversations(): Observable<Conversation[]> {
-    return this.http.get<Conversation[]>(this.settings.chatAPI).map(
-      conversations => {
+    return this.http
+      .get<Conversation[]>(this.settings.chatAPI)
+      .map(conversations => {
         conversations.forEach(value => this.setConversationTitle(value));
         return conversations;
       });
@@ -148,22 +148,27 @@ export class ChatService {
     signalrService.on('joinConversation', conv =>
       this.onJoinConversation(conv)
     );
-    signalrService.closed.subscribe((error: HttpError) => {
-      if (!this.retryConnection
-        && error
-        && (error.message === 'Websocket closed with status code: 1006 ()'
-        || error.statusCode === 0
-        || error.statusCode === 503)) {
+    signalrService.closed.subscribe(
+      (error: HttpError) => {
+        if (
+          !this.retryConnection &&
+          error &&
+          (error.message === 'Websocket closed with status code: 1006 ()' ||
+            error.statusCode === 0 ||
+            error.statusCode === 503)
+        ) {
           this.retryConnection = true;
-        this.start(this.settings.debug);
-      } else {
+          this.start(this.settings.debug);
+        } else {
+          this.currentState = ConnectionState.Error;
+          this.connectionStateSubject.next(this.currentState);
+        }
+      },
+      error => {
         this.currentState = ConnectionState.Error;
         this.connectionStateSubject.next(this.currentState);
       }
-    }, error => {
-      this.currentState = ConnectionState.Error;
-      this.connectionStateSubject.next(this.currentState);
-    });
+    );
   }
 
   private setConversationTitle(conversation: Conversation) {

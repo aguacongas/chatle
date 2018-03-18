@@ -35,41 +35,45 @@ namespace ChatLe
         }
 
         readonly IHostingEnvironment _environment;
-        public ILoggerFactory LoggerFactory { get; private set; }
-        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
-                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
 
             if (env.IsDevelopment())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets<Startup>();
-                loggerFactory.AddDebug();
             }
-
-            builder.AddEnvironmentVariables();
 
             Configuration = builder.Build();
 
             _environment = env;
-            LoggerFactory = loggerFactory;
-            loggerFactory.AddAzureWebAppDiagnostics();
-
-            loggerFactory.AddConsole();
         }
 
         public IConfiguration Configuration { get; private set; }
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services
+            services.AddLogging(builder =>
+            {
+                builder.AddConsole()
+                    .AddAzureWebAppDiagnostics()
+                    .AddDebug()
+                    .SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+            })
                 .Configure<HubSettings>(hubSettings => Configuration.GetSection("HubSettings").Bind(hubSettings))
                 .AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
                 .AddCors()
-                .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+                .AddAntiforgery(options =>
+                {
+                    options.HeaderName = "X-XSRF-TOKEN";
+                    options.Cookie.Name = "XSRF-TOKEN";
+                    options.Cookie.HttpOnly = false;
+                });
 
             ConfigureEntity(services);
 
@@ -259,13 +263,20 @@ namespace ChatLe
             }
         }
 
-        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery, ILoggerFactory loggerFactory)
         {
-
             ConfigureErrors(app);
+            app.Use(async (context, next) =>
+            {
+                var logger = loggerFactory.CreateLogger("ValidRequestMW");
 
-            var logger = LoggerFactory.CreateLogger("request");
-            app.UseCors(
+                logger.LogInformation("Request Cookie is " + context.Request.Cookies["XSRF-TOKEN"]);
+                logger.LogInformation("Request Header is " + context.Request.Headers["X-XSRF-TOKEN"]);
+
+                await next();
+            })
+
+                .UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()

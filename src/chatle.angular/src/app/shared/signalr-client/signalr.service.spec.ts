@@ -7,12 +7,15 @@ describe('SignalrService', () => {
     TestBed.configureTestingModule({
       providers: [
         SignalrService,
-        { provide: HUB_CONNECTION_FACTORY, useValue: undefined },
+        { provide: HUB_CONNECTION_FACTORY, useValue: undefined }
       ]
     });
   });
 
-  it('should be created', inject([SignalrService], (service: SignalrService) => {
-    expect(service).toBeTruthy();
-  }));
+  it(
+    'should be created',
+    inject([SignalrService], (service: SignalrService) => {
+      expect(service).toBeTruthy();
+    })
+  );
 });

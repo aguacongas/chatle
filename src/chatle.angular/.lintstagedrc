@@ -1,0 +1,10 @@
+{
+  "{src,e2e}/**/*.ts": [
+    "yarn lint",
+    "git add"
+  ],
+  "{src,e2e}/**/*.{ts, css, md}": {
+    "prettier --write",
+    "git add"
+  }
+}

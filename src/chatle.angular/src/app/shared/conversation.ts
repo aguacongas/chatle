@@ -2,8 +2,8 @@
 import { Message } from './message';
 
 export class Conversation {
-    id: string;
-    title: string;
-    attendees: Attendee[] = [];
-    messages: Message[] = [];
+  id: string;
+  title: string;
+  attendees: Attendee[] = [];
+  messages: Message[] = [];
 }

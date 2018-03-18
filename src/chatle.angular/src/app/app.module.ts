@@ -16,28 +16,29 @@ import { Settings } from './shared/settings';
 import { ChatService, ConnectionState } from './shared/chat.service';
 
 @NgModule({
-  imports: [ BrowserModule, FormsModule, HttpClientModule, SignalrModule ],
+  imports: [BrowserModule, FormsModule, HttpClientModule, SignalrModule],
   declarations: [
     AppComponent,
     ContactComponent,
     ContactsComponent,
     ConversationPreviewComponent,
     ConversationComponent,
-    ConversationsComponent ],
+    ConversationsComponent
+  ],
   bootstrap: [AppComponent],
   providers: [
     ChatService,
     { provide: Settings, useFactory: getSettings },
     { provide: HubSettings, useFactory: getHubSettings, deps: [Settings] },
     {
-        provide: APP_INITIALIZER,
-        useFactory: boot,
-        deps: [ChatService],
-        multi: true
-    },
+      provide: APP_INITIALIZER,
+      useFactory: boot,
+      deps: [ChatService],
+      multi: true
+    }
   ]
 })
-export class AppModule { }
+export class AppModule {}
 
 export function getSettings(): Settings {
   return window['chatleSetting'] as Settings;
@@ -47,23 +48,24 @@ export function getHubSettings(settings: Settings): HubSettings {
   let hubSettings = settings.hubSettings;
   if (!hubSettings) {
     hubSettings = {
-      url: environment.production ?  '/chat' : 'http://localhost:5000/chat',
+      url: environment.production ? '/chat' : 'http://localhost:5000/chat',
       transportType: TransportType.LongPolling,
-      logLevel: settings.debug ? LogLevel.Trace : LogLevel.Warning,
+      logLevel: settings.debug ? LogLevel.Trace : LogLevel.Warning
     };
   }
   return hubSettings;
 }
 
 export function boot(service: ChatService): Function {
-    return () => {
-        return new Promise((resolve, reject) => {
-            service.start(true).subscribe(
-                () => resolve(),
-                error => {
-                    location.assign('Account?reason=disconnected');
-                    reject();
-                });
-        });
-    };
+  return () => {
+    return new Promise((resolve, reject) => {
+      service.start(true).subscribe(
+        () => resolve(),
+        error => {
+          location.assign('Account?reason=disconnected');
+          reject();
+        }
+      );
+    });
+  };
 }
