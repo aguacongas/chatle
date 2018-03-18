@@ -10,8 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "publish": "ng build --aot --output-path ../chatle/wwwroot/app --environment prod",
-    "dev": "ng build --output-path ../chatle/wwwroot/app --watch",
-    "format": "prettier {src,e2e}/**/*.{ts,css,md} --write"
+    "dev": "ng build --output-path ../chatle/wwwroot/app --watch"
   },
   "private": true,
   "dependencies": {
