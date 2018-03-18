@@ -11,8 +11,7 @@
     "e2e": "ng e2e",
     "publish": "ng build --aot --output-path ../chatle/wwwroot/app --environment prod",
     "dev": "ng build --output-path ../chatle/wwwroot/app --watch",
-    "format": "prettier {src,e2e}/**/*.{ts,css,md} --write",
-    "precommit": "lint-staged"
+    "format": "prettier {src,e2e}/**/*.{ts,css,md} --write"
   },
   "private": true,
   "dependencies": {
@@ -46,8 +45,7 @@
     "karma-cli": "~1.0.1",
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
-    "karma-jasmine-html-reporter": "^0.2.2",
-    "lint-staged": "^7.0.0",
+    "karma-jasmine-html-reporter": "^0.2.2"
     "prettier": "^1.11.1",
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
