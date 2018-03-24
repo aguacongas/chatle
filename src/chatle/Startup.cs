@@ -74,7 +74,7 @@ namespace ChatLe
                     options.Cookie.Name = "XSRF-TOKEN";
                     options.Cookie.HttpOnly = false;
                     options.Cookie.Path = "/";
-                    options.Cookie.SameSite = SameSiteMode.Lax;
+                    options.Cookie.SameSite = SameSiteMode.None;
                 });
 
             ConfigureEntity(services);
