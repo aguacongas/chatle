@@ -230,7 +230,7 @@ namespace ChatLe.Controllers
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
 
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
