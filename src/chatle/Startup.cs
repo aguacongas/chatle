@@ -59,12 +59,12 @@ namespace ChatLe
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(builder =>
-            {
-                builder.AddConsole()
-                    .AddAzureWebAppDiagnostics()
-                    .AddDebug()
-                    .SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
-            })
+                {
+                    builder.AddConsole()
+                        .AddAzureWebAppDiagnostics()
+                        .AddDebug()
+                        .SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+                })
                 .Configure<HubSettings>(hubSettings => Configuration.GetSection("HubSettings").Bind(hubSettings))
                 .AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
                 .AddCors()
@@ -73,6 +73,8 @@ namespace ChatLe
                     options.HeaderName = "X-XSRF-TOKEN";
                     options.Cookie.Name = "XSRF-TOKEN";
                     options.Cookie.HttpOnly = false;
+                    options.Cookie.Path = "/";
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                 });
 
             ConfigureEntity(services);
@@ -287,7 +289,6 @@ namespace ChatLe
                 .Map("/xhrf", a => a.Run(async context =>
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
-                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
                     await context.Response.WriteAsync(tokens.RequestToken);
                 }))
                 .Map("/cls", a => a.Run(async context =>

@@ -81,6 +81,8 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaLogin
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> SpaLogin([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -126,6 +128,8 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaGuess
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+
         public async Task<JsonResult> SpaGuess([FromBody] GuessViewModel model)
         {
             if (ModelState.IsValid)
@@ -193,6 +197,8 @@ namespace ChatLe.Controllers
         //
         // POST: /Account/SpaLogOff
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task SpaLogOff(string reason = null)
         {
             await SignOut();        
@@ -215,6 +221,7 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
