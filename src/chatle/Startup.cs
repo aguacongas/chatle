@@ -71,10 +71,11 @@ namespace ChatLe
                 .AddAntiforgery(options =>
                 {
                     options.HeaderName = "X-XSRF-TOKEN";
-                    options.Cookie.Name = "XSRF-TOKEN";
-                    options.Cookie.HttpOnly = false;
-                    options.Cookie.Path = "/";
-                    options.Cookie.SameSite = SameSiteMode.None;
+                    var cookie = options.Cookie;
+                    cookie.Name = "XSRF-TOKEN";
+                    cookie.HttpOnly = false;
+                    cookie.Path = "/";
+                    cookie.SameSite = SameSiteMode.None;
                 });
 
             ConfigureEntity(services);
