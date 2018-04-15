@@ -12,16 +12,14 @@ namespace ChatLe.Repository.Test
         [Fact]
         public void ConfigureChatLeTest()
         {
-            var serviceCollectionMock = new Mock<IServiceCollection>();
-            var services = serviceCollectionMock.Object;
+            var services = new ServiceCollection();
             services.ConfigureChatLe((options) => { });
         }
 
         [Fact]
         public void AddChatLe_with_configure_action()
         {
-            var serviceCollectionMock = new Mock<IServiceCollection>();
-            var services = serviceCollectionMock.Object;
+            var services = new ServiceCollection();
             services.AddChatLe(configure: (options) => { });
         }
 
