@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\ViewModels\ChatViewModels.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe.Models;
+using System;
+using System.Collections.Generic;
+
+namespace ChatLe.ViewModels
+{
+    /// &lt;summary&gt;
+    /// View model for conversation
+    /// &lt;/summary&gt;
+    public class ConversationViewModel
+    {
+        /// &lt;summary&gt;
+        /// Gets or sets the conversation id
+        /// &lt;/summary&gt;
+        public string Id { get; set; }
+        /// &lt;summary&gt;
+        /// Gets or sets the attendees list
+        /// &lt;/summary&gt;
+        public IEnumerable&lt;AttendeeViewModel&gt; Attendees { get; set; }
+        /// &lt;summary&gt;
+        /// Gets or sets the messages list
+        /// &lt;/summary&gt;
+        public IEnumerable&lt;MessageViewModel&gt; Messages { get; set; }
+    }
+    /// &lt;summary&gt;
+    /// View model for attendee
+    /// &lt;/summary&gt;
+    public class AttendeeViewModel
+    {
+        /// &lt;summary&gt;
+        /// Gets or sets the user id
+        /// &lt;/summary&gt;
+        public string UserId { get; set; }        
+    }
+    /// &lt;summary&gt;
+    /// View model for message
+    /// &lt;/summary&gt;
+    public class MessageViewModel
+    {
+        public string ConversationId { get; set; }
+        /// &lt;summary&gt;
+        /// Gets or sets the sender user name
+        /// &lt;/summary&gt;
+        public string From { get; set; }
+        /// &lt;summary&gt;
+        /// Gets or sets the message content
+        /// &lt;/summary&gt;
+        public string Text { get; set; }
+        /// &lt;summary&gt;
+        /// Gets or sets the message date
+        /// &lt;/summary&gt;
+        public DateTime Date { get; set; }
+    }
+
+    public class UserCollectionViewModel
+    {
+        private readonly Page&lt;ChatLeUser&gt; _model;
+        public UserCollectionViewModel(Page&lt;ChatLeUser&gt; model)
+        {
+            _model = model;
+        }
+
+        public int PageCount
+        {
+            get
+            {
+                return _model.PageCount;
+            }
+        }
+
+        public int PageIndex
+        {
+            get
+            {
+                return _model.PageIndex;
+            }
+        }
+
+        public IEnumerable&lt;UserViewModel&gt; Users
+        {
+            get
+            {
+                foreach (var user in _model)
+                    yield return new UserViewModel() { Id = user.UserName };
+            }
+        }
+    }
+
+    public class UserViewModel
+    {
+        public string Id { get; set; }
+    }
+
+    public class MessageToSend
+    {
+        public string To { get; set; }
+        public string Text { get; set; }
+    }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[15,28,15,32,0],[15,33,15,37,1],[19,59,19,63,0],[19,64,19,68,1],[23,57,23,61,1],[23,62,23,66,1],[33,32,33,36,0],[33,37,33,41,1],[40,40,40,44,0],[40,45,40,49,1],[44,30,44,34,1],[44,35,44,39,1],[48,30,48,34,1],[48,35,48,39,1],[52,32,52,36,1],[52,37,52,41,1],[58,9,58,63,1],[59,9,59,10,1],[60,13,60,28,1],[61,9,61,10,1],[66,13,66,14,1],[67,17,67,41,1],[68,13,68,14,1],[74,13,74,14,1],[75,17,75,41,1],[76,13,76,14,1],[82,13,82,14,1],[83,17,83,24,1],[83,26,83,34,1],[83,35,83,37,1],[83,38,83,44,1],[84,21,84,77,1],[85,13,85,14,0],[91,28,91,32,0],[91,33,91,37,1],[96,28,96,32,1],[96,33,96,37,1],[97,30,97,34,1],[97,35,97,39,1]]);
+    </script>
+  </body>
+</html>

@@ -2,28 +2,49 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\LookupNormalizer.cs</title>
+    <title>C:\projects\chatle\src\chatle\Views\Account\_ChangePasswordPartial.cshtml</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using Microsoft.AspNetCore.Identity;
+@using System.Security.Principal
+@model UpdatePasswordViewModel
 
-namespace ChatLe.Repository.Identity
-{
-    public class LookupNormalizer : ILookupNormalizer
-    {
-        public string Normalize(string key)
-        {
-            return key;
-        }
-    }
-}
+&lt;p&gt;You&#39;re logged in as &lt;strong&gt;@User.Identity.Name&lt;/strong&gt;.&lt;/p&gt;
+&lt;form class=&quot;form-horizontal&quot; role=&quot;form&quot; method=&quot;post&quot; asp-action=&quot;UpdatePassword&quot; asp-antiforgery=&quot;true&quot;&gt;
+	&lt;h4&gt;Change Password Form&lt;/h4&gt;
+	&lt;hr /&gt;
+	&lt;div asp-validation-summary=&quot;All&quot; class=&quot;text-danger&quot;&gt;&lt;/div&gt;
+	&lt;div class=&quot;form-group&quot;&gt;
+		&lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;OldPassword&quot;&gt;&lt;/label&gt;
+		&lt;div class=&quot;col-md-10&quot;&gt;
+			&lt;input class=&quot;form-control&quot; asp-for=&quot;OldPassword&quot; /&gt;			
+		&lt;/div&gt;
+	&lt;/div&gt;
+	&lt;div class=&quot;form-group&quot;&gt;
+		&lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;NewPassword&quot;&gt;&lt;/label&gt;	
+		&lt;div class=&quot;col-md-10&quot;&gt;
+			&lt;input class=&quot;form-control&quot; asp-for=&quot;NewPassword&quot; /&gt;			
+		&lt;/div&gt;
+	&lt;/div&gt;
+	&lt;div class=&quot;form-group&quot;&gt;
+		&lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;ConfirmPassword&quot;&gt;&lt;/label&gt;
+		&lt;div class=&quot;col-md-10&quot;&gt;
+			&lt;input class=&quot;form-control&quot; asp-for=&quot;ConfirmPassword&quot; /&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+
+	&lt;div class=&quot;form-group&quot;&gt;
+		&lt;div class=&quot;col-md-offset-2 col-md-10&quot;&gt;
+			&lt;input type=&quot;submit&quot; value=&quot;Change password&quot; class=&quot;btn btn-default&quot; /&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/form&gt;
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[8,9,8,10,1],[9,13,9,24,1],[10,9,10,10,1]]);
+      highlightRanges([[4,27,4,53,0],[5,1,5,72,0],[8,1,8,151,0],[10,1,10,148,0],[12,1,12,148,0],[16,1,16,148,0],[18,1,18,148,0],[22,1,22,152,0],[24,1,24,152,0]]);
     </script>
   </body>
 </html>

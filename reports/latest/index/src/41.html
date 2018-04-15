@@ -2,38 +2,26 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\ChatLeUser.cs</title>
+    <title>C:\projects\chatle\src\chatle\Views\Shared\Error.cshtml</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using System;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-
-namespace ChatLe.Models
-{
-    public class ChatLeUser : IdentityUser, IChatUser&lt;string&gt;
-    {
-        public ChatLeUser()
-        {
-            Id = Guid.NewGuid().ToString(&quot;N&quot;);
-        }
-
-        public ChatLeUser(string userName) :this()
-        {
-            UserName = userName;
-        }
-
-        public DateTime LastLoginDate { get; set; }
-
-        public bool IsGuess { get; set; }
-    }
+@model Exception
+@{
+    ViewBag.Title = &quot;Oops!&quot;;
 }
+&lt;h1 class=&quot;text-danger&quot;&gt;Oops! an error occurs&lt;/h1&gt;
+&lt;h2 class=&quot;text-danger&quot;&gt;An error occurred while processing your request.&lt;/h2&gt;
+@if (Model != null)
+{
+    @Html.ValueFor(model =&gt; model.Message)
+}
+
     </pre>
     <script type="text/javascript">
-      highlightRanges([[9,9,9,28,1],[10,9,10,10,1],[11,13,11,47,1],[12,9,12,10,1],[14,45,14,51,1],[15,9,15,10,1],[16,13,16,33,1],[17,9,17,10,1],[19,41,19,45,1],[19,46,19,50,1],[21,31,21,35,1],[21,36,21,40,1]]);
+      highlightRanges([[3,5,3,29,0],[7,2,7,20,0],[8,1,8,2,0],[9,1,9,46,0],[10,1,10,2,0]]);
     </script>
   </body>
 </html>

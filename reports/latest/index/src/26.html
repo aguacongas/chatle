@@ -2,46 +2,31 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\Hubs\HubSettings.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Repository\NotificationConnection.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace chatle.Hubs
+namespace ChatLe.Models
 {
-    public enum TransportType
+    public class NotificationConnection :NotificationConnection&lt;string&gt;
     {
-        WebSockets = 0,
-        ServerSentEvents = 1,
-        LongPolling = 2,
     }
 
-    public enum LogLevel
-    {
-        Trace = 0,
-        Information = 1,
-        Warning = 2,
-        Error = 3,
-        None = 4,
-    }
-
-    public class HubSettings
-    {
-        public string Url { get; set; }
-        public TransportType TransportType { get; set; }
-        public LogLevel LogLevel { get; set; }
+    public class NotificationConnection&lt;TKey&gt; where TKey : IEquatable&lt;TKey&gt;
+    {        
+        public virtual string ConnectionId { get; set; }
+        public virtual string NotificationType { get; set; }
+        public virtual TKey UserId { get; set; }
+        public virtual DateTime ConnectionDate { get; set; }
     }
 }
-
     </pre>
     <script type="text/javascript">
-      highlightRanges([[26,29,26,33,0],[26,34,26,38,0],[27,46,27,50,0],[27,51,27,55,0],[28,36,28,40,0],[28,41,28,45,0]]);
+      highlightRanges([[11,46,11,50,1],[11,51,11,55,1],[12,50,12,54,1],[12,55,12,59,1],[13,38,13,42,1],[13,43,13,47,1],[14,50,14,54,1],[14,55,14,59,1]]);
     </script>
   </body>
 </html>

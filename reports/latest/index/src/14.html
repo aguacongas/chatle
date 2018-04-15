@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\SignInManager.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using ChatLe.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
+
+namespace ChatLe.Repository.Identity
+{
+    public class SignInManager: SignInManager&lt;ChatLeUser&gt;
+    {
+        public SignInManager(UserManager&lt;ChatLeUser&gt; userManager, 
+            IHttpContextAccessor contextAccessor, 
+            IUserClaimsPrincipalFactory&lt;ChatLeUser&gt; claimsFactory, 
+            IOptions&lt;IdentityOptions&gt; optionsAccessor, 
+            ILogger&lt;SignInManager&lt;ChatLeUser&gt;&gt; logger,
+            IAuthenticationSchemeProvider schemes) 
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes)
+        {
+        }
+
+        public override async Task SignInAsync(ChatLeUser user, AuthenticationProperties authenticationProperties, string authenticationMethod = null)
+        {
+            user.LastLoginDate = DateTime.UtcNow;
+            await this.UserManager.UpdateAsync(user);
+            await  base.SignInAsync(user, authenticationProperties, authenticationMethod);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[21,15,21,98,1],[22,9,22,10,1],[23,9,23,10,1],[26,9,26,10,1],[27,13,27,50,1],[28,13,28,54,1],[29,13,29,91,1],[30,9,30,10,1]]);
+    </script>
+  </body>
+</html>

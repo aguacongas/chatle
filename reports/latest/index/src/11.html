@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Controllers\HomeController.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+namespace ChatLe.Controllers
+{
+    public class HomeController : Controller
+    {
+        static ILogger _logger;
+        public HomeController(ILoggerFactory factory)
+        {
+            if (_logger == null)
+                _logger = factory.CreateLogger(&quot;Unhandled Error&quot;);
+        }
+
+
+        public IActionResult Index()
+        {
+            if (User.Identity.IsAuthenticated)
+                return View();
+
+            return RedirectToRoute(new { controller= &quot;Account&quot;, action= &quot;Index&quot; });
+        }
+
+        public IActionResult About()
+        {
+            ViewBag.Message = &quot;Chatle, a realy simple chat.&quot;;
+
+            return View();
+        }
+
+        public IActionResult Error()
+        {
+            var feature = this.HttpContext.Features.Get&lt;IExceptionHandlerFeature&gt;();
+            var error = feature?.Error;
+            _logger.LogError(&quot;Oops!&quot;, error);
+            return View(&quot;~/Views/Shared/Error.cshtml&quot;, error);
+        }
+    }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[10,9,10,54,1],[11,9,11,10,1],[12,13,12,33,1],[13,17,13,67,1],[14,9,14,10,1],[18,9,18,10,1],[19,13,19,47,1],[20,17,20,31,1],[22,13,22,84,1],[23,9,23,10,1],[26,9,26,10,1],[27,13,27,62,1],[29,13,29,27,1],[30,9,30,10,1],[33,9,33,10,1],[34,13,34,85,1],[35,13,35,40,1],[36,13,36,46,1],[37,13,37,63,1],[38,9,38,10,1]]);
+    </script>
+  </body>
+</html>

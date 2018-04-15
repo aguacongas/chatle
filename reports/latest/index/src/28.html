@@ -2,113 +2,101 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\ViewModels\AccountViewModels.cs</title>
+    <title>C:\projects\chatle\src\ChatLe.Cryptography\Utility.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using System.ComponentModel.DataAnnotations;
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ChatLe.ViewModels
+namespace ChatLe.Cryptography
 {
-    public class ExternalLoginProvider
+    public class Utility : IUtility
     {
-        public string DisplayName { get; set; }
-        public string AuthenticationScheme { get; set; }
-    }
+        private readonly string _key;
+        private readonly SymmetricAlgorithm _algorithm = Aes.Create();
 
-    public class ExternalLoginConfirmationViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
-    }
+        public Utility(string key)
+        {
+            _key = key ?? throw new ArgumentNullException(key);
+        }
 
-    public class UpdatePasswordViewModel
-    {
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Current password&quot;)]
-        public string OldPassword { get; set; }
+        public async Task EncryptFile(string path)
+        {
+            var byteKey = GetKey();
 
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;New password&quot;)]
-        public string NewPassword { get; set; }
+            using (var encryptor = _algorithm.CreateEncryptor(byteKey, _algorithm.IV))
+            {
+                var iv = _algorithm.IV;
 
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm new password&quot;)]
-        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
-    }
+                using (var encryptStream = File.Open(path + &quot;.enc&quot;, FileMode.Create))
+                {
+                    await encryptStream.WriteAsync(iv, 0, iv.Length);
 
-    public class CreatePasswordViewModel
-    {
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;New password&quot;)]
-        public string NewPassword { get; set; }
+                    using (var csEncrypt = new CryptoStream(encryptStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (var fileStream = File.OpenRead(path))
+                        {
+                            await fileStream.CopyToAsync(csEncrypt);
+                        }
+                    }
+                }
+            }
+        }
 
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm new password&quot;)]
-        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
-    }
+        public async Task&lt;Stream&gt; DecryptFile(string path)
+        {
+            var byteKey = GetKey();
 
-    public class LoginViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
+            var fileStream = File.OpenRead(path);
+            var iv = new byte[16];
+            await fileStream.ReadAsync(iv, 0, iv.Length);
 
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Password&quot;)]
-        public string Password { get; set; }
+            var decryptor = _algorithm.CreateDecryptor(byteKey, iv);
 
-        [Display(Name = &quot;Remember me?&quot;)]
-        public bool RememberMe { get; set; }
-    }
+            return new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read);
+        }
 
-    public class GuessViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
+        private byte[] GetKey()
+        {
+            var key = Encoding.UTF8.GetBytes(_key);
+            var byteKey = new byte[16];
+            Buffer.BlockCopy(key, 0, byteKey, 0, key.Length &gt; 16 ? 16 : key.Length);
+            return byteKey;
+        }
 
-    }
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
 
-    public class LoginPageViewModel
-    {
-        public LoginViewModel Login { get; set; } = new LoginViewModel();
-        public GuessViewModel Guess { get; set; } = new GuessViewModel();
-    }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _algorithm.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
 
-    public class RegisterViewModel
-    {
-        [Required]
-        [Display(Name = &quot;User name&quot;)]
-        public string UserName { get; set; }
-
-        [Required]
-        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Password&quot;)]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = &quot;Confirm password&quot;)]
-        [Compare(&quot;Password&quot;, ErrorMessage = &quot;The password and confirmation password do not match.&quot;)]
-        public string ConfirmPassword { get; set; }
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }
 
     </pre>
     <script type="text/javascript">
-      highlightRanges([[7,37,7,41,0],[7,42,7,46,0],[8,46,8,50,0],[8,51,8,55,0],[15,34,15,38,0],[15,39,15,43,0],[23,37,23,41,1],[23,42,23,46,1],[29,37,29,41,1],[29,42,29,46,1],[34,41,34,45,0],[34,46,34,50,1],[43,37,43,41,0],[43,42,43,46,0],[48,41,48,45,0],[48,46,48,50,0],[55,34,55,38,1],[55,39,55,43,1],[60,34,60,38,1],[60,39,60,43,1],[63,34,63,38,1],[63,39,63,43,1],[70,34,70,38,1],[70,39,70,43,1],[76,39,76,43,0],[76,44,76,48,0],[76,53,76,73,1],[77,39,77,43,0],[77,44,77,48,1],[77,53,77,73,1],[84,34,84,38,1],[84,39,84,43,1],[90,34,90,38,1],[90,39,90,43,1],[95,41,95,45,0],[95,46,95,50,1]]);
+      highlightRanges([[12,9,12,71,1],[14,9,14,35,1],[15,9,15,10,1],[16,13,16,64,1],[17,9,17,10,1],[20,9,20,10,1],[21,13,21,36,1],[23,20,23,86,1],[24,13,24,14,1],[25,17,25,40,1],[27,24,27,85,1],[28,17,28,18,1],[29,21,29,70,1],[31,28,31,110,1],[32,21,32,22,1],[33,32,33,68,1],[34,25,34,26,1],[35,29,35,69,1],[36,25,36,26,1],[37,21,37,22,1],[38,17,38,18,1],[39,13,39,14,1],[40,9,40,10,1],[43,9,43,10,1],[44,13,44,36,1],[46,13,46,50,1],[47,13,47,35,1],[48,13,48,58,1],[50,13,50,69,1],[52,13,52,83,1],[53,9,53,10,1],[56,9,56,10,1],[57,13,57,52,1],[58,13,58,40,1],[59,13,59,85,1],[60,13,60,28,1],[61,9,61,10,1],[64,9,64,44,1],[67,9,67,10,1],[68,13,68,32,1],[69,13,69,14,1],[70,17,70,31,1],[71,17,71,18,1],[72,21,72,42,1],[73,17,73,18,1],[74,17,74,38,1],[75,13,75,14,1],[76,9,76,10,1],[80,9,80,10,1],[81,13,81,27,1],[82,9,82,10,1]]);
     </script>
   </body>
 </html>

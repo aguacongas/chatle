@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\ViewModels\AccountViewModels.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.ComponentModel.DataAnnotations;
+
+namespace ChatLe.ViewModels
+{
+    public class ExternalLoginProvider
+    {
+        public string DisplayName { get; set; }
+        public string AuthenticationScheme { get; set; }
+    }
+
+    public class ExternalLoginConfirmationViewModel
+    {
+        [Required]
+        [Display(Name = &quot;User name&quot;)]
+        public string UserName { get; set; }
+    }
+
+    public class UpdatePasswordViewModel
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Current password&quot;)]
+        public string OldPassword { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;New password&quot;)]
+        public string NewPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Confirm new password&quot;)]
+        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class CreatePasswordViewModel
+    {
+        [Required]
+        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;New password&quot;)]
+        public string NewPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Confirm new password&quot;)]
+        [Compare(&quot;NewPassword&quot;, ErrorMessage = &quot;The new password and confirmation password do not match.&quot;)]
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class LoginViewModel
+    {
+        [Required]
+        [Display(Name = &quot;User name&quot;)]
+        public string UserName { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Password&quot;)]
+        public string Password { get; set; }
+
+        [Display(Name = &quot;Remember me?&quot;)]
+        public bool RememberMe { get; set; }
+    }
+
+    public class GuessViewModel
+    {
+        [Required]
+        [Display(Name = &quot;User name&quot;)]
+        public string UserName { get; set; }
+
+    }
+
+    public class LoginPageViewModel
+    {
+        public LoginViewModel Login { get; set; } = new LoginViewModel();
+        public GuessViewModel Guess { get; set; } = new GuessViewModel();
+    }
+
+    public class RegisterViewModel
+    {
+        [Required]
+        [Display(Name = &quot;User name&quot;)]
+        public string UserName { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = &quot;The {0} must be at least {2} characters long.&quot;, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Password&quot;)]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = &quot;Confirm password&quot;)]
+        [Compare(&quot;Password&quot;, ErrorMessage = &quot;The password and confirmation password do not match.&quot;)]
+        public string ConfirmPassword { get; set; }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[7,37,7,41,0],[7,42,7,46,0],[8,46,8,50,0],[8,51,8,55,0],[15,34,15,38,0],[15,39,15,43,0],[23,37,23,41,1],[23,42,23,46,1],[29,37,29,41,1],[29,42,29,46,1],[34,41,34,45,0],[34,46,34,50,1],[43,37,43,41,0],[43,42,43,46,0],[48,41,48,45,0],[48,46,48,50,0],[55,34,55,38,1],[55,39,55,43,1],[60,34,60,38,1],[60,39,60,43,1],[63,34,63,38,1],[63,39,63,43,1],[70,34,70,38,1],[70,39,70,43,1],[76,39,76,43,0],[76,44,76,48,0],[76,53,76,73,1],[77,39,77,43,0],[77,44,77,48,1],[77,53,77,73,1],[84,34,84,38,1],[84,39,84,43,1],[90,34,90,38,1],[90,39,90,43,1],[95,41,95,45,0],[95,46,95,50,1]]);
+    </script>
+  </body>
+</html>

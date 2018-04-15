@@ -2,64 +2,28 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\ChatLe.Repository.Identity\BuilderExtensions.cs</title>
+    <title>C:\projects\chatle\src\chatle\Views\Home\About.cshtml</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-using ChatLe.Repository.Identity;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-
-namespace ChatLe.Models
-{
-    public static class BuilderExtensions
-    {
-        public static IServiceCollection ConfigureChatLe(this IServiceCollection services, Action&lt;ChatOptions&gt; configure)
-        {
-            services.Configure(configure);
-            return services;
-        }
-
-        public static IServiceCollection AddChatLe&lt;TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection&gt;(this IServiceCollection services, Action&lt;ChatOptions&gt; configure = null)
-            where TUser : IdentityUser&lt;string&gt;, IChatUser&lt;string&gt;
-            where TContext : DbContext
-            where TConversation : Conversation&lt;string&gt;, new()
-            where TAttendee : Attendee&lt;string&gt;, new()
-            where TMessage : Message&lt;string&gt;, new()
-            where TNotificationConnection : NotificationConnection&lt;string&gt;, new()
-        {
-            if (configure != null)
-                services.ConfigureChatLe(configure);
-
-            services.AddTransient&lt;IChatStore&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatStore&lt;string, TUser, TContext, TConversation, TAttendee, TMessage, TNotificationConnection, IdentityUserLogin&lt;string&gt;&gt;&gt;()
-                .AddTransient&lt;IChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;, ChatManager&lt;string, TUser, TConversation, TAttendee, TMessage, TNotificationConnection&gt;&gt;()
-                .AddSingleton&lt;ILookupNormalizer, LookupNormalizer&gt;()
-                .AddScoped&lt;SignInManager&gt;();            
-
-            return services;
-        }
-
-        public static IServiceCollection AddChatLe(this IServiceCollection services, Action&lt;ChatOptions&gt; configure = null)
-        {            
-            return services.AddChatLe&lt;ChatLeUser, ChatLeIdentityDbContext, Conversation, Attendee, Message, NotificationConnection&gt;(configure);
-        }
-
-        public static IApplicationBuilder UseChatLe(this IApplicationBuilder app)
-        {
-            var store = app.ApplicationServices.GetRequiredService&lt;IChatStore&lt;string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection&gt;&gt;();            
-            store.Init();
-            return app;
-        }
-    }
+@{
+  ViewBag.Title = &quot;About&quot;;
 }
+
+&lt;div class=&quot;row vertical-container&quot;&gt;
+  &lt;div class=&quot;col-xs-12 vertical-container vertical-list&quot;&gt;
+
+    &lt;h2&gt;@ViewBag.Title.&lt;/h2&gt;
+    &lt;h3&gt;@ViewBag.Message&lt;/h3&gt;
+
+    &lt;p&gt;This site is an open source project. Visit &lt;a href=&quot;https://github.com/aguacongas/chatle&quot;&gt;the project site on Github&lt;/a&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
     </pre>
     <script type="text/javascript">
-      highlightRanges([[13,9,13,10,1],[14,13,14,43,1],[15,13,15,29,1],[16,9,16,10,1],[25,9,25,10,1],[26,13,26,35,1],[27,17,27,53,1],[29,13,32,45,1],[34,13,34,29,1],[35,9,35,10,1],[38,9,38,10,1],[39,13,39,144,1],[40,9,40,10,1],[43,9,43,10,1],[44,13,44,159,1],[45,13,45,26,1],[46,13,46,24,1],[47,9,47,10,1]]);
+      highlightRanges([[2,3,2,27,0],[8,4,8,25,0],[9,4,9,27,0]]);
     </script>
   </body>
 </html>

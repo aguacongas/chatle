@@ -2,23 +2,24 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>C:\projects\chatle\src\chatle\Views\Account\ExternalLoginFailure.cshtml</title>
+    <title>C:\projects\chatle\src\chatle\ViewModels\RemoveLoginViewModel.cs</title>
     <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
   </head>
   <body>
     <pre id="content" class="source-code">
-@{
-    ViewData[&quot;Title&quot;] = &quot;Login Failure&quot;;
+namespace ChatLe.ViewModels
+{
+    public class RemoveLoginViewModel
+    {
+        public string LoginProvider { get; set; }
+        public string ProviderKey { get; set; }
+    }
 }
 
-&lt;header&gt;
-    &lt;h2&gt;@ViewData[&quot;Title&quot;].&lt;/h2&gt;
-    &lt;p class=&quot;text-danger&quot;&gt;Unsuccessful login with service.&lt;/p&gt;
-&lt;/header&gt;
     </pre>
     <script type="text/javascript">
-      highlightRanges([[2,5,2,41,0],[6,4,6,29,0]]);
+      highlightRanges([[5,39,5,43,0],[5,44,5,48,0],[6,37,6,41,0],[6,42,6,46,0]]);
     </script>
   </body>
 </html>
