@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpConnection, HubConnection, LogLevel } from '@aspnet/signalr';
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
 
 import { HubSettings } from './hub-settings';
 import {
@@ -26,10 +26,8 @@ export function createHubConnection(
   hubSettings: HubSettings
 ): HubConnectionFactory {
   return () =>
-    new HubConnection(
-      new HttpConnection(hubSettings.url, {
-        transport: hubSettings.transportType,
-        logger: hubSettings.logLevel
-      })
-    );
+    new HubConnectionBuilder()
+      .withUrl(hubSettings.url)
+      .configureLogging(hubSettings.logLevel)
+      .build();
 }

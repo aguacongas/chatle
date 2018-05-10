@@ -1,11 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { HubConnection, HttpConnection, HttpError } from '@aspnet/signalr';
+import { HubConnection, HttpError } from '@aspnet/signalr';
 import { SignalrService } from './signalr-client';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Settings } from './settings';
 import { User } from './user';
@@ -91,7 +89,7 @@ export class ChatService {
           to: conversation.id,
           text: message
         })
-        .map(value => m);
+        .pipe(map(value => m));
     } else {
       const attendee = conversation.attendees.find(
         a => a.userId !== this.settings.userName
@@ -101,31 +99,31 @@ export class ChatService {
           to: attendee.userId,
           text: message
         })
-        .map(response => {
+        .pipe(map(response => {
           conversation.id = response as string;
           this.setConversationTitle(conversation);
           this.joinConversationSubject.next(conversation);
           return m;
-        });
+        }));
     }
   }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<any>(this.settings.userAPI).map(response => {
+    return this.http.get<any>(this.settings.userAPI).pipe(map(response => {
       const data = response;
       if (data && data.users) {
         return data.users as User[];
       }
-    });
+    }));
   }
 
   getConversations(): Observable<Conversation[]> {
     return this.http
       .get<Conversation[]>(this.settings.chatAPI)
-      .map(conversations => {
+      .pipe(map(conversations => {
         conversations.forEach(value => this.setConversationTitle(value));
         return conversations;
-      });
+      }));
   }
 
   private initializeObservables() {

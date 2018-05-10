@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SignalrModule, HubSettings } from './shared/signalr-client';
-import { TransportType, LogLevel } from '@aspnet/signalr';
+import { LogLevel } from '@aspnet/signalr';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
@@ -49,7 +49,6 @@ export function getHubSettings(settings: Settings): HubSettings {
   if (!hubSettings) {
     hubSettings = {
       url: environment.production ? '/chat' : 'http://localhost:5000/chat',
-      transportType: TransportType.LongPolling,
       logLevel: settings.debug ? LogLevel.Trace : LogLevel.Warning
     };
   }

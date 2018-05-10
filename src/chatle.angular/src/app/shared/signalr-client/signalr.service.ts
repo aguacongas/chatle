@@ -1,9 +1,8 @@
 import { Injectable, Inject, InjectionToken } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject, pipe } from 'rxjs';
+import { map } from 'rxjs/operators';
 import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/map';
 
 /**
  * Hub connection factory type
@@ -62,9 +61,9 @@ export class SignalrService {
       this.connectionCloseSubject.next(e);
     });
 
-    return Observable.fromPromise(this.connection.start()).map(() => {
+    return Observable.fromPromise(this.connection.start()).pipe(map(() => {
       this.isConnected = true;
-    });
+    }));
   }
 
   /**
