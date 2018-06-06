@@ -35,7 +35,7 @@
     <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
-    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.1.0-beta0001" />
+    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
   </ItemGroup>
 
