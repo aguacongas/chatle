@@ -1,4 +1,4 @@
 export class Attendee {
-    userId: string;
-    name: string;
+  userId: string;
+  name: string;
 }

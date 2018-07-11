@@ -6,16 +6,9 @@ function exec($cmd) {
     & $cmd @args
 }
 
-cd .\src\chatle.angular
-
-exec npm i
-exec npm run publish
-
-cd $PSScriptRoot
-
 dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:OutputPath=..\..\artifacts\chatle -p:Version=$env:GitVersion_NuGetVersion -p:FileVersion=$env:GitVersion_AssemblySemVer -p:FileVersion=$env:GitVersion_AssemblySemVer
 
-#7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
+7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
 
 gci -Path src -rec `
 | ? { $_.Name -like "*.csproj" -and $_.Name -ne "chatle.angular.csproj" ` -and $_.Name -ne "DotZLib.csproj"

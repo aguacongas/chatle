@@ -2,12 +2,12 @@
     "ChatConfig": {
         "UserPerPage": 25
     },
-    "IdentityDatabase": "Firebase",
+    "IdentityDatabase": "InMemory",
     "DatabaseEngine": "InMemory",
     "CreateDatabase": "false",
     "Data": {
         "DefaultConnection": {
-            "ConnectionString": "Filename=./ChatLeDbContext.db"
+            "ConnectionString": "localhost"
         }
     },
     "Identity": {
@@ -20,5 +20,10 @@
     },
     "RemoveResponseHeader": {
         "Values": "Server, ETag"
+    },
+    "HubSettings": {
+        "Url": "http://localhost:5000/chat",
+        "TransportType": "LongPolling",
+        "LogLevel": "Trace"
     }
 }

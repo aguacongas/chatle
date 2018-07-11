@@ -60,16 +60,6 @@ namespace chatle.test.Controllers
 		}
 
 		[Fact]
-		public void ContactTest()
-		{
-			ExecuteAction(controller =>
-			{
-				var result = controller.Contact();
-				Assert.IsType<ViewResult>(result);
-			});
-		}
-
-		[Fact]
 		public void ErrorTest()
 		{
 			ExecuteAction(controller =>

@@ -1,9 +1,8 @@
 import { Injectable, Inject, InjectionToken } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject, pipe } from 'rxjs';
+import { map } from 'rxjs/operators';
 import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/map';
 
 /**
  * Hub connection factory type
@@ -12,7 +11,9 @@ export type HubConnectionFactory = () => HubConnection;
 /**
  * {@link HubConnectionFactory} injection token
  */
-export const HUB_CONNECTION_FACTORY = new InjectionToken<HubConnectionFactory>('HUB_CONNECTION_FACTORY');
+export const HUB_CONNECTION_FACTORY = new InjectionToken<HubConnectionFactory>(
+  'HUB_CONNECTION_FACTORY'
+);
 
 export interface ServerMethodCallback {
   methodName: string;
@@ -24,7 +25,6 @@ export interface ServerMethodCallback {
  */
 @Injectable()
 export class SignalrService {
-
   /**
    * Hub connection closed event
    */
@@ -44,8 +44,9 @@ export class SignalrService {
    * Initialise a new instance of {@link SignalrService}
    * @param factory the hub connection factorx
    */
-  constructor(@Inject(HUB_CONNECTION_FACTORY) private factory: HubConnectionFactory) {
-  }
+  constructor(
+    @Inject(HUB_CONNECTION_FACTORY) private factory: HubConnectionFactory
+  ) {}
 
   /**
    * Connects to the hub
@@ -60,10 +61,9 @@ export class SignalrService {
       this.connectionCloseSubject.next(e);
     });
 
-    return Observable.fromPromise(this.connection.start())
-      .map(() => {
-        this.isConnected = true;
-      });
+    return Observable.fromPromise(this.connection.start()).pipe(map(() => {
+      this.isConnected = true;
+    }));
   }
 
   /**
@@ -95,7 +95,8 @@ export class SignalrService {
     const argsArray = Array.prototype.slice.call(arguments);
 
     const subject = new Subject<any>();
-    const promise = this.connection.invoke.apply(this.connection, argsArray)
+    const promise = this.connection.invoke
+      .apply(this.connection, argsArray)
       .then(result => {
         subject.next(result);
       })

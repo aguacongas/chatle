@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>chatle</AssemblyName>
@@ -11,10 +11,15 @@
     <UserSecretsId>aspnet5-chatle-75f79cf1-fb8a-43d9-8dd4-7d8dab2fef27</UserSecretsId>
     <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.12-x64;osx.10.11-x64;osx.10.10-x64;ubuntu.14.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64</RuntimeIdentifiers>
     <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
+    <AspNetCoreModuleHostingModel>inprocess</AspNetCoreModuleHostingModel>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="node_modules" />
+    <None Update="firebase-key.json.enc">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <Content Include="firebase-key.json.enc" />
     <None Update="wwwroot\css\site.min.css;wwwroot\app\**\*.js;wwwroot\app\**\*.html;wwwroot\js\**\*;wwwroot\lib\angular\**\*.min.js;wwwroot\lib\angular2-in-memory-web-api\*.js;wwwroot\lib\core-js\client\shim.min.js;wwwroot\lib\rxjs\**\*.js;wwwroot\lib\reflect-metadata\Reflect.js;wwwroot\lib\systemjs\dist\system.js;wwwroot\lib\zone.js\dist\zone.min.js;Views\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
@@ -30,15 +35,20 @@
     <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
+    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.0-preview1-final" />
+    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.6.362" />
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
+    <Folder Include="wwwroot\app\" />
   </ItemGroup>
 
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <Exec Command="npm i" WorkingDirectory="..\chatle.angular" />
+    <Exec Command="npm run publish" WorkingDirectory="..\chatle.angular" />
+  </Target>
 </Project>

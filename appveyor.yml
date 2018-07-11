@@ -1,5 +1,6 @@
 version: 1.0.0-{build}
 skip_tags: true
+image: Visual Studio 2017 Preview
 branches:
   except:
   - gh-pages
@@ -39,6 +40,7 @@ on_success:
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "aguacongas@gmail.com"
   - git config --global user.name "Aguacongas"
+  - git stash
   - git checkout gh-pages
   - IF EXIST reports\latest ( rmdir /S /Q reports\latest )
   - IF NOT EXIST reports ( mkdir reports )
@@ -54,4 +56,42 @@ deploy:
     branch: 
         - master
         - /release*/
-    
+- provider: GitHub
+  auth_token:
+    secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
+  draft: true
+  prerelease: true
+  release: $(GitVersion_SemVer)
+  on:
+    branch: 
+        - /release*/
+- provider: GitHub
+  auth_token:
+    secure: u7qaOQsrkLqq44yS24C0eM2vRCzp1A8gZTWNmlA58TIDJGmrDXguHL9H/vww7Fg/
+  draft: true
+  prerelease: false
+  release: $(GitVersion_SemVer)
+  on:
+    branch: 
+        - master
+for:
+-
+  branches:
+    only:
+      - master
+  on_success:
+      - git config --global credential.helper store
+      - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+      - git config --global user.email "aguacongas@gmail.com"
+      - git config --global user.name "Aguacongas"
+      - git stash
+      - git checkout gh-pages
+      - mkdir %GITVERSION_NuGetVersion%
+      - move coverage\docs reports\%GITVERSION_NuGetVersion%
+      - git add reports\%GITVERSION_NuGetVersion%
+      - git commit reports\%GITVERSION_NuGetVersion% -m "Appveyor build succed %APPVEYOR_BUILD_NUMBER%"
+      - git push
+-
+  branches:
+    except:
+      - master

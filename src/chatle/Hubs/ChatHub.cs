@@ -63,7 +63,7 @@ namespace ChatLe.Hubs
 
 			await Manager.AddConnectionIdAsync(name, Context.ConnectionId, "signalR");
 			
-			await Groups.AddAsync(Context.ConnectionId, name);
+			await Groups.AddToGroupAsync(Context.ConnectionId, name);
 			await Clients.All.SendAsync("userConnected", new { id = name });
 			await base.OnConnectedAsync();
 		}

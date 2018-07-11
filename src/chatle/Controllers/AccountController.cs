@@ -82,6 +82,7 @@ namespace ChatLe.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> SpaLogin([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -127,6 +128,8 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaGuess
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+
         public async Task<JsonResult> SpaGuess([FromBody] GuessViewModel model)
         {
             if (ModelState.IsValid)
@@ -195,6 +198,7 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaLogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task SpaLogOff(string reason = null)
         {
             await SignOut();        
@@ -216,7 +220,8 @@ namespace ChatLe.Controllers
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
+
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
@@ -337,7 +342,6 @@ namespace ChatLe.Controllers
         // POST: /Account/SpaExternalLoginConfirmation
         [HttpPut]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<JsonResult> SpaExternalLoginConfirmation([FromBody] ExternalLoginConfirmationViewModel model)
         {
             if (ModelState.IsValid)
@@ -375,7 +379,6 @@ namespace ChatLe.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<bool> Exists(string userName)
         {
             return await UserManager.FindByNameAsync(userName) != null;
@@ -483,7 +486,6 @@ namespace ChatLe.Controllers
         }
 
         [HttpDelete]
-        [ValidateAntiForgeryToken]
         public async Task SpaRemoveLogin(RemoveLoginViewModel account)
         {
             await InternalRemoveLogin(account);

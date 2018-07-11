@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SignalrModule, HubSettings } from './shared/signalr-client';
+import { LogLevel } from '@aspnet/signalr';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
@@ -14,47 +15,56 @@ import { ConversationsComponent } from './conversations/conversations.component'
 import { Settings } from './shared/settings';
 import { ChatService, ConnectionState } from './shared/chat.service';
 
-const hubSettings = {
-  url: environment.production ?  '/chat' : 'http://localhost:5000/chat'
-};
-
 @NgModule({
-  imports: [ BrowserModule, FormsModule, HttpClientModule, SignalrModule ],
+  imports: [BrowserModule, FormsModule, HttpClientModule, SignalrModule],
   declarations: [
     AppComponent,
     ContactComponent,
     ContactsComponent,
     ConversationPreviewComponent,
     ConversationComponent,
-    ConversationsComponent ],
+    ConversationsComponent
+  ],
   bootstrap: [AppComponent],
   providers: [
     ChatService,
     { provide: Settings, useFactory: getSettings },
-    { provide: HubSettings, useValue: hubSettings },
+    { provide: HubSettings, useFactory: getHubSettings, deps: [Settings] },
     {
-        provide: APP_INITIALIZER,
-        useFactory: boot,
-        deps: [ChatService],
-        multi: true
-    },
+      provide: APP_INITIALIZER,
+      useFactory: boot,
+      deps: [ChatService],
+      multi: true
+    }
   ]
 })
-export class AppModule { }
+export class AppModule {}
 
 export function getSettings(): Settings {
   return window['chatleSetting'] as Settings;
 }
 
-export function boot(service: ChatService): Function {
-    return () => {
-        return new Promise((resolve, reject) => {
-            service.start(true).subscribe(
-                () => resolve(),
-                error => {
-                    location.assign('/Account?reason=disconnected');
-                    reject();
-                });
-        });
+export function getHubSettings(settings: Settings): HubSettings {
+  let hubSettings = settings.hubSettings;
+  if (!hubSettings) {
+    hubSettings = {
+      url: environment.production ? '/chat' : 'http://localhost:5000/chat',
+      logLevel: settings.debug ? LogLevel.Trace : LogLevel.Warning
     };
+  }
+  return hubSettings;
+}
+
+export function boot(service: ChatService): Function {
+  return () => {
+    return new Promise((resolve, reject) => {
+      service.start(true).subscribe(
+        () => resolve(),
+        error => {
+          location.assign('Account?reason=disconnected');
+          reject();
+        }
+      );
+    });
+  };
 }

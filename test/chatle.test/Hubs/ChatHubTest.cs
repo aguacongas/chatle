@@ -3,7 +3,6 @@ using ChatLe.Hubs;
 using ChatLe.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,7 +38,7 @@ namespace chatle.test.Hubs
 			return userManager;
 		}
 
-        internal static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HubConnectionContext>> a)
+        internal static void ExecuteAction(Action<ChatHub, Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>, Mock<HubCallerContext>> a)
 		{
 			var mockChatManager = new Mock<IChatManager<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>();
 			var mockLoggerFactory = new Mock<ILoggerFactory>();
@@ -52,14 +51,18 @@ namespace chatle.test.Hubs
 			var provideMock = new Mock<IServiceProvider>();
 			provideMock.Setup(p => p.GetService(It.IsAny<Type>()))
 				.Returns(mockChatManager.Object);
-            var mockConnectionContext = new Mock<ConnectionContext>();
-            var hubConnectionContextMock = new Mock<HubConnectionContext>(mockConnectionContext.Object, TimeSpan.FromSeconds(1), mockLoggerFactory.Object);
+
+            var hubCallerContextMock = new Mock<HubCallerContext>();
+            var groupManagerMock = new Mock<IGroupManager>();
+            var clientManagerMock = new Mock<IHubCallerClients>();
             var hub = new ChatHub(provideMock.Object, mockLoggerFactory.Object);
 
             using (hub)
 			{
-				hub.Context = new HubCallerContext(hubConnectionContextMock.Object);
-				a.Invoke(hub, mockChatManager, hubConnectionContextMock);
+				hub.Context = hubCallerContextMock.Object;
+                hub.Clients = clientManagerMock.Object;
+                hub.Groups = groupManagerMock.Object;
+				a.Invoke(hub, mockChatManager, hubCallerContextMock);
 			}
 		}
 

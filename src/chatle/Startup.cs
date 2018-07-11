@@ -1,24 +1,24 @@
-﻿using System;
+﻿using chatle.Hubs;
+using ChatLe.Cryptography;
+using ChatLe.Hubs;
+using ChatLe.Models;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using ChatLe.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Identity;
-using ChatLe.Hubs;
-using ChatLe.Cryptography;
-using Google.Apis.Auth.OAuth2;
-using Newtonsoft.Json;
 
 namespace ChatLe
 {
@@ -35,39 +35,48 @@ namespace ChatLe
         }
 
         readonly IHostingEnvironment _environment;
-        public ILoggerFactory LoggerFactory { get; private set; }
-        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("config.json")
-                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
 
             if (env.IsDevelopment())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets<Startup>();
-                loggerFactory.AddDebug();
             }
-
-            builder.AddEnvironmentVariables();
 
             Configuration = builder.Build();
 
             _environment = env;
-            LoggerFactory = loggerFactory;
-            loggerFactory.AddAzureWebAppDiagnostics();
-
-            loggerFactory.AddConsole();
         }
 
         public IConfiguration Configuration { get; private set; }
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
+            services.AddLogging(builder =>
+                {
+                    builder.AddConsole()
+                        .AddAzureWebAppDiagnostics()
+                        .AddDebug()
+                        .SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+                })
+                .Configure<HubSettings>(hubSettings => Configuration.GetSection("HubSettings").Bind(hubSettings))
+                .AddChatLe(options => options.UserPerPage = int.Parse(Configuration["ChatConfig:UserPerPage"]))
                 .AddCors()
-                .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+                .AddAntiforgery(options =>
+                {
+                    options.HeaderName = "X-XSRF-TOKEN";
+                    var cookie = options.Cookie;
+                    cookie.Name = "XSRF-TOKEN";
+                    cookie.HttpOnly = false;
+                    cookie.Path = "/";
+                    cookie.SameSite = SameSiteMode.None;
+                });
 
             ConfigureEntity(services);
 
@@ -192,7 +201,7 @@ namespace ChatLe
 
         private void ConfigureEntity(IServiceCollection services)
         {
-            var identyBuilder = services.AddIdentity<ChatLeUser, IdentityRole>(options =>
+            var identityBuilder = services.AddIdentity<ChatLeUser, IdentityRole>(options =>
                         {
                             var userOptions = options.User;
                             userOptions.AllowedUserNameCharacters += " ";
@@ -200,24 +209,29 @@ namespace ChatLe
                 .AddDefaultTokenProviders();
 
             var identityEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["IdentityDatabase"]);
-            if (identityEngine != DBEngine.Firebase)
+
+            switch(identityEngine)
             {
-                identyBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
-            }
-            else
-            {
-                identyBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
-                {
-                    using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
+                case DBEngine.Redis:
+                    identityBuilder.AddRedisStores(Configuration["Data:DefaultConnection:ConnectionString"]);
+                    break;
+                case DBEngine.Firebase:
+                    identityBuilder.AddFirebaseStores(Configuration["FirebaseOptions:DatabaseUrl"], provider =>
                     {
-                        using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                        using (var utility = new Utility(Configuration["FirebaseOptions:SecureKey"]))
                         {
-                            return GoogleCredential.FromStream(stream)
-                                .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
-                                .UnderlyingCredential;
+                            using (var stream = utility.DecryptFile("firebase-key.json.enc").GetAwaiter().GetResult())
+                            {
+                                return GoogleCredential.FromStream(stream)
+                                    .CreateScoped("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase.database")
+                                    .UnderlyingCredential;
+                            }
                         }
-                    }
-                });
+                    });
+                    break;
+                default:
+                    identityBuilder.AddEntityFrameworkStores<ChatLeIdentityDbContext>();
+                    break;
             }
 
             var dbEngine = (DBEngine)Enum.Parse(typeof(DBEngine), Configuration["DatabaseEngine"]);
@@ -252,13 +266,20 @@ namespace ChatLe
             }
         }
 
-        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
+        public virtual void Configure(IApplicationBuilder app, IAntiforgery antiforgery, ILoggerFactory loggerFactory)
         {
-
             ConfigureErrors(app);
+            app.Use(async (context, next) =>
+            {
+                var logger = loggerFactory.CreateLogger("ValidRequestMW");
 
-            var logger = LoggerFactory.CreateLogger("request");
-            app.UseCors(
+                logger.LogInformation("Request Cookie is " + context.Request.Cookies["XSRF-TOKEN"]);
+                logger.LogInformation("Request Header is " + context.Request.Headers["X-XSRF-TOKEN"]);
+
+                await next();
+            })
+
+                .UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -269,7 +290,6 @@ namespace ChatLe
                 .Map("/xhrf", a => a.Run(async context =>
                 {
                     var tokens = antiforgery.GetAndStoreTokens(context);
-                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { HttpOnly = false });
                     await context.Response.WriteAsync(tokens.RequestToken);
                 }))
                 .Map("/cls", a => a.Run(async context =>

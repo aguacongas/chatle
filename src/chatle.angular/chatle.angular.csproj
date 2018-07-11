@@ -1,8 +1,68 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="e2e\app.e2e-spec.ts" />
+    <None Remove="e2e\app.po.ts" />
+    <None Remove="src\app\app.component.spec.ts" />
+    <None Remove="src\app\app.component.ts" />
+    <None Remove="src\app\app.module.ts" />
+    <None Remove="src\app\contacts\contact.component.ts" />
+    <None Remove="src\app\contacts\contacts.component.ts" />
+    <None Remove="src\app\conversations\conversation.component.ts" />
+    <None Remove="src\app\conversations\conversationPreview.component.ts" />
+    <None Remove="src\app\conversations\conversations.component.ts" />
+    <None Remove="src\app\shared\attendee.ts" />
+    <None Remove="src\app\shared\chat.service.spec.ts" />
+    <None Remove="src\app\shared\chat.service.ts" />
+    <None Remove="src\app\shared\conversation.ts" />
+    <None Remove="src\app\shared\message.ts" />
+    <None Remove="src\app\shared\settings.ts" />
+    <None Remove="src\app\shared\signalr-client\hub-settings.ts" />
+    <None Remove="src\app\shared\signalr-client\index.ts" />
+    <None Remove="src\app\shared\signalr-client\signalr.module.ts" />
+    <None Remove="src\app\shared\signalr-client\signalr.service.spec.ts" />
+    <None Remove="src\app\shared\signalr-client\signalr.service.ts" />
+    <None Remove="src\app\shared\user.ts" />
+    <None Remove="src\environments\environment.prod.ts" />
+    <None Remove="src\environments\environment.ts" />
+    <None Remove="src\main.ts" />
+    <None Remove="src\polyfills.ts" />
+    <None Remove="src\test.ts" />
+    <None Remove="src\typings.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="e2e\app.e2e-spec.ts" />
+    <TypeScriptCompile Include="e2e\app.po.ts" />
+    <TypeScriptCompile Include="src\app\app.component.spec.ts" />
+    <TypeScriptCompile Include="src\app\app.component.ts" />
+    <TypeScriptCompile Include="src\app\app.module.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact.component.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contacts.component.ts" />
+    <TypeScriptCompile Include="src\app\conversations\conversation.component.ts" />
+    <TypeScriptCompile Include="src\app\conversations\conversationPreview.component.ts" />
+    <TypeScriptCompile Include="src\app\conversations\conversations.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\attendee.ts" />
+    <TypeScriptCompile Include="src\app\shared\chat.service.spec.ts" />
+    <TypeScriptCompile Include="src\app\shared\chat.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\conversation.ts" />
+    <TypeScriptCompile Include="src\app\shared\message.ts" />
+    <TypeScriptCompile Include="src\app\shared\settings.ts" />
+    <TypeScriptCompile Include="src\app\shared\signalr-client\hub-settings.ts" />
+    <TypeScriptCompile Include="src\app\shared\signalr-client\index.ts" />
+    <TypeScriptCompile Include="src\app\shared\signalr-client\signalr.module.ts" />
+    <TypeScriptCompile Include="src\app\shared\signalr-client\signalr.service.spec.ts" />
+    <TypeScriptCompile Include="src\app\shared\signalr-client\signalr.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\user.ts" />
+    <TypeScriptCompile Include="src\environments\environment.prod.ts" />
+    <TypeScriptCompile Include="src\environments\environment.ts" />
+    <TypeScriptCompile Include="src\main.ts" />
+    <TypeScriptCompile Include="src\polyfills.ts" />
+    <TypeScriptCompile Include="src\test.ts" />
+    <TypeScriptCompile Include="src\typings.d.ts" />
+  </ItemGroup>
 
 </Project>

@@ -12,39 +12,39 @@ import { Settings } from '../shared/settings';
   templateUrl: './contact.component.html'
 })
 export class ContactComponent implements OnInit {
-    @Input()
-    user: User;
-    isCurrentUser: boolean;
+  @Input() user: User;
+  isCurrentUser: boolean;
 
-    constructor(private service: ChatService, private settings: Settings) {  }
+  constructor(private service: ChatService, private settings: Settings) {}
 
-    ngOnInit() {
-        this.service.joinConversation
-            .subscribe(conversion => {
-                if (!this.user.conversation
-                    && conversion.attendees.length < 3
-                    && conversion.attendees.some(a => a.userId === this.user.id)) {
-                    this.user.conversation = conversion;
-                }
-            });
+  ngOnInit() {
+    this.service.joinConversation.subscribe(conversion => {
+      if (
+        !this.user.conversation &&
+        conversion.attendees.length < 3 &&
+        conversion.attendees.some(a => a.userId === this.user.id)
+      ) {
+        this.user.conversation = conversion;
+      }
+    });
 
-        this.isCurrentUser = this.settings.userName === this.user.id;
+    this.isCurrentUser = this.settings.userName === this.user.id;
+  }
+
+  onClick() {
+    if (!this.user.conversation) {
+      const conversation = new Conversation();
+      const attendees = new Array<Attendee>();
+      const attendee = new Attendee();
+
+      attendee.userId = this.user.id;
+      attendees.push(attendee);
+      conversation.attendees = attendees;
+      conversation.messages = new Array<Message>();
+
+      this.user.conversation = conversation;
     }
 
-    onClick() {
-        if (!this.user.conversation) {
-            const conversation = new Conversation();
-            const attendees = new Array<Attendee>();
-            const attendee = new Attendee();
-
-            attendee.userId = this.user.id;
-            attendees.push(attendee);
-            conversation.attendees = attendees;
-            conversation.messages = new Array<Message>();
-
-            this.user.conversation = conversation;
-        }
-
-        this.service.showConversation(this.user.conversation);
-    }
+    this.service.showConversation(this.user.conversation);
+  }
 }
