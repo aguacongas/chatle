@@ -16,12 +16,12 @@
     <PackageReference Include="Microsoft.CodeCoverage" Version="1.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0-beta.1.build3958" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.0-rc1-final" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0-rc1-final" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.0-rc1-final" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0-rc1-final" />
-    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.1.0-rc1-final" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.0-rc1-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
     <PackageReference Include="xunit" Version="2.4.0-beta.1.build3958" />
     <PackageReference Include="Moq" Version="4.8.2" />
