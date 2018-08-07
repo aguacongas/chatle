@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ChatLe.Cryptography.Tools</id>
+    <version>2.1.0</version>
+    <authors>Olivier Lefebvre</authors>
+    <owners>Olivier Lefebvre</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</projectUrl>
+    <description>
+      dotnet-encrypt.
+      encrypt a file that can be read using ChatLe.Cryptography.Utility.
+      Usage:
+      encrypt {path to the file to encryp} {secret-key}
+    </description>
+    <copyright>Olivier Lefebvre @2018</copyright>
+    <tags>chat Cryptography dotnet-tools</tags>
+    <repository type="git" url="https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt" />
+    <dependencies>
+      <dependency id="Microsoft.NETCore.Platforms" version="2.0.1" />
+    </dependencies>
+    <packageTypes>
+      <packageType name="DotnetTool" />
+    </packageTypes>
+  </metadata>
+  <files>
+    <file src="bin\Release\netcoreapp2.1\*.*" target="tools\netcoreapp2.1\any" />
+    <file src="DotnetToolSettings.xml" target="tools\netcoreapp2.1\any" />
+  </files>
+</package>
