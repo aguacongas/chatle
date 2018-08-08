@@ -5,7 +5,7 @@ Encrypt a file that can be read using `ChatLe.Cryptography.Utility`.
 ## Install
 
 ``` bash
-dotnet tool install -g dotnet-encrypt
+dotnet tool install --global ChatLe.Cryptography.Tools
 ```
 
 ## Usage
