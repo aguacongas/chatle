@@ -10,6 +10,8 @@ dotnet msbuild ./src/chatle -t:Publish -p:Configuration=Release -p:OutputPath=..
 
 7z a .\artifacts\chatle.zip .\artifacts\chatle\ > null
 
+dotnet build .\src\dotnet-encrypt -c Release
+
 gci -Path src -rec `
 | ? { $_.Name -like "*.csproj" -and $_.Name -ne "chatle.angular.csproj" ` -and $_.Name -ne "DotZLib.csproj"
      } `

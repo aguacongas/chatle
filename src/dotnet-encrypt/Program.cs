@@ -12,7 +12,7 @@ namespace ChatLe.Cryptography.Tools
                 Console.WriteLine("donet-encrypt");
                 Console.WriteLine("\tencrypt a file that can be read using ChatLe.Cryptography.Utility.");
                 Console.WriteLine("Usage:");
-                Console.WriteLine("\tdotnet encrypt <path to the file to encryp> <secret-key>");
+                Console.WriteLine("\tencrypt <path to the file to encryp> <secret-key>");
                 return;
             }
 
