@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Account\Manage.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@model ManageLoginsViewModel
+@using Microsoft.AspNetCore.Http.Authentication
+@{
+  ViewBag.Title = &quot;Manage Account&quot;;
+}
+
+&lt;div class=&quot;row vertical-container&quot;&gt;
+  &lt;div class=&quot;col-xs-12 vertical-container vertical-list&quot;&gt;
+    &lt;h2&gt;@ViewBag.Title.&lt;/h2&gt;
+    &lt;p class=&quot;text-success&quot;&gt;@ViewBag.StatusMessage&lt;/p&gt;
+    &lt;div class=&quot;row&quot;&gt;
+      @if (Model.CurrentLogins.Count &gt; 0)
+      {
+        &lt;h4&gt;Registered Logins&lt;/h4&gt;
+        &lt;table class=&quot;table&quot;&gt;
+          &lt;tbody&gt;
+            @for (var index = 0; index &lt; Model.CurrentLogins.Count; index++)
+            {
+              &lt;tr&gt;
+                &lt;td&gt;@Model.CurrentLogins[index].LoginProvider&lt;/td&gt;
+                &lt;td&gt;
+                  @if ((bool)ViewData[&quot;ShowRemoveButton&quot;])
+                  {
+                    &lt;form asp-controller=&quot;Account&quot; asp-action=&quot;RemoveLogin&quot; method=&quot;post&quot; class=&quot;form-horizontal&quot; role=&quot;form&quot;&gt;
+                      &lt;div&gt;
+                        &lt;input asp-for=&quot;@Model.CurrentLogins[index].LoginProvider&quot; name=&quot;LoginProvider&quot; type=&quot;hidden&quot; /&gt;
+                        &lt;input asp-for=&quot;@Model.CurrentLogins[index].ProviderKey&quot; name=&quot;ProviderKey&quot; type=&quot;hidden&quot; /&gt;
+                        &lt;input type=&quot;submit&quot; class=&quot;btn btn-default&quot; value=&quot;Remove&quot; title=&quot;Remove this @Model.CurrentLogins[index].LoginProvider login from your account&quot; /&gt;
+                      &lt;/div&gt;
+                    &lt;/form&gt;
+                  }
+                  else
+                  {
+                    @: &amp;nbsp;
+                  }
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            }
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      }
+      @if (Model.OtherLogins.Count &gt; 0)
+      {
+        &lt;h4&gt;Add another service to log in.&lt;/h4&gt;
+        &lt;hr /&gt;
+        &lt;form asp-controller=&quot;Account&quot; asp-action=&quot;LinkLogin&quot; method=&quot;post&quot; class=&quot;form-horizontal&quot; role=&quot;form&quot;&gt;
+          &lt;div id=&quot;socialLoginList&quot;&gt;
+            &lt;p&gt;
+              @foreach (var provider in Model.OtherLogins)
+              {
+                &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot; name=&quot;provider&quot; value=&quot;@provider.AuthenticationScheme&quot; title=&quot;Log in using your @provider.DisplayName account&quot;&gt;@provider.AuthenticationScheme&lt;/button&gt;
+              }
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+      }
+      &lt;div class=&quot;col-md-12&quot;&gt;
+        @if (Model.Passwords != null)
+        {
+          await Html.PartialAsync(&quot;_ChangePasswordPartial&quot;, Model.Passwords);
+        }
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[4,3,4,36,0],[9,4,9,25,0],[10,24,10,53,0],[12,8,12,42,0],[13,7,13,8,0],[17,19,17,32,0],[17,34,17,67,0],[17,69,17,76,0],[18,13,18,14,0],[20,16,20,64,0],[22,20,22,59,0],[23,19,23,20,0],[26,1,26,169,0],[27,1,27,167,0],[28,1,28,91,0],[31,19,31,20,0],[33,19,33,20,0],[35,19,35,20,0],[38,13,38,14,0],[41,7,41,8,0],[42,8,42,40,0],[43,7,43,8,0],[49,16,49,23,0],[49,25,49,37,0],[49,38,49,40,0],[49,41,49,58,0],[50,15,50,16,0],[51,1,51,79,0],[51,1,51,71,0],[51,169,51,206,0],[52,15,52,16,0],[56,7,56,8,0],[58,10,58,38,0],[59,9,59,10,0],[60,11,60,78,0],[61,9,61,10,0]]);
+    </script>
+  </body>
+</html>

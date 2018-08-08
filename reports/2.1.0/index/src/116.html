@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Account\ExternalLoginConfirmation.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@model ExternalLoginConfirmationViewModel
+@{
+    ViewData[&quot;Title&quot;] = &quot;Register&quot;;
+}
+
+&lt;h2&gt;@ViewData[&quot;Title&quot;].&lt;/h2&gt;
+&lt;h3&gt;Associate your @ViewData[&quot;LoginProvider&quot;] account.&lt;/h3&gt;
+
+&lt;form asp-controller=&quot;Account&quot; asp-action=&quot;ExternalLoginConfirmation&quot; asp-route-returnurl=&quot;@ViewData[&quot;ReturnUrl&quot;]&quot; method=&quot;post&quot; class=&quot;form-horizontal&quot; role=&quot;form&quot;&gt;
+    &lt;h4&gt;Association Form&lt;/h4&gt;
+    &lt;hr /&gt;
+    &lt;div asp-validation-summary=&quot;All&quot; class=&quot;text-danger&quot;&gt;&lt;/div&gt;
+
+    &lt;p class=&quot;text-info&quot;&gt;
+        You&#39;ve successfully authenticated with &lt;strong&gt;@ViewData[&quot;LoginProvider&quot;]&lt;/strong&gt;.
+        Please enter a user name for this site below and click the Register button to finish
+        logging in.
+    &lt;/p&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label asp-for=&quot;UserName&quot; class=&quot;col-md-2 control-label&quot;&gt;User name&lt;/label&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+            &lt;input name=&quot;UserName&quot; class=&quot;form-control&quot; value.bind=&quot;&quot; /&gt;
+            &lt;span asp-validation-for=&quot;UserName&quot; class=&quot;text-danger&quot;&gt;&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;div class=&quot;col-md-offset-2 col-md-10&quot;&gt;
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Register&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/form&gt;
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync(&quot;_ValidationScriptsPartial&quot;); }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[3,5,3,36,0],[6,1,6,26,0],[7,15,7,48,0],[9,80,9,116,0],[12,1,12,151,0],[15,51,15,84,0],[20,1,20,145,0],[23,1,23,157,0],[34,8,34,67,0]]);
+    </script>
+  </body>
+</html>

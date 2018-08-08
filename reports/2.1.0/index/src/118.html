@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Account\Index.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@model LoginPageViewModel
+@{
+  ViewBag.Title = &quot;Log in&quot;;
+}
+
+&lt;div class=&quot;row vertical-container&quot;&gt;
+  &lt;div class=&quot;col-xs-12 vertical-container vertical-list&quot;&gt;
+    &lt;h2&gt;@ViewBag.Title.&lt;/h2&gt;
+    &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-6&quot;&gt;
+        &lt;section id=&quot;loginForm&quot;&gt;
+          @await Html.PartialAsync(&quot;_AccountLoginPartial&quot;, Model.Login)
+        &lt;/section&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-6&quot;&gt;
+        &lt;section id=&quot;guessForm&quot;&gt;
+          @await Html.PartialAsync(&quot;_GuessPartial&quot;, Model.Guess)
+        &lt;/section&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[3,3,3,28,0],[8,4,8,25,0],[12,6,12,74,0],[17,6,17,67,0]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Shared\Error.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@model Exception
+@{
+    ViewBag.Title = &quot;Oops!&quot;;
+}
+&lt;h1 class=&quot;text-danger&quot;&gt;Oops! an error occurs&lt;/h1&gt;
+&lt;h2 class=&quot;text-danger&quot;&gt;An error occurred while processing your request.&lt;/h2&gt;
+@if (Model != null)
+{
+    @Html.ValueFor(model =&gt; model.Message)
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[3,5,3,29,0],[7,2,7,20,0],[8,1,8,2,0],[9,1,9,46,0],[10,1,10,2,0]]);
+    </script>
+  </body>
+</html>

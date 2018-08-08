@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Home\Index.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@using chatle.Hubs
+@using Microsoft.Extensions.Options
+@inject IOptions&lt;HubSettings&gt; hubSettings
+
+@{
+    ViewBag.Title = &quot;Home Page&quot;;
+}
+
+&lt;chatle&gt;Loading...&lt;/chatle&gt;
+
+@section scripts
+{
+	&lt;script&gt;
+        window[&#39;chatleSetting&#39;] = {
+            userName: &#39;@User.Identity.Name&#39;,
+            chatAPI: &#39;@Url.Action(&quot;Get&quot;, &quot;Chat&quot;)&#39;,
+            convAPI: &#39;@Url.Action(&quot;CreateConversation&quot;, &quot;Chat&quot;)&#39;,
+            userAPI: &#39;@Url.Action(&quot;Get&quot;, &quot;User&quot;)&#39;,
+            debug: true,
+            hubSettings: {
+              url: &#39;@hubSettings.Value.Url&#39;,
+              transportType: @Convert.ToInt32(hubSettings.Value.TransportType),
+              logLevel: @Convert.ToInt32(hubSettings.Value.LogLevel)
+            }
+        };
+	&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;~/app/runtime.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;~/app/polyfills.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;~/app/vendor.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;~/app/main.js&quot;&gt;&lt;/script&gt;
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[6,5,6,33,0],[15,19,15,45,0],[16,18,16,51,0],[17,18,17,66,0],[18,18,18,51,0],[21,16,21,45,0],[22,25,22,81,0],[23,20,23,71,0]]);
+    </script>
+  </body>
+</html>

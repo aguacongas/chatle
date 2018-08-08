@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Account\Register.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@model RegisterViewModel
+
+@{
+  ViewBag.Title = &quot;Register&quot;;
+}
+&lt;div class=&quot;row vertical-container&quot;&gt;
+  &lt;div class=&quot;col-xs-12 vertical-container vertical-list&quot;&gt;
+    &lt;h2&gt;@ViewBag.Title.&lt;/h2&gt;
+    &lt;form class=&quot;form-horizontal&quot; role=&quot;form&quot; method=&quot;post&quot; asp-action=&quot;Register&quot; asp-antiforgery=&quot;true&quot;&gt;
+      &lt;h4&gt;Create a new account.&lt;/h4&gt;
+      &lt;hr /&gt;
+      &lt;div asp-validation-summary=&quot;All&quot; class=&quot;text-danger&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;UserName&quot;&gt;&lt;/label&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+          &lt;input class=&quot;form-control&quot; asp-for=&quot;UserName&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;Password&quot;&gt;&lt;/label&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+          &lt;input class=&quot;form-control&quot; asp-for=&quot;Password&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label class=&quot;col-md-2 control-label&quot; asp-for=&quot;ConfirmPassword&quot;&gt;&lt;/label&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+          &lt;input class=&quot;form-control&quot; asp-for=&quot;ConfirmPassword&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;div class=&quot;col-md-offset-2 col-md-10&quot;&gt;
+          &lt;input type=&quot;submit&quot; class=&quot;btn btn-default&quot; value=&quot;Register&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[4,3,4,30,0],[8,4,8,25,0],[9,1,9,72,0],[12,1,12,151,0],[14,1,14,145,0],[16,1,16,145,0],[20,1,20,145,0],[22,1,22,145,0],[26,1,26,152,0],[28,1,28,152,0]]);
+    </script>
+  </body>
+</html>

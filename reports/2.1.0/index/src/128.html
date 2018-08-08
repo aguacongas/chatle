@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Shared\_LoginPartial.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+@using System.Security.Principal
+
+@if (User.Identity.IsAuthenticated)
+{
+    &lt;form id=&quot;logoutForm&quot; class=&quot;navbar-right&quot; method=&quot;POST&quot; asp-controller=&quot;Account&quot; asp-action=&quot;LogOff&quot;&gt;
+        &lt;input type=&quot;hidden&quot; name=&quot;reason&quot; /&gt;
+        &lt;ul class=&quot;nav navbar-nav navbar-right&quot;&gt;
+            &lt;li&gt;
+                &lt;a  title=&quot;Manage&quot; asp-action=&quot;Manage&quot;&gt;Hello @User.Identity.Name!&quot;&lt;/a&gt;
+            &lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;javascript:document.getElementById(&#39;logoutForm&#39;).submit()&quot;&gt;Log off&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/form&gt;
+}
+else
+{
+    &lt;ul class=&quot;nav navbar-nav navbar-right&quot;&gt;    
+        &lt;li&gt;&lt;a asp-controller=&quot;Account&quot; asp-action=&quot;Register&quot;&gt;Register&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a asp-controller=&quot;Account&quot; asp-action=&quot;Index&quot;&gt;Log in&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[3,2,3,36,0],[4,1,4,2,0],[9,57,9,83,0],[14,1,14,2,0],[16,1,16,2,0],[21,1,21,2,0]]);
+    </script>
+  </body>
+</html>
