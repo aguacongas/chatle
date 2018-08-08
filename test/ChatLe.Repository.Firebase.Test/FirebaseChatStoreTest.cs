@@ -59,7 +59,7 @@ namespace ChatLe.Repository.Firebase.Test
             Assert.Equal(conversation1.Id, conversation2.Id);
         }
 
-        [Fact]
+        [Fact(Skip = "Too long")]
         public async Task GetUsersConnectedTest()
         {
             var sut = _fixture.GetStore();
