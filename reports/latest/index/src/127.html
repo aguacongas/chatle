@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>C:\projects\chatle\src\chatle\Views\Shared\_Layout.cshtml</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot; /&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;@ViewBag.Title - chatle&lt;/title&gt;
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css&quot;
+        asp-fallback-href=&quot;~/css/bootstrap.min.css&quot;
+        asp-fallback-test-class=&quot;sr-only&quot; asp-fallback-test-property=&quot;position&quot; asp-fallback-test-value=&quot;absolute&quot; /&gt;
+  &lt;environment names=&quot;Development&quot;&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;~/css/site.css&quot; /&gt;
+  &lt;/environment&gt;
+  &lt;environment names=&quot;Staging,Production&quot;&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;~/css/site.min.css&quot; asp-append-version=&quot;true&quot; /&gt;
+  &lt;/environment&gt;
+&lt;/head&gt;
+&lt;body class=&quot;console&quot;&gt;
+  &lt;div class=&quot;navbar navbar-default navbar-fixed-top&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;div class=&quot;navbar-header&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;navbar-toggle&quot; data-toggle=&quot;collapse&quot; data-target=&quot;.navbar-collapse&quot;&gt;
+          &lt;span class=&quot;icon-bar menu&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;icon-bar menu&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;icon-bar menu&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;a class=&quot;navbar-brand title&quot; asp-controller=&quot;Home&quot; asp-action=&quot;Index&quot;&gt;chatle&lt;/a&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;navbar-collapse collapse&quot;&gt;
+        &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+          &lt;li&gt;&lt;a asp-controller=&quot;Home&quot; asp-action=&quot;Index&quot;&gt;Home&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a asp-controller=&quot;Account&quot; asp-action=&quot;Manage&quot;&gt;Manage&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a asp-controller=&quot;Home&quot; asp-action=&quot;About&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        @await Html.PartialAsync(&quot;_LoginPartial&quot;)
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;container body-content&quot;&gt;
+    @RenderBody()
+  &lt;/div&gt;
+  &lt;div class=&quot;container footer&quot;&gt;
+    &lt;hr /&gt;
+    &lt;footer&gt;
+      &lt;p&gt;&amp;copy; @DateTime.Now.Year - chatle&lt;/p&gt;
+    &lt;/footer&gt;
+  &lt;/div&gt;
+  &lt;script src=&quot;https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js&quot;
+          asp-fallback-src=&quot;~/lib/jquery-3.3.1.min.js&quot;
+          asp-fallback-test=&quot;window.jQuery&quot;&gt;
+  &lt;/script&gt;
+  &lt;script src=&quot;https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js&quot;
+          asp-fallback-src=&quot;~/lib/bootstrap.min.js&quot;
+          asp-fallback-test=&quot;window.jQuery &amp;&amp; window.jQuery.fn &amp;&amp; window.jQuery.fn.modal&quot;&gt;
+  &lt;/script&gt;
+
+  @RenderSection(&quot;scripts&quot;, required: false)
+&lt;/body&gt;
+&lt;/html&gt;
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[6,5,6,26,0],[15,1,15,74,0],[35,4,35,52,0],[40,1,40,21,0],[45,12,45,37,0],[57,1,57,50,0]]);
+    </script>
+  </body>
+</html>
