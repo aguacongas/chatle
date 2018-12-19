@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>chatle</AssemblyName>
@@ -35,8 +35,8 @@
     <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
-    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
+    <PackageReference Include="Aguacongas.Identity.Redis" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
