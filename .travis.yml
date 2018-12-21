@@ -1,6 +1,6 @@
 language: csharp
 mono: none
-dotnet: 2.1.300-preview2-008533
+dotnet: 2.2.100
 os:
   - linux
 branches:
