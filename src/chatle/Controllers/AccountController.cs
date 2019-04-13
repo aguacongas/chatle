@@ -13,8 +13,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.AspNetCore.Authentication;
 using System;
 
 namespace ChatLe.Controllers
