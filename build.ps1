@@ -1,27 +1,57 @@
 $result = 0
-$merge = ""
-gci -rec `
-| ? { $_.Name -like "*.IntegrationTests.csproj" `
-       -Or $_.Name -like "*.IntegrationTest.csproj" `
-       -Or $_.Name -like "*.Test.csproj" `
-       -Or $_.Name -like "*.Tests.csproj" `
-     } `
-| % { 
-    $testArgs = "test " + $_.FullName
-    Write-Host "testargs" $testArgs
-    Write-Host "coveragefile" $coveragefile
-    JetBrains.dotCover.CommandLineTools\tools\dotCover.exe cover /TargetExecutable="C:\Program Files\dotnet\dotnet.exe" /TargetArguments="$testArgs" /Filters="-:*.Test;-:*.test;-:xunit.*;-:MSBuild;-:Moq;-:StackExchange.*;-:*.SqlServer;-:*.MySql;-:*.Sqlite;-:MySqlConnector" /Output="$_.snapshot"
-    
-    if ($LASTEXITCODE -ne 0) {
-        $result = $LASTEXITCODE
-    }
 
-    $merge = $merge + $_.Name + ".snapshot;"
-  }
+$location = Get-Location;
 
-  Write-Host "merge " $merge
-  JetBrains.dotCover.CommandLineTools\tools\dotCover.exe merge /Source="$merge" /Output="coverage\coverage.snapshot"
-  JetBrains.dotCover.CommandLineTools\tools\dotCover.exe report /Source="coverage\coverage.snapshot" /Output="coverage\docs\index.html" /ReportType="HTML"
+$envar = Get-Childitem env: -Name 
 
-  exit $result
-  
+if (-not($envar -contains 'APPVEYOR_PULL_REQUEST_NUMBER'))
+{
+	if ($isLinux) {
+		Get-ChildItem -rec `
+		| Where-Object { $_.Name -like "*.IntegrationTest.csproj" `
+			-Or $_.Name -like "*.Test.csproj" `
+			} `
+		| ForEach-Object { 
+			Set-Location $_.DirectoryName
+			dotnet test
+		
+			if ($LASTEXITCODE -ne 0) {
+				$result = $LASTEXITCODE
+			}
+		}
+	} else {
+		Get-ChildItem -rec `
+		| Where-Object { $_.Name -like "*.IntegrationTest.csproj" `
+			-Or $_.Name -like "*.Test.csproj" `
+			} `
+		| ForEach-Object { 
+			&('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Debug', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura', '/p:Exclude="[*]xunit*?%2c[*]System.Interactive*?%2c[*]MySqlConnector*"')    
+			if ($LASTEXITCODE -ne 0) {
+				$result = $LASTEXITCODE
+			}
+		}
+
+		$merge = ""
+		Get-ChildItem -rec `
+		| Where-Object { $_.Name -like "coverage.cobertura.xml" } `
+		| ForEach-Object { 
+			$path = $_.FullName
+			$merge = "$merge;$path"
+		}
+		Write-Host $merge
+		ReportGenerator\tools\net47\ReportGenerator.exe "-reports:$merge" "-targetdir:coverage\docs" "-reporttypes:HtmlInline;Badges"
+	}
+} else {
+	Get-ChildItem -rec `
+	| Where-Object { $_.Name -like "*.Test.csproj" } `
+	| ForEach-Object { 
+		Set-Location $_.DirectoryName
+		&('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Release', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura')    
+	
+		if ($LASTEXITCODE -ne 0) {
+			$result = $LASTEXITCODE
+		}
+	}	
+}
+Set-Location $location;
+exit $result

@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
     <ProjectReference Include="..\ChatLe.Cryptography\ChatLe.Cryptography.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.Firebase\ChatLe.Repository.Identity.Firebase.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
