@@ -6,7 +6,7 @@
     <authors>Olivier Lefebvre</authors>
     <owners>Olivier Lefebvre</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</licenseUrl>
+    <license>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</license>
     <projectUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</projectUrl>
     <description>
       dotnet-encrypt.
@@ -18,14 +18,14 @@
     <tags>chat Cryptography dotnet-tools</tags>
     <repository type="git" url="https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt" />
     <dependencies>
-      <dependency id="Microsoft.NETCore.Platforms" version="2.0.1" />
+      <dependency id="Microsoft.NETCore.Platforms" version="3.0.0" />
     </dependencies>
     <packageTypes>
       <packageType name="DotnetTool" />
     </packageTypes>
   </metadata>
   <files>
-    <file src="bin\Release\netcoreapp2.1\*.*" target="tools\netcoreapp2.1\any" />
-    <file src="DotnetToolSettings.xml" target="tools\netcoreapp2.1\any" />
+    <file src="bin\Release\netcoreapp3.0\*.*" target="tools\netcoreapp3.0\any" />
+    <file src="DotnetToolSettings.xml" target="tools\netcoreapp3.0\any" />
   </files>
 </package>
