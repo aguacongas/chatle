@@ -11,7 +11,7 @@ branches:
     - /^feature\/.*$/
     - develop
 install: 
-  - chmod +x ./install.sh
-  - ./install.sh
+  - chmod +x ./dotnet-install.sh
+  - ./dotnet-install.sh
 script:
   - dotnet build
