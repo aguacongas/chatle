@@ -85,7 +85,7 @@ namespace Chatle.test.Controllers
             var options = new Mock<IOptions<IdentityOptions>>();
             options.Setup(a => a.Value).Returns(identityOptions);
             var claimsFactory = new UserClaimsPrincipalFactory<TUser, TestRole>(userManager, roleManager, options.Object);
-            return new Mock<SignInManager>(userManager, contextAccessor.Object, claimsFactory, options.Object, null, null);
+            return new Mock<SignInManager>(userManager, contextAccessor.Object, claimsFactory, options.Object, null, null, null);
         }
 
 

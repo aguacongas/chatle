@@ -255,9 +255,6 @@ namespace ChatLe
                         case DBEngine.SQLite:
                             options.UseSqlite(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.Sqlite"));
                             break;
-                        case DBEngine.MySql:
-                            options.UseMySql(Configuration["Data:DefaultConnection:ConnectionString"], o => o.MigrationsAssembly("ChatLe.Repository.Identity.MySql"));
-                            break;
                 }
                 });
             }
@@ -279,39 +276,35 @@ namespace ChatLe
 
                 await next();
             })
-
+                .UseRouting()
                 .UseCors(
                 builder => builder.AllowAnyOrigin()
                     .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials())
+                    .AllowAnyMethod())
                 .UseStaticFiles()
                 .UseWebSockets()
+                .UseAuthorization()
                 .UseAuthentication()
-                .Map("/xhrf", a => a.Run(async context =>
+                .UseEndpoints(endpoints =>
                 {
-                    var tokens = antiforgery.GetAndStoreTokens(context);
-                    await context.Response.WriteAsync(tokens.RequestToken);
-                }))
-                .Map("/cls", a => a.Run(async context =>
-                {
-                    var response = context.Response;
-                    foreach (var cookie in context.Request.Cookies)
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                    endpoints.MapHub<ChatHub>("/chat");
+                    endpoints.Map("/cls", async context =>
                     {
-                        response.Cookies.Delete(cookie.Key);
-                    }
-                    await context.Response.WriteAsync(string.Empty);
-                }))
-                .UseSignalR(configure =>
-                {
-                    configure.MapHub<ChatHub>("/chat");
-                })
-                .UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" });
+                        var response = context.Response;
+                        foreach (var cookie in context.Request.Cookies)
+                        {
+                            response.Cookies.Delete(cookie.Key);
+                        }
+                        await context.Response.WriteAsync(string.Empty);
+                    });
+                    endpoints.Map("/xhrf", async context =>
+                    {
+                        var tokens = antiforgery.GetAndStoreTokens(context);
+                        await context.Response.WriteAsync(tokens.RequestToken);
+                    });
                 })
                 .UseChatLe();
         }

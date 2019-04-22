@@ -152,9 +152,9 @@ namespace ChatLe.Repository.Test
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
-                var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
-                loggingBuilder.AddConsole()
-                    .AddFilter("Console", level => level >= LogLevel.Error);
+                //var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
+                //loggingBuilder.AddConsole()
+                //    .AddFilter("Console", level => level >= LogLevel.Error);
                 var userStore = (IUserStore<ChatLeUser>)new UserStore<ChatLeUser, IdentityRole, DbContext>(context);
                 var store = new ChatStore<string, ChatLeUser, ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>, Conversation, Attendee, Message, NotificationConnection, IdentityUserLogin<string>>(context, userStore, null);
                 await action(store);
@@ -303,9 +303,6 @@ namespace ChatLe.Repository.Test
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
-                var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
-                loggingBuilder.AddConsole()
-                    .AddFilter("Console", level => level >= LogLevel.Debug);
                 var store = GetStore(context, null);
                 
                 await store.CreateNotificationConnectionAsync(connection);
@@ -314,9 +311,6 @@ namespace ChatLe.Repository.Test
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
-                var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
-                loggingBuilder.AddConsole()
-                    .AddFilter("Console", level => level >= LogLevel.Debug);
 
                 var store = GetStore(context, null);
                 
@@ -327,9 +321,6 @@ namespace ChatLe.Repository.Test
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
-                var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
-                loggingBuilder.AddConsole()
-                    .AddFilter("Console", level => level >= LogLevel.Debug);
 
                 var store = GetStore(context, null);
                 var c = await store.GetNotificationConnectionAsync(connection.ConnectionId, connection.NotificationType);
@@ -366,9 +357,6 @@ namespace ChatLe.Repository.Test
             using (var context = new ChatLeIdentityDbContext<string, Message, Attendee, Conversation, NotificationConnection>(builder.Options))
             {            
                 var contextServices = ((IInfrastructure<IServiceProvider>) context).Instance;
-                var loggingBuilder = contextServices.GetRequiredService<ILoggingBuilder>();
-                loggingBuilder.AddConsole()
-                    .AddFilter("Console", level => level >= LogLevel.Debug);
 
                 var store = GetStore(context, null);
                 

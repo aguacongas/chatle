@@ -34,15 +34,14 @@
     <ProjectReference Include="..\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
-    <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
     <PackageReference Include="Aguacongas.Identity.Redis" Version="1.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview3.19153.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview4.19216.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,8 +16,9 @@ namespace ChatLe.Repository.Identity
             IUserClaimsPrincipalFactory<ChatLeUser> claimsFactory, 
             IOptions<IdentityOptions> optionsAccessor, 
             ILogger<SignInManager<ChatLeUser>> logger,
-            IAuthenticationSchemeProvider schemes) 
-            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes)
+            IAuthenticationSchemeProvider schemes,
+            IUserConfirmation<ChatLeUser> confirmation) 
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
         }
 

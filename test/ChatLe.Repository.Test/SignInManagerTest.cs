@@ -78,7 +78,14 @@ namespace ChatLe.Repository.Test
 
             var loggerMock = new Mock<ILogger<SignInManager<ChatLeUser>>>();
             var authSchemeProvider = new Mock<IAuthenticationSchemeProvider>();
-            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, loggerMock.Object, authSchemeProvider.Object);
+            var confirmationMock = new Mock<IUserConfirmation<ChatLeUser>>();
+            var manager = new SignInManager(userManagerMock.Object,
+                contextAccessor.Object, 
+                claimsFactoryMock.Object, 
+                options.Object, 
+                loggerMock.Object, 
+                authSchemeProvider.Object,
+                confirmationMock.Object);
 
             var user = new ChatLeUser { Id = "test", UserName = "test" };
             await manager.SignInAsync(user, isPersistent: false);
