@@ -1,7 +1,7 @@
 language: csharp
 mono: none
 dist: xenial 
-dotnet: 2.2.100
+sudo: required
 os:
   - linux
 branches:
@@ -10,7 +10,8 @@ branches:
     - /^release\/.*$/
     - /^feature\/.*$/
     - develop
+install: 
+  - chmod +x ./install.sh
+  - ./install.sh
 script:
-  - chmod +x ./dotnet-install.sh 
-  - ./dotnet-install.sh -Channel Current -Version 3.0.100-preview4-011223 
   - dotnet build
