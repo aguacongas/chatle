@@ -1,6 +1,5 @@
 language: csharp
 mono: none
-dotnet: 3.0.100-preview4-011223
 os:
   - linux
 branches:
@@ -9,4 +8,6 @@ branches:
     - /^release\/.*$/
     - /^feature\/.*$/
     - develop
-script: dotnet build
+script:
+  - ./dotnet-install -Channel Current -Version 3.0.100-preview4-011223 
+  - dotnet build

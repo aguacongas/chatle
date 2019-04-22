@@ -8,7 +8,7 @@ install:
   - choco install gitversion.portable -pre -y
   - ps: Install-Product node 6.9.4
   - set path=%programfiles(x86)%\\Microsoft SDKs\TypeScript\2.2;%path%
-  - nuget install JetBrains.dotCover.CommandLineTools -ExcludeVersion
+  - nuget install ReportGenerator -ExcludeVersion
 init:
 - cmd: git config --global core.autocrlf true
 environment:
