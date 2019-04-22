@@ -9,5 +9,6 @@ branches:
     - /^feature\/.*$/
     - develop
 script:
-  - ./dotnet-install -Channel Current -Version 3.0.100-preview4-011223 
+  - chmod +x ./dotnet-install.sh 
+  - ./dotnet-install.sh -Channel Current -Version 3.0.100-preview4-011223 
   - dotnet build
