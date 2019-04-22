@@ -2,6 +2,15 @@ language: csharp
 mono: none
 dist: xenial 
 sudo: required
+addons:
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - zlib1g
 os:
   - linux
 branches:
@@ -14,4 +23,4 @@ install:
   - chmod +x ./dotnet-install.sh
   - ./dotnet-install.sh
 script:
-  - dotnet build
+  - /home/travis/.dotnet/dotnet build
