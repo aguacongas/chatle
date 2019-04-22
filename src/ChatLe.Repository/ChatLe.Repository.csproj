@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <Description>ChatLe repository</Description>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository</AssemblyName>
     <PackageId>ChatLe.Repository</PackageId>

@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <Description>ChatLe cryptography utilities</Description>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>chat Cryptography</PackageTags>
     <PackageProjectUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</RepositoryUrl>
