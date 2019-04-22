@@ -25,21 +25,11 @@ if (-not($envar -contains 'APPVEYOR_PULL_REQUEST_NUMBER'))
 			-Or $_.Name -like "*.Test.csproj" `
 			} `
 		| ForEach-Object { 
-			&('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Debug', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura', '/p:Exclude="[*]xunit*?%2c[*]System.Interactive*?%2c[*]MySqlConnector*"')    
+			&('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Release', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura', '/p:Exclude="[*]xunit*?%2c[*]System.Interactive*?%2c[*]MySqlConnector*"')    
 			if ($LASTEXITCODE -ne 0) {
 				$result = $LASTEXITCODE
 			}
 		}
-
-		$merge = ""
-		Get-ChildItem -rec `
-		| Where-Object { $_.Name -like "coverage.cobertura.xml" } `
-		| ForEach-Object { 
-			$path = $_.FullName
-			$merge = "$merge;$path"
-		}
-		Write-Host $merge
-		ReportGenerator\tools\net47\ReportGenerator.exe "-reports:$merge" "-targetdir:coverage\docs" "-reporttypes:HtmlInline;Badges"
 	}
 } else {
 	Get-ChildItem -rec `
