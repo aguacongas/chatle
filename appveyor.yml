@@ -6,7 +6,7 @@ branches:
   - gh-pages
 install:
   - choco install gitversion.portable -pre -y
-  - ps: Install-Product node 6.9.4
+  - ps: Install-Product node 10.15.3
   - set path=%programfiles(x86)%\\Microsoft SDKs\TypeScript\2.2;%path%
   - nuget install ReportGenerator -ExcludeVersion
 init:
