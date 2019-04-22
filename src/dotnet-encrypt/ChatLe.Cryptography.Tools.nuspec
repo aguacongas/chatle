@@ -6,7 +6,7 @@
     <authors>Olivier Lefebvre</authors>
     <owners>Olivier Lefebvre</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</license>
+    <licenseUrl>https://raw.githubusercontent.com/aguacongas/chatle/develop/LICENSE</licenseUrl>
     <projectUrl>https://github.com/aguacongas/chatle/tree/develop/src/dotnet-encrypt</projectUrl>
     <description>
       dotnet-encrypt.
