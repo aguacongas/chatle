@@ -41,14 +41,6 @@ on_success:
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "aguacongas@gmail.com"
   - git config --global user.name "Aguacongas"
-  - git stash
-  - git checkout gh-pages
-  - IF EXIST reports\latest ( rmdir /S /Q reports\latest )
-  - IF NOT EXIST reports ( mkdir reports )
-  - move coverage\docs reports\latest
-  - git add reports\latest
-  - git commit reports\latest -m "Appveyor build succed %APPVEYOR_BUILD_NUMBER%"
-  - git push
 deploy:
 - provider: NuGet
   api_key:
@@ -85,13 +77,6 @@ for:
       - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
       - git config --global user.email "aguacongas@gmail.com"
       - git config --global user.name "Aguacongas"
-      - git stash
-      - git checkout gh-pages
-      - mkdir %GITVERSION_NuGetVersion%
-      - move coverage\docs reports\%GITVERSION_NuGetVersion%
-      - git add reports\%GITVERSION_NuGetVersion%
-      - git commit reports\%GITVERSION_NuGetVersion% -m "Appveyor build succed %APPVEYOR_BUILD_NUMBER%"
-      - git push
 -
   branches:
     except:
