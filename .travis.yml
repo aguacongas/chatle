@@ -21,6 +21,6 @@ branches:
     - develop
 install: 
   - chmod +x ./dotnet-install.sh
-  - ./dotnet-install.sh -Channel Current -Version 3.0.100-preview4-011223
+  - ./dotnet-install.sh -Channel Current -Version 3.0.100-preview5-011568
 script:
   - /home/travis/.dotnet/dotnet build
