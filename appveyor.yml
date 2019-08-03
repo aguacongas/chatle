@@ -24,7 +24,7 @@ environment:
 before_build:
   - ps: gitversion /l console /output buildserver
   - ps: $env:BuildNumber=$env:APPVEYOR_BUILD_NUMBER
-  - ps: ./dotnet-install.ps1 -Channel Current -Version 3.0.100-preview5-011568
+  - ps: ./dotnet-install.ps1 -Channel Current -Version 3.0.100-preview7-012821
   - cmd: dotnet restore
 build_script:
 - cmd: build.cmd
