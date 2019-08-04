@@ -8,5 +8,9 @@ namespace ChatLe.Repository.Identity
         {
             return key;
         }
+
+        public string NormalizeEmail(string email) => Normalize(email);
+
+        public string NormalizeName(string name) => Normalize(name);
     }
 }

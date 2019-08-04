@@ -27,6 +27,14 @@ namespace ChatLe.Repository.Test
         {
             public object GetService(Type serviceType)
             {
+                if (serviceType == typeof(IServiceScopeFactory))
+                {
+                    var mock = new Mock<IServiceScopeFactory>();
+                    var scopeMock = new Mock<IServiceScope>();
+                    scopeMock.Setup(m => m.ServiceProvider).Returns(this);
+                    mock.Setup(m => m.CreateScope()).Returns(scopeMock.Object);
+                    return mock.Object;
+                }
                 return new Mock<IChatStore<string, ChatLeUser, Conversation, Attendee, Message, NotificationConnection>>().Object;
             }
         }

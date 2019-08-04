@@ -1,7 +1,7 @@
 ﻿using ChatLe;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using System.IO;
+using Microsoft.Extensions.Hosting;
 
 namespace chatle
 {
@@ -13,16 +13,13 @@ namespace chatle
                 .AddCommandLine(args)
                 .Build();
 
-            string rootPath = Directory.GetCurrentDirectory();
-            if (args.Length == 1)
-                rootPath += '/' + args[0];
-
-            var host = new WebHostBuilder()
-                .UseContentRoot(rootPath)
-                .UseConfiguration(config)
-                .UseStartup<Startup>()
-                .UseIISIntegration()
-                .UseKestrel()
+            var host = Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder
+                        .UseConfiguration(config)
+                        .UseStartup<Startup>();
+                })
                 .Build();
 
             host.Run();

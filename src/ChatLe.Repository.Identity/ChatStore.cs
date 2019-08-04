@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ChatLe.Models
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="userStore"></param>
         /// <param name="env"></param>
-        public ChatStore(ChatLeIdentityDbContext context, IUserStore<ChatLeUser> userStore, IHostingEnvironment env) 
+        public ChatStore(ChatLeIdentityDbContext context, IUserStore<ChatLeUser> userStore, IWebHostEnvironment env) 
             : base(context, userStore, env) { }
     }
     
@@ -38,7 +39,7 @@ namespace ChatLe.Models
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="userStore"></param>
         /// <param name="env"></param>
-        public ChatStore(DbContext context, IUserStore<TUser> userStore, IHostingEnvironment env) 
+        public ChatStore(DbContext context, IUserStore<TUser> userStore, IWebHostEnvironment env) 
             : base(context, userStore, env) { }
     }
     
@@ -64,7 +65,7 @@ namespace ChatLe.Models
         where TNotificationConnection : NotificationConnection<TKey>
         where TUserLogin : IdentityUserLogin<TKey>
     {
-        readonly IHostingEnvironment _env;
+        readonly IWebHostEnvironment _env;
         private readonly IUserStore<TUser> _userStore;
 
         public IQueryable<TUser> Users { get => ((IQueryableUserStore<TUser>)_userStore).Users; }
@@ -75,7 +76,7 @@ namespace ChatLe.Models
         /// <param name="context">The <see cref="DbContext" to use/></param>
         /// <param name="userStore"></param>
         /// <param name="env"></param>
-        public ChatStore(TContext context, IUserStore<TUser> userStore, IHostingEnvironment env)
+        public ChatStore(TContext context, IUserStore<TUser> userStore, IWebHostEnvironment env)
         {
             Context = context ?? throw new ArgumentNullException("context");
             _userStore = userStore ?? throw new ArgumentNullException("userStore");

@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <Description>ChatLe repository implementation for Identity framework</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository.Identity</AssemblyName>
     <PackageId>ChatLe.Repository.Identity</PackageId>
@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0-preview7.19365.7" />
   </ItemGroup>
 
   <ItemGroup>

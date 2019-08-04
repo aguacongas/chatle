@@ -1,33 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <VersionPrefix>1.1.0</VersionPrefix>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>ChatLe.Repository.Test</AssemblyName>
     <PackageId>ChatLe.Repository.Test</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
     <ProjectReference Include="..\..\src\ChatLe.Repository\ChatLe.Repository.csproj" />
     <ProjectReference Include="..\..\src\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeCoverage" Version="16.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="16.3.0-preview-20190715-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0-preview-20190715-02" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview7.19362.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview7.19362.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview7.19362.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0-preview7.19362.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="3.0.0-preview7.19362.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0-preview7.19362.4" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="Moq" Version="4.12.0" />
   </ItemGroup>
 
   <ItemGroup>

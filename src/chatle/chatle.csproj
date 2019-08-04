@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>chatle is simple chat website using AST.NET 5 technologies</Description>
     <Authors>Olivier Lefebvre</Authors>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>chatle</AssemblyName>
@@ -34,9 +34,14 @@
     <ProjectReference Include="..\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.Sqlite\ChatLe.Repository.Identity.Sqlite.csproj" />
     <ProjectReference Include="..\ChatLe.Repository.Identity.SqlServer\ChatLe.Repository.Identity.SqlServer.csproj" />
-    <ProjectReference Include="..\ChatLe.Repository.Identity.MySql\ChatLe.Repository.Identity.MySql.csproj" />
     <PackageReference Include="Aguacongas.Identity.Redis" Version="1.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.All" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview7.19362.6" />
   </ItemGroup>
 
   <ItemGroup>
