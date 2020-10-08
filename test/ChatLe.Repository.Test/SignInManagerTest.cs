@@ -4,9 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ChatLe.Models;
 using ChatLe.Repository.Identity;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -80,7 +78,14 @@ namespace ChatLe.Repository.Test
 
             var loggerMock = new Mock<ILogger<SignInManager<ChatLeUser>>>();
             var authSchemeProvider = new Mock<IAuthenticationSchemeProvider>();
-            var manager = new SignInManager(userManagerMock.Object, contextAccessor.Object, claimsFactoryMock.Object, options.Object, loggerMock.Object, authSchemeProvider.Object);
+            var confirmationMock = new Mock<IUserConfirmation<ChatLeUser>>();
+            var manager = new SignInManager(userManagerMock.Object,
+                contextAccessor.Object, 
+                claimsFactoryMock.Object, 
+                options.Object, 
+                loggerMock.Object, 
+                authSchemeProvider.Object,
+                confirmationMock.Object);
 
             var user = new ChatLeUser { Id = "test", UserName = "test" };
             await manager.SignInAsync(user, isPersistent: false);

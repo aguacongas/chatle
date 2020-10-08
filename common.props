@@ -7,5 +7,6 @@
     <PackageProjectUrl>https://github.com/aguacongas/chatle</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aguacongas/chatle</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 </Project>

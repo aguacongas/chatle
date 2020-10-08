@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <Description>ChatLe repository</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>ChatLe.Repository</AssemblyName>
     <PackageId>ChatLe.Repository</PackageId>
@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview7.19362.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0-preview7.19362.4" />
   </ItemGroup>
 
   <ItemGroup>

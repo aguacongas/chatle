@@ -1,6 +1,16 @@
 language: csharp
 mono: none
-dotnet: 2.1.300-preview2-008533
+dist: xenial 
+sudo: required
+addons:
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - zlib1g
 os:
   - linux
 branches:
@@ -9,4 +19,8 @@ branches:
     - /^release\/.*$/
     - /^feature\/.*$/
     - develop
-script: dotnet build
+install: 
+  - chmod +x ./dotnet-install.sh
+  - ./dotnet-install.sh -Channel Current -Version 3.0.100-preview7-012821
+script:
+  - /home/travis/.dotnet/dotnet build

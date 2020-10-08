@@ -1,14 +1,12 @@
 ﻿using ChatLe.Controllers;
 using ChatLe.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
 using Moq;
 using Xunit;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Threading;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
@@ -17,12 +15,10 @@ using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using ChatLe.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using System.Dynamic;
 using ChatLe.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using ChatLe.Repository.Identity;
 using System.Security.Principal;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Authentication;
 
 namespace Chatle.test.Controllers
@@ -89,7 +85,7 @@ namespace Chatle.test.Controllers
             var options = new Mock<IOptions<IdentityOptions>>();
             options.Setup(a => a.Value).Returns(identityOptions);
             var claimsFactory = new UserClaimsPrincipalFactory<TUser, TestRole>(userManager, roleManager, options.Object);
-            return new Mock<SignInManager>(userManager, contextAccessor.Object, claimsFactory, options.Object, null, null);
+            return new Mock<SignInManager>(userManager, contextAccessor.Object, claimsFactory, options.Object, null, null, null);
         }
 
 

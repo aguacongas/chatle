@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>chatle.test</AssemblyName>
     <PackageId>chatle.test</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -12,12 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0-beta.1.build3958" />
-    <PackageReference Include="xunit" Version="2.4.0-beta.1.build3958" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.0" />
-    <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0-preview-20190715-02" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="Moq" Version="4.12.0" />
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
   </ItemGroup>
 

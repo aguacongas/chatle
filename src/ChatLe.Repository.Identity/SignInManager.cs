@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,8 +16,9 @@ namespace ChatLe.Repository.Identity
             IUserClaimsPrincipalFactory<ChatLeUser> claimsFactory, 
             IOptions<IdentityOptions> optionsAccessor, 
             ILogger<SignInManager<ChatLeUser>> logger,
-            IAuthenticationSchemeProvider schemes) 
-            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes)
+            IAuthenticationSchemeProvider schemes,
+            IUserConfirmation<ChatLeUser> confirmation) 
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
         }
 

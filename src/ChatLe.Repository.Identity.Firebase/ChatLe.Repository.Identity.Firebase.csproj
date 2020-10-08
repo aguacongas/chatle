@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <Description>ChatLe repository implementation for Identity framework and firebase</Description>
     <PackageTags>chat Identity firebase</PackageTags>
   </PropertyGroup>
@@ -17,11 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aguacongas.Firebase" Version="2.0.0-beta0002" />
-    <PackageReference Include="Aguacongas.Identity.Firebase" Version="2.0.0-beta0002" />
+    <PackageReference Include="Aguacongas.Firebase" Version="2.2.1" />
+    <PackageReference Include="Aguacongas.Identity.Firebase" Version="2.2.1" />
   </ItemGroup>
   
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
     <ProjectReference Include="..\ChatLe.Repository.Identity\ChatLe.Repository.Identity.csproj" />
   </ItemGroup>
 
